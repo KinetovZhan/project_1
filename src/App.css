@@ -1,38 +1,268 @@
-.App {
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
   text-align: center;
 }
+.mainText {
+  position: fixed;
+  text-align: center;
+}*/
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+
+/* Окно навигации */
+header {
+  height: 164px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: rgba(85, 86, 90, 1);
+  font-size: small;
+  position: fixed;
+  z-index: 1000;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+
+.navigation {
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+  padding-right: 80px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.navigation h3 {
+  cursor: pointer;
+  margin-right: 40px;
+  font-style: Ag3;
+}
+
+.mainText h3 {
+  cursor: pointer;
+  padding: 80px;
+}
+
+
+
+
+
+/* Основная страница */
+main {
+  padding-top: 164px;
+  min-height: calc(100vh - 164px);/*Занимает всю высоту которая осталась*/
+  box-sizing: border-box;
+  
+}
+
+
+.table {
+  display: flex;
+  margin-top: 67px;
+  justify-content: center;
+}
+
+
+
+/* Левая часть */
+.sidebar {
+  margin-left: 98px;
+  height: 800px;
+  width: 387px;
+  background-color: rgba(85, 86, 90, 1);
+  border-radius: 30px;
+  flex-shrink: 0; /* Запрещаем уменьшение */
+  z-index: 2;
+  position: relative;
+}
+
+
+.choose{
+  margin: 44px 56px 65px 63px ;
+  text-align: center;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  color:black;
+}
+
+
+button {
+  width: 268px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+}
+
+
+.filters {
   display: flex;
   flex-direction: column;
+
+  box-sizing: border-box;
+  width: 360px;
+  height: 160px;
+  border-radius: 20px;
+  padding: 12px 10px;
+  gap: 10px;
+
+  position: absolute;
+  top: 187px;
+  
+  background-color: rgba(217, 217, 217, 1);
+  margin-left: 17px;
+
+  color: black;
+}
+
+button.active {
+  background-color:rgba(139, 139, 139, 1);
+  color: black;
+}
+
+
+.filter {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  justify-content: space-between; /* Ключевое свойство */
+  width: 100%;
+  position: relative;
 }
 
-.App-link {
-  color: #61dafb;
+
+.filter h3 {
+  margin: 0;
+  flex-shrink: 0; /* Запрещаем сжатие текста */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+
+.filter input[type="checkbox"] {
+  position: absolute;
+  right: 0;
+}
+
+.filters2 {
+  /* Размеры и визуал блока */
+  box-sizing: border-box;
+  width: 360px;
+  height: 120px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+  color: black;
+
+  /* Положение */
+  position: absolute;
+  top: 369px;
+  left:13px;
+}
+
+#tractor-select {
+  /* Общий вид */
+  box-sizing: border-box;
+  width: 200px;
+  height: 53px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 25px;
+  border: none;
+
+  position: absolute;
+  left: 0px;
+  top: 143px;
+  
+  /* Стили для кастомной стрелки */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* Стрелка вправо */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath d='M10 7l5 5-5 5z' fill='%23000'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+  
+  /* Отступ для текста */
+  padding: 0 40px 0 20px;
+  font-size: 16px;
+}
+
+
+
+/* Правая часть */
+.MainPart {
+  width:1369px;
+  height: 800px;
+  background-color: rgba(217, 217, 217, 0.7);
+  flex-shrink: 0; /* Запрещаем уменьшение */
+  margin-left:-38px;
+  border-radius: 30px;
+  z-index: 1;
+  position: relative;
+}
+
+.maininfo {
+  /* Общий вид */
+  box-sizing: border-box;
+  width: 963px;
+  height: 624px;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+  padding: 50px 70px;
+
+
+  position: absolute;
+  left: 171px;
+  top: 80px;
+  right: 235px;
+}
+
+
+.object {
+  box-sizing: border-box;
+  width: 160px;
+  height: 160px;
+  margin: 24px;
+
+  
+}
+
+
+.objectmenu {
+  /* Внешний вид */
+  width: 835px;
+  height: 208px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 15px;
+  display: flex;
+}
+
+
+/* Кнопка */
+.download {
+  box-sizing: border-box;
+  width: 89px;
+
+  height: 40px;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+}
+button:hover {
+  background-color: #b6bbc1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  background-color: #707479;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
