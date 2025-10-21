@@ -100,9 +100,9 @@ function App() {
               <div className='model'>
                 <select id="tractor-select" name="tractor">
                   <option value=""><h3>Модель</h3></option>
-                  <option value="bmw"><h3>К-743</h3></option>
-                  <option value="audi"><h3>К-745</h3></option>
-                  <option value="mercedes"><h3>К-743</h3></option>
+                  <option value="m1"><h3>К-743</h3></option>
+                  <option value="m2"><h3>К-745</h3></option>
+                  <option value="m3"><h3>К-743</h3></option>
                 </select>
               </div>
             </div>
