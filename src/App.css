@@ -43,6 +43,10 @@ header {
   padding: 80px;
 }
 
+.mainText {
+  position: relative;
+}
+
 
 
 
@@ -267,4 +271,20 @@ button:active {
   background-color: #707479;
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.back-button {
+
+  background-color: #55565a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  position: absolute;
+  top:60px;
+}
+
+.back-button:hover {
+  background-color: #6b6c70;
 }

@@ -2,35 +2,38 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import SecondPage from './components/SecondPage.jsx';
+import ThirdPage from './components/ThirdPage.jsx';
 import { Header, Sidebar, MainPart } from '../Func' // ДОБАВИТЬ этот импорт
-
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom'//Для переключения между страницами
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('second');
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
- // Состояние для активной кнопки
-  const [activeButton, setActiveButton] = useState(null);
-
-  // Функция для обработки нажатия
-  const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
+  // Функция для перехода на третью страницу
+  const goToThirdPage = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage('third');
   };
 
-
-  return(
+  // Функция для возврата на вторую страницу
+  function goToSecondPage() {
+    setCurrentPage('second');
+    setSelectedCategory(null);
+  }
+  
+  return (
     <>
-      <Header />
-      <main>
-        <div className='table'>
-          <Sidebar 
-            activeButton={activeButton} 
-            handleButtonClick={handleButtonClick} 
-          />
-          <MainPart />
-        </div>
-      </main>
+      {currentPage === 'second' ? (
+        <SecondPage onButtonClick={goToThirdPage} />
+      ) : (
+        <ThirdPage 
+          selectedCategory={selectedCategory}
+          onBackClick={goToSecondPage} 
+        />
+      )}
     </>
-  )  
+  );
 }
-
-
-export default App
+export default App;
