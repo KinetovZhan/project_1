@@ -1,0 +1,76 @@
+/* src/Login/LoginPage.css */
+
+/* Отступ для main, чтобы не залезать под fixed header */
+.login-main {
+  padding-top: 164px; /* Как у вас в App.css */
+  min-height: calc(100vh - 164px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Контейнер формы */
+.login-form-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  width: 350px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /* Текст внутри формы - черный, как в макете */
+  color: black;
+}
+
+.login-form-container h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 20px;
+  color: #333;
+}
+
+/* Группа полей формы */
+.login-form-group {
+  margin-bottom: 20px;
+}
+
+.login-form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.login-form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+/* Кнопка "Войти" в стиле вашего проекта */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  border: none;
+  border-radius: 20px; /* Как в вашем App.css */
+  background-color: rgb(105, 105, 105); /* Как в вашем App.css */
+  cursor: pointer;
+  margin-top: 10px;
+  color: rgb(255, 255, 255); /* Явно задаем черный цвет текста */
+}
+
+/* Стили наведения и активации из вашего App.css */
+.login-button:hover {
+  background-color: #2C2C2C;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.login-button:active {
+  background-color: #020202;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

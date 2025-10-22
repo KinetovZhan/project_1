@@ -2,6 +2,8 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { Header, Sidebar, MainPart } from './Func.jsx' // ДОБАВИТЬ этот импорт
+
 import SecondPage from './components/SecondPage.jsx';
 import ThirdPage from './components/ThirdPage.jsx';
 import { Header, Sidebar, MainPart } from '../Func' // ДОБАВИТЬ этот импорт
