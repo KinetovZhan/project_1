@@ -1,5 +1,7 @@
+import Image from './img/Image.png'
 
-function Header() {
+
+export function Header() {
   return(
     <>
       <header>
@@ -16,7 +18,7 @@ function Header() {
 }
 
 
-function Sidebar({ activeButton, handleButtonClick }) {
+export function Sidebar({ activeButton, handleButtonClick }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -96,7 +98,7 @@ function Sidebar({ activeButton, handleButtonClick }) {
   )
 }
 
-function MainPart() {
+export function MainPart() {
   return(
     <div class='MainPart'>
       <div className='maininfo'>

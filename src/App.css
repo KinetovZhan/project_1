@@ -139,6 +139,7 @@ button.active {
 .filter input[type="checkbox"] {
   position: absolute;
   right: 0;
+  transform: scale(1.5);
 }
 
 .filters2 {
