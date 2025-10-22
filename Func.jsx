@@ -1,4 +1,4 @@
-import Image from './img/Image.png'
+import Image from './src/img/Image.png'
 
 
 export function Header() {
