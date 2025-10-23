@@ -103,6 +103,8 @@ export function Sidebar({ activeButton, handleButtonClick }) {
           </button>
       </div>
       {activeButton === 'aggregates' && <Filters />}
+      {activeButton === 'tractor' && <Filters2 />}
+
     </div>
 
   )
@@ -113,14 +115,18 @@ export function Objects() {
   return (
     <div className='maininfo'>
       <h3>Последние версии ПО для ДВС 1220 ЛС</h3>
-      <div className='objectmenu'>
-        <img className='object' src={Image} alt="" />
-        <div className='inform'>
-          <h3>№123 от (даты) Maj/Min</h3>
-          <h4>Описание изменений улучшений</h4>
-          <button className='download'>Скачать</button>
-        </div>
-      </div>
+      <ul className='List'>
+        <li>
+          <div className='objectmenu'>
+            <img className='object' src={Image} alt="" />
+            <div className='inform'>
+              <h3>№123 от (даты) Maj/Min</h3>
+              <h4>Описание изменений улучшений</h4>
+              <button className='download'>Скачать</button>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
   );
 }
@@ -131,5 +137,68 @@ export function MainPart({activeButton}) {
     <div class='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
     </div>
+  )
+}
+
+
+
+
+//Трактор
+
+export function Filters2() {
+  return (
+    <>
+      <div className='filterstrac'>
+        <label>
+          <span>К-742МСТ</span>
+          <input type="checkbox" />
+        </label>
+
+        <label>
+          <span>К-735</span>
+          <input type="checkbox" />
+        </label>
+
+        <label>
+          <span>К-525</span>
+          <input type="checkbox" />
+        </label>
+      </div>
+
+      <div className='Дата выпуска'>
+      </div>
+
+      <div className='Поиск по дилеру'>
+      </div>
+
+
+      <div className='filterstrac2'>
+        <label>
+          <span>Серийное</span>
+          <input type="checkbox" />
+        </label>
+
+        <label>
+          <span>Опытное</span>
+          <input type="checkbox" />
+        </label>
+
+        <label>
+          <span>Актуальное</span>
+          <input type="checkbox" />
+        </label>
+
+        <label>
+          <span>Критические</span>
+          <input type="checkbox" />
+        </label>
+      </div>
+
+
+      <div className='Majmin'>
+        <button className='majmin_button'>Требуется MAJ</button>
+        <button className='majmin_button'>Требуется MIN</button>
+      </div>
+    </>
   )
 }

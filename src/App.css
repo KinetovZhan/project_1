@@ -246,6 +246,7 @@ button.active {
   border-color: grey;
   border-radius: 15px;
   display: flex;
+  margin-left: 0;
 }
 
 
@@ -287,4 +288,118 @@ button:active {
 
 .back-button:hover {
   background-color: #6b6c70;
+}
+
+
+.List {
+  list-style-type: none;
+  padding-left: 0;    
+}
+
+
+
+/* Кнопка Tractor */
+
+.filterstrac {
+  /* Размеры и визуал блока */
+  box-sizing: border-box;
+  width: 360px;
+  height: 120px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
+  color: black;
+
+
+  /* Положение */
+  position: absolute;
+  top: 185px;
+  left:13px;
+}
+
+
+
+
+.filterstrac h3 {
+  margin: 0;
+  flex-shrink: 0; /* Запрещаем сжатие текста */
+  font-size: 25px;
+
+}
+
+
+.filterstrac input[type="checkbox"] {
+  position: absolute;
+  right: 10px;
+  transform: scale(1.5);
+}
+
+
+
+.filterstrac2 {
+  /* Размеры и визуал блока */
+  box-sizing: border-box;
+  width: 360px;
+  height: 160px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 13px;
+  color: black;
+
+
+  /* Положение */
+  position: absolute;
+  top: 485px;
+  left:13px;
+}
+
+
+.filterstrac2 h3 {
+  margin: 0;
+  flex-shrink: 0; /* Запрещаем сжатие текста */
+  font-size: 25px;
+
+}
+
+
+.filterstrac2 input[type="checkbox"] {
+  position: absolute;
+  right: 10px;
+  transform: scale(1.5);
+}
+
+
+.Majmin {
+  box-sizing: border-box;
+  width: 349px;
+  height: 68px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  display: flex;
+  align-items: row;
+
+  /* ПОзиция */
+  position: absolute;
+  left: 13px;
+  top: 694px;
+}
+
+.majmin_button {
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 20px;
+  margin: 4px;
+}
+
+.majmin_button:active {
+  background-color: black;
+  color: white;
 }
