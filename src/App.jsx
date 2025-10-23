@@ -13,28 +13,24 @@ function App() {
   const [currentPage, setCurrentPage] = useState('second');
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // Функция для перехода на третью страницу
-  const goToThirdPage = (category) => {
-    setSelectedCategory(category);
-    setCurrentPage('third');
+  // Функция для обработки нажатия
+  const handleButtonClick = (buttonName) => {
+    setActiveButton(buttonName);
   };
 
-  // Функция для возврата на вторую страницу
-  function goToSecondPage() {
-    setCurrentPage('second');
-    setSelectedCategory(null);
-  }
-  
-  return (
+
+  return(
     <>
-      {currentPage === 'second' ? (
-        <SecondPage onButtonClick={goToThirdPage} />
-      ) : (
-        <ThirdPage 
-          selectedCategory={selectedCategory}
-          onBackClick={goToSecondPage} 
-        />
-      )}
+      <Header />
+      <main>
+        <div className='table'>
+          <Sidebar 
+            activeButton={activeButton} 
+            handleButtonClick={handleButtonClick} 
+          />
+          <MainPart activeButton={activeButton}/>
+        </div>
+      </main>
     </>
   );
 }

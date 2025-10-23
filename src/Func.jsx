@@ -1,4 +1,4 @@
-import Image from './img/Image.png'
+import Image from './src/img/Image.png'
 
 
 export function Header() {
@@ -18,25 +18,9 @@ export function Header() {
 }
 
 
-export function Sidebar({ activeButton, handleButtonClick }) {
-  return (
-    <div className='sidebar'>
-      <div className='choose'>
-        <button 
-          className={activeButton === 'tractor' ? 'active' : ''}
-          onClick={() => handleButtonClick('tractor')}
-        >
-          Трактор
-          </button>
-          <br />
-        <button
-          className={activeButton === 'aggregates' ? 'active' : ''}
-          onClick={() => handleButtonClick('aggregates')}
-        >
-          Агрегаты
-          </button>
-      </div>
-
+export function Filters() {
+  return(
+    <>
       <div className='filters'>
         <div className='filter'>
           <label>  {/* Добавлен label для лучшей доступности */}
@@ -93,25 +77,57 @@ export function Sidebar({ activeButton, handleButtonClick }) {
           </select>
         </div>
       </div>
+    </>
+  )
+}
+
+
+export function Sidebar({ activeButton, handleButtonClick }) {
+  return (
+    <div className='sidebar'>
+      <div className='choose'>
+        <button 
+          className={activeButton === 'tractor' ? 'active' : ''}
+          onClick={() => handleButtonClick('tractor')}
+        >
+          Трактор
+          </button>
+          <br />
+        <button
+          className={activeButton === 'aggregates' ? 'active' : ''}
+          onClick={() => handleButtonClick('aggregates')}
+        >
+          Агрегаты
+          </button>
+      </div>
+      {activeButton === 'aggregates' && <Filters />}
     </div>
 
   )
 }
 
-export function MainPart() {
-  return(
-    <div class='MainPart'>
-      <div className='maininfo'>
-        <h3>Последние версии ПО для ДВС 1220 ЛС</h3>
-        <div className='objectmenu'>
-          <img className='object' src={Image} alt="" />
-          <div className='inform'>
-            <h3>№123 от (даты) Maj/Min</h3>
-            <h4>Описание изменений  улучшений</h4>
-            <button className='download'>Скачать</button>
-          </div>
+
+export function Objects() {
+  return (
+    <div className='maininfo'>
+      <h3>Последние версии ПО для ДВС 1220 ЛС</h3>
+      <div className='objectmenu'>
+        <img className='object' src={Image} alt="" />
+        <div className='inform'>
+          <h3>№123 от (даты) Maj/Min</h3>
+          <h4>Описание изменений улучшений</h4>
+          <button className='download'>Скачать</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+export function MainPart({activeButton}) {
+  return(
+    <div class='MainPart'> 
+      {activeButton === 'aggregates' && <Objects />}
     </div>
   )
 }
