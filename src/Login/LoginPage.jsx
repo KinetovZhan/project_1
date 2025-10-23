@@ -19,7 +19,7 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <>
-      <Header />
+      <Header onLogout={''}/>
       
       <main className="login-main">
         <div className="login-form-container">
