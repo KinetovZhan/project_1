@@ -1,7 +1,7 @@
-import Image from './src/img/Image.png'
+import Image from './img/Image.png'
 
 
-export function Header() {
+export function Header({ onLogout }) {
   return(
     <>
       <header>
@@ -10,7 +10,9 @@ export function Header() {
         </div>
         <div className='navigation'>
           <h3>Помощь</h3>
-          <h3>Выйти</h3>
+          {onLogout && (
+            <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
+          )}
         </div>
       </header>
     </>

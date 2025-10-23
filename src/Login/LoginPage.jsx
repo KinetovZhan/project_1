@@ -1,30 +1,30 @@
-// src/Login/LoginPage.jsx
 import React, { useState } from 'react';
-import { Header } from '../Func'; // Используем ваш готовый Header
-import './LoginPage.css'; // Стили только для формы
+import { Header } from '../Func';
+import './LoginPage.css';
 
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Login attempt:', { login, password });
-    // Здесь будет ваша логика входа
-    // Например: const success = await api.login(login, password);
-    // if (success) { navigate('/'); }
+    
+    if (login && password) {
+      onLogin();
+    } else {
+      alert('Введите логин и пароль');
+    }
   };
 
   return (
     <>
-      {/* Используем ваш существующий Header без изменений */}
       <Header />
       
-      {/* Основное содержимое страницы */}
       <main className="login-main">
         <div className="login-form-container">
-          
           <form onSubmit={handleSubmit} className="login-form">
+            <h2>Вход в систему</h2>
             <div className="login-form-group">
               <label htmlFor="login-input">Логин</label>
               <input
@@ -32,7 +32,7 @@ const LoginPage = () => {
                 type="text"
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
-                placeholder="Value"
+                placeholder="Введите логин"
                 required
               />
             </div>
@@ -43,7 +43,7 @@ const LoginPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Value"
+                placeholder="Введите пароль"
                 required
               />
             </div>
