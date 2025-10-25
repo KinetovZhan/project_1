@@ -1,6 +1,6 @@
 import Image from './img/Image.png'
 import { useNavigate } from 'react-router-dom'
-
+import { useState, useEffect } from 'react';
 
 
 
@@ -115,20 +115,42 @@ export function Sidebar({ activeButton, handleButtonClick }) {
 
 
 export function Objects() {
+  const [versions, setVersions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Запрос к твоему серверу
+    fetch('http://localhost:5000/api/dvs')
+      .then(response => response.json())
+      .then(data => {
+        setVersions(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Ошибка загрузки данных:', error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div className="maininfo">Загрузка версий ДВС...</div>;
+  }
+
   return (
-    <div className='maininfo'>
-      <h3>Последние версии ПО для ДВС 1220 ЛС</h3>
-      <ul className='List'>
-        <li>
-          <div className='objectmenu'>
-            <img className='object' src={Image} alt="anskjdsngj" />
-            <div className='inform'>
-              <h3>№123 от (даты) Maj/Min</h3>
-              <h4>Описание изменений улучшений</h4>
-              <button className='download'>Скачать</button>
+    <div className="maininfo">
+      <h3>Последние версии ПО для ДВС</h3>
+      <ul className="List">
+        {versions.map(ver => (
+          <li key={ver.id}>
+            <div className="objectmenu">
+              <div className="inform">
+                <h3>№{ver.id} от {ver.date} ({ver.type})</h3>
+                <h4>{ver.description}</h4>
+                <button className="download">Скачать</button>
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
+        ))}
       </ul>
     </div>
   );
