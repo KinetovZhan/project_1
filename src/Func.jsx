@@ -131,6 +131,9 @@ export function Objects() {
         setLoading(false);
       });
   }, []);
+  const handleDownload = (id) => {
+    window.open(`http://localhost:5000/api/download/${ id }`, '_blank');
+  };
 
   if (loading) {
     return <div className="maininfo">Загрузка версий ДВС...</div>;
@@ -143,10 +146,16 @@ export function Objects() {
         {versions.map(ver => (
           <li key={ver.id}>
             <div className="objectmenu">
+              <img className="object" src={Image} alt="ДВС" />
               <div className="inform">
                 <h3>№{ver.id} от {ver.date} ({ver.type})</h3>
                 <h4>{ver.description}</h4>
-                <button className="download">Скачать</button>
+                <button 
+                  className="download"
+                  onClick={() => handleDownload(ver.id)}
+                >
+                  Скачать
+                </button>
               </div>
             </div>
           </li>
