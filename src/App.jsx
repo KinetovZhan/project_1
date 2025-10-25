@@ -1,39 +1,20 @@
 import { useState } from 'react'
 import './App.css'
-import LoginPage from './Login/LoginPage.jsx'
-import MainPage from './components/mainpage.jsx'
+import LoginPage from './Login/LoginPage'
+import MainPage from './components/mainpage'
+import { Routes, Route, Navigate } from 'react-router-dom'; // ← ДОБАВЬТЕ этот импорт
+
 
 function App() {
-  const [activeButton, setActiveButton] = useState(null);
-  const [currentPage, setCurrentPage] = useState('login'); // 'login' или 'main'
 
+  return (
+  <Routes>
+    <Route path="/login" element={<LoginPage />} />      // Страница логина
+    <Route path="/main" element={<MainPage />} />        // Главная страница
+    <Route path="/" element={<Navigate to="/login" replace />} />  // Перенаправление
+  </Routes>
 
-  // Функция для входа
-  const handleLogin = () => {
-    setCurrentPage('main');
-  };
-
-
-  // Функция для выхода
-  const handleLogout = () => {
-    setActiveButton(null);
-    setCurrentPage('login');
-  };
-
-
-  // Рендерим нужную страницу
-  const renderCurrentPage = () => {
-    switch(currentPage) {
-      case 'login':
-        return <LoginPage onLogin={handleLogin} />;
-      case 'main':
-        return <MainPage onLogout={handleLogout}/>;
-      default:
-        return <LoginPage onLogin={handleLogin} />;
-    }
-  };
-
-  return renderCurrentPage();
+  )
 }
 
 export default App;

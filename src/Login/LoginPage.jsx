@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { Header } from '../Func';
 import './LoginPage.css';
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = ({ onLogin }) => {
+
+const LoginPage = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Login attempt:', { login, password });
     
     if (login && password) {
-      onLogin();
+      navigate('/main');
     } else {
       alert('Введите логин и пароль');
     }
@@ -19,7 +22,7 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <>
-      <Header onLogout={''}/>
+      <Header/>
       
       <main className="login-main">
         <div className="login-form-container">

@@ -1,4 +1,7 @@
 import Image from './img/Image.png'
+import { useNavigate } from 'react-router-dom'
+
+
 
 
 export function Header({ onLogout }) {
@@ -25,25 +28,25 @@ export function Filters() {
     <>
       <div className='filters'>
         <div className='filter'>
-          <label>  {/* Добавлен label для лучшей доступности */}
+          <label> 
             <span>ДВС</span>
             <input type="checkbox"/>
           </label>
         </div>
         <div className='filter'>
-          <label>  {/* Добавлен label для лучшей доступности */}
+          <label>
             <span>КПП</span>
             <input type="checkbox"/>
           </label>
         </div>
         <div className='filter'>
-          <label>  {/* Добавлен label для лучшей доступности */}
+          <label>
             <span>РК</span>
             <input type="checkbox"/>
           </label>
         </div>
         <div className='filter'>
-          <label>  {/* Добавлен label для лучшей доступности */}
+          <label> 
             <span>Гидрораспределитель</span>
             <input type="checkbox"/>
           </label>
@@ -118,7 +121,7 @@ export function Objects() {
       <ul className='List'>
         <li>
           <div className='objectmenu'>
-            <img className='object' src={Image} alt="" />
+            <img className='object' src={Image} alt="anskjdsngj" />
             <div className='inform'>
               <h3>№123 от (даты) Maj/Min</h3>
               <h4>Описание изменений улучшений</h4>
@@ -134,7 +137,7 @@ export function Objects() {
 
 export function MainPart({activeButton}) {
   return(
-    <div class='MainPart'> 
+    <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
     </div>
   )
