@@ -87,7 +87,7 @@ export function Filters() {
 }
 
 
-export function Sidebar({ activeButton, handleButtonClick }) {
+export function Sidebar({ activeButton, handleButtonClick,onAddSoftware }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -104,6 +104,15 @@ export function Sidebar({ activeButton, handleButtonClick }) {
         >
           Агрегаты
           </button>
+      </div>
+      {/* Кнопка Добавить ПО в сайдбаре */}
+      <div className="sidebar-actions">
+        <button 
+          className="add-software-sidebar-btn"
+          onClick={onAddSoftware}
+        >
+           Добавить ПО
+        </button>
       </div>
       {activeButton === 'aggregates' && <Filters />}
       {activeButton === 'tractor' && <Filters2 />}
