@@ -87,7 +87,7 @@ export function Filters() {
 }
 
 
-export function Sidebar({ activeButton, handleButtonClick }) {
+export function Sidebar({ activeButton, handleButtonClick,onAddSoftware }) {
   return (
     <div className='sidebar'>
       {/* Блок с кнопками "Трактор" и "Агрегаты" */}
@@ -106,6 +106,7 @@ export function Sidebar({ activeButton, handleButtonClick }) {
           Агрегаты
         </button>
       </div>
+
 
       {/* 🔹 Новая кнопка — использует тот же стиль, что и другие */}
       <div className='add-po-container'>
