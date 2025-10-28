@@ -10,16 +10,6 @@ function MainPage() {
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
   };
-  const handleAddSoftware = () => {
-    // Здесь может быть логика для добавления ПО
-    console.log('Добавить новое ПО');
-    // Например: navigate('/add-software') или открытие модального окна
-  };
-
-
-  const handleLogout = () => {
-      navigate('/login');
-    };
 
   return ( // ← ДОБАВЬТЕ return
     <>
