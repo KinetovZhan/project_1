@@ -82,7 +82,7 @@ main {
 
 
 .choose{
-  margin: 44px 56px 65px 63px ;
+  margin: 44px 56px 0px 63px ;
   text-align: center;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
@@ -402,4 +402,9 @@ button:active {
 .majmin_button:active {
   background-color: black;
   color: white;
+}
+
+.add-po-container {
+  margin-top: 20px; /* отступ сверху */
+  padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }

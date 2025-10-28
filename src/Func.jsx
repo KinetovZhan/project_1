@@ -90,27 +90,38 @@ export function Filters() {
 export function Sidebar({ activeButton, handleButtonClick }) {
   return (
     <div className='sidebar'>
+      {/* Блок с кнопками "Трактор" и "Агрегаты" */}
       <div className='choose'>
         <button 
           className={activeButton === 'tractor' ? 'active' : ''}
           onClick={() => handleButtonClick('tractor')}
         >
           Трактор
-          </button>
-          <br />
+        </button>
+        <br />
         <button
           className={activeButton === 'aggregates' ? 'active' : ''}
           onClick={() => handleButtonClick('aggregates')}
         >
           Агрегаты
-          </button>
+        </button>
       </div>
+
+      {/* 🔹 Новая кнопка — использует тот же стиль, что и другие */}
+      <div className='add-po-container'>
+        <button 
+          // Не добавляем класс active — чтобы не было выделения как у активной кнопки
+          onClick={() => alert('Пока не реализовано')}
+        >
+          Добавить ПО
+        </button>
+      </div>
+
+      {/* Фильтры — остаются как есть */}
       {activeButton === 'aggregates' && <Filters />}
       {activeButton === 'tractor' && <Filters2 />}
-
     </div>
-
-  )
+  );
 }
 
 
