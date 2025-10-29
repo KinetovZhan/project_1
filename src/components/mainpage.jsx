@@ -11,11 +11,6 @@ function MainPage() {
     setActiveButton(buttonName);
   };
 
-
-  const handleLogout = () => {
-      navigate('/login');
-    };
-
   return ( // ← ДОБАВЬТЕ return
     <>
       <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
@@ -23,7 +18,8 @@ function MainPage() {
         <div className='table'>
           <Sidebar 
             activeButton={activeButton} 
-            handleButtonClick={handleButtonClick} 
+            handleButtonClick={handleButtonClick}
+            onAddSoftware={handleAddSoftware} 
           />
           <MainPart activeButton={activeButton}/>
         </div>
