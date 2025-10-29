@@ -87,7 +87,7 @@ export function Filters() {
 }
 
 
-export function Sidebar({ activeButton, handleButtonClick,onAddSoftware }) {
+export function Sidebar({ activeButton, handleButtonClick}) {
   return (
     <div className='sidebar'>
       {/* Блок с кнопками "Трактор" и "Агрегаты" */}

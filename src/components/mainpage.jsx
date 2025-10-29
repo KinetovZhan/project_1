@@ -11,6 +11,10 @@ function MainPage() {
     setActiveButton(buttonName);
   };
 
+  const handleLogout = () => {
+      navigate('/login');
+    };
+    
   return ( // ← ДОБАВЬТЕ return
     <>
       <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
