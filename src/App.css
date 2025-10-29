@@ -250,6 +250,11 @@ button.active {
 }
 
 
+.inform {
+  gap: 0px;
+}
+
+
 /* Кнопка */
 .download {
   box-sizing: border-box;
@@ -293,7 +298,11 @@ button:active {
 
 .List {
   list-style-type: none;
-  padding-left: 0;    
+  padding-left: 0;  
+  overflow: auto;
+  overflow-y: auto;
+  max-height: 400px;
+  overflow-x: hidden;
 }
 
 
@@ -402,4 +411,27 @@ button:active {
 .majmin_button:active {
   background-color: black;
   color: white;
+}
+
+
+
+.download {
+  width: 268px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+}
+
+
+.download:hover {
+  background-color: #b6bbc1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.download:active {
+  background-color: #707479;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
