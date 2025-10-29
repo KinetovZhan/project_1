@@ -9,8 +9,8 @@ function App() {
 
   return (
   <Routes>
-    <Route path="/login" element={<LoginPage />} />      // Страница логина
-    <Route path="/main" element={<MainPage />} />        // Главная страница
+    <Route path="//login" element={<LoginPage />} />      // Страница логина
+    <Route path="//main" element={<MainPage />} />        // Главная страница
     <Route path="/" element={<Navigate to="/login" replace />} />  // Перенаправление
   </Routes>
 
