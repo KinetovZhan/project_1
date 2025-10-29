@@ -17,32 +17,67 @@ export function Header({ onLogout }) {
   )
 }
 
-export function Filters() {
+export function Filters( {onFilterChange}) { 
+
+  const [FilterItems, setFilterItems] = useState({
+    DVS: false,
+    KPP: false,
+    RK: false,
+    hydrorasp: false
+  });
+
+  const handleFilterChange = (FilterType) => {
+    const newFilter = {
+      ...FilterItems,
+      [FilterType]: !FilterItems[FilterType]
+    };
+    setFilterItems(newFilter);
+
+    if (onFilterChange) {
+      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]);
+      onFilterChange(activeFilters);
+    }
+  };
+
   return(
     <>
       <div className='filters'>
         <div className='filter'>
           <label> 
             <span>ДВС</span>
-            <input type="checkbox"/>
+            <input 
+              type="checkbox"
+              checked={FilterItems.DVS}
+              onChange={() => handleFilterChange('DVS')}
+            />
+            
           </label>
         </div>
         <div className='filter'>
           <label>
             <span>КПП</span>
-            <input type="checkbox"/>
+            <input 
+              checked={FilterItems.KPP}
+              onChange={() => handleFilterChange('KPP')}
+              type="checkbox"/>
           </label>
         </div>
         <div className='filter'>
           <label>
             <span>РК</span>
-            <input type="checkbox"/>
+            <input 
+              checked={FilterItems.RK}
+              onChange={() => handleFilterChange('RK')}
+              type="checkbox"/>
           </label>
         </div>
         <div className='filter'>
           <label> 
             <span>Гидрораспределитель</span>
-            <input type="checkbox"/>
+            <input 
+              checked={FilterItems.hydrorasp}
+              onChange={() => handleFilterChange('hydrorasp')}
+              type="checkbox"/>
           </label>
         </div>
       </div>
@@ -80,7 +115,7 @@ export function Filters() {
   )
 }
 
-export function Sidebar({ activeButton, handleButtonClick }) {
+export function Sidebar({ activeButton, handleButtonClick, onFilterChange }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -98,7 +133,7 @@ export function Sidebar({ activeButton, handleButtonClick }) {
           Агрегаты
         </button>
       </div>
-      {activeButton === 'aggregates' && <Filters />}
+      {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange}/>}
       {activeButton === 'tractor' && <Filters2 />}
     </div>
   )
@@ -107,17 +142,18 @@ export function Sidebar({ activeButton, handleButtonClick }) {
 
 
 
-export function Objects() {
+export function Objects({activeFilters = []}) {
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filteredItems, setFilteredItems] = useState([])
 
 useEffect(() => {
   const fetchSoftware = async () => {
     try {
       console.log('Начало загрузки данных...');
       
-      const response = await fetch('http://localhost:8000/component-version/0/', {
+      const response = await fetch('http://localhost:8000/component-version/11/', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -136,14 +172,15 @@ useEffect(() => {
       console.log('Тип download_link:', typeof data.download_link);
 
       if (Array.isArray(data)) {
-          // data уже является массивом объектов
-          setSoftwareItems(data);
-        } else if (data && typeof data === 'object') {
-          // Если это один объект, оборачиваем в массив
-          setSoftwareItems([data]);
-        } else {
-          setSoftwareItems([]);
-        }
+        setSoftwareItems(data);
+        setFilteredItems(data); 
+      } else if (data && typeof data === 'object') {
+        setSoftwareItems([data]);
+        setFilteredItems([data]); 
+      } else {
+        setSoftwareItems([]);
+        setFilteredItems([]); 
+      }
       
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
@@ -156,6 +193,39 @@ useEffect(() => {
 
   fetchSoftware();
 }, []);
+
+
+  // Эффект для фильтрации данных при изменении активных фильтров
+  useEffect(() => {
+    if (activeFilters.length === 0) {
+      // Если нет активных фильтров, показываем все элементы
+      setFilteredItems(softwareItems);
+    } else {
+      // Фильтруем элементы по типу компонента
+      const filtered = softwareItems.filter(item => {
+        const type = item.type_component?.toLowerCase();
+
+        // Сопоставление фильтров с типами компонентов
+        const filterMap = {
+          'DVS': 'двс',
+          'KPP': 'кпп', 
+          'RK': 'рк',
+          'hydrorasp': 'гидрораспределитель'
+        };
+        
+        // Проверяем, соответствует ли тип компонента любому из активных фильтров
+        return activeFilters.some(filter => {
+          const expectedType = filterMap[filter];
+          return type && type.includes(expectedType);
+        });
+      });
+      
+      setFilteredItems(filtered);
+    }
+  }, [activeFilters, softwareItems]);
+
+
+
 
   const handleDownload = (item) => {
     console.log('Детали компонента:', item);
@@ -196,10 +266,23 @@ useEffect(() => {
       <h3>Последние версии ПО для ДВС 1 220 ЛС</h3>
       
       <div>
-        <h4>Компоненты ({softwareItems.length})</h4>
+        <h4>Компоненты ({filteredItems.length})</h4>
+        {activeFilters.length > 0 && (
+          <div style={{marginBottom: '10px', color: '#666'}}>
+            Активные фильтры: {activeFilters.map(filter => {
+              const filterNames = {
+                'DVS': 'ДВС',
+                'KPP': 'КПП',
+                'RK': 'РК',
+                'hydrorasp': 'Гидрораспределитель'
+              };
+              return filterNames[filter];
+            }).join(', ')}
+          </div>
+        )}
         
           <ul className='List'>
-            {softwareItems.map((item) => ( 
+            {filteredItems.map((item) => ( 
               <li key={item.id_Firmwares}>
                 <div className='objectmenu'>
                   <img className='object' src={Image} alt='Компонент' />
@@ -217,7 +300,11 @@ useEffect(() => {
               </li>
             ))}
           </ul>
-        
+          {filteredItems.length === 0 && softwareItems.length > 0 && (
+          <div style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>
+            Нет компонентов, соответствующих выбранным фильтрам
+          </div>
+          )}
       </div>
     </div>
   );
@@ -225,10 +312,10 @@ useEffect(() => {
 
 
 
-export function MainPart({activeButton}) {
+export function MainPart({activeButton, activeFilters}) {
   return(
     <div className='MainPart'> 
-      {activeButton === 'aggregates' && <Objects />}
+      {activeButton === 'aggregates' && <Objects activeFilters={activeFilters}/>}
       {activeButton === 'tractor'}
     </div>
   )
@@ -236,6 +323,9 @@ export function MainPart({activeButton}) {
 
 // Трактор
 export function Filters2() {
+
+
+
   return (
     <>
       <div className='filterstrac'>

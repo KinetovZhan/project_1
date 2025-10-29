@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Header, Sidebar, MainPart } from '../Func'; // Добавьте импорт
+import { Header, Sidebar, MainPart } from '../Func'; 
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
 
 function MainPage() {
-  const [activeButton, setActiveButton] = useState(null); // Добавьте состояние
+  const [activeButton, setActiveButton] = useState(null); 
+  const [activeFilters, setActiveFilters] = useState([]);
   const navigate = useNavigate();
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
+  };
+
+  const handleFilterChange = (filters) => {
+    setActiveFilters(filters);
   };
 
 
@@ -16,20 +21,24 @@ function MainPage() {
       navigate('/login');
     };
 
-  return ( // ← ДОБАВЬТЕ return
+  return ( 
     <>
-      <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
+      <Header onLogout={handleLogout}/> 
       <main>
         <div className='table'>
           <Sidebar 
             activeButton={activeButton} 
-            handleButtonClick={handleButtonClick} 
+            handleButtonClick={handleButtonClick}
+            onFilterChange={handleFilterChange} 
           />
-          <MainPart activeButton={activeButton}/>
+          <MainPart 
+            activeButton={activeButton}
+            activeFilters={activeFilters} 
+          />
         </div>
       </main>
     </>
   );
 }
 
-export default MainPage; // Добавьте экспорт
+export default MainPage; 
