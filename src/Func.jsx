@@ -153,7 +153,7 @@ useEffect(() => {
     try {
       console.log('Начало загрузки данных...');
       
-      const response = await fetch('http://localhost:8000/component-version/11/', {
+      const response = await fetch('http://localhost:4000/component-version/11/', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
