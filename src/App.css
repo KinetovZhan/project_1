@@ -409,4 +409,57 @@ button:active {
   margin-top: 20px; /* отступ сверху */
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }
+/* Поле поиска */
+.search-bar {
+  position: absolute;
+  top: 10px;
+  right:10px;
+  width: 300px;
+  height: 50px;
+  border-radius: 40px;
+  background-color: rgba(85, 86, 90, 1);
+  border-color:transparent;
+}
+/* Поле ввода текста */
+.search-bar input {
+  border: none;
+  background: transparent;
+  color: rgb(245, 243, 243);
+  font-size: 16px;
+  padding: 16px 35px;
+  outline: none;
+  width: 220px;
+  border-radius: 4px;
+}
+
+.search-bar input::placeholder {
+  color: #fffefe;
+}
+/* Кнопка поиска с иконкой лупы */
+.search-bar .search-icon-button {
+  width:50px;
+  position:absolute;
+  border: none;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  cursor: pointer;
+  color: white;
+  cursor: pointer;
+  padding: 1px;
+  border-radius: 10px;
+ 
+}
+/* Отключаем эффекты hover для этой кнопки */
+.search-bar .search-icon-button:hover {
+  background: transparent;
+  box-shadow: none;
+}
+/* Иконка лупы */
+.search-bar .search-icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 
