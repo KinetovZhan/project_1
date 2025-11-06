@@ -4,32 +4,45 @@ import '../App.css';
 import { useNavigate } from 'react-router-dom';
 
 function MainPage() {
-  const [activeButton, setActiveButton] = useState(null); // Добавьте состояние
+  const [activeButton, setActiveButton] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('');
   const navigate = useNavigate();
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
+    // Сбрасываем выбранную модель при смене раздела (кроме тракторов)
+    if (buttonName !== 'tractor') {
+      setSelectedModel('');
+    }
+  };
+
+  const handleModelChange = (model) => {
+    setSelectedModel(model);
   };
 
   const handleLogout = () => {
-      navigate('/login');
-    };
+    navigate('/login');
+  };
 
-  return ( // ← ДОБАВЬТЕ return
+  return (
     <>
-      <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
+      <Header onLogout={handleLogout}/>
       <main>
         <div className='table'>
           <Sidebar 
-            activeButton={activeButton} 
+            activeButton={activeButton}
             handleButtonClick={handleButtonClick}
-           
+            selectedModel={selectedModel}
+            onModelChange={handleModelChange}
           />
-          <MainPart activeButton={activeButton}/>
+          <MainPart 
+            activeButton={activeButton}
+            selectedModel={selectedModel}
+          />
         </div>
       </main>
     </>
   );
 }
 
-export default MainPage; // Добавьте экспорт
+export default MainPage;

@@ -310,7 +310,7 @@ button:active {
   /* Внутренности */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 20px;
   gap: 10px;
   color: black;
 
@@ -463,3 +463,88 @@ button:active {
 }
 
 
+
+/*Пока бесполезный мусор для таблицы тракторов*/
+.tractor-table-container {
+  margin: 100px;
+  overflow-x:auto;
+}
+
+.tractor-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 2px;
+  overflow: scroll;
+}
+
+.tractor-table th {
+  background: #d7dadc;
+  color: rgb(8, 8, 8);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #454343;
+  
+  
+  
+}
+
+.tractor-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ecf0f1;
+  color: #2c3e50;
+  font-size: 14px;
+  border: 1px solid #030303;
+}
+
+
+/*Временный вариант*/
+/*.loading, .error, .no-data {
+  padding: 40px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 20px 0;
+  font-size: 16px;
+}
+
+.loading {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.no-data {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.filterstrac {
+  margin-bottom: 20px;
+}
+
+.filterstrac label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filterstrac label:hover {
+  background: #e9ecef;
+}
+
+.filterstrac input[type="radio"] {
+  margin-left: 10px;
+}*/
