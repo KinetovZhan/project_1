@@ -75,10 +75,10 @@ export function Filters() {
 
         <div className='model'>
           <select id="tractor-select" name="tractor">
-            <option value=""><h3>Модель</h3></option>
-            <option value="m1"><h3>К-743</h3></option>
-            <option value="m2"><h3>К-745</h3></option>
-            <option value="m3"><h3>К-743</h3></option>
+            <option value="">Модель</option>
+            <option value="m1">К-743</option>
+            <option value="m2">К-745</option>
+            <option value="m3">К-743</option>
           </select>
         </div>
       </div>
@@ -87,7 +87,7 @@ export function Filters() {
 }
 
 
-export function Sidebar({ activeButton, handleButtonClick}) {
+export function Sidebar({ activeButton, handleButtonClick, onAddPoClick}) {
   return (
     <div className='sidebar'>
       {/* Блок с кнопками "Трактор" и "Агрегаты" */}
@@ -112,8 +112,7 @@ export function Sidebar({ activeButton, handleButtonClick}) {
       <div className='add-po-container'>
         <button 
           // Не добавляем класс active — чтобы не было выделения как у активной кнопки
-          onClick={() => alert('Пока не реализовано')}
-        >
+          onClick={onAddPoClick}> {}
           Добавить ПО
         </button>
       </div>
@@ -178,12 +177,60 @@ export function Objects() {
 }
 
 
-export function MainPart({activeButton}) {
+export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit}) {
+  if (showAddForm) {
+    return (
+      <div className='MainPart'>
+        <div className="maininfo" style={{ padding: '50px 70px'}}>
+          <h3>Добавить новое ПО</h3>
+          <form onSubmit={onAddSubmit} style={{marginTop: '20px'}}>
+            <input
+              type="text"
+              name='poNumber'
+              placeholder="Номер ПО (напр. 123)"
+              required
+              style={{
+                width: '100%',
+                padding: '10px',
+                fontSize: '16px',
+                marginBottom: '20px',
+                borderRadius: '5px',
+                border: '1px solid #ccc'
+              }}
+            />
+            <div style={{display: 'flex', gap: '10px'}}>
+              <button
+                type="button"
+                className="download"
+                onClick={onCloseAddForm}
+                style={{flex: 1}}
+              >
+                Отмена
+              </button>
+              <button
+                type="submit"
+                className="download"
+                style={{flex:1, backgroundColor: '#007bff', color: 'white'}}
+              >
+                Сохранить
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeButton) {
+    return <div className='MainPart'></div>
+  }
+  
   return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
+      {activeButton === 'tractor' && <Filters2 />}
     </div>
-  )
+  );
 }
 
 
