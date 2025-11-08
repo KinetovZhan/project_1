@@ -177,28 +177,191 @@ export function Objects() {
 }
 
 
-export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit}) {
+export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit, onBack}) {
   if (showAddForm) {
     return (
-      <div className='MainPart'>
-        <div className="maininfo" style={{ padding: '50px 70px'}}>
-          <h3>Добавить новое ПО</h3>
-          <form onSubmit={onAddSubmit} style={{marginTop: '20px'}}>
-            <input
-              type="text"
-              name='poNumber'
-              placeholder="Номер ПО (напр. 123)"
-              required
+      <div 
+        className='MainPart'
+        style={{
+          position: 'relative'
+        }}
+      >
+        <button
+          onClick={onBack}
+          style={{
+            position: 'absolute',
+            top: '30px',
+            left: '-30px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            zIndex: 10,
+            padding: '0',
+            boxShadow: 'none',
+            backgroundColor: 'transparent'
+          }}
+        >
+          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button> 
+
+        <div 
+          className="maininfo" 
+          style={{
+            padding: '50px 70px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            maxHeight: '710px',
+            height: 'auto',
+          }}
+        >
+
+          <h3 style={{
+            marginTop: '-30px', 
+            marginBottom: '30px', 
+            fontWeight: 'bold',
+            fontSize: '30px'
+          }}>
+            Добавление нового ПО
+          </h3>
+
+          <form style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
+            <div style={{ marginBottom: '0px'}}>
+              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>Номер ПО</label>
+              <input
+                type="text"
+                name='poNumber'
+                placeholder="Value"
+                required
+                style={{
+                  width: '97.28%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  marginBottom: '0px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc'
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '0px'}}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Агрегат</label>
+              <select
+                name="aggregate"
+                required
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  marginBottom: '0px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc'
+                }}
+              >
+                <option value="">Выберите агрегат</option>
+                <option value="dvs">ДВС</option>
+                <option value="kpp">КПП</option>
+                <option value="rk">РК</option>
+                <option value="hydro">Гидрораспределитель</option>
+              </select>
+            </div>
+
+            <div style={{marginBottom: '0px'}}>
+              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>Модель трактора</label>
+              <input
+                type="text"
+                name="tractorModel"
+                placeholder="Value"
+                required
+                style={{
+                  width: '97.28%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc'
+                }}
+              />
+            </div>
+
+            <div style={{marginBottom: '0px'}}>
+              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>Major/Minor</label>
+              <select
+                name="majorMinor"
+                required
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc'
+                }}
+              >
+                <option value="">Выберите тип</option>
+                <option value="major">Major</option>
+                <option value="minor">Minor</option>
+              </select>    
+            </div>
+
+            <div style={{marginBottom: '0px'}}>
+              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>Версия ПО</label>
+              <select
+                name="version"
+                required
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc'
+                }}
+              >
+                <option value="">Выберите версию</option>
+                <option value="1.0">1.0</option>
+                <option value="2.0">2.0</option>
+                <option value="3.0">3.0</option>
+              </select>
+            </div>
+
+            <div style={{marginBottom: '15px'}}>
+              <label style={{display: 'block', marginBottom: '5px', fontWeight: 'bold'}}>Описание</label>
+              <textarea
+                name="description"
+                placeholder='Value'
+                rows="5"
+                required
+                style={{
+                  width: '97.28%',
+                  padding: '10px',
+                  fontSize: '16px',
+                  borderRadius: '5px',
+                  border: '1px solid #ccc',
+                  resize: 'vertical',
+                  minHeight: '20px',
+                  maxHeight: '150px',
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
               style={{
                 width: '100%',
                 padding: '10px',
                 fontSize: '16px',
-                marginBottom: '20px',
-                borderRadius: '5px',
-                border: '1px solid #ccc'
+                backgroundColor: '#333',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                marginTop: '15px'
               }}
-            />
-            <div style={{display: 'flex', gap: '10px'}}>
+            >
+              Добавить
+            </button>
+            {/* <div style={{display: 'flex', gap: '10px'}}>
               <button
                 type="button"
                 className="download"
@@ -214,7 +377,7 @@ export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit
               >
                 Сохранить
               </button>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>

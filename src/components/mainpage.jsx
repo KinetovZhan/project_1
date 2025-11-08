@@ -47,6 +47,10 @@ function MainPage() {
             showAddForm={showAddForm}
             onCloseAddForm={closeAddForm}
             onAddSubmit={handleAddSubmit}
+            onBack={() => {
+              setShowAddForm(false);
+              setActiveButton(null);
+            }}
           />
         </div>
       </main>
