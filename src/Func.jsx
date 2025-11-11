@@ -232,19 +232,11 @@ export function Objects() {
 } */
 // Более менее норм, вызывает таблицу с конкретной моделью
 export function MainPart({ activeButton, selectedModel, onSearch }) {
-  /*return(
+  return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
       {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel}/>: '') }
       <SearchBar/>
-    </div>
-  );
-}*/
-return(
-    <div className='MainPart'> 
-      {activeButton === 'aggregates' && <Objects />}
-      {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel}/>: '') }
-      <SearchBar onSearch={onSearch}/>
     </div>
   );
 }
