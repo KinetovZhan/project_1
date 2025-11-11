@@ -236,7 +236,7 @@ export function MainPart({ activeButton, selectedModel, onSearch }) {
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
       {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel}/>: '') }
-      <SearchBar/>
+      <SearchBar onSearch={onSearch}/>
     </div>
   );
 }
