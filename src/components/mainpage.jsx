@@ -6,10 +6,14 @@ import { useNavigate } from 'react-router-dom';
 function MainPage() {
   const [activeButton, setActiveButton] = useState(null); // Добавьте состояние
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedModel, setSelectedModel] = useState(''); 
   const navigate = useNavigate();
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
+    if (buttonName !== 'tractor') {
+      setSelectedModel('');
+    }
   };
 
   const handleLogout = () => {
@@ -32,6 +36,10 @@ function MainPage() {
     closeAddForm();
   };
 
+  const handleModelChange = (model) => {
+    setSelectedModel(model);
+  }
+
   return ( // ← ДОБАВЬТЕ return
     <>
       <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
@@ -41,6 +49,8 @@ function MainPage() {
             activeButton={activeButton} 
             handleButtonClick={handleButtonClick}
             onAddPoClick={openAddForm}
+            selectedModel={selectedModel}
+            onModelChange={handleModelChange}
           />
           <MainPart 
             activeButton={activeButton}
@@ -51,6 +61,7 @@ function MainPage() {
               setShowAddForm(false);
               setActiveButton(null);
             }}
+            selectedModel={selectedModel}
           />
         </div>
       </main>
