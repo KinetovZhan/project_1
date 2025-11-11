@@ -14,7 +14,11 @@ function MainPage() {
   const [selectedModel, setSelectedModel] = useState('');
 
   const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
+      if (activeButton === buttonName) {
+          setActiveButton(null);
+      } else {
+          setActiveButton(buttonName);
+      }
   };
 
   const handleFilterChange = (filters) => {
@@ -28,7 +32,11 @@ function MainPage() {
 
   const handleModelChange = (model) => {
     setSelectedModel(model);
-    console.log('Выбрана модель:', model);
+  };
+
+
+  const handleModelChangeTrac = (model) => {
+    setSelectedModel(model);
   };
 
 
@@ -47,6 +55,7 @@ function MainPage() {
             onFilterChange={handleFilterChange} 
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
+            onModelChangeTrac={handleModelChangeTrac}
           />
           <MainPart 
             activeButton={activeButton}

@@ -33,6 +33,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
 
   const [selectedModel, setSelectedModel] = useState('');
 
+
   const handleModelChange = (event) => {
     const model = event.target.value;
     setSelectedModel(model);
@@ -40,6 +41,20 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     
     if (onModelChange) {
       onModelChange(model); 
+    }
+  };
+
+
+  const handleFilterChange = (FilterType) => {
+    const newFilter = {
+      ...FilterItems,
+      [FilterType]: !FilterItems[FilterType]
+    };
+    setFilterItems(newFilter);
+
+    if (onFilterChange) {
+      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]);
+      onFilterChange(activeFilters);
     }
   };
 
@@ -58,18 +73,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   }
 
 
-  const handleFilterChange = (FilterType) => {
-    const newFilter = {
-      ...FilterItems,
-      [FilterType]: !FilterItems[FilterType]
-    };
-    setFilterItems(newFilter);
 
-    if (onFilterChange) {
-      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]);
-      onFilterChange(activeFilters);
-    }
-  };
 
   return(
     <>
@@ -157,7 +161,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   )
 }
 
-export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFilterChange2, onModelChange }) {
+export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -176,7 +180,7 @@ export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFil
         </button>
       </div>
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
-      {activeButton === 'tractor' && <Filters2 />}
+      {activeButton === 'tractor' && <Filters2  onModelChangeTrac={onModelChangeTrac}/>}
     </div>
   )
 }
@@ -188,12 +192,14 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filteredItems, setFilteredItems] = useState([])
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
   
-  
-  const getAPIUrl = () => {
+
+
+  const getPostData = () => {
     const hasComponentFilters = activeFilters.length > 0;
-    const hasModelFilters = activeFilters2.length > 0;
+    const hasTractorFilter = activeFilters2.length > 0;
     const hasSelectedModel = selectedModel && selectedModel !== '';
     
     const FilterToTypeMap = {
@@ -203,32 +209,32 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
       'hydrorasp': 'гидрораспределитель'
     };
 
-    const FilterToModelMap = {
-      'K7': 'K7', 
-      'K5': 'К5'
+    const FilterToTractor = {
+      'K7': 'K7',
+      'K5': 'K5'
     };
 
-    if (hasSelectedModel && hasComponentFilters) {
-      const componentTypes = activeFilters.map(filter => FilterToTypeMap[filter]);
-      return `http://localhost:8000/model_type_comp/?model_comp=${selectedModel}&type_comp=${componentTypes.join(',')}`;
-  }
+    // Подготавливаем данные для POST запроса
+    const postData = {
+      trac_model: [],
+      type_comp: [],
+      model_comp: ""
+    };
 
-
-  if (hasComponentFilters) {
-    const componentTypes = activeFilters.map(filter => FilterToTypeMap[filter]);
-    return `http://localhost:8000/component-version/?types=${componentTypes.join(',')}`;
-  }
-
-
-  if (hasSelectedModel) {
-    return `http://localhost:8000/model-version/?model_comp=${selectedModel}`;
-  }
-
-
-
-    else {
-      return 'http://localhost:8000/component-version/all/';
+    // Заполняем данные в зависимости от активных фильтров
+    if (hasTractorFilter) {
+      postData.trac_model = activeFilters2.map(filter => FilterToTractor[filter]);
     }
+
+    if (hasComponentFilters) {
+      postData.type_comp = activeFilters.map(filter => FilterToTypeMap[filter]);
+    }
+
+    if (hasSelectedModel) {
+      postData.model_comp = selectedModel;
+    }
+
+    return postData;
   };
 
 
@@ -240,13 +246,35 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
         console.log('Начало загрузки данных...');
 
 
-        const apiURL = getAPIUrl();
-        const response = await fetch(apiURL, {
-          method: 'GET',
+        const postData = getPostData();
+        console.log('Данные для пост запроса:', postData)
+        // const hasAnyFilter = postData.trac_model.length > 0 || postData.type_comp.length > 0 || postData.model_comp !== '';
+
+        let response;
+        let data;
+
+
+        response = await fetch('http://localhost:8000/component-info/', {
+          method: 'POST',
           headers: {  
             'Accept': 'application/json',
-          }
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+          
         });
+
+
+        data = await response.json();
+
+        if (data && data.status_code === 404) {
+          console.log("404");
+          setSoftwareItems([])
+          setFilteredItems([])
+          alert("По вашим фильтрам ничего не нашлось");
+          return;
+      }
+
         
         console.log('Статус ответа:', response.status);
 
@@ -254,14 +282,20 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const data = await response.json();
+        
         console.log('Данные компонента:', data);
-        console.log('Структура download_link:', data.download_link);
-        console.log('Тип download_link:', typeof data.download_link);
 
+        
         if (Array.isArray(data)) {
-          setSoftwareItems(data);
-          setFilteredItems(data); 
+          if (data.status_code == 404){
+            setSoftwareItems([]);
+            setFilteredItems([]); 
+          }
+          else{
+            setSoftwareItems(data);
+            setFilteredItems(data); 
+          }
+          
         } else if (data && typeof data === 'object') {
           setSoftwareItems([data]);
           setFilteredItems([data]); 
@@ -279,7 +313,9 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
       }
     };
 
+
     fetchSoftware();
+
   }, [activeFilters, activeFilters2, selectedModel]);
 
 
@@ -334,7 +370,7 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
       'RK': 'РК',
       'hydrorasp': 'Гидрораспределитель',
       'K7': 'К7',
-      'K5': 'К-5'
+      'K5': 'К5'
     };
 
     const allActive = [...activeFilters, ...activeFilters2];
@@ -374,29 +410,43 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
         <h4>Компоненты ({filteredItems.length})</h4>
         {activeFilters.length > 0 && (
           <div style={{marginBottom: '10px', color: '#666'}}>
-            Активные фильтры: {getAllActiveFilters()}
+            Активные фильтры: {getAllActiveFilters()} 
           </div>
         )}
         
+        
           <ul className='List'>
-            {filteredItems.map((item) => ( 
-              <li key={item.id_Firmwares}>
-                <div className='objectmenu'>
-                  <img className='object' src={Image} alt='Компонент' />
-                  <div className='inform'>
-                    <h4>Тип: {item.model_component} от {new   Date(item.release_date).toLocaleDateString()}</h4>
-                    <button 
-                      className='download'
-                      onClick={() => handleDownload(item)}
-                      disabled={!item.download_link}
-                    >
-                      Скачать
-                    </button>
-                  </div>
+            {softwareItems.status ? (
+              <li>
+                <div
+                  style={{
+                    textAlign: 'center', 
+                    color: '#666', 
+                    padding: '20px'
+                  }}>
+                    <h4>Объектов нет</h4>
+                    <p>Попробуйте изменить фильтры</p>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </li>) : (
+              filteredItems.map((item) => ( 
+                <li key={item.Tractor}>
+                  <div className='objectmenu'>
+                    <img className='object' src={Image} alt='Компонент' />
+                    <div className='inform'>
+                      <h4>№: {item.producer_version} от {new   Date(item.release_date).toLocaleDateString()}</h4>
+                      <button 
+                        className='download'
+                        onClick={() => handleDownload(item)}
+                        disabled={!item.type}
+                      >
+                        Скачать
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))
+            )}
+            </ul>
           {filteredItems.length === 0 && softwareItems.length > 0 && (
           <div style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>
             Нет компонентов, соответствующих выбранным фильтрам
@@ -409,43 +459,41 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
 
 
 
-export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel}) {
-  return(
-    <div className='MainPart'> 
-      {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-      {activeButton === 'tractor'}
-    </div>
-  )
-}
+// export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel}) {
+//   return(
+//     <div className='MainPart'> 
+//       {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
+//       {activeButton === 'tractor' && <TractorsTable/>}
+//     </div>
+//   )
+// }
 
 // Трактор
-export function Filters2() {
+export function Filters2({ selectedModel, onModelChangeTrac }) {
+  const models = ['К-742МСТ', 'К-735', 'К-525'];
 
-
+  const handleModelChangeTrac = (modelName) => {
+    onModelChangeTrac(modelName);
+  };
 
   return (
     <>
       <div className='filterstrac'>
-        <label>
-          <span>К-742МСТ</span>
-          <input type="checkbox" />
-        </label>
-        <label>
-          <span>К-735</span>
-          <input type="checkbox" />
-        </label>
-        <label>
-          <span>К-525</span>
-          <input type="checkbox" />
-        </label>
+
+          <label>
+            <span>dsadsa</span>
+            <input 
+              type="checkbox"
+              // checked={selectedModel === model}
+              // onChange={(e) => handleModelChangeTrac(model, e.target.checked)}
+            />
+          </label>
       </div>
 
       <div className='Дата выпуска'>
-        {/* Добавьте поля для даты выпуска */}
       </div>
 
       <div className='Поиск по дилеру'>
-        {/* Добавьте поля для поиска по дилеру */}
       </div>
 
       <div className='filterstrac2'>
@@ -453,14 +501,17 @@ export function Filters2() {
           <span>Серийное</span>
           <input type="checkbox" />
         </label>
+
         <label>
           <span>Опытное</span>
           <input type="checkbox" />
         </label>
+
         <label>
           <span>Актуальное</span>
           <input type="checkbox" />
         </label>
+
         <label>
           <span>Критические</span>
           <input type="checkbox" />
@@ -472,5 +523,180 @@ export function Filters2() {
         <button className='majmin_button'>Требуется MIN</button>
       </div>
     </>
+  );
+}
+
+
+export function TractorTable({ selectedModel }) {
+  const [tractors, setTractors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const filteredTractors = selectedModel 
+    ? tractors.filter(tractor => tractor.model === selectedModel)
+    : tractors;
+
+  useEffect(() => {
+    fetchTractors = async () => {
+      try {
+        setLoading(true);
+        
+        // Подготовка данных для запроса
+        const postData = {
+          trac_model: selectedModel ? [selectedModel] : [],
+          status: [],
+          dealer: ""
+        };
+        response = await fetch('http://localhost:8000/tractor-info/', {
+          method: 'POST',
+          headers: {  
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+          
+        });
+  
+  
+        const data = await response.json();
+  
+        if (data && data.status_code === 404) {
+          console.log("404");
+          setTractors([])
+          // setFilteredItems([])
+          alert("По вашим фильтрам ничего не нашлось");
+          return;
+      }
+  
+        
+        console.log('Статус ответа:', response.status);
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        
+        console.log('Данные компонента:', data);
+  
+        
+        if (Array.isArray(data)) {
+          if (data.status_code == 404){
+            setTractors([]);
+            // setFilteredItems([]); 
+          }
+          else{
+            setTractors(data);
+            // setFilteredItems(data); 
+          }
+          
+        } else if (data && typeof data === 'object') {
+          setTractors([data]);
+          // setFilteredItems([data]); 
+        } else {
+          setTractors([]);
+          // setFilteredItems([]); 
+        }
+        
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        setError(`Ошибка подключения к серверу: ${error.message}`);
+        
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+  
+    fetchTractors();
+  
+  }, [selectedModel]);
+
+
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div>Загрузка данных о тракторах...</div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="error">
+        <div>Ошибка: {error}</div>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="reload-button"
+        >
+          Перезагрузить
+        </button>
+      </div>
+    );
+  }
+
+  if (tractors.length === 0) {
+    return <div className="no-data">Нет данных о тракторах</div>;
+  }
+
+  return (
+    <div className="tractor-table-container">
+      {filteredTractors.length === 0 ? (
+        <div className="no-data">
+          {selectedModel 
+            ? `Нет тракторов модели "${selectedModel}"`
+            : "Нет данных о тракторах"
+          }
+        </div>
+      ) : (
+        <>
+          <div className="table-info">
+            Показано {filteredTractors.length} из {tractors.length} тракторов
+            {selectedModel && ` (фильтр: ${selectedModel})`}
+          </div>
+          <table className="tractor-table">
+            <thead>
+              <tr>
+                <th>VIN</th>
+                <th>Модель</th>
+                <th>Дата выпуска</th>
+                <th>Регион</th>
+                <th>Моточасы</th>
+                <th>Последняя активность</th>
+                <th>ДВС</th>
+                <th>КПП</th>
+                <th>РК</th>
+                <th>БК</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTractors.map(tractor => (
+                <tr key={tractor.id || tractor.vin}>
+                  <td>{tractor.vin || tractor.VIN}</td>
+                  <td>{tractor.model}</td>
+                  <td>{tractor.assembly_date || tractor.releaseDate}</td>
+                  <td>{tractor.region}</td>
+                  <td>{tractor.oh_hour || tractor.motoHours}</td>
+                  <td>{tractor.last_activity || tractor.lastActivity}</td>
+                  <td>{tractor.dvs || tractor.DVS || '-'}</td>
+                  <td>{tractor.kpp || tractor.KPP || '-'}</td>
+                  <td>{tractor.rk || tractor.RK || '-'}</td>
+                  <td>{tractor.bk || tractor.BK || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel}) {
+  return(
+    <div className='MainPart'> 
+      {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
+      {activeButton === 'tractor' && <TractorsTable/>}
+    </div>
   )
 }
