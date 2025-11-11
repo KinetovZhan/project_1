@@ -231,56 +231,63 @@ export function Objects() {
   )
 } */
 // Более менее норм, вызывает таблицу с конкретной моделью
-export function MainPart({ activeButton, selectedModel }) {
-  return(
+export function MainPart({ activeButton, selectedModel, onSearch }) {
+  /*return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
       {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel}/>: '') }
       <SearchBar/>
     </div>
   );
+}*/
+return(
+    <div className='MainPart'> 
+      {activeButton === 'aggregates' && <Objects />}
+      {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel}/>: '') }
+      <SearchBar onSearch={onSearch}/>
+    </div>
+  );
 }
 
 
 //Поле поиска в правом верхнем углу
-export function SearchBar({onSearch}) {
+ export function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
+
   const handleSearch = () => {
     if (onSearch && typeof onSearch === 'function') {
       onSearch(query);
     }
   };
+
   const handleKeydown = (e) => {
     if (e.key === 'Enter') {
-     handleSearch(); 
+      handleSearch(); 
     } 
   };
 
   return (
-    <div className = "search-bar">
+    <div className="search-bar">
       <input
-        type = "text"
-        placeholder = "Поиск"
-        value = {query}
-        onChange = {(e) => setQuery(e.target.value)} 
-        onKeyDown = {handleKeydown}
+        type="text"
+        placeholder="Поиск"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)} 
+        onKeyDown={handleKeydown}
       />
-      <button type = "button" //Кнопка поиска с иконкой лупв
-      onClick = {handleSearch}
-      className='search-icon-button'
+      <button 
+        type="button"
+        onClick={handleSearch}
+        className='search-icon-button'
       >
-        <svg width = "16" height = "16" viewBox = "0 0 24 24" fill = "none" stroke = "currentColor" strokeWidth = "2">
-          <circle cx = "11" cy = "11" r = "8" />
-          <line x1 = "21" y1 = "21" x2 = "16.65" y2 = "16.65" />
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </button>  
     </div>
-  
   );
-  
-};
-
-
+}
 
 
 
@@ -609,6 +616,14 @@ export function TractorTable({ selectedModel }) {
           </table>
         </>
       )}
+    </div>
+  );
+}
+
+export function Tractor() {
+  return(
+    <div className='windowTractor'> 
+     
     </div>
   );
 }

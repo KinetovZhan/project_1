@@ -4,7 +4,7 @@ import '../App.css';
 import { useNavigate } from 'react-router-dom';
 
 function MainPage() {
-  const [activeButton, setActiveButton] = useState(null);
+  /*const [activeButton, setActiveButton] = useState(null);
   const [selectedModel, setSelectedModel] = useState('');
   const navigate = useNavigate();
 
@@ -22,7 +22,70 @@ function MainPage() {
 
   const handleLogout = () => {
     navigate('/login');
+  };*/
+   const navigate = useNavigate();
+  
+  // 🔹 Отслеживаем все состояния через хук истории
+  const [appState, setAppState, undo, redo] = useHistoryState({
+    activeButton: null,
+    selectedModel: '',
+    searchQuery: '',
+    // можно добавить другие состояния
+  });
+
+  const handleButtonClick = (buttonName) => {
+    const newState = {
+      ...appState,
+      activeButton: buttonName,
+      selectedModel: buttonName !== 'tractor' ? '' : appState.selectedModel
+    };
+    setAppState(newState);
   };
+
+  const handleModelChange = (model) => {
+    const newState = {
+      ...appState,
+      selectedModel: model
+    };
+    setAppState(newState);
+  };
+
+  const handleSearch = (query) => {
+    const newState = {
+      ...appState,
+      searchQuery: query
+    };
+    setAppState(newState);
+  };
+
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
+  // 🔹 Обработка кнопки "Назад" в браузере
+  React.useEffect(() => {
+    const handlePopState = (event) => {
+      // При нажатии кнопки "Назад" в браузере - откатываем состояние
+      undo();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [undo]);
+
+  // 🔹 Сохраняем состояние в URL при изменениях
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams();
+    if (appState.activeButton) urlParams.set('tab', appState.activeButton);
+    if (appState.selectedModel) urlParams.set('model', appState.selectedModel);
+    if (appState.searchQuery) urlParams.set('search', appState.searchQuery);
+    
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+    window.history.pushState({ appState }, '', newUrl);
+  }, [appState]);
 
   return (
     <>
@@ -38,6 +101,7 @@ function MainPage() {
           <MainPart 
             activeButton={activeButton}
             selectedModel={selectedModel}
+            onSearch={handleSearch}
           />
         </div>
       </main>
