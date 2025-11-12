@@ -1,6 +1,25 @@
 import Image from './img/Image.png'
 import { useState, useEffect } from 'react';
 
+
+
+const formatDateTime = (dateString) => {
+  if (!dateString) return '-';
+  
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    return '-';
+  }
+};
+
 export function Header({ onLogout }) {
   return(
     <header>
@@ -161,7 +180,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   )
 }
 
-export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac }) {
+export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -180,7 +199,7 @@ export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFil
         </button>
       </div>
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
-      {activeButton === 'tractor' && <Filters2/>}
+      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel}/>}
     </div>
   )
 }
@@ -469,25 +488,59 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
 // }
 
 // Трактор
-export function Filters2({ selectedModel, onModelChangeTrac }) {
-  const models = ['К-742МСТ', 'К-735', 'К-525'];
+export function Filters2({ onFilterChangeTracByModel }) {
+  const models = ['К-742МСТ', 'К7', 'К-525'];
 
-  const handleModelChangeTrac = (modelName) => {
-    onModelChangeTrac(modelName);
+  const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
+    'K-742МСТ': false,
+    'К7': false,
+    'К-525': false
+  });
+
+  const FilterToTractor = {
+    'К-742МСТ': 'K742MST',
+    'К7': 'K7', 
+    'К-525': 'K525'
   };
+
+  const [FilterTractor_by_mass_order, setFilterTractor_by_mass_order] = useState({
+    Serial: false,
+    experienced: false,
+    actual: false,
+    critical: false
+  });
+
+  const [selectedModel2, setSelectedModel2] = useState('');
+
+  const handleFilterByModelTractors = (FilterType) => {
+    const newFilter = {
+      ...FilterTractors_by_model,
+      [FilterType]: !FilterTractors_by_model[FilterType]
+    };
+    setFilterTractors_by_model(newFilter)
+
+    if (onFilterChangeTracByModel) {
+      const activeFiltersTrac = Object.keys(newFilter)
+        .filter(key => newFilter[key])
+        .map(filter => FilterToTractor[filter]);
+      onFilterChangeTracByModel(activeFiltersTrac);
+    }
+  }
+  
 
   return (
     <>
       <div className='filterstrac'>
-
-          <label>
-            <span>dsadsa</span>
+        {models.map(model => (
+          <label key = {model}>
+            <span>{model}</span>
             <input 
               type="checkbox"
-              // checked={selectedModel === model}
-              // onChange={(e) => handleModelChangeTrac(model, e.target.checked)}
+              checked={FilterTractors_by_model[model]}
+              onChange={() => handleFilterByModelTractors(model)}
             />
           </label>
+        ))}
       </div>
 
       <div className='Дата выпуска'>
@@ -527,26 +580,50 @@ export function Filters2({ selectedModel, onModelChangeTrac }) {
 }
 
 
-export function TractorTable({ selectedModel }) {
+export function TractorTable({ activeFiltersTrac }) {
   const [tractors, setTractors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const filteredTractors = selectedModel 
-    ? tractors.filter(tractor => tractor.model === selectedModel)
-    : tractors;
+  // Функция для подготовки данных запроса с учетом фильтров
+  const getPostData = () => {
+    const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
+
+    const postData = {
+      trac_model: [],
+      status: [],
+      dealer: ""
+    };
+
+    // Добавляем фильтры по моделям из чекбоксов
+    if (hasModelFilters) {
+      postData.trac_model = activeFiltersTrac;
+    }
+
+    return postData;
+  };
 
   useEffect(() => {
     const fetchTractors = async () => {
+      const postData = getPostData();
+      console.log('=== ЗАПРОС ТРАКТОРОВ ===');
+      console.log('activeFiltersTrac:', activeFiltersTrac);
+      console.log('Данные для запроса:', postData);
+
+      // Проверяем, есть ли вообще какие-то фильтры для запроса
+      const hasAnyFilters = postData.trac_model.length > 0;
+      console.log('Есть фильтры для запроса:', hasAnyFilters);
+
+      // if (!hasAnyFilters) {
+      //   console.log('Нет активных фильтров - пропускаем запрос');
+      //   setTractors([]);
+      //   return;
+      // }
+
       try {
         setLoading(true);
-        
-        // Подготовка данных для запроса
-        const postData = {
-          trac_model: selectedModel ? [selectedModel] : [],
-          status: [],
-          dealer: ""
-        };
+        console.log('Отправляем запрос на сервер...');
+
         const response = await fetch('http://localhost:8000/tractor-info/', {
           method: 'POST',
           headers: {  
@@ -554,69 +631,68 @@ export function TractorTable({ selectedModel }) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(postData)
-          
         });
-  
-  
-        const data = await response.json();
-  
-        if (data && data.status_code === 404) {
-          console.log("404");
-          setTractors([])
-          // setFilteredItems([])
-          alert("По вашим фильтрам ничего не нашлось");
-          return;
-      }
-  
-        
+
         console.log('Статус ответа:', response.status);
-  
+
+        const data = await response.json();
+        console.log('Полученные данные:', data);
+
+        if (data && data.status_code === 404) {
+          console.log("404 - тракторы не найдены");
+          setTractors([]);
+          return;
+        }
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        
-        console.log('Данные компонента:', data);
-  
-        
+        console.log('Успешно получены данные тракторов:', data);
+
         if (Array.isArray(data)) {
-          if (data.status_code == 404){
-            setTractors([]);
-            // setFilteredItems([]); 
-          }
-          else{
-            setTractors(data);
-            // setFilteredItems(data); 
-          }
-          
+          setTractors(data);
         } else if (data && typeof data === 'object') {
           setTractors([data]);
-          // setFilteredItems([data]); 
         } else {
           setTractors([]);
-          // setFilteredItems([]); 
         }
         
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         setError(`Ошибка подключения к серверу: ${error.message}`);
-        
       } finally {
         setLoading(false);
       }
     };
-  
-  
+
     fetchTractors();
-  
-  }, [selectedModel]);
+  }, [activeFiltersTrac]); // ТОЛЬКО activeFiltersTrac
 
+  // Отладочная информация
+  console.log('=== РЕНДЕР TractorTable ===');
+  console.log('activeFiltersTrac:', activeFiltersTrac);
+  console.log('tractors:', tractors);
+  console.log('loading:', loading);
 
+  // Если нет активных фильтров, показываем сообщение
+  const hasActiveFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
+
+  // if (!hasActiveFilters) {
+  //   return (
+  //     <div className="tractor-table-container">
+  //       <div className="no-data">
+  //         Выберите модели тракторов для отображения
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (loading) {
     return (
       <div className="loading">
         <div>Загрузка данных о тракторах...</div>
+        <div>Активные фильтры: {activeFiltersTrac.join(', ')}</div>
       </div>
     );
   }
@@ -635,25 +711,27 @@ export function TractorTable({ selectedModel }) {
     );
   }
 
-  if (tractors.length === 0) {
-    return <div className="no-data">Нет данных о тракторах</div>;
-  }
-
   return (
     <div className="tractor-table-container">
-      {filteredTractors.length === 0 ? (
-        <div className="no-data">
-          {selectedModel 
-            ? `Нет тракторов модели "${selectedModel}"`
-            : "Нет данных о тракторах"
-          }
+      {/* Информация о фильтрах */}
+      <div className="filter-info">
+        {activeFiltersTrac.length > 0 && (
+          <div style={{marginBottom: '10px', color: '#666'}}>
+            Активные фильтры: {activeFiltersTrac.join(', ')}
+          </div>
+        )}
+      </div>
+
+      {tractors.length === 0 ? (
+        <div className="no-data"> 
+          Нет тракторов, соответствующих выбранным фильтрам
         </div>
       ) : (
         <>
-          <div className="table-info">
-            Показано {filteredTractors.length} из {tractors.length} тракторов
-            {selectedModel && ` (фильтр: ${selectedModel})`}
-          </div>
+          {/* <div className="table-info">
+            Показано {tractors.length} тракторов
+            {` (фильтр: ${activeFiltersTrac.join(', ')})`}
+          </div> */}
           <table className="tractor-table">
             <thead>
               <tr>
@@ -670,14 +748,14 @@ export function TractorTable({ selectedModel }) {
               </tr>
             </thead>
             <tbody>
-              {filteredTractors.map(tractor => (
+              {tractors.map(tractor => (
                 <tr key={tractor.id || tractor.vin}>
-                  <td>{tractor.vin || tractor.VIN}</td>
-                  <td>{tractor.model}</td>
-                  <td>{tractor.assembly_date || tractor.releaseDate}</td>
-                  <td>{tractor.region}</td>
-                  <td>{tractor.oh_hour || tractor.motoHours}</td>
-                  <td>{tractor.last_activity || tractor.lastActivity}</td>
+                  <td>{tractor.vin || tractor.VIN || '-'}</td>
+                  <td>{tractor.model || '-'}</td>
+                  <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
+                  <td>{tractor.region || '-'}</td>
+                  <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
+                  <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   <td>{tractor.dvs || tractor.DVS || '-'}</td>
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
                   <td>{tractor.rk || tractor.RK || '-'}</td>
@@ -692,11 +770,11 @@ export function TractorTable({ selectedModel }) {
   );
 }
 
-export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel}) {
+export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac}) {
   return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-      {activeButton === 'tractor' && <TractorTable/>}
+      {activeButton === 'tractor'&& <TractorTable activeFiltersTrac={activeFiltersTrac}/>}
     </div>
   )
 }

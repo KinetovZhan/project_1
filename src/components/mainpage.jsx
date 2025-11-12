@@ -7,11 +7,15 @@ function MainPage() {
   const [activeButton, setActiveButton] = useState(null); 
   const [activeFilters, setActiveFilters] = useState([]);
   const [activeFilters2, setActiveFilters2] = useState([]);
+  const [activeFiltersTrac, setActiveFiltersTrac] = useState([]);
+  const [activeFiltersTrac2, setActiveFiltersTrac2] = useState([]);
   const navigate = useNavigate();
 
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
+  const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const [selectedModel, setSelectedModel] = useState('');
+
 
   const handleButtonClick = (buttonName) => {
       if (activeButton === buttonName) {
@@ -35,8 +39,9 @@ function MainPage() {
   };
 
 
-  const handleModelChangeTrac = (model) => {
-    setSelectedModel(model);
+
+  const handleFilterByModelTractors = (model) => {
+    setActiveFiltersTrac(model);
   };
 
 
@@ -55,13 +60,15 @@ function MainPage() {
             onFilterChange={handleFilterChange} 
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
-            onModelChangeTrac={handleModelChangeTrac}
+            onFilterChangeTracByModel={handleFilterByModelTractors}
+
           />
           <MainPart 
             activeButton={activeButton}
             activeFilters={memoizedActiveFilters} 
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
+            activeFiltersTrac={memoizedActiveFiltersTrac}
           />
         </div>
       </main>
