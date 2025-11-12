@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
 import { Header, Sidebar, MainPart } from '../Func'; // Добавьте импорт
 import '../App.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function MainPage() {
-  const [activeButton, setActiveButton] = useState(null); // Добавьте состояние
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(''); 
   const navigate = useNavigate();
-
+  //Получаем состояния URL параметров (Тракторы или агрегаты и тд)
+  const activeButton = searchParams.get('tab') || null;
+  const selectedModel = searchParams.get('model') || '';
   const handleButtonClick = (buttonName) => {
-    setActiveButton(buttonName);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab', buttonName);
     if (buttonName !== 'tractor') {
-      setSelectedModel('');
+      newParams.delete('model');
     }
+    setSearchParams(newParams);
   };
+  const handleModelChange = (model) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (model)
+      {newParams.set('model', model);
+  } else {
+    newParams.delete('model');
+  } 
+  setSearchParams(newParams);
+}
 
   const handleLogout = () => {
     navigate('/login');
@@ -36,9 +48,7 @@ function MainPage() {
     closeAddForm();
   };
 
-  const handleModelChange = (model) => {
-    setSelectedModel(model);
-  }
+  
 
   return ( // ← ДОБАВЬТЕ return
     <>

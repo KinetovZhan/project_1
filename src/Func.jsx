@@ -447,10 +447,7 @@ export function SearchBar({ onSearch }) {
 export function Filters2({ selectedModel, onModelChange }) {
   const models = ['К-742МСТ', 'К-735', 'К-525'];
 
-  const handleModelChange = (modelName) => {
-    onModelChange(modelName);
-  };
-
+ 
   return (
     <>
       <div className='filterstrac'>
@@ -460,7 +457,7 @@ export function Filters2({ selectedModel, onModelChange }) {
             <input 
               type="checkbox"
               checked={selectedModel === model}
-              onChange={(e) => handleModelChange(model, e.target.checked)}
+              onChange={() => onModelChange(model)}
             />
           </label>
         ))}
