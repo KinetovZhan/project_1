@@ -1,3 +1,0 @@
-const getURL_all = () => {
-
-}

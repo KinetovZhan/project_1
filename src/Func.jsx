@@ -180,7 +180,7 @@ export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFil
         </button>
       </div>
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
-      {activeButton === 'tractor' && <Filters2  onModelChangeTrac={onModelChangeTrac}/>}
+      {activeButton === 'tractor' && <Filters2/>}
     </div>
   )
 }
@@ -537,7 +537,7 @@ export function TractorTable({ selectedModel }) {
     : tractors;
 
   useEffect(() => {
-    fetchTractors = async () => {
+    const fetchTractors = async () => {
       try {
         setLoading(true);
         
@@ -547,7 +547,7 @@ export function TractorTable({ selectedModel }) {
           status: [],
           dealer: ""
         };
-        response = await fetch('http://localhost:8000/tractor-info/', {
+        const response = await fetch('http://localhost:8000/tractor-info/', {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',
@@ -696,7 +696,7 @@ export function MainPart({activeButton, activeFilters, activeFilters2, selectedM
   return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-      {activeButton === 'tractor' && <TractorsTable/>}
+      {activeButton === 'tractor' && <TractorTable/>}
     </div>
   )
 }

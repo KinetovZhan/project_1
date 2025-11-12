@@ -480,7 +480,7 @@ button:active {
   cursor: pointer;
   padding: 1px;
   border-radius: 10px;
- 
+
 }
 /* Отключаем эффекты hover для этой кнопки */
 .search-bar .search-icon-button:hover {
