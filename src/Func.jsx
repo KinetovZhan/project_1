@@ -410,12 +410,21 @@ export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit
   }
   
   return(
-    <div className='MainPart'> 
-      {activeButton === 'aggregates' && <Objects />}
-      {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel} /> : '')}
-      <SearchBar/> 
-    </div>
-  );
+  <div className='MainPart'> 
+    {activeButton === 'aggregates' && (
+      <>
+        <SearchBar/>
+        <Objects />
+      </>
+    )}
+    {activeButton === 'tractor' && (
+      <>
+        <SearchBar/>
+        {selectedModel && <TractorTable selectedModel={selectedModel} />}
+      </>
+    )} 
+  </div>
+);
 }
 
 export function SearchBar({ onSearch }) {
@@ -700,10 +709,11 @@ export function Filters2({ selectedModel, onModelChange }) {
 }
 
 
-export function TractorTable({ selectedModel }) {
+/*export function TractorTable({ selectedModel }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedTractor, setSelectedTractor] = useState(null); // Новое состояние
   
   const mockTractors = [
     {
@@ -810,6 +820,16 @@ export function TractorTable({ selectedModel }) {
     fetchTractors();
   }, []);
 
+  // Функция для обработки клика по строке
+  const handleRowClick = (tractor) => {
+    setSelectedTractor(tractor);
+  };
+
+  // Функция для возврата назад
+  const handleBack = () => {
+    setSelectedTractor(null);
+  };
+
   if (loading) {
     return (
       <div className="loading">
@@ -833,6 +853,16 @@ export function TractorTable({ selectedModel }) {
 
   if (tractors.length === 0) {
     return <div className="no-data">Нет данных о тракторах</div>;
+  }
+
+  // Если выбран трактор, отображаем его детали
+  if (selectedTractor) {
+    return (
+      <TractorDetails 
+        tractor={selectedTractor} 
+        onBack={handleBack} 
+      />
+    );
   }
 
   return (
@@ -863,7 +893,11 @@ export function TractorTable({ selectedModel }) {
             </thead>
             <tbody>
               {filteredTractors.map(tractor => (
-                <tr key={tractor.id}>
+                <tr 
+                 key={tractor.id} 
+                 onClick={() => handleRowClick(tractor)} // Обработчик клика
+                 style={{ cursor: 'pointer' }}
+                >
                   <td>{tractor.VIN}</td>
                   <td> {tractor.model}</td>
                   <td>{tractor.releaseDate}</td>
@@ -880,6 +914,322 @@ export function TractorTable({ selectedModel }) {
           </table>
         </>
       )}
+    </div>
+  );
+}*/
+export function TractorTable({ selectedModel }) {
+  const [tractors, setTractors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedTractor, setSelectedTractor] = useState(null);
+
+  const mockTractors = [
+    {
+      id: 1,
+      VIN: "1HGBH41JXMN109186",
+      model: "К-742МСТ",
+      releaseDate: "2023-01-15",
+      region: "Московская область",
+      motoHours: 1250,
+      lastActivity: "2024-01-20",
+      DVS: "Исправен",
+      KPP: "Исправна",
+      RK: "Требует проверки",
+      BK: "Исправен"
+    },
+    {
+      id: 2,
+      VIN: "2FMDK3GC5DBA53674", 
+      model: "К-735",
+      releaseDate: "2022-08-10",
+      region: "Ленинградская область",
+      motoHours: 890,
+      lastActivity: "2024-01-18",
+      DVS: "Исправен",
+      KPP: "Исправна",
+      RK: "Исправен",
+      BK: "Исправен"
+    },
+    {
+      id: 4,
+      VIN: "4HGBH41JXMN109187",
+      model: "К-742МСТ",
+      releaseDate: "2023-03-20",
+      region: "Новосибирская область",
+      motoHours: 980,
+      lastActivity: "2024-01-19",
+      DVS: "Исправен",
+      KPP: "Требует ремонта",
+      RK: "Исправен",
+      BK: "Исправен"
+    },
+    {
+      id: 5,
+      VIN: "5FMDK3GC5DBA53675",
+      model: "К-735", 
+      releaseDate: "2022-11-05",
+      region: "Ростовская область",
+      motoHours: 1340,
+      lastActivity: "2024-01-21",
+      DVS: "На обслуживании",
+      KPP: "Исправна",
+      RK: "Требует проверки",
+      BK: "Исправen"
+    },
+  ];
+
+  const filteredTractors = selectedModel 
+    ? tractors.filter(tractor => tractor.model === selectedModel)
+    : tractors;
+
+  useEffect(() => {
+    const API_URL = '/api/tractors';
+    
+    const fetchTractors = async () => {
+      try {
+        const USE_MOCK_DATA = true;
+        
+        if (USE_MOCK_DATA) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          setTractors(mockTractors);
+          return;
+        }
+        
+        const response = await fetch(API_URL);
+        
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Сервер вернул не JSON формат');
+        }
+        
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          throw new Error('Сервер вернул не массив');
+        }
+       
+        setTractors(data);  
+      } catch (err) {
+        console.error('Ошибка при загрузке данных:', err);
+        if (err.message.includes('JSON') || err.message.includes('Unexpected token')) {
+          setError('Ошибка: Сервер вернул HTML вместо JSON. Проверьте API endpoint.');
+        } else {
+          setError(`Ошибка: ${err.message}`);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTractors();
+  }, []);
+
+  // Функция для обработки клика по строке
+  const handleRowClick = (tractor) => {
+    console.log('Клик по трактору:', tractor); // Для отладки
+    setSelectedTractor(tractor);
+  };
+
+  /* Функция для возврата назад
+  const handleBack = () => {
+    setSelectedTractor(null);
+  };*/
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div>Загрузка данных о тракторах...</div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="error">
+        <div>Ошибка: {error}</div>
+        <button 
+          onClick={() => window.location.reload()} 
+        >
+          Перезагрузить
+        </button>
+      </div>
+    );
+  }
+
+  if (tractors.length === 0) {
+    return <div className="no-data">Нет данных о тракторах</div>;
+  }
+
+  // 🔹 ВАЖНО: Если выбран трактор, отображаем его детали
+  if (selectedTractor) {
+    return (
+      <TractorDetails 
+        tractor={selectedTractor} 
+        //onBack={handleBack} 
+      />
+    );
+  }
+
+  return (
+    <div className="tractor-table-container">
+      {filteredTractors.length === 0 ? (
+        <div className="no-data">
+          {selectedModel 
+            ? `Нет тракторов модели "${selectedModel}"`
+            : "Нет данных о тракторах"
+          }
+        </div>
+      ) : (
+        <>
+          <table className="tractor-table">
+            <thead>
+              <tr>
+                <th>Vin</th>
+                <th>Модель</th>
+                <th>Дата выпуска</th>
+                <th>Регион</th>
+                <th>Моточасы</th>
+                <th>Последняя активность</th>
+                <th>ДВС</th>
+                <th>КПП</th>
+                <th>РК</th>
+                <th>БК</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTractors.map(tractor => (
+                <tr 
+                  key={tractor.id} 
+                  onClick={() => handleRowClick(tractor)}
+                  style={{ cursor: 'pointer' }}
+                  className="clickable-row"
+                >
+                  <td>{tractor.VIN}</td>
+                  <td>{tractor.model}</td>
+                  <td>{tractor.releaseDate}</td>
+                  <td>{tractor.region}</td>
+                  <td>{tractor.motoHours}</td>
+                  <td>{tractor.lastActivity}</td>
+                  <td>{tractor.DVS}</td>
+                  <td>{tractor.KPP}</td>
+                  <td>{tractor.RK}</td>
+                  <td>{tractor.BK}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function TractorDetails({ tractor }) {
+  if (!tractor) return null;
+
+  const {
+    VIN,
+    model,
+    releaseDate,
+    region,
+    motoHours,
+    lastActivity,
+    DVS,
+    KPP,
+    RK,
+    BK
+  } = tractor;
+
+  // Пример данных для "Комплектация и ПО" (можно адаптировать под реальные данные)
+  const poList = [
+    { name: 'ДВС', version: '1.320' },
+    { name: 'КПП', version: '2.15' },
+    { name: 'РК', version: '1.0' },
+    { name: 'ГР', version: '3.2' },
+    { name: 'БК', version: '4.0' },
+    { name: 'Автопилот', version: '1.5' }
+  ];
+
+  // Пример данных для "Последние ошибки"
+  const lastError = {
+    code: 'E-001',
+    date: '02.08.2025'
+  };
+
+  // Пример данных для "Дата последней эксплуатации"
+  const lastOperation = {
+    date: '15.08.2025',
+    hours: '65,5 ч.'
+  };
+
+  return (
+    <div className="tractor-details-container">
+      {/* 
+      <button
+        onClick={onBack}
+        className="back-button"
+        style={{
+          position: 'absolute',
+          top: '30px',
+          left: '30px',
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          zIndex: 10,
+          padding: '0',
+          boxShadow: 'none',
+          backgroundColor: 'transparent'
+        }}
+      >
+        <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </button>*/}
+
+      <div className="tractor-details-content">
+        <div className="tractor-info">
+          <h2>{model}</h2>
+          <img src={Image} alt={model} className="tractor-image" />
+        </div>
+
+        <div className="details-columns">
+          <div className="column">
+            <div className="section">
+              <h3>Дата выпуска</h3>
+              <p>{releaseDate}</p>
+            </div>
+            <div className="section">
+              <h3>Регион эксплуатации</h3>
+              <p>{region}</p>
+            </div>
+            <div className="section">
+              <h3>Дата последней эксплуатации, Кол-во МЧ</h3>
+              <p>{lastOperation.date}, {lastOperation.hours}</p>
+            </div>
+          </div>
+
+          <div className="column">
+            <div className="section">
+              <h3>Комплектация и ПО</h3>
+              <ul className="po-list">
+                {poList.map((item, index) => (
+                  <li key={index}>
+                    {item.name} {item.version && `v${item.version}`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="section">
+              <h3>Последние ошибки, дата</h3>
+              <p>Код ошибки: {lastError.code}, {lastError.date}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
