@@ -9,11 +9,13 @@ function MainPage() {
   const [activeFilters2, setActiveFilters2] = useState([]);
   const [activeFiltersTrac, setActiveFiltersTrac] = useState([]);
   const [activeFiltersTrac2, setActiveFiltersTrac2] = useState([]);
+  const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const navigate = useNavigate();
 
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
+  const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
   const [selectedModel, setSelectedModel] = useState('');
 
 
@@ -23,6 +25,14 @@ function MainPage() {
       } else {
           setActiveButton(buttonName);
       }
+  };
+
+  const handleMajMinButtonClick = (buttonName) => {
+    if(activeMajMinButton === buttonName) {
+      setActiveMajMinButton(null);
+    } else {
+      setActiveMajMinButton(buttonName);
+    }
   };
 
   const handleFilterChange = (filters) => {
@@ -44,6 +54,10 @@ function MainPage() {
     setActiveFiltersTrac(model);
   };
 
+  const handleFilterByStatus = (model) => {
+    setActiveFiltersTrac2(model);
+  };
+
 
   const handleLogout = () => {
       navigate('/login');
@@ -57,18 +71,26 @@ function MainPage() {
           <Sidebar 
             activeButton={activeButton} 
             handleButtonClick={handleButtonClick}
+
             onFilterChange={handleFilterChange} 
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
+            
             onFilterChangeTracByModel={handleFilterByModelTractors}
-
+            onFilterChangeByStatus = {handleFilterByStatus}
+            activeMajMinButton={activeMajMinButton}
+            handleMajMinButtonClick={handleMajMinButtonClick}
           />
           <MainPart 
             activeButton={activeButton}
+
             activeFilters={memoizedActiveFilters} 
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
+
             activeFiltersTrac={memoizedActiveFiltersTrac}
+            activeFiltersTrac2={memoizedActiveFiltersTrac2}
+            activeMajMinButton={activeMajMinButton}
           />
         </div>
       </main>

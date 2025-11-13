@@ -271,7 +271,7 @@ button.active {
 
 button:hover {
   background-color: #b6bbc1;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -324,6 +324,11 @@ button:active {
   padding: 10px;
   gap: 10px;
   color: black;
+  /* Полоса прокрутки */
+  max-height: 120px;
+  overflow-y: auto;
+  border: 7px solid rgba(217, 217, 217, 1);
+
 
 
   /* Положение */
@@ -333,7 +338,20 @@ button:active {
 }
 
 
+.filterstrac::-webkit-scrollbar {
+  width: 8px;
+  height: 10px;
+}
 
+
+.filterstrac::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+.filterstrac::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
 
 .filterstrac h3 {
   margin: 0;
@@ -397,7 +415,7 @@ button:active {
   display: flex;
   align-items: row;
 
-  /* ПОзиция */
+  /* Позиция */
   position: absolute;
   left: 13px;
   top: 694px;
@@ -410,12 +428,20 @@ button:active {
   margin: 4px;
 }
 
+
+.majmin_button_active {
+  background-color: black;
+  color: white;
+}
+.majmin_button_active:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
 .majmin_button:active {
   background-color: black;
   color: white;
 }
-
-
 
 .download {
   width: 268px;
@@ -540,13 +566,12 @@ button:active {
 }
 
 .no-data {
-  background: #f5f5f5;
-  width: 400px;
-  height: 100px;
+  /* background: #f5f5f5; */
   color: #131313;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* display: flex; */
+  font-size: larger;
+  /* align-items: center; */
+  /* justify-content: center; */
 }
 
 /*Временный вариант*/

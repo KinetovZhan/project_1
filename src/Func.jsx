@@ -180,7 +180,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   )
 }
 
-export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel }) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -199,7 +199,7 @@ export function Sidebar({ activeButton, handleButtonClick, onFilterChange, onFil
         </button>
       </div>
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
-      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel}/>}
+      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton}/>}
     </div>
   )
 }
@@ -476,23 +476,12 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
   );
 }
 
-
-
-// export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel}) {
-//   return(
-//     <div className='MainPart'> 
-//       {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-//       {activeButton === 'tractor' && <TractorsTable/>}
-//     </div>
-//   )
-// }
-
 // Трактор
-export function Filters2({ onFilterChangeTracByModel }) {
+export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick }) {
   const models = ['К-742МСТ', 'К7', 'К-525'];
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
-    'K-742МСТ': false,
+    'К-742МСТ': false,
     'К7': false,
     'К-525': false
   });
@@ -503,14 +492,39 @@ export function Filters2({ onFilterChangeTracByModel }) {
     'К-525': 'K525'
   };
 
-  const [FilterTractor_by_mass_order, setFilterTractor_by_mass_order] = useState({
+  const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
     Serial: false,
-    experienced: false,
-    actual: false,
-    critical: false
+    Experienced: false,
+    Actual: false,
+    Critical: false
   });
 
-  const [selectedModel2, setSelectedModel2] = useState('');
+  const FilterStatus = {
+    'Serial': 'Серийное',
+    'Experienced': 'Опытное',
+    'Actual': 'Актуальное',
+    'Critical': 'Критические'
+  }
+
+
+
+  const handleFilterByStatus = (FilterType) => {
+    const newFilter = {
+      ...FilterTractor_by_status,
+      [FilterType]: !FilterTractor_by_status[FilterType]
+    };
+    setFilterTractor_by_status(newFilter)
+
+
+    if(onFilterChangeByStatus) {
+      const activeFiltersTrac2 = Object.keys(newFilter)
+        .filter(key => newFilter[key])
+        .map(filter => FilterStatus[filter]);
+      onFilterChangeByStatus(activeFiltersTrac2);
+    }
+  }
+  
+
 
   const handleFilterByModelTractors = (FilterType) => {
     const newFilter = {
@@ -552,35 +566,53 @@ export function Filters2({ onFilterChangeTracByModel }) {
       <div className='filterstrac2'>
         <label>
           <span>Серийное</span>
-          <input type="checkbox" />
+          <input type="checkbox"
+          checked={FilterTractor_by_status.Serial} 
+          onChange={() => handleFilterByStatus('Serial')}/>
         </label>
 
         <label>
           <span>Опытное</span>
-          <input type="checkbox" />
+          <input type="checkbox"
+          checked={FilterTractor_by_status.Experienced} 
+          onChange={() => handleFilterByStatus('Experienced')}/>
         </label>
 
         <label>
           <span>Актуальное</span>
-          <input type="checkbox" />
+          <input type="checkbox"
+          checked={FilterTractor_by_status.Actual} 
+          onChange={() => handleFilterByStatus('Actual')}/>
         </label>
 
         <label>
           <span>Критические</span>
-          <input type="checkbox" />
+          <input type="checkbox"
+          checked={FilterTractor_by_status.Critical} 
+          onChange={() => handleFilterByStatus('Critical')}/>
         </label>
       </div>
 
       <div className='Majmin'>
-        <button className='majmin_button'>Требуется MAJ</button>
-        <button className='majmin_button'>Требуется MIN</button>
+        <button 
+          className={activeMajMinButton === 'MAJ'?'majmin_button_active' : 'majmin_button'}
+          onClick={() => handleMajMinButtonClick('MAJ')}
+        >
+          Требуется MAJ
+        </button>
+        <button 
+          className={activeMajMinButton === 'MIN'? 'majmin_button_active' : 'majmin_button'}
+          onClick={() => handleMajMinButtonClick('MIN')}
+        >
+          Требуется MIN
+        </button>
       </div>
     </>
   );
 }
 
 
-export function TractorTable({ activeFiltersTrac }) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -588,6 +620,7 @@ export function TractorTable({ activeFiltersTrac }) {
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
     const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
+    const hasStatusFilters = activeFiltersTrac2 && activeFiltersTrac2.length > 0;
 
     const postData = {
       trac_model: [],
@@ -599,6 +632,10 @@ export function TractorTable({ activeFiltersTrac }) {
     if (hasModelFilters) {
       postData.trac_model = activeFiltersTrac;
     }
+    if (hasStatusFilters) {
+      postData.status = activeFiltersTrac2;
+      
+    }
 
     return postData;
   };
@@ -606,24 +643,9 @@ export function TractorTable({ activeFiltersTrac }) {
   useEffect(() => {
     const fetchTractors = async () => {
       const postData = getPostData();
-      console.log('=== ЗАПРОС ТРАКТОРОВ ===');
-      console.log('activeFiltersTrac:', activeFiltersTrac);
-      console.log('Данные для запроса:', postData);
-
-      // Проверяем, есть ли вообще какие-то фильтры для запроса
-      const hasAnyFilters = postData.trac_model.length > 0;
-      console.log('Есть фильтры для запроса:', hasAnyFilters);
-
-      // if (!hasAnyFilters) {
-      //   console.log('Нет активных фильтров - пропускаем запрос');
-      //   setTractors([]);
-      //   return;
-      // }
 
       try {
         setLoading(true);
-        console.log('Отправляем запрос на сервер...');
-
         const response = await fetch('http://localhost:8000/tractor-info/', {
           method: 'POST',
           headers: {  
@@ -667,7 +689,7 @@ export function TractorTable({ activeFiltersTrac }) {
     };
 
     fetchTractors();
-  }, [activeFiltersTrac]); // ТОЛЬКО activeFiltersTrac
+  }, [activeFiltersTrac, activeFiltersTrac2]); 
 
   // Отладочная информация
   console.log('=== РЕНДЕР TractorTable ===');
@@ -675,18 +697,7 @@ export function TractorTable({ activeFiltersTrac }) {
   console.log('tractors:', tractors);
   console.log('loading:', loading);
 
-  // Если нет активных фильтров, показываем сообщение
-  const hasActiveFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
 
-  // if (!hasActiveFilters) {
-  //   return (
-  //     <div className="tractor-table-container">
-  //       <div className="no-data">
-  //         Выберите модели тракторов для отображения
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   if (loading) {
     return (
@@ -715,9 +726,9 @@ export function TractorTable({ activeFiltersTrac }) {
     <div className="tractor-table-container">
       {/* Информация о фильтрах */}
       <div className="filter-info">
-        {activeFiltersTrac.length > 0 && (
+        {activeFiltersTrac.length > 0 && activeFiltersTrac2.length > 0 && (
           <div style={{marginBottom: '10px', color: '#666'}}>
-            Активные фильтры: {activeFiltersTrac.join(', ')}
+            Активные фильтры: {activeFiltersTrac.join(', ')} {activeFiltersTrac2.join(',')}
           </div>
         )}
       </div>
@@ -728,10 +739,10 @@ export function TractorTable({ activeFiltersTrac }) {
         </div>
       ) : (
         <>
-          {/* <div className="table-info">
+          <div className="table-info">
             Показано {tractors.length} тракторов
             {` (фильтр: ${activeFiltersTrac.join(', ')})`}
-          </div> */}
+          </div>
           <table className="tractor-table">
             <thead>
               <tr>
@@ -770,11 +781,11 @@ export function TractorTable({ activeFiltersTrac }) {
   );
 }
 
-export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac}) {
+export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2}) {
   return(
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-      {activeButton === 'tractor'&& <TractorTable activeFiltersTrac={activeFiltersTrac}/>}
+      {activeButton === 'tractor'&& <TractorTable activeFiltersTrac={activeFiltersTrac} activeFiltersTrac2={activeFiltersTrac2}/>}
     </div>
   )
 }
