@@ -10,6 +10,8 @@ function MainPage() {
   const [activeFiltersTrac, setActiveFiltersTrac] = useState([]);
   const [activeFiltersTrac2, setActiveFiltersTrac2] = useState([]);
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('');
   const navigate = useNavigate();
 
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
@@ -25,6 +27,12 @@ function MainPage() {
       } else {
           setActiveButton(buttonName);
       }
+  };
+
+  const handleSearch = (query, type = '') => {
+    console.log('Поиск:', query, 'Тип:', type);
+    setSearchQuery(query);
+    setSearchType(type);
   };
 
   const handleMajMinButtonClick = (buttonName) => {
@@ -91,6 +99,10 @@ function MainPage() {
             activeFiltersTrac={memoizedActiveFiltersTrac}
             activeFiltersTrac2={memoizedActiveFiltersTrac2}
             activeMajMinButton={activeMajMinButton}
+
+            onSearch={handleSearch}
+            searchQuery={searchQuery}
+            searchType={searchType}
           />
         </div>
       </main>

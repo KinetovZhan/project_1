@@ -207,16 +207,16 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
 
 
-export function Objects({activeFilters, activeFilters2, selectedModel}) {
+export function Objects({activeFilters, activeFilters2, selectedModel, onSearch, searchQuery, searchType}) {
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredItems, setFilteredItems] = useState([]);
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
-  
 
 
   const getPostData = () => {
+
     const hasComponentFilters = activeFilters.length > 0;
     const hasTractorFilter = activeFilters2.length > 0;
     const hasSelectedModel = selectedModel && selectedModel !== '';
@@ -240,6 +240,24 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
       model_comp: ""
     };
 
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      if (searchType === 'trac_model') {
+        // Поиск по модели трактора
+        postData.trac_model = [searchQuery.trim()];
+      } else if (searchType === 'type_comp') {
+        // Поиск по типу компонента
+        postData.type_comp = [searchQuery.trim()];
+      } else if (searchType === 'model_comp') {
+        // Поиск по модели компонента
+        postData.model_comp = searchQuery.trim();
+      } else {
+        // Общий поиск (если тип не выбран)
+        postData.search_query = searchQuery.trim();
+      }
+    }
+
+
     // Заполняем данные в зависимости от активных фильтров
     if (hasTractorFilter) {
       postData.trac_model = activeFilters2.map(filter => FilterToTractor[filter]);
@@ -256,6 +274,16 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
     return postData;
   };
 
+  const handleDownload = (item) => {
+    console.log('Детали компонента:', item);
+    
+    if (item && item.download_link && item.download_link.length > 10) {
+      window.open(item.download_link, '_blank');
+    } else {
+      console.warn('Ссылка для скачивания не найдена для элемента:', item);
+      alert('Ссылка для скачивания недоступна');
+    }
+  };
 
 
   useEffect(() => {
@@ -267,13 +295,13 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
 
         const postData = getPostData();
         console.log('Данные для пост запроса:', postData)
-        // const hasAnyFilter = postData.trac_model.length > 0 || postData.type_comp.length > 0 || postData.model_comp !== '';
+        
 
-        let response;
-        let data;
+        const endpoint = 'http://localhost:8000/component-info/';
+    
 
 
-        response = await fetch('http://localhost:8000/component-info/', {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',
@@ -284,7 +312,7 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
         });
 
 
-        data = await response.json();
+        const data = await response.json();
 
         if (data && data.status_code === 404) {
           console.log("404");
@@ -335,51 +363,10 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
 
     fetchSoftware();
 
-  }, [activeFilters, activeFilters2, selectedModel]);
-
-
-  // // Эффект для фильтрации данных при изменении активных фильтров
-  // useEffect(() => {
-  //   if (activeFilters.length === 0) {
-  //     // Если нет активных фильтров, показываем все элементы
-  //     setFilteredItems(softwareItems);
-  //   } else {
-  //     // Фильтруем элементы по типу компонента
-  //     const filtered = softwareItems.filter(item => {
-  //       const type = item.type_component?.toLowerCase();
-
-  //       // Сопоставление фильтров с типами компонентов
-  //       const filterMap = {
-  //         'DVS': 'двс',
-  //         'KPP': 'кпп', 
-  //         'RK': 'рк',
-  //         'hydrorasp': 'гидрораспределитель'
-  //       };
-        
-  //       // Проверяем, соответствует ли тип компонента любому из активных фильтров
-  //       return activeFilters.some(filter => {
-  //         const expectedType = filterMap[filter];
-  //         return type && type.includes(expectedType);
-  //       });
-  //     });
-      
-  //     setFilteredItems(filtered);
-  //   }
-  // }, [activeFilters, softwareItems]);
+  }, [activeFilters, activeFilters2, selectedModel, searchQuery, searchType]);
 
 
 
-
-  const handleDownload = (item) => {
-    console.log('Детали компонента:', item);
-    
-    if (item && (item.download_link).length > 10) {
-      window.open(item.download_link, '_blank');
-    } else {
-      console.warn('Ссылка для скачивания не найдена для элемента:', item);
-      alert('Ссылка для скачивания недоступна');
-    }
-  };
 
 
     const getAllActiveFilters = () => {
@@ -397,11 +384,29 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
   };
 
 
+  const getComponentName = () => {
+  const filterNames = {
+    'DVS': 'ДВС',
+    'KPP': 'КПП', 
+    'RK': 'РК',
+    'hydrorasp': 'Гидрораспределитель'
+  };
+  
+  // Если есть активные фильтры, показываем все выбранные
+  if (activeFilters.length > 0) {
+    const selectedNames = activeFilters.map(filter => filterNames[filter]).filter(Boolean);
+    return selectedNames.length > 0 ? selectedNames.join(', ') : 'компонентов';
+  }
+  
+  // Если нет фильтров, показываем из данных или по умолчанию
+  return softwareItems[0]?.type_comp || 'компонентов';
+};
+
 
   if (loading) {
     return (
       <div className='maininfo'>
-        <h3>Последние версии ПО для ДВС 1 220 ЛС</h3>
+        <h3>Последние версии ПО для {getComponentName()}</h3>
         <div>Загрузка данных с сервера...</div>
       </div>
     );
@@ -423,7 +428,7 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
 
   return (
     <div className='maininfo'>
-      <h3>Последние версии ПО для ДВС 1 220 ЛС</h3>
+      <h3>Последние версии ПО для {getComponentName()}</h3>
       
       <div>
         <h4>Компоненты ({filteredItems.length})</h4>
@@ -447,8 +452,8 @@ export function Objects({activeFilters, activeFilters2, selectedModel}) {
                     <p>Попробуйте изменить фильтры</p>
                 </div>
               </li>) : (
-              filteredItems.map((item) => ( 
-                <li key={item.Tractor}>
+              filteredItems.map((item, index) => ( 
+                <li key={item.id_Firmwares || item.id || `component-${index}`}>
                   <div className='objectmenu'>
                     <img className='object' src={Image} alt='Компонент' />
                     <div className='inform'>
@@ -786,6 +791,7 @@ export function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
+    type_request: '',
     region: '',
     status: '',
     dateFrom: '',
@@ -796,7 +802,7 @@ export function SearchBar({ onSearch }) {
 
   const handleSearch = () => {
     if (onSearch && typeof onSearch === 'function') {
-      onSearch(query, filters);
+      onSearch(query, filters.type_request);
     }
   };
 
@@ -813,8 +819,9 @@ export function SearchBar({ onSearch }) {
     }));
   };
 
-   const clearFilters = () => {
+  const clearFilters = () => {
     setFilters({
+      type_request: '',
       region: '',
       status: '',
       dateFrom: '',
@@ -865,6 +872,21 @@ export function SearchBar({ onSearch }) {
       {showFilters && (
         <div className = "filters-panel" >
           <div className = 'filters-panel-inner'>
+            <div>
+              <label>
+                Тип запроса
+              </label>
+              <select
+                value={filters.type_request}
+                onChange = {(e) => handleFilterChange('type_request', e.target.value)}
+                className = 'filters-region'>
+                <option value="-">-</option>
+                <option value="trac_model">Модель трактора</option>
+                <option value="type_comp">Тип компонента</option>
+                <option value="model_comp">Модель компонента</option>
+              </select>
+            </div>
+
             {/* Регион */}
             <div > 
               <label >
@@ -1005,12 +1027,11 @@ export function SearchBar({ onSearch }) {
 }
 
 
-export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2}) {
+export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2, onSearch, searchQuery, searchType}) {
   return(
     <div className='MainPart'> 
-      {activeButton === 'aggregates' && <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel}/>}
-      {activeButton === 'tractor'&& <TractorTable activeFiltersTrac={activeFiltersTrac} activeFiltersTrac2={activeFiltersTrac2}/>}
-      <SearchBar/>
+      {activeButton === 'aggregates'&& (<><SearchBar onSearch={onSearch}/> <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel} onSearch={onSearch} searchQuery={searchQuery} searchType={searchType}/></>)}
+      {activeButton === 'tractor'&& (<><SearchBar onSearch={onSearch}/> <TractorTable activeFiltersTrac={activeFiltersTrac} activeFiltersTrac2={activeFiltersTrac2}/></>)}
     </div>
   )
 }
