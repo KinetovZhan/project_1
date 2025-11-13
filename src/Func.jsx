@@ -183,6 +183,22 @@ export function Objects() {
 
 
 export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit, onBack, selectedModel, onSearch}) {
+  /*const [searchResults, setSearchResults] = useState([]);
+  
+  const handleSearch = (query, filters = {}) => {
+    console.log('Поиск:', query);
+    console.log('Фильтры:', filters);
+    
+    // Здесь будет логика поиска с фильтрами
+    if (onSearch && typeof onSearch === 'function') {
+      onSearch(query, filters);
+    }
+    
+    // Временная заглушка для демонстрации
+    if (query || Object.values(filters).some(val => val !== '')) {
+      alert(`Поиск: "${query}"\nФильтры: ${JSON.stringify(filters, null, 2)}`);
+    }
+  };*/
   if (showAddForm) {
     return (
       <div 
@@ -397,17 +413,26 @@ export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit
     <div className='MainPart'> 
       {activeButton === 'aggregates' && <Objects />}
       {activeButton === 'tractor' && (selectedModel ? <TractorTable selectedModel={selectedModel} /> : '')}
-      <SearchBar/>
+      <SearchBar/> 
     </div>
   );
 }
 
 export function SearchBar({ onSearch }) {
   const [query, setQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    region: '',
+    status: '',
+    dateFrom: '',
+    dateTo: '',
+    motoHoursMin: '',
+    motoHoursMax: ''
+  });
 
   const handleSearch = () => {
     if (onSearch && typeof onSearch === 'function') {
-      onSearch(query);
+      onSearch(query, filters);
     }
   };
 
@@ -417,8 +442,44 @@ export function SearchBar({ onSearch }) {
     } 
   };
 
+  const handleFilterChange = (filterName, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterName]: value
+    }));
+  };
+
+   const clearFilters = () => {
+    setFilters({
+      region: '',
+      status: '',
+      dateFrom: '',
+      dateTo: '',
+      motoHoursMin: '',
+      motoHoursMax: ''
+    });
+  };
+
+  const applyFilters = () => {
+    handleSearch();
+    setShowFilters(false);
+  };
+
   return (
     <div className="search-bar">
+      {/* Иконка фильтров (три полоски) */}
+      <button 
+        type="button"
+        onClick={() => setShowFilters(!showFilters)}
+        className='filter-toggle-button'
+      >
+        <svg width="20" height="20" viewBox="0 0 50 50" class = 'multiple-lines' fill="none" stroke="currentColor" strokeWidth="3">
+          <line x1="40" y1="15" x2="0" y2="15" />
+          <line x1="40" y1="25" x2="0" y2="25" />
+          <line x1="40" y1="35" x2="0" y2="35" />
+        </svg>
+      </button>
+
       <input
         type="text"
         placeholder="Поиск"
@@ -436,6 +497,145 @@ export function SearchBar({ onSearch }) {
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </button>  
+      {/* Панель фильтров */}
+      {showFilters && (
+        <div className = "filters-panel" >
+          <div className = 'filters-panel-inner'>
+            {/* Регион */}
+            <div > 
+              <label >
+                Регион
+              </label>
+              <select
+                value = {filters.region}
+                onChange = {(e) => handleFilterChange('region', e.target.value)}
+                className = 'filters-region'
+              >
+                <option value="">Все регионы</option>
+                <option value="Московская область">Московская область</option>
+                <option value="Ленинградская область">Ленинградская область</option>
+                <option value="Новосибирская область">Новосибирская область</option>
+                <option value="Ростовская область">Ростовская область</option>
+                <option value="Краснодарский край">Краснодарский край</option>
+              </select>
+            </div>
+
+            {/* Статус */}
+            <div>
+              <label >
+                Статус
+              </label>
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className = 'filters-status'
+              >
+                <option value="">Все статусы</option>
+                <option value="Исправен">Исправен</option>
+                <option value="На обслуживании">На обслуживании</option>
+                <option value="Требует проверки">Требует проверки</option>
+                <option value="Требует ремонта">Требует ремонта</option>
+              </select>
+            </div>
+
+            {/* Дата от */}
+            <div>
+              <label >
+                Дата выпуска от
+              </label>
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+
+            {/* Дата до */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>
+                Дата выпуска до
+              </label>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+
+            {/* Моточасы от */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px', color: ' rgb(8, 8, 8)' }}>
+                Моточасы от
+              </label>
+              <input
+                type="number"
+                placeholder="0"
+                value={filters.motoHoursMin}
+                onChange={(e) => handleFilterChange('motoHoursMin', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+
+            {/* Моточасы до */}
+            <div>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '14px' }}>
+                Моточасы до
+              </label>
+              <input
+                type="number"
+                placeholder="10000"
+                value={filters.motoHoursMax}
+                onChange={(e) => handleFilterChange('motoHoursMax', e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Кнопки управления фильтрами */}
+          <div className = 'clear-and-apply-container'>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className = 'button-clearfilters'
+            >
+              Очистить
+            </button>
+            <button
+              type="button"
+              onClick={applyFilters}
+              className = 'button-applyfilters'
+            >
+              Применить
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

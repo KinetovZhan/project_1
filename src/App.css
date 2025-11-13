@@ -426,8 +426,9 @@ button:active {
   border: none;
   background: transparent;
   color: rgb(245, 243, 243);
+  
   font-size: 16px;
-  padding: 16px 35px;
+  padding: 16px 50px;
   outline: none;
   width: 220px;
   border-radius: 4px;
@@ -486,9 +487,6 @@ button:active {
   text-align: left;
   font-weight: 600;
   border: 1px solid #454343;
-  
-  
-  
 }
 
 .tractor-table td {
@@ -528,4 +526,91 @@ button:active {
   border-radius: 30px;
   z-index: 1;
   position: relative; 
+}
+
+.filter-toggle-button {
+  width:50px;
+  position:absolute;
+  border: none;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  cursor: pointer;
+  color: white;
+  cursor: pointer;
+  padding: 1px;
+  border-radius: 10px;
+}
+
+.filter-toggle-button:hover {
+  background: transparent;
+  box-shadow: none;
+  left: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+ /* Фильтры для поля поиска*/
+.filters-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-Color: white;
+  border: 1px solid #ddd;
+  border-Radius: 8px;
+  padding: 20px;
+  margin-Top: 10px;
+  box-Shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-Index: 100;
+}
+
+.filters-panel-inner {
+ display: grid;
+ grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+ gap: 15px;
+ margin-Bottom: 20px;
+         
+}
+
+.filters-region {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-Radius: 4px;
+  font-Size: 14px;
+}
+
+.filters-status { 
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-Radius: 4px;
+  font-Size: 14px;              
+}
+
+.button-clearfilters {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-Radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-Size: 14px;
+}
+
+.clear-and-apply-container {
+  display: flex;
+  gap: 10px;
+  justify-Content: flex-end;
+}
+
+.button-applyfilters {
+  padding: 8px 16px;
+  border: none;
+  border-Radius: 4px;
+  background: #55565a;
+  color: white;
+  cursor: pointer;
+  font-Size: 14px;
 }
