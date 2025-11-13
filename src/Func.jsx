@@ -241,22 +241,31 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
     };
 
 
-    if (searchQuery && searchQuery.trim() !== '') {
-      if (searchType === 'trac_model') {
-        // Поиск по модели трактора
-        postData.trac_model = [searchQuery.trim()];
-      } else if (searchType === 'type_comp') {
-        // Поиск по типу компонента
-        postData.type_comp = [searchQuery.trim()];
-      } else if (searchType === 'model_comp') {
-        // Поиск по модели компонента
-        postData.model_comp = searchQuery.trim();
-      } else {
-        // Общий поиск (если тип не выбран)
-        postData.search_query = searchQuery.trim();
-      }
+  if (searchQuery && searchQuery.trim() !== '') {
+    const searchData = {
+      trac_model: "",
+      type_comp: "",
+      model_comp: "",
+      trac_regex: true,
+      type_regex: true,
+      model_regex: true
+    };
+
+    if (searchType === 'trac_model') {
+      searchData.trac_model = searchQuery.trim();
+    } else if (searchType === 'type_comp') {
+      searchData.type_comp = searchQuery.trim();
+    } else if (searchType === 'model_comp') {
+      searchData.model_comp = searchQuery.trim();
+    } else {
+      // Если тип не выбран, используем общий поиск по всем полям
+      searchData.trac_model = searchQuery.trim();
+      searchData.type_comp = searchQuery.trim();
+      searchData.model_comp = searchQuery.trim();
     }
 
+    return searchData;
+  }
 
     // Заполняем данные в зависимости от активных фильтров
     if (hasTractorFilter) {
@@ -295,10 +304,15 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
 
         const postData = getPostData();
         console.log('Данные для пост запроса:', postData)
-        
 
-        const endpoint = 'http://localhost:8000/component-info/';
-    
+        
+        let endpoint = 'http://localhost:8000/component-info/';
+        
+        if (searchQuery && searchQuery.trim() !== '') {
+        endpoint = 'http://localhost:8000/search-component/';
+        }
+
+
 
 
         const response = await fetch(endpoint, {
