@@ -9,8 +9,8 @@ function App() {
 
   return (
   <Routes>
-    <Route path="//login" element={<LoginPage />} />
-    <Route path="//main" element={<MainPage />} />
+    <Route path="/software_vis/login" element={<LoginPage />} />
+    <Route path="/software_vis/main" element={<MainPage />} />
     <Route path="/" element={<Navigate to="/login" replace />} />
   </Routes>
 
