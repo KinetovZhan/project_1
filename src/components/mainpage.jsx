@@ -69,7 +69,11 @@ function MainPage() {
             onAddSubmit={handleAddSubmit}
             onBack={() => {
               setShowAddForm(false);
-              setActiveButton(null);
+              setSearchParams(prev => {
+                const newParams = new URLSearchParams(prev);
+                newParams.delete('tab');
+                return newParams;
+              });
             }}
             selectedModel={selectedModel}
           />
