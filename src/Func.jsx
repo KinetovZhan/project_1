@@ -390,7 +390,7 @@ export function SearchBar({ onSearch }) {
         onClick={() => setShowFilters(!showFilters)}
         className='filter-toggle-button'
       >
-        <svg width="20" height="20" viewBox="0 0 50 50" class = 'multiple-lines' fill="none" stroke="currentColor" strokeWidth="3">
+        <svg width="20" height="20" view-box="0 0 50 50" className = 'multiple-lines' fill="none" stroke="currentColor" strokeWidth="3">
           <line x1="40" y1="15" x2="0" y2="15" />
           <line x1="40" y1="25" x2="0" y2="25" />
           <line x1="40" y1="35" x2="0" y2="35" />
@@ -1074,6 +1074,15 @@ export function TractorDetails({ tractor }) {
     hours: '65,5 ч.'
   };
 
+  const poDescriptions = {
+    'ДВС': 'Изменена цикловая подача топлива в камеру сгорания, изменено количество вспрысков форсунки',
+    'КПП': '',
+    'РК': 'это не рекалмный кабинет, если что!',
+    'ГР': '',
+    'БК': 'а это не бургер кинг',
+    'Автопилот': 'я хочу сырнеке'
+  };
+
   return (
     <div className="tractor-details-container">
       {/* 
@@ -1125,8 +1134,21 @@ export function TractorDetails({ tractor }) {
               <h3>Комплектация и ПО</h3>
               <ul className="po-list">
                 {poList.map((item, index) => (
-                  <li key={index}>
+                  <li
+                    key={index}
+                    onMouseEnter={(e) =>{
+                      const tooltip = e.currentTarget.querySelector('.tooltip');
+                      if (tooltip) tooltip.style.display = 'block';
+                    }}
+                    onMouseLeave={(e) => {
+                      const tooltip = e.currentTarget.querySelector('.tooltip');
+                      if (tooltip) tooltip.style.display = 'none';
+                    }}
+                    className="po-item"
+                  >
                     {item.name} {item.version && `v${item.version}`}
+
+                    <div className="tooltip"> {poDescriptions[item.name] || 'Нет описания'}</div>
                   </li>
                 ))}
               </ul>
