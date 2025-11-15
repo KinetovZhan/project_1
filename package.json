@@ -2,7 +2,7 @@
   "name": "my-react-project",
   "private": true,
   "version": "0.0.0",
-  "homepage": ".",
+  "homepage": "http://localhost:80/software_vis",
   "type": "module",
   "scripts": {
     "dev": "vite",
