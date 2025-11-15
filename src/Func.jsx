@@ -185,22 +185,12 @@ export function Objects() {
 
 
 export function MainPart({activeButton, showAddForm, onCloseAddForm, onAddSubmit, onBack, selectedModel, onSearch}) {
-  /*const [searchResults, setSearchResults] = useState([]);
-  
-  const handleSearch = (query, filters = {}) => {
-    console.log('Поиск:', query);
-    console.log('Фильтры:', filters);
-    
-    // Здесь будет логика поиска с фильтрами
-    if (onSearch && typeof onSearch === 'function') {
-      onSearch(query, filters);
+  React.useEffect(() => {
+    if (activeButton && activeButton !== 'AddPO' && showAddForm) {
+      onCloseAddForm();
     }
-    
-    // Временная заглушка для демонстрации
-    if (query || Object.values(filters).some(val => val !== '')) {
-      alert(`Поиск: "${query}"\nФильтры: ${JSON.stringify(filters, null, 2)}`);
-    }
-  };*/
+  }, [activeButton, showAddForm, onCloseAddForm]);
+
   if (showAddForm) {
     return (
       <div className='MainPart'>

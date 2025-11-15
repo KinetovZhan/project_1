@@ -5,14 +5,20 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function MainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [showAddForm, setShowAddForm] = useState(false);
+  //const [showAddForm, setShowAddForm] = useState(false);
   const navigate = useNavigate();
   //Получаем состояния URL параметров (Тракторы или агрегаты и тд)
   const activeButton = searchParams.get('tab') || null;
   const selectedModel = searchParams.get('model') || '';
+  const showAddForm = activeButton === 'addPO';
   const handleButtonClick = (buttonName) => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('tab', buttonName);
+     if (activeButton === buttonName) {
+      newParams.delete('tab');
+    } else {
+      // Иначе активируем новую кнопку
+      newParams.set('tab', buttonName);
+    }
     if (buttonName !== 'tractor') {
       newParams.delete('model');
     }
@@ -27,17 +33,24 @@ function MainPage() {
   } 
   setSearchParams(newParams);
 }
+  const handleAddForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('tab','addPO');
+    setSearchParams(newParams);
+  }
 
   const handleLogout = () => {
     navigate('/login');
   };
 
-  const openAddForm = () => {
+  /*const openAddForm = () => {
      setShowAddForm(true);
-  }
+  }*/
 
   const closeAddForm = () => {
-    setShowAddForm(false);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('tab');
+    setSearchParams(newParams);
   };
 
   const handleAddSubmit = (e) => {
@@ -58,7 +71,7 @@ function MainPage() {
           <Sidebar 
             activeButton={activeButton} 
             handleButtonClick={handleButtonClick}
-            onAddPoClick={openAddForm}
+            onAddPoClick={handleAddForm}
             selectedModel={selectedModel}
             onModelChange={handleModelChange}
           />
@@ -67,14 +80,7 @@ function MainPage() {
             showAddForm={showAddForm}
             onCloseAddForm={closeAddForm}
             onAddSubmit={handleAddSubmit}
-            onBack={() => {
-              setShowAddForm(false);
-              setSearchParams(prev => {
-                const newParams = new URLSearchParams(prev);
-                newParams.delete('tab');
-                return newParams;
-              });
-            }}
+            onBack={closeAddForm}
             selectedModel={selectedModel}
           />
         </div>
