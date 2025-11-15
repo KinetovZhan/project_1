@@ -432,15 +432,46 @@ button:active {
 .majmin_button_active {
   background-color: black;
   color: white;
+  margin: 4px;
 }
 .majmin_button_active:hover {
   background: transparent;
   box-shadow: none;
+  margin: 4px;
 }
 
 .majmin_button:active {
   background-color: black;
   color: white;
+  margin: 4px;
+}
+
+
+.majmin_button:hover {
+  background-color: #b6bbc1;
+  margin: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.majmin_button:active {
+  background-color: #969aa0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin: 4px;
+}
+
+
+.majmin_button_active:hover {
+  background-color: black;
+  color: white;
+  margin: 4px;
+}
+
+
+
+.majmin_button_active:active {
+  background-color: black;
+  color: white;
+  margin: 4px;
 }
 
 .download {
@@ -449,6 +480,7 @@ button:active {
   border-radius: 20px;
   background-color: rgba(217, 217, 217, 1);
   border-color:transparent;
+  margin: 4px;
 }
 
 
