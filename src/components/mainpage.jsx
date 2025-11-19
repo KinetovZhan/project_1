@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 function MainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddAggForm, setShowAddAggForm] = useState(false);
   const navigate = useNavigate();
   //Получаем состояния URL параметров (Тракторы или агрегаты и тд)
   const activeButton = searchParams.get('tab') || null;
@@ -48,9 +49,15 @@ function MainPage() {
     closeAddForm();
   };
 
-  
+  const openAddAggForm = () => {
+    setShowAddAggForm(true);
+  };
 
-  return ( // ← ДОБАВЬТЕ return
+  const closeAddAggForm = () => {
+    setShowAddAggForm(false);
+  };
+
+  return (
     <>
       <Header onLogout={handleLogout}/> {/* Исправьте onLogout */}
       <main>
@@ -59,16 +66,20 @@ function MainPage() {
             activeButton={activeButton} 
             handleButtonClick={handleButtonClick}
             onAddPoClick={openAddForm}
+            onAddAggClick={openAddAggForm}
             selectedModel={selectedModel}
             onModelChange={handleModelChange}
           />
           <MainPart 
             activeButton={activeButton}
             showAddForm={showAddForm}
+            showAddAggForm={showAddAggForm}
             onCloseAddForm={closeAddForm}
+            onCloseAddAggForm={closeAddAggForm}
             onAddSubmit={handleAddSubmit}
             onBack={() => {
               setShowAddForm(false);
+              setShowAddAggForm(false);
               setSearchParams(prev => {
                 const newParams = new URLSearchParams(prev);
                 newParams.delete('tab');
