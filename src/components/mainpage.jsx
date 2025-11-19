@@ -102,7 +102,6 @@ function MainPage() {
             activeFiltersTrac={memoizedActiveFiltersTrac}
             activeFiltersTrac2={memoizedActiveFiltersTrac2}
             activeMajMinButton={activeMajMinButton}
-
             onSearch={handleSearch}
             searchQuery={searchQuery}
             searchType={searchType}

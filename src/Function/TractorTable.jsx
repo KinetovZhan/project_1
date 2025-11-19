@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
+import {SearchBar} from "./SearchBar.jsx";
 
 
 const formatDateTime = (dateString) => {
@@ -21,7 +22,7 @@ const formatDateTime = (dateString) => {
 
 
 
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, searchQuery}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -36,6 +37,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
       status: [],
       dealer: ""
     };
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      return { query: searchQuery.trim() };
+    }
+
 
     // Добавляем фильтры по моделям из чекбоксов
     if (hasModelFilters) {
@@ -52,17 +58,28 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
   useEffect(() => {
     const fetchTractors = async () => {
       const postData = getPostData();
-
+      let response
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/tractor-info', {
+        if(searchQuery) {
+          response = await fetch('http://localhost:8000/search-tractor', {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(postData)
-        });
+        })} else {
+        
+          response = await fetch('http://localhost:8000/tractor-info', {
+          method: 'POST',
+          headers: {  
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        })
+      }
 
         console.log('Статус ответа:', response.status);
 
@@ -98,7 +115,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2]); 
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery]); 
 
   // Отладочная информация
   console.log('=== РЕНДЕР TractorTable ===');

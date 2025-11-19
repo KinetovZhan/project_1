@@ -36,9 +36,9 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
     };
 
 
-  if (searchQuery && searchQuery.trim() !== '') {
-    return { filters: searchQuery.trim() };
-  }
+    if (searchQuery && searchQuery.trim() !== '') {
+      return { filters: searchQuery.trim() };
+    }
 
     // Заполняем данные в зависимости от активных фильтров
     if (hasTractorFilter) {
