@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Header } from '../Func';
+import { Header } from '../Function/Header';
 import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 

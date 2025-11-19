@@ -1,7 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Header, Sidebar, MainPart } from '../Func'; 
 import '../App.css';
 import { useNavigate } from 'react-router-dom';
+import { Header } from '../Function/Header.jsx';
+import { Sidebar } from '../Function/Sidebar.jsx';
+import { MainPart } from '../Function/MainPart.jsx';
+
+
 
 function MainPage() {
   const [activeButton, setActiveButton] = useState(null); 
@@ -29,10 +33,9 @@ function MainPage() {
       }
   };
 
-  const handleSearch = (query, type = '') => {
-    console.log('Поиск:', query, 'Тип:', type);
+  const handleSearch = (query) => {
+    console.log('Поиск:', query);
     setSearchQuery(query);
-    setSearchType(type);
   };
 
   const handleMajMinButtonClick = (buttonName) => {
