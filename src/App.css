@@ -754,3 +754,198 @@ button:active {
   cursor: pointer;
   font-Size: 14px;
 }
+
+/* Окно с детальной информацией о тракторе */
+.tractor-details-container {
+  box-sizing: border-box;
+  width: 963px;
+  height: 624px;
+  background-color: rgb(219, 219, 219);
+  border-radius: 30px;
+  color: black;
+  padding: 50px 70px;
+  position: absolute;
+  left: 171px;
+  top: 80px;
+  right: 235px;
+}
+ 
+
+.tractor-details-content {
+  display: flex;
+  gap: 80px;
+  align-items: flex-start;
+}
+
+.tractor-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+}
+
+.tractor-info h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.tractor-image {
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.details-columns {
+  display: flex;
+  gap: 10px;
+  width: 70%;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  background:rgb(219, 219, 219);
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.section h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.po-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.po-list li {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/*Для добавления по*/
+.add-po-form-container {
+  padding: 50px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-height: 710px;
+  height: auto;
+  position: relative;
+}
+
+.add-po-back-button {
+  position: absolute;
+  top: -50px;
+  left: -210px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0 ;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+.add-po-title {
+  margin-top: -30px; 
+  margin-bottom: 30px; 
+  font-size: bold;
+  font-size: 30px;
+}
+
+.add-po-form {
+  flex-grow: 1;
+  display: flex; 
+  flex-direction: column;
+}
+
+.add-po-field {
+  margin-bottom: 0;
+}
+
+.add-po-label {
+  display: block; 
+  margin-bottom: 5px; 
+  font-weight: bold;
+}
+
+.add-po-input {
+  width: 97.28%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-po-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-po-textarea {
+  width: 97.28%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  min-height: 20px;
+  max-height: 150px;
+}
+
+.add-po-submit-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.add-po-container {
+  margin-top: 20px; /* отступ сверху */
+  padding: 0 63px; /* отступы по бокам, как у других кнопок */
+}
+
+/* всплывающее окно у трактора */
+.po-item {
+  position: relative;
+}
+
+.tooltip {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 134px;
+  margin-left: 10px;
+  background-color: #555;
+  color: white;
+  padding: 10px;
+  border-radius: 25px;
+  width: 300px;
+  font-size: 20px;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: pre-line;
+}

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import '../App.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../Function/Header.jsx';
 import { Sidebar } from '../Function/Sidebar.jsx';
 import { MainPart } from '../Function/MainPart.jsx';
@@ -8,7 +8,14 @@ import { MainPart } from '../Function/MainPart.jsx';
 
 
 function MainPage() {
-  const [activeButton, setActiveButton] = useState(null); 
+  //const [activeButton, setActiveButton] = useState(null); 
+  // Получаем состояния URL параметров (Тракторы или агрегаты и тд)
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const activeButton = searchParams.get('tab') || null;
+  const selectedModel = searchParams.get('model') || '';
+  const showAddForm = activeButton === 'addPO';
   const [activeFilters, setActiveFilters] = useState([]);
   const [activeFilters2, setActiveFilters2] = useState([]);
   const [activeFiltersTrac, setActiveFiltersTrac] = useState([]);
@@ -16,22 +23,58 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('');
-  const navigate = useNavigate();
-
+  
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
-  const [selectedModel, setSelectedModel] = useState('');
+  //const [selectedModel, setSelectedModel] = useState('');
+  
 
-
-  const handleButtonClick = (buttonName) => {
-      if (activeButton === buttonName) {
-          setActiveButton(null);
-      } else {
-          setActiveButton(buttonName);
-      }
+   const handleButtonClick = (buttonName) => {
+    const newParams = new URLSearchParams(searchParams);
+     if (activeButton === buttonName) {
+      newParams.delete('tab');
+    } else {
+      // Иначе активируем новую кнопку
+      newParams.set('tab', buttonName);
+    }
+    if (buttonName !== 'tractor') {
+      newParams.delete('model');
+    }
+    setSearchParams(newParams);
   };
+  const handleModelChange = (model) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (model)
+      {newParams.set('model', model);
+  } else {
+    newParams.delete('model');
+  } 
+  setSearchParams(newParams);
+}
+  const handleAddForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    if (activeButton === 'addPO') {
+      newParams.delete('tab');
+    } else
+    newParams.set('tab','addPO');
+    setSearchParams(newParams);
+}
+    const closeAddForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('tab');
+    setSearchParams(newParams);
+  };
+
+  const handleAddSubmit = (e) => {
+    e.preventDefault();
+    const formdata = new FormData(e.target);
+    const poNumber = formdata.get('poNumber');
+    alert(`ПО №${poNumber} будет добавлено!`);
+    closeAddForm();
+  };
+  
 
   const handleSearch = (query) => {
     console.log('Поиск:', query);
@@ -55,9 +98,9 @@ function MainPage() {
   };
 
 
-  const handleModelChange = (model) => {
+  /*const handleModelChange = (model) => {
     setSelectedModel(model);
-  };
+  };*/
 
 
 
@@ -86,7 +129,10 @@ function MainPage() {
             onFilterChange={handleFilterChange} 
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
-            
+
+            onAddPoClick={handleAddForm}
+            selectedModel={selectedModel}
+
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onFilterChangeByStatus = {handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
@@ -98,6 +144,11 @@ function MainPage() {
             activeFilters={memoizedActiveFilters} 
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
+
+            showAddForm={showAddForm}
+            onCloseAddForm={closeAddForm}
+            onAddSubmit={handleAddSubmit}
+            onBack={closeAddForm}
 
             activeFiltersTrac={memoizedActiveFiltersTrac}
             activeFiltersTrac2={memoizedActiveFiltersTrac2}

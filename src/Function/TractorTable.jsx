@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'; 
-
+import React, { useState, useEffect } from 'react';
+import {TractorDetails} from '../Function/TractorDetails.jsx'
+ 
 
 const formatDateTime = (dateString) => {
   if (!dateString) return '-';
@@ -25,6 +26,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedTractor, setSelectedTractor] = useState(null);
+
 
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
@@ -105,7 +108,20 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
   console.log('activeFiltersTrac:', activeFiltersTrac);
   console.log('tractors:', tractors);
   console.log('loading:', loading);
+    // Функция для обработки клика по строке
+  const handleRowClick = (tractor) => {
+    console.log('Клик по трактору:', tractor); // Для отладки
+    setSelectedTractor(tractor);
+  };
 
+  // Если выбран трактор, отображаем его детали
+  if (selectedTractor) {
+    return (
+      <TractorDetails 
+        tractor={selectedTractor}  
+      />
+    );
+  }
 
 
   if (loading) {
@@ -169,7 +185,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
             </thead>
             <tbody>
               {tractors.map(tractor => (
-                <tr key={tractor.id || tractor.vin}>
+                <tr key={tractor.id || tractor.vin}
+                /*onClick={() => handleRowClick(tractor)}
+                  style={{ cursor: 'pointer' }}
+                  className="clickable-row"*/>
                   <td>{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
