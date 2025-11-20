@@ -22,7 +22,7 @@ const formatDateTime = (dateString) => {
 
 
 
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, searchQuery}) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -42,6 +42,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, 
       return { query: searchQuery.trim() };
     }
 
+    if (searchDealer && searchDealer.trim() !== ''){
+      postData.dealer = searchDealer
+    }
+
 
     // Добавляем фильтры по моделям из чекбоксов
     if (hasModelFilters) {
@@ -49,8 +53,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, 
     }
     if (hasStatusFilters) {
       postData.status = activeFiltersTrac2;
-      
     }
+    
 
     return postData;
   };
@@ -63,7 +67,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, 
         setLoading(true);
         if(searchQuery) {
           response = await fetch('http://localhost:8000/search-tractor', {
-          method: 'POST',
+          method: 'GET',
           headers: {  
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -115,7 +119,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, onSearch, 
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery]); 
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer]); 
 
   // Отладочная информация
   console.log('=== РЕНДЕР TractorTable ===');

@@ -2,7 +2,7 @@ import {Filters} from '../Function/Filters_agregates.jsx'
 import {Filters2} from '../Function/Filters_tractors.jsx'
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange}) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -21,7 +21,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </button>
       </div>
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
-      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton}/>}
+      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange}/>}
     </div>
   )
 }

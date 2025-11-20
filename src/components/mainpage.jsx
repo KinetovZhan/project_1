@@ -16,13 +16,17 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('');
+  const [selectedModel, setSelectedModel] = useState('');
+  
+  // Поиск по дилеру
+  const [searchDealer, setSearchDealer] =useState('');
+  
   const navigate = useNavigate();
 
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
-  const [selectedModel, setSelectedModel] = useState('');
 
 
   const handleButtonClick = (buttonName) => {
@@ -37,6 +41,10 @@ function MainPage() {
     console.log('Поиск:', query);
     setSearchQuery(query);
   };
+
+  const handleDealer = (query) => {
+    setSearchDealer(query);
+  }
 
   const handleMajMinButtonClick = (buttonName) => {
     if(activeMajMinButton === buttonName) {
@@ -88,6 +96,7 @@ function MainPage() {
             onModelChange={handleModelChange}
             
             onFilterChangeTracByModel={handleFilterByModelTractors}
+            onDealerChange={handleDealer}
             onFilterChangeByStatus = {handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
             handleMajMinButtonClick={handleMajMinButtonClick}
@@ -104,7 +113,10 @@ function MainPage() {
             activeMajMinButton={activeMajMinButton}
             onSearch={handleSearch}
             searchQuery={searchQuery}
-            searchType={searchType}
+
+            searchDealer={searchDealer}
+            onDealerSearch={handleDealer}
+            
           />
         </div>
       </main>

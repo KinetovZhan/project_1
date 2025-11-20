@@ -817,6 +817,7 @@ button.search_button {
   left: 13px;
   border-radius: 25px;
   background-color: rgba(217, 217, 217, 1);
+  
 
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -828,4 +829,3 @@ button.search_button {
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
-
