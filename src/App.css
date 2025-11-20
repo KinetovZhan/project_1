@@ -999,9 +999,18 @@ button.search_button {
 }
 
 .add-po-container {
-  margin-top: 20px; /* отступ сверху */
+  position: absolute;
+  top: 182px; /* отступ сверху */
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }
+
+
+.add-po-container2 {
+  position: absolute;
+  top: 252px; /* отступ сверху */
+  padding: 0 63px; /* отступы по бокам, как у других кнопок */
+}
+
 
 /* всплывающее окно у трактора */
 .po-item {

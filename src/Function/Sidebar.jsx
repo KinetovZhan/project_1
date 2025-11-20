@@ -33,7 +33,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       )}
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
-        <div className='add-po-container'>
+        <div className='add-po-container2'>
           <button onClick={onAddAggClick}> 
             Добавить агрегат
           </button>

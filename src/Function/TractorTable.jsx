@@ -67,25 +67,27 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       let response
       try {
         setLoading(true);
-        if(searchQuery) {
-          response = await fetch(`http://localhost:8000/search-tractor`, {
-          method: 'GET',
-          headers: {  
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        })} else {
-        
-          response = await fetch('http://localhost:8000/tractor-info', {
-          method: 'POST',
-          headers: {  
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        })
-      }
+        if (searchQuery && searchQuery.trim() !== '') {
+          const searchParams = new URLSearchParams({
+            request: searchQuery.trim()
+        });
+            response = await fetch(`http://localhost:8000/search-tractor?${searchParams}`, {
+            method: 'GET',
+            headers: {  
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+          })} else {
+            response = await fetch('http://localhost:8000/tractor-info', {
+            method: 'POST',
+            headers: {  
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+          })
+        }
+      
 
         console.log('Статус ответа:', response.status);
 
