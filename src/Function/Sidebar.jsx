@@ -4,7 +4,7 @@ import {Filters2} from '../Function/Filters_tractors.jsx'
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, 
   activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, 
-  onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onAddPoClick, selectedModel }) {
+  onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onAddPoClick, onAddAggClick, selectedModel }) {
   return (
     <div className='sidebar'>
       <div className='choose'>
@@ -23,12 +23,20 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </button>
       </div>
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && (
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addAgg' && (
         <div className='add-po-container'>
           <button 
             // Не добавляем класс active — чтобы не было выделения как у активной кнопки
-            onClick={onAddPoClick}> {}
+            onClick={onAddPoClick}> 
             Добавить ПО
+          </button>
+        </div>
+      )}
+
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
+        <div className='add-po-container'>
+          <button onClick={onAddAggClick}> 
+            Добавить агрегат
           </button>
         </div>
       )}

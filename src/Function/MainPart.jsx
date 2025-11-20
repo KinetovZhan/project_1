@@ -2,26 +2,41 @@ import {SearchBar} from '../Function/SearchBar';
 import {Objects} from '../Function/Objects';
 import {TractorTable} from '../Function/TractorTable';
 import {AddPoForm} from '../Function/AddPo';
-import React, {useeffect} from 'react';
+import {AddAggForm} from '../Function/AddAgg';
+import React, {useffect} from 'react';
 
 
 export function MainPart({activeButton, activeFilters, activeFilters2, 
   selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2, 
-  onSearch, searchQuery, searchType, showAddForm, onCloseAddForm, onAddSubmit, onBack}) {
+  onSearch, searchQuery, searchType, showAddForm, onCloseAddForm, showAddAggForm, onCloseAddAggForm, onAddSubmit, onBack}) {
     React.useEffect(() => {
     if (activeButton && activeButton !== 'addPO' && showAddForm) {
       onCloseAddForm();
     }
   }, [activeButton, showAddForm, onCloseAddForm]);
 
+
+    React.useEffect(() => {
+      if(activeButton && activeButton !== 'addAgg' && showAddAggForm) {
+        onCloseAddAggForm();
+      }
+    }, [activeButton, showAddAggForm, onCloseAddAggForm]);
+
   if (showAddForm) {
     return (
       <div className='MainPart'>
-        <AddPoForm onBack={onBack} onSubmit={onAddSubmit} />  
+        <AddPoForm onBack = {onBack} onSubmit={onAddSubmit} />  
       </div>
     );
   }
-
+    
+  if (showAddAggForm) {
+      return (
+        <div className = 'MainPart'>
+         <AddAggForm onBack = {onBack} onSubmit = {onAddSubmit}/>
+         </div>
+      );
+    }
   if (!activeButton) {
     return <div className='MainPart'></div>
   }

@@ -16,6 +16,7 @@ function MainPage() {
   const activeButton = searchParams.get('tab') || null;
   const selectedModel = searchParams.get('model') || '';
   const showAddForm = activeButton === 'addPO';
+  const showAddAggForm = activeButton === 'addAgg';
   const [activeFilters, setActiveFilters] = useState([]);
   const [activeFilters2, setActiveFilters2] = useState([]);
   const [activeFiltersTrac, setActiveFiltersTrac] = useState([]);
@@ -73,6 +74,21 @@ function MainPage() {
     const poNumber = formdata.get('poNumber');
     alert(`ПО №${poNumber} будет добавлено!`);
     closeAddForm();
+  };
+
+  const handleAggForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    if (activeButton === 'addAgg') {
+      newParams.delete('tab');
+    } else 
+    newParams.set('tab','addAgg');
+    setSearchParams(newParams);
+  }
+
+  const closeAddAggForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('tab');
+    setSearchParams(newParams);
   };
   
 
@@ -133,6 +149,8 @@ function MainPage() {
             onAddPoClick={handleAddForm}
             selectedModel={selectedModel}
 
+            onAddAggClick={handleAggForm}
+
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onFilterChangeByStatus = {handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
@@ -149,6 +167,10 @@ function MainPage() {
             onCloseAddForm={closeAddForm}
             onAddSubmit={handleAddSubmit}
             onBack={closeAddForm}
+
+            showAddAggForm={showAddAggForm}
+            onCloseAddAggForm={closeAddAggForm}
+            
 
             activeFiltersTrac={memoizedActiveFiltersTrac}
             activeFiltersTrac2={memoizedActiveFiltersTrac2}
