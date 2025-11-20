@@ -2,7 +2,7 @@ import Image from '../img/Image.png'
 import { useState, useEffect } from 'react';
 
 
-export function Objects({activeFilters, activeFilters2, selectedModel, onSearch, searchQuery, searchType}) {
+export function Objects({activeFilters, activeFilters2, selectedModel, searchQuery}) {
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,9 +36,9 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
     };
 
 
-  if (searchQuery && searchQuery.trim() !== '') {
-    return { filters: searchQuery.trim() };
-  }
+    if (searchQuery && searchQuery.trim() !== '') {
+      return { filters: searchQuery.trim() };
+    }
 
     // Заполняем данные в зависимости от активных фильтров
     if (hasTractorFilter) {
@@ -68,79 +68,77 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
   };
 
 
-  useEffect(() => {
-    const APY_URL = 'http://localhost:8000';
-    const PATH_FILTERS = 'component-info';
-    const PATH_SEARCH = 'search-component';
-    
-    const fetchSoftware = async () => {
-      setLoading(true);
-      try {
-        console.log('Начало загрузки данных...');
+useEffect(() => {
+  const fetchSoftware = async () => {
+    setLoading(true);
+    try {
+      console.log('Начало загрузки данных...');
 
-        const postData = getPostData();
-        console.log('Данные для пост запроса:', postData);
-        console.log('Тип данных:', typeof postData);
+      const postData = getPostData();  
+      let response;
+      
+      if (searchQuery && searchQuery.trim() !== '') {
+        const searchParams = new URLSearchParams({
+          query: searchQuery.trim()
+        });
         
-        let endpoint = `${APY_URL}/${PATH_FILTERS}`;
-        let requestBody = postData;
-        
-        if (searchQuery && searchQuery.trim() !== '') {
-          endpoint = `${APY_URL}/${PATH_SEARCH}`;
-          requestBody = postData;
-        }
-
-
-        const response = await fetch(endpoint, {
+        response = await fetch(`http://localhost:8000/search-component?${searchParams}`, {
+          method: 'GET',
+          headers: {  
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+        });
+      } else {
+        response = await fetch('http://localhost:8000/component-info', {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(requestBody)
+          body: JSON.stringify(postData)
         });
+      } // ← УБЕРИТЕ ЛИШНЮЮ СКОБКУ ЗДЕСЬ!
 
+      const data = await response.json();
 
-
-        const data = await response.json();
-
-        if (data && data.status_code === 404) {
-          console.log("404 - ничего не найдено");
-          setSoftwareItems([]);
-          setFilteredItems([]);
-          alert("По вашим фильтрам ничего не нашлось");
-          return;
-        }
-
-        console.log('Статус ответа:', response.status);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        console.log('Данные компонента:', data);
-
-        if (Array.isArray(data)) {
-          setSoftwareItems(data);
-          setFilteredItems(data); 
-        } else if (data && typeof data === 'object') {
-          setSoftwareItems([data]);
-          setFilteredItems([data]); 
-        } else {
-          setSoftwareItems([]);
-          setFilteredItems([]); 
-        }
-        
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-        setError(`Ошибка подключения к серверу: ${error.message}`);
-      } finally {
-        setLoading(false);
+      if (data && data.status_code === 404) {
+        console.log("404 - ничего не найдено");
+        setSoftwareItems([]);
+        setFilteredItems([]);
+        alert("По вашим фильтрам ничего не нашлось");
+        return;
       }
-    };
 
-    fetchSoftware();
-  }, [activeFilters, activeFilters2, selectedModel, searchQuery]);
+      console.log('Статус ответа:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      console.log('Данные компонента:', data);
+
+      if (Array.isArray(data)) {
+        setSoftwareItems(data);
+        setFilteredItems(data); 
+      } else if (data && typeof data === 'object') {
+        setSoftwareItems([data]);
+        setFilteredItems([data]); 
+      } else {
+        setSoftwareItems([]);
+        setFilteredItems([]); 
+      }
+      
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      setError(`Ошибка подключения к серверу: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchSoftware();
+}, [activeFilters, activeFilters2, selectedModel, searchQuery]);
 
 
 
