@@ -11,7 +11,7 @@ function MainPage() {
   //const [activeButton, setActiveButton] = useState(null); 
   // Получаем состояния URL параметров (Тракторы или агрегаты и тд)
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+
 
   const activeButton = searchParams.get('tab') || null;
   const selectedModel = searchParams.get('model') || '';
@@ -24,7 +24,6 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('');
-  const [selectedModel, setSelectedModel] = useState('');
   
   // Поиск по дилеру
   const [searchDealer, setSearchDealer] =useState('');

@@ -20,23 +20,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
           Агрегаты
         </button>
       </div>
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addAgg' && (
-        <div className='add-po-container'>
-          <button 
-            // Не добавляем класс active — чтобы не было выделения как у активной кнопки
-            onClick={onAddPoClick}> 
-            Добавить ПО
-          </button>
-        </div>
-      )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
-        <div className='add-po-container'>
-          <button onClick={onAddAggClick}> 
-            Добавить агрегат
-          </button>
-        </div>
-      )}
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addAgg' && (
         <div className='add-po-container'>

@@ -68,7 +68,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       try {
         setLoading(true);
         if(searchQuery) {
-          response = await fetch('http://localhost:8000/search-tractor', {
+          response = await fetch(`http://localhost:8000/search-tractor`, {
           method: 'GET',
           headers: {  
             'Accept': 'application/json',
@@ -206,9 +206,9 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
             <tbody>
               {tractors.map(tractor => (
                 <tr key={tractor.id || tractor.vin}
-                /*onClick={() => handleRowClick(tractor)}
+                  onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
-                  className="clickable-row"*/>
+                  className="clickable-row">
                   <td>{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
