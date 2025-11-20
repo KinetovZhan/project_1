@@ -6,10 +6,8 @@ import {AddAggForm} from '../Function/AddAgg';
 import React, {useffect} from 'react';
 
 
-export function MainPart({activeButton, activeFilters, activeFilters2, 
-  selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2, 
-  onSearch, searchQuery, searchType, showAddForm, onCloseAddForm, showAddAggForm, onCloseAddAggForm, onAddSubmit, onBack}) {
-    React.useEffect(() => {
+export function MainPart({activeButton, activeFilters, activeFilters2, selectedModel, selectedTractorModel, activeFiltersTrac, activeFiltersTrac2, onSearch, searchQuery, searchDealer, showAddForm, onCloseAddForm, showAddAggForm, onCloseAddAggForm, onAddSubmit, onBack}) {
+  React.useEffect(() => {
     if (activeButton && activeButton !== 'addPO' && showAddForm) {
       onCloseAddForm();
     }
@@ -42,8 +40,8 @@ export function MainPart({activeButton, activeFilters, activeFilters2,
   }
   return(
     <div className='MainPart'> 
-      {activeButton === 'aggregates'&& (<><SearchBar onSearch={onSearch}/> <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel} onSearch={onSearch} searchQuery={searchQuery} searchType={searchType}/></>)}
-      {activeButton === 'tractor'&& (<><SearchBar onSearch={onSearch}/> <TractorTable activeFiltersTrac={activeFiltersTrac} activeFiltersTrac2={activeFiltersTrac2} onSearch={onSearch} searchQuery={searchQuery} searchType={searchType}/></>)}
+      {activeButton === 'aggregates'&& (<><SearchBar onSearch={onSearch}/> <Objects activeFilters={activeFilters} activeFilters2={activeFilters2} selectedModel={selectedModel} onSearch={onSearch} searchQuery={searchQuery}/></>)}
+      {activeButton === 'tractor'&& (<><SearchBar onSearch={onSearch}/> <TractorTable activeFiltersTrac={activeFiltersTrac} activeFiltersTrac2={activeFiltersTrac2} onSearch={onSearch} searchQuery={searchQuery} searchDealer={searchDealer}/></>)}
     </div>
   )
 }

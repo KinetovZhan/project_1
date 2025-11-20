@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 
 // Трактор
-export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick }) {
+export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange}) {
   const models = ['К-742МСТ', 'К7', 'К-525'];
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
@@ -30,6 +30,32 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     'Actual': 'Актуальное',
     'Critical': 'Критические'
   }
+
+  const [Dealer, setDealer] = useState('')
+
+
+
+
+
+
+
+  const handleDealer = (event) => {
+    const dealer = event.target.value;
+    setDealer(dealer)
+  }
+
+
+    const handleSearch = () => {
+    if (onDealerChange && typeof onDealerChange === 'function') {
+      onDealerChange(Dealer);
+    }
+  };
+
+  const handleKeydown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch(); 
+    } 
+  };
 
 
 
@@ -83,9 +109,33 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       </div>
 
       <div className='Дата выпуска'>
+        <input 
+          type="date" 
+          placeholder="Дата выпуска"
+          className='choose_date_release'
+          />
       </div>
 
-      <div className='Поиск по дилеру'>
+      <div className='search_by_dealer'>
+
+        <input
+          type="text"
+          placeholder="Поиск по дилеру"
+          className='searcher_dealer'
+          value={Dealer}
+          onChange={handleDealer} 
+          onKeyDown={handleKeydown}
+        />
+        <button 
+          type="button"
+          onClick={handleSearch}
+          className='search_button'
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>  
       </div>
 
       <div className='filterstrac2'>
