@@ -33,13 +33,13 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       )}
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
-        <div className='add-po-container2'>
+        <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат
           </button>
         </div>
       )}
-     
+      
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
       {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange}/>}
     </div>

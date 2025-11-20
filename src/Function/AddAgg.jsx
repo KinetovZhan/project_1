@@ -1,10 +1,101 @@
-import { useState, useEffect } from 'react';
-export function AddAggForm({onBack, onSubmit}) {
+import { useState } from 'react';
+
+export function AddAggForm({ onBack, onSubmit }) {
+  const [formData, setFormData] = useState({
+    id: '',
+    type: '',
+    model: '',
+    mounting_date: '',
+    comp_ser_num: '',
+    tractor_id: '',
+    number_of_parts: '',
+    producer_comp: ''
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    // Защита от ошибки e.preventDefault is not a function
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
+
+    try {
+      setLoading(true); 
+      setError(null);
+
+      const submitData = {
+        id: formData.id,
+        type: formData.type,
+        model: formData.model,
+        mounting_date: formData.mounting_date || null,
+        comp_ser_num: formData.comp_ser_num || null,
+        tractor_id: formData.tractor_id ? parseInt(formData.tractor_id) : null,
+        number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts) : null,
+        producer_comp: formData.producer_comp || null
+      };
+
+      console.log('Отправляемые данные:', submitData);
+
+      // Отправка данных на сервер
+      const response = await fetch('http://localhost:8000/component/', {
+        method: 'POST',
+        headers: {  
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(submitData)
+      });
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        console.error('Детали ошибки от сервера:', responseData);
+        
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        if (responseData.detail) {
+          errorMessage = responseData.detail;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      console.log('Агрегат успешно добавлен:', responseData);
+      
+      // Защита от ошибки - проверяем, что onSubmit это функция
+      if (typeof onSubmit === 'function') {
+        onSubmit(responseData);
+      } else {
+        console.warn('onSubmit не является функцией:', onSubmit);
+        // Если onSubmit не функция, просто закрываем форму
+        if (typeof onBack === 'function') {
+          onBack();
+        }
+      }
+      
+    } catch (error) {
+      console.error('Ошибка при добавлении агрегата:', error);
+      setError(`Ошибка при добавлении: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return(
     <div className="maininfo add-po-form-container">
       <button
         onClick={onBack}
         className="add-po-back-button"
+        disabled={loading}
       >
         <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
@@ -15,13 +106,36 @@ export function AddAggForm({onBack, onSubmit}) {
         Добавление агрегата
       </h3>
 
-      <form className='add-po-form' onSubmit={onSubmit}>
+      {error && (
+        <div className="error-message" style={{color: 'red', marginBottom: '15px'}}>
+          {error}
+        </div>
+      )}
+
+      <form className='add-po-form' onSubmit={handleSubmit}>
+        <div className='add-po-field'>
+          <label className='add-po-label'>ID агрегата (обязательно)</label>
+          <input
+            type="text"
+            name="id"
+            placeholder="Введите уникальный ID агрегата"
+            value={formData.id}
+            onChange={handleChange}
+            required
+            className='add-po-input'
+            disabled={loading}
+          />
+        </div>
+
         <div className='add-po-field'>
           <label className='add-po-label'>Тип</label>
           <select
-            name="aggregate"
+            name="type"
             required
+            value={formData.type}
+            onChange={handleChange}
             className='add-po-select'
+            disabled={loading}
           >
             <option value="">Выберите агрегат</option>
             <option value="dvs">ДВС</option>
@@ -35,10 +149,13 @@ export function AddAggForm({onBack, onSubmit}) {
           <label className='add-po-label'>Название</label>
           <input
             type="text"
-            name='nameAgg'
-            placeholder="Value"
+            name="model"
+            placeholder="Введите название"
+            value={formData.model}
+            onChange={handleChange}
             required
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
@@ -46,9 +163,12 @@ export function AddAggForm({onBack, onSubmit}) {
           <label className='add-po-label'>Серийный номер</label>
           <input
             type="text"
-            name="serialNum"
-            placeholder="Value"
+            name="comp_ser_num"
+            placeholder="Введите серийный номер"
+            value={formData.comp_ser_num}
+            onChange={handleChange}
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
@@ -56,49 +176,61 @@ export function AddAggForm({onBack, onSubmit}) {
           <label className='add-po-label'>Дата установки</label>
           <input
             type="date"
-            name="installDate"
+            name="mounting_date"
+            value={formData.mounting_date}
+            onChange={handleChange}
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
         <div className='add-po-field'>
           <label className='add-po-label'>ID Трактора</label>
           <input
-            type="text"
-            name="tractorId"
-            placeholder="Value"
+            type="number"
+            name="tractor_id"
+            value={formData.tractor_id}
+            onChange={handleChange}
+            placeholder="Введите ID трактора"
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
         <div className='add-po-field'>
           <label className='add-po-label'>Количество подчастей</label>
           <input
-            type="text"
-            name="subdistricts"
-            placeholder="Value"
+            type="number"
+            name="number_of_parts"
+            placeholder="Введите количество"
+            value={formData.number_of_parts}
+            onChange={handleChange}
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
         <div className='add-po-field'>
-          <label className='add-po-label'>Producer Comp</label>
+          <label className='add-po-label'>Производитель</label>
           <input
             type="text"
-            name="producerComp"
-            placeholder="Value"
+            name="producer_comp"
+            placeholder="Введите производителя"
+            value={formData.producer_comp}
+            onChange={handleChange}
             className='add-po-input'
+            disabled={loading}
           />
         </div>
 
         <button
           type="submit"
           className='add-po-submit-button'
+          disabled={loading}
         >
-          Добавить
+          {loading ? 'Добавление...' : 'Добавить'}
         </button> 
       </form> 
     </div>   
-    
   );
 }

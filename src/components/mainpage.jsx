@@ -36,9 +36,9 @@ function MainPage() {
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
 
 
-   const handleButtonClick = (buttonName) => {
+  const handleButtonClick = (buttonName) => {
     const newParams = new URLSearchParams(searchParams);
-     if (activeButton === buttonName) {
+      if (activeButton === buttonName) {
       newParams.delete('tab');
     } else {
       // Иначе активируем новую кнопку
