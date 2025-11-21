@@ -68,7 +68,7 @@ function MainPage() {
 
 
   const handleLogout = () => {
-      navigate('/login');
+      navigate('software_vis/login');
     };
 
   return ( 

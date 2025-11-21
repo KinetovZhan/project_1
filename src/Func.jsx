@@ -306,10 +306,10 @@ export function Objects({activeFilters, activeFilters2, selectedModel, onSearch,
         console.log('Данные для пост запроса:', postData)
 
         
-        let endpoint = 'http://localhost:8000/component-info/';
+        let endpoint = '/software_vis/api/v1/component-info';
         
         if (searchQuery && searchQuery.trim() !== '') {
-        endpoint = 'http://localhost:8000/search-component/';
+        endpoint = '/software_vis/api/v1/search-component';
         }
 
 
@@ -665,7 +665,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2 }) {
 
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/tractor-info/', {
+        const response = await fetch('/software_vis/api/v1/tractor-info', {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',

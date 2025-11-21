@@ -11,7 +11,7 @@ function App() {
   <Routes>
     <Route path="/software_vis/login" element={<LoginPage />} />
     <Route path="/software_vis/main" element={<MainPage />} />
-      <Route path="/software_vis/" element={<Navigate to="/login" replace />} />
+    <Route path="/software_vis/" element={<Navigate to="/software_vis/login" replace />} />
   </Routes>
 
   )

@@ -14,7 +14,7 @@ const LoginPage = () => {
     console.log('Login attempt:', { login, password });
     
     if (login && password) {
-      navigate('/main');
+      navigate('/software_vis/main');
     } else {
       alert('Введите логин и пароль');
     }
