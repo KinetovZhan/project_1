@@ -1,54 +1,98 @@
 import Image from '../img/Image.png'
 import { useState, useEffect } from 'react';
 
-export function TractorDetails({ tractor }) {
-  if (!tractor) return null;
+export function TractorDetails({ vin, onBack }) {
+  const [tractor, setTractor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTractorDetails = async () => {
+      if (!vin) {
+        setError('VIN не указан');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        console.log('Запрос деталей для VIN:', vin);
+        
+        // Вариант 1: с параметром 'request'
+        const response = await fetch(`http://localhost:8000/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('Статус ответа:', response.status);
+
+        if (!response.ok) {
+          throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Полученные данные трактора:', data);
+
+        if (!data || data.length === 0) {
+          setError('Данные по трактору не найдены');
+          setTractor(null);
+        } else {
+          setTractor(data[0]);
+        }
+      } catch (err) {
+        console.error('Ошибка загрузки деталей трактора:', err);
+        setError(`Ошибка: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTractorDetails();
+  }, [vin]);
+
+  if (loading) return (
+    <div className="loading">
+      <div>Загрузка деталей трактора...</div>
+      <div>VIN: {vin}</div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="error">
+      <div>{error}</div>
+      <button onClick={onBack}>Назад к списку</button>
+    </div>
+  );
+  
+  if (!tractor) return (
+    <div>
+      <div>Данные отсутствуют</div>
+      <button onClick={onBack}>Назад к списку</button>
+    </div>
+  );
 
   const {
-    VIN,
+    vin: VIN,
     model,
-    releaseDate,
+    assembly_date,
     region,
-    motoHours,
-    lastActivity,
-    DVS,
-    KPP,
-    RK,
-    BK
+    oh_hour,
+    last_activity,
+    dvs,
+    kpp,
+    rk,
+    bk,
+    ap,
+    gr
+    // Добавьте другие поля по необходимости
   } = tractor;
 
-  // Пример данных для "Комплектация и ПО" (можно адаптировать под реальные данные)
-  const poList = [
-    { name: 'ДВС', version: '1.320' },
-    { name: 'КПП', version: '2.15' },
-    { name: 'РК', version: '1.0' },
-    { name: 'ГР', version: '3.2' },
-    { name: 'БК', version: '4.0' },
-    { name: 'Автопилот', version: '1.5' }
-  ];
 
-  // Пример данных для "Последние ошибки"
-  const lastError = {
-    code: 'E-001',
-    date: '02.08.2025'
-  };
-
-  // Пример данных для "Дата последней эксплуатации"
-  const lastOperation = {
-    date: '15.08.2025',
-    hours: '65,5 ч.'
-  };
-
-  const poDescriptions = {
-    'ДВС': 'Изменена цикловая подача топлива в камеру сгорания, изменено количество вспрысков форсунки',
-    'КПП': '',
-    'РК': 'это не рекалмный кабинет, если что!',
-    'ГР': '',
-    'БК': 'а это не бургер кинг',
-    'Автопилот': 'я хочу сырнеке'
-  };
-
-  return (
+return (
     <div className="tractor-details-container">
       <div className="tractor-details-content">
         <div className="tractor-info">
@@ -60,45 +104,31 @@ export function TractorDetails({ tractor }) {
           <div className="column">
             <div className="section">
               <h3>Дата выпуска</h3>
-              <p>{releaseDate}</p>
+              <p>{assembly_date ? new Date(assembly_date).toLocaleDateString('ru-RU') : '-'}</p>
             </div>
             <div className="section">
               <h3>Регион эксплуатации</h3>
-              <p>{region}</p>
+              <p>{region || '-'}</p>
             </div>
             <div className="section">
               <h3>Дата последней эксплуатации, Кол-во МЧ</h3>
-              <p>{lastOperation.date}, {lastOperation.hours}</p>
+              <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
             </div>
           </div>
 
           <div className="column">
             <div className="section">
               <h3>Комплектация и ПО</h3>
-              <ul className="po-list">
-                {poList.map((item, index) => (
-                  <li
-                    key={index}
-                    onMouseEnter={(e) =>{
-                      const tooltip = e.currentTarget.querySelector('.tooltip');
-                      if (tooltip) tooltip.style.display = 'block';
-                    }}
-                    onMouseLeave={(e) => {
-                      const tooltip = e.currentTarget.querySelector('.tooltip');
-                      if (tooltip) tooltip.style.display = 'none';
-                    }}
-                    className="po-item"
-                  >
-                    {item.name} {item.version && `v${item.version}`}
-
-                    <div className="tooltip"> {poDescriptions[item.name] || 'Нет описания'}</div>
-                  </li>
-                ))}
-              </ul>
+              <p>ДВС: {dvs || '-'}</p>
+              <p>КПП: {kpp || '-'}</p>
+              <p>РК: {rk || '-'}</p>
+              <p>БК: {bk || '-'}</p>
+              <p>ГР: {gr || '-'}</p>
+              <p>Автопилот: {ap || '-'}</p>
             </div>
             <div className="section">
               <h3>Последние ошибки, дата</h3>
-              <p>Код ошибки: {lastError.code}, {lastError.date}</p>
+              <p>Код ошибки:{error} </p>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
+import {TractorDetails} from "./TractorDetails.jsx";
 
 
 const formatDateTime = (dateString) => {
@@ -132,18 +133,14 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   console.log('loading:', loading);
     // Функция для обработки клика по строке
   const handleRowClick = (tractor) => {
-    console.log('Клик по трактору:', tractor); // Для отладки
-    setSelectedTractor(tractor);
-  };
+  console.log('Клик по трактору:', tractor.vin);
+  setSelectedTractor(tractor.vin);
+};
 
   // Если выбран трактор, отображаем его детали
   if (selectedTractor) {
-    return (
-      <TractorDetails 
-        tractor={selectedTractor}  
-      />
-    );
-  }
+  return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
+}
 
 
   if (loading) {
