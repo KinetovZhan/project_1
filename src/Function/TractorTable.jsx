@@ -168,7 +168,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
   return (
     <div className="tractor-table-container">
-      {/* Информация о фильтрах */}
+      {/* Информация о фильтрах
       <div className="filter-info">
         {activeFiltersTrac.length > 0 && activeFiltersTrac2.length > 0 && (
           <div style={{marginBottom: '10px', color: '#666'}}>
@@ -186,7 +186,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           <div className="table-info">
             Показано {tractors.length} тракторов
             {` (фильтр: ${activeFiltersTrac.join(', ')})`}
-          </div>
+          </div> */}
           <table className="tractor-table">
             <thead>
               <tr>
@@ -200,6 +200,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>КПП</th>
                 <th>РК</th>
                 <th>БК</th>
+                <th>ГР</th>
+                <th>Автопилот</th>
               </tr>
             </thead>
             <tbody>
@@ -218,12 +220,12 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
                   <td>{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
+                  <td>{tractor.gr || tractor.GR || '-'}</td>
+                  <td>{tractor.ap || tractor.AP || '-'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </>
-      )}
     </div>
   );
 }

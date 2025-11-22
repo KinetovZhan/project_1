@@ -108,7 +108,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
         ))}
       </div>
 
-      <div className='Дата выпуска'>
+      <div className='release-date'>
         <input 
           type="date" 
           placeholder="Дата выпуска"
