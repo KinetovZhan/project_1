@@ -20,6 +20,43 @@ const formatDateTime = (dateString) => {
 };
 
 
+const groupTractors = (data) => {
+  const grouped = {};
+
+  data.forEach(item => {
+    const vin = item.vin;
+    if (!grouped[vin]) {
+      // Копируем общие поля трактора (они одинаковы для всех записей с этим VIN)
+      const { sw_name, componentParts_id, component_id, comp_model, component_type, ...common } = item;
+      grouped[vin] = {
+        ...common,
+        dvs: '-',
+        transmition: '-',
+        rk: '-',
+        bk: '-',
+      };
+    }
+
+    // Определяем, какой компонент указан в записи
+    const type = item.component_type;
+    const version = item.sw_name || '-';
+
+    if (type === 'dvs') {
+      grouped[vin].dvs = version;
+    } else if (type === 'transmition') {
+      grouped[vin].transmition = version;
+    } else if (type === 'rk') {
+      grouped[vin].rk = version;
+    } else if (type === 'bk') {
+      grouped[vin].bk = version;
+    }
+    // Можно добавить другие типы по аналогии
+  });
+
+  return Object.values(grouped);
+};
+
+
 
 
 export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer}) {
@@ -106,10 +143,13 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
         
         console.log('Успешно получены данные тракторов:', data);
 
-        if (Array.isArray(data)) {
-          setTractors(data);
+        if (Array.isArray(data) && data.length > 0) {
+          const grouped = groupTractors(data);
+          setTractors(grouped);
         } else if (data && typeof data === 'object') {
-          setTractors([data]);
+          // Если пришёл один объект — обрабатываем как массив из одного элемента
+          const grouped = groupTractors([data]);
+          setTractors(grouped);
         } else {
           setTractors([]);
         }
@@ -206,24 +246,26 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               </tr>
             </thead>
             <tbody>
-              {tractors.map(tractor => (
-                <tr key={tractor.id || tractor.vin}
-                  onClick={() => handleRowClick(tractor)}
-                  style={{ cursor: 'pointer' }}
-                  className="clickable-row">
-                  <td>{tractor.vin || tractor.VIN || '-'}</td>
-                  <td>{tractor.model || '-'}</td>
-                  <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
-                  <td>{tractor.region || '-'}</td>
-                  <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
-                  <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
-                  <td>{tractor.dvs || tractor.DVS || '-'}</td>
-                  <td>{tractor.kpp || tractor.KPP || '-'}</td>
-                  <td>{tractor.rk || tractor.RK || '-'}</td>
-                  <td>{tractor.bk || tractor.BK || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
+            {tractors.map(tractor => (
+              <tr
+                key={tractor.vin}
+                onClick={() => handleRowClick(tractor)}
+                style={{ cursor: 'pointer' }}
+                className="clickable-row"
+              >
+                <td>{tractor.vin || '-'}</td>
+                <td>{tractor.model || '-'}</td>
+                <td>{formatDateTime(tractor.assembly_date)}</td>
+                <td>{tractor.region || '-'}</td>
+                <td>{tractor.oh_hour || '-'}</td>
+                <td>{formatDateTime(tractor.last_activity)}</td>
+                <td>{tractor.dvs}</td>
+                <td>{tractor.transmition}</td>
+                <td>{tractor.rk}</td>
+                <td>{tractor.bk}</td>
+              </tr>
+            ))}
+          </tbody>
           </table>
         </>
       )}

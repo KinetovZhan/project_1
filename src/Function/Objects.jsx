@@ -14,25 +14,25 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
 
     const hasComponentFilters = activeFilters.length > 0;
     const hasTractorFilter = activeFilters2.length > 0;
-    const hasSelectedModel = selectedModel && selectedModel !== '';
+    const hasSelectedModel = selectedModel && selectedModel > 0;
     
     const FilterToTypeMap = {
-      'DVS': 'двс',
-      'KPP': 'кпп', 
-      'RK': 'рк',
-      'hydrorasp': 'гидрораспределитель'
+      'DVS': 'dvs',
+      'KPP': 'kpp', 
+      'RK': 'rk',
+      'hydrorasp': 'hydro'
     };
 
     const FilterToTractor = {
-      'K7': 'K7',
-      'K5': 'K5'
+      'K7': 'K-7'||'K7',
+      'K5': 'K-5'
     };
 
-    // Подготавливаем данные для POST запроса
+
     const postData = {
       trac_model: [],
       type_comp: [],
-      model_comp: ""
+      model_comp: []
     };
 
 
@@ -57,15 +57,19 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
   };
 
   const handleDownload = (item) => {
-    console.log('Детали компонента:', item);
-    
-    if (item && item.download_link && item.download_link.length > 10) {
-      window.open(item.download_link, '_blank');
-    } else {
-      console.warn('Ссылка для скачивания не найдена для элемента:', item);
-      alert('Ссылка для скачивания недоступна');
-    }
-  };
+  const url = item?.download_link?.trim();
+  if (!url) {
+    alert('Файл недоступен');
+    return;
+  }
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = ''; // или имя файла
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 
 
 useEffect(() => {
@@ -76,12 +80,16 @@ useEffect(() => {
 
       const postData = getPostData();  
       let response;
-      
+      let downloadResponse;
+      let data;
+      let downloadData;
+
       if (searchQuery && searchQuery.trim() !== '') {
         const searchParams = new URLSearchParams({
           query: searchQuery.trim()
         });
-        
+
+              
         response = await fetch(`http://localhost:8000/search-component?${searchParams}`, {
           method: 'GET',
           headers: {  
@@ -89,6 +97,7 @@ useEffect(() => {
             'Content-Type': 'application/json'
           },
         });
+
       } else {
         response = await fetch('http://localhost:8000/component-info', {
           method: 'POST',
@@ -98,9 +107,20 @@ useEffect(() => {
           },
           body: JSON.stringify(postData)
         });
-      } // ← УБЕРИТЕ ЛИШНЮЮ СКОБКУ ЗДЕСЬ!
+      } 
+        data = await response.json();
 
-      const data = await response.json();
+
+
+      downloadResponse = await fetch(`http://localhost:8000/software/download?${data.id_Firmwares}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      downloadData = await downloadResponse.json();
 
       if (data && data.status_code === 404) {
         console.log("404 - ничего не найдено");
@@ -150,8 +170,8 @@ useEffect(() => {
       'KPP': 'КПП',
       'RK': 'РК',
       'hydrorasp': 'Гидрораспределитель',
-      'K7': 'К7',
-      'K5': 'К5'
+      'K7': 'К-7',
+      'K5': 'К-5'
     };
 
     const allActive = [...activeFilters, ...activeFilters2];
@@ -232,11 +252,12 @@ useEffect(() => {
                   <div className='objectmenu'>
                     <img className='object' src={Image} alt='Компонент' />
                     <div className='inform'>
-                      <h4>№: {item.producer_version} от {new   Date(item.release_date).toLocaleDateString()}</h4>
+                      <h4 className='poster'>№: {item.producer_version} от {new   Date(item.release_date).toLocaleDateString()}</h4>
+                      <h5 className='textunder'>Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}</h5>
                       <button 
                         className='download'
                         onClick={() => handleDownload(item)}
-                        disabled={!item.type}
+                        disabled={!item.download_link || item.download_link.trim() === ''}
                       >
                         Скачать
                       </button>

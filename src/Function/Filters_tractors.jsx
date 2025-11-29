@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange}) {
-  const models = ['К-742МСТ', 'К7', 'К-525'];
+  const models = ['К-742МСТ', 'К7', 'К-525', 'К-525'];
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
     'К-742МСТ': false,
@@ -11,11 +11,22 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     'К-525': false
   });
 
-  const FilterToTractor = {
-    'К-742МСТ': 'K742MST',
-    'К7': 'K7', 
-    'К-525': 'K525'
-  };
+  const buildFilterToTractorMap = () => {
+    const mappingRules = {
+      'К-742МСТ': ['К-742МСТ', 'K-742MST', '742'],
+      'К7': ['К-7', 'K-7', 'К7', 'K7', 'K 7'], 
+      'К-525': ['К-525', 'K-525', '525']
+    };
+    const map = {};
+    for (const [dbValue, uiNames] of Object.entries(mappingRules)) {
+      uiNames.forEach(name => {
+        map[name] = dbValue;
+      });
+    }
+    return map;
+};
+
+const FilterToTractor = buildFilterToTractorMap();
 
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
     Serial: false,

@@ -1,7 +1,21 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
+import Select from 'react-select';
 
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
+
+
+  const componentTypeMap = {
+    DVS: 'dvs',
+    KPP: 'kpp',
+    RK: 'rk',
+    hydrorasp: 'hydro' 
+  };
+
+  const tractorModelMap = {
+    K7: 'K-7',
+    K5: 'K5'
+  };
 
   const [FilterItems, setFilterItems] = useState({
     DVS: false,
@@ -15,19 +29,27 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     K5: false,
   })
 
-  const [selectedModel, setSelectedModel] = useState('');
+
+  const [selectedModel, setSelectedModel] = useState([]);
+  const [componentModels, setComponentModels] = useState([]);
+  
+  const options = [{value: '', label:'Все модели'}, ...componentModels.map(item => ({ value: item, label: item }))];
 
 
-  const handleModelChange = (event) => {
-    const model = event.target.value;
-    setSelectedModel(model);
-    console.log('Выбрана модель:', model);
+  const handleModelChange = (selectedOptions) => {
+    const values = selectedOptions 
+      ? selectedOptions.map(opt => opt.value) 
+      : [];
+    
+    setSelectedModel(values);
     
     if (onModelChange) {
-      onModelChange(model); 
+      onModelChange(values);
     }
   };
 
+
+  const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
 
   const handleFilterChange = (FilterType) => {
     const newFilter = {
@@ -56,9 +78,63 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     }
   }
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
 
+  const fetchModels = async () => {
+    
+    const activeComponentTypes = Object.keys(FilterItems)
+      .filter(key => FilterItems[key])
+      .map(key => componentTypeMap[key]);
+    
+    const activeTractorModels = Object.keys(FilterItems2)
+      .filter(key => FilterItems2[key])
+      .map(key => tractorModelMap[key]);
 
+    
+    
+    const postData = {
+      trac_model: activeTractorModels[0],
+      type_comp: activeComponentTypes[0]
+    };
+    
+    
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('FJSDFJG;SDFV')
+      const response = await fetch('http://localhost:8000/component-models', {
+        method: 'POST',
+        headers: {  
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+      });
+      console.log('FJSDFJG;SDFV')
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setComponentModels(data.component_models || []);
+    } catch (err) {
+      console.error('Ошибка загрузки моделей компонентов:', err);
+      setError('Не удалось загрузить модели компонентов');
+      setComponentModels([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  useEffect(() => { 
+       
+    fetchModels();
+    
+  }, [FilterItems,FilterItems2]);
+  
   return(
     <>
       <div className='filters'>
@@ -128,19 +204,23 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
               type="checkbox" />
           </label>
         </div>
-
-        <div className='model'>
-          <select 
-            id="tractor-select" 
-            name="tractor"
-            value={selectedModel}
-            onChange={handleModelChange}>
-            <option value="">Модель</option>
-            <option value="K7">К-7</option>
-            <option value="K5">К-5</option>
-          </select>
-        </div>
+  
       </div>
+        <div className='model'>
+          <Select
+            isMulti
+            options={options}
+            value={selectedOptions}
+            onChange={handleModelChange}
+            
+            placeholder="Модель"
+            isDisabled={loading || componentModels.length === 0}
+            styles={{ 
+              control: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width:'200px', borderRadius: '25px', height:'53px'}),
+              menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'rgba(217, 217, 217, 1)',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
+            }}
+          />
+        </div>
     </>
   )
 }

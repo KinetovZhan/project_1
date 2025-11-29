@@ -10,7 +10,7 @@
 }*/
 
 body {
-  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family:Arial, Helvetica, sans-serif
 }
 /* Окно навигации */
 header {
@@ -110,13 +110,13 @@ button {
   height: 160px;
   border-radius: 20px;
   padding: 12px 10px;
-  gap: 10px;
+  gap: 20px;
 
   position: absolute;
   top: 187px;
   
   background-color: rgba(217, 217, 217, 1);
-  margin-left: 17px;
+  margin-left: 13px;
 
   color: black;
 }
@@ -159,7 +159,7 @@ button.active {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  gap: 10px;
+  gap: 20px;
   color: black;
 
   /* Положение */
@@ -180,6 +180,8 @@ button.active {
   position: absolute;
   left: 0px;
   top: 143px;
+
+  
   
   /* Стили для кастомной стрелки */
   appearance: none;
@@ -256,6 +258,9 @@ button.active {
   gap: 0px;
 }
 
+.textunder {
+  color: grey;
+}
 
 /* Кнопка */
 .download {
@@ -325,9 +330,10 @@ button:active {
   gap: 10px;
   color: black;
   /* Полоса прокрутки */
-  max-height: 120px;
+  max-height: 100px;
   overflow-y: auto;
-  border: 7px solid rgba(217, 217, 217, 1);
+  gap: 10px;
+  border: 1px solid rgba(217, 217, 217, 1);
 
 
 
@@ -1032,4 +1038,23 @@ button.search_button {
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   white-space: pre-line;
+}
+
+
+.poster {
+  white-space: nowrap;       
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+  max-width: 300px;          
+}
+
+
+
+
+/* Страница 3 прокртука для select */
+.model {
+  position: absolute;
+  top: 512px;
+  left:13px;
+  width: 200px;
 }
