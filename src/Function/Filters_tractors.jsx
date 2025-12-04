@@ -119,7 +119,7 @@ const FilterToTractor = buildFilterToTractorMap();
         ))}
       </div>
 
-      <div className='Дата выпуска'>
+      <div className='release-date'>
         <input 
           type="date" 
           placeholder="Дата выпуска"

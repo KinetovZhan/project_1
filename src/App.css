@@ -559,19 +559,77 @@ button:active {
 }
 
 
-
-/*Пока бесполезный мусор для таблицы тракторов*/
 .tractor-table-container {
   margin: 100px;
-  overflow-x:auto;
+  overflow-x: auto;
+  background: #454343; /* Черный фон */
+  border-radius: 20px;
+  border: 1px solid #454343;
+  overflow: hidden; /* Важно! чтобы обрезать углы таблицы */
 }
 
 .tractor-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  border-radius: 2px;
-  overflow: scroll;
+  /* Убираем border-radius у таблицы, так как контейнер уже скруглен */
+  border-radius: 0;
+}
+
+.tractor-table th {
+  background: #d7dadc;
+  color: rgb(8, 8, 8);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #454343;
+  border-right: 1px solid #454343;
+
+}
+
+.table-info {
+  color: #030303;
+}
+
+.tractor-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #454343;
+  color: #2c3e50;
+  font-size: 14px;
+  border-right: 1px solid #454343
+}
+
+.tractor-table th:last-child {
+  border-top-right-radius: 0;
+  border-right: none;
+}
+
+.tractor-table td:last-child {
+
+  border-right: none;
+}
+
+.tractor-table tr:last-child td {
+  border-bottom: none;
+}
+
+
+
+
+/*Пока бесполезный мусор для таблицы тракторов*/
+/* .tractor-table-container {
+  margin: 100px;
+  overflow-x: auto;
+
+}
+
+.tractor-table {
+  width: 100%;
+  border-collapse: collapse; 
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  border-color: #007bff;
 }
 
 .tractor-table th {
@@ -581,9 +639,20 @@ button:active {
   text-align: left;
   font-weight: 600;
   border: 1px solid #454343;
+}
+
+.tractor-table th:first-child {
+  border-top-left-radius: 20px;
+   border-color: #000000;
+}
+
+.tractor-table th:last-child {
+  border-top-right-radius: 20px;
   
-  
-  
+}
+
+.table-info {
+  color: #030303;
 }
 
 .tractor-table td {
@@ -591,8 +660,17 @@ button:active {
   border-bottom: 1px solid #ecf0f1;
   color: #2c3e50;
   font-size: 14px;
-  border: 1px solid #030303;
+  border: 0.5px solid #666060;
 }
+
+/* Скругление для последней строки */
+.tractor-table tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+
+.tractor-table tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
+} */
 
 .loading {
   background: transparent;
@@ -782,19 +860,17 @@ button:active {
 
 button.search_button {
   width:50px;
-  height: 50px;
+  position:absolute;
   border: none;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
   background: transparent;
   cursor: pointer;
-  color: black;
+  color:  black;
   cursor: pointer;
   padding: 1px;
-  border-radius: 25px;
-  justify-content: right;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 10px;
   box-shadow: none;
 }
 
@@ -815,14 +891,29 @@ button.search_button {
 
 
 /* Поиск по дате */
-.choose_date_release {
-  width: 202px;
-  height: 53px;
+.release-date {
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 1);
+  width: 242px;
+  height: 56px;
+  border-radius: 25px;
   position: absolute;
   top: 318px;
   left: 13px;
+  padding: 0 10px;
+  box-sizing: border-box;
+
+}
+.choose_date_release {
+  flex: 1;
+  align-items: center;
+  border: none;
+  background-color: transparent;
+  width: 192px;
+  height: 56px;
   border-radius: 25px;
-  background-color: rgba(217, 217, 217, 1);
+  outline: none;
   
 
   -webkit-appearance: none;
@@ -832,9 +923,14 @@ button.search_button {
 
 .choose_date_release:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: transparent;
+  box-shadow: none;
 }
+
+.choose_date_release::placeholder {
+  color: #000000;
+}
+
 
 /* Окно с детальной информацией о тракторе */
 .tractor-details-container {
@@ -1019,7 +1115,7 @@ button.search_button {
 
 
 /* всплывающее окно у трактора */
-.po-item {
+/* .po-item {
   position: relative;
 }
 
@@ -1038,7 +1134,8 @@ button.search_button {
   z-index: 10;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   white-space: pre-line;
-}
+} */
+
 
 
 .poster {
@@ -1049,12 +1146,60 @@ button.search_button {
 }
 
 
-
-
 /* Страница 3 прокртука для select */
 .model {
   position: absolute;
   top: 512px;
   left:13px;
   width: 200px;
+}
+
+ .po-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.po-item {
+  position: relative;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.po-item:hover {
+  background-color: transparent;
+}
+
+.tooltip {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: #333;
+  color: white;
+  padding: 12px;
+  border-radius: 6px;
+  z-index: 1000;
+  margin-left: 10px;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  width: 250px; /* Фиксированная ширина */
+  max-width: 300px; /* Максимальная ширина */
+}
+
+.tooltip-content {
+  white-space: normal; /* Разрешаем перенос строк */
+  word-wrap: break-word; /* Перенос длинных слов */
+  line-height: 1.4; /* Межстрочный интервал */
+  text-align: left;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent #333 transparent transparent;
 }

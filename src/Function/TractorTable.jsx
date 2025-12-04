@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
+import {TractorDetails} from "./TractorDetails.jsx";
 
 
 const formatDateTime = (dateString) => {
@@ -172,18 +173,14 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   console.log('loading:', loading);
     // Функция для обработки клика по строке
   const handleRowClick = (tractor) => {
-    console.log('Клик по трактору:', tractor); // Для отладки
-    setSelectedTractor(tractor);
-  };
+  console.log('Клик по трактору:', tractor.vin);
+  setSelectedTractor(tractor.vin);
+};
 
   // Если выбран трактор, отображаем его детали
   if (selectedTractor) {
-    return (
-      <TractorDetails 
-        tractor={selectedTractor}  
-      />
-    );
-  }
+  return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
+}
 
 
   if (loading) {
@@ -211,7 +208,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
   return (
     <div className="tractor-table-container">
-      {/* Информация о фильтрах */}
+      {/* Информация о фильтрах
       <div className="filter-info">
         {activeFiltersTrac.length > 0 && activeFiltersTrac2.length > 0 && (
           <div style={{marginBottom: '10px', color: '#666'}}>
@@ -229,7 +226,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           <div className="table-info">
             Показано {tractors.length} тракторов
             {` (фильтр: ${activeFiltersTrac.join(', ')})`}
-          </div>
+          </div> */}
           <table className="tractor-table">
             <thead>
               <tr>
@@ -243,32 +240,30 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>КПП</th>
                 <th>РК</th>
                 <th>БК</th>
+                <th>ГР</th>
+                <th>Автопилот</th>
               </tr>
             </thead>
             <tbody>
-            {tractors.map(tractor => (
-              <tr
-                key={tractor.vin}
-                onClick={() => handleRowClick(tractor)}
-                style={{ cursor: 'pointer' }}
-                className="clickable-row"
-              >
-                <td>{tractor.vin || '-'}</td>
-                <td>{tractor.model || '-'}</td>
-                <td>{formatDateTime(tractor.assembly_date)}</td>
-                <td>{tractor.region || '-'}</td>
-                <td>{tractor.oh_hour || '-'}</td>
-                <td>{formatDateTime(tractor.last_activity)}</td>
-                <td>{tractor.dvs}</td>
-                <td>{tractor.transmition}</td>
-                <td>{tractor.rk}</td>
-                <td>{tractor.bk}</td>
-              </tr>
-            ))}
-          </tbody>
+              {tractors.map(tractor => (
+                <tr key={tractor.id || tractor.vin}
+                  onClick={() => handleRowClick(tractor)}
+                  style={{ cursor: 'pointer' }}
+                  className="clickable-row">
+                  <td>{tractor.vin || tractor.VIN || '-'}</td>
+                  <td>{tractor.model || '-'}</td>
+                  <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
+                  <td>{tractor.region || '-'}</td>
+                  <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
+                  <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
+                  <td>{tractor.dvs || tractor.DVS || '-'}</td>
+                  <td>{tractor.kpp || tractor.KPP || '-'}</td>
+                  <td>{tractor.rk || tractor.RK || '-'}</td>
+                  <td>{tractor.bk || tractor.BK || '-'}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
-        </>
-      )}
     </div>
   );
 }
