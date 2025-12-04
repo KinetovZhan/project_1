@@ -35,6 +35,8 @@ const groupTractors = (data) => {
         transmition: '-',
         rk: '-',
         bk: '-',
+        gr: '-',
+        ap: '-'
       };
     }
 
@@ -260,6 +262,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
                   <td>{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
+                  <td>{tractor.gr || tractor.GR || '-'}</td>
+                  <td>{tractor.ap || tractor.AP || '-'}</td>                  
                 </tr>
               ))}
             </tbody>
