@@ -409,7 +409,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     <div className="tractor-table-outer-wrapper" >
       <div className="tractor-table-container" >
         <div 
-          className="tractor-table-body-scroll" 
+          className="scroll-bar" 
           
         >
           <table className="tractor-table">
