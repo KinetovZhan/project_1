@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import '../App.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../Function/Header.jsx';
@@ -38,6 +38,20 @@ function MainPage() {
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
+
+
+  useEffect(() => {
+  const shouldPreserveFilters = ['aggregates'].includes(activeButton);
+
+  if (!shouldPreserveFilters) {
+    setActiveFilters([]);
+    setActiveFilters2([]);
+
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('model');
+    setSearchParams(newParams, { replace: true });
+  }
+}, [activeButton, searchParams, setSearchParams]);
 
 
   const handleButtonClick = (buttonName) => {
@@ -92,7 +106,7 @@ function MainPage() {
     newParams.set('tab','addAgg');
     setSearchParams(newParams);
   }
-
+  
   const closeAddAggForm = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('tab');

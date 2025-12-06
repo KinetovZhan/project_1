@@ -1151,7 +1151,7 @@ button.search_button {
   position: absolute;
   top: 512px;
   left:13px;
-  width: 200px;
+  width: 360px;
 }
 
  .po-list {
@@ -1203,3 +1203,81 @@ button.search_button {
   border-style: solid;
   border-color: transparent #333 transparent transparent;
 }
+
+
+.showModels {
+  position: absolute;
+  width: 360px;
+  min-height: 70px;
+  max-height: 150px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  top: 600px;
+  left: 13px;
+  padding: 10px; /* лучше использовать общий padding */
+  color: black;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Новый контейнер для заголовка и кнопки */
+.showModelsHeader {
+  display: flex;
+  justify-content: space-between; /* "Выбранные модели" — слева/по центру логически, "Очистить" — справа */
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.showModelsHeader strong {
+  flex: 1;           /* занимает всё доступное пространство */
+  text-align: center; /* центрирует текст внутри своего пространства */
+  margin-right: 10px; /* отступ от кнопки */
+}
+
+.deleteAll {
+  font-size: smaller;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: black;
+  white-space: nowrap; /* чтобы "Очистить" не переносилось */
+}
+
+/* Стили списка остаются почти без изменений */
+.showModels ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.showModels li {
+  background-color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  padding: 7px;
+  cursor: pointer;
+}
+
+.clear {
+  position: absolute;
+  top: 720px;
+  left: 13px;
+  width: 100px;
+  height: 50px;
+  color: black;
+  background-color: rgba(217, 217, 217, 1);
+  box-shadow: none;
+  border-radius: 20px;
+  text-align: center;
+}
+
+
+
+

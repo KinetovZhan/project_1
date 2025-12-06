@@ -33,7 +33,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   const [selectedModel, setSelectedModel] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   
-  const options = [{value: '', label:'Все модели'}, ...componentModels.map(item => ({ value: item, label: item }))];
+  const options = [...componentModels.map(item => ({ value: item, label: item }))];
 
 
   const handleModelChange = (selectedOptions) => {
@@ -132,6 +132,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     fetchModels();
     
   }, [FilterItems,FilterItems2]);
+
+
   
   return(
     <>
@@ -206,19 +208,79 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       </div>
         <div className='model'>
           <Select
+          className='modelSelect'
             isMulti
             options={options}
             value={selectedOptions}
             onChange={handleModelChange}
-            
+            // controlShouldRenderValue={false}          
             placeholder="Модель"
             isDisabled={loading || componentModels.length === 0}
             styles={{ 
-              control: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width:'200px', borderRadius: '25px', height:'53px'}),
-              menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'rgba(217, 217, 217, 1)',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
+              control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width:'360px', borderRadius: '15px', height:'53px'}),
+              menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
             }}
           />
         </div>
+        {/* <div className="showModels">
+          <div className="showModelsHeader">
+            <strong>Выбранные модели:</strong>
+            <h2
+              className="deleteAll"
+              onClick={() => {
+                setSelectedModel([]);
+                if (onModel) onModelChange([]);
+              }}
+            >
+              Очистить
+            </h2>
+          </div>
+
+          {selectedModel.length > 0 ? (
+            <ul>
+              {selectedModel.map((model, index) => (
+                <li
+                  key={index}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    const newSelectedModel = selectedModel.filter(m => m !== model);
+                    const newSelectedOptions = newSelectedModel.map(m => ({ value: m, label: m }));
+                    handleModelChange(newSelectedOptions);
+                  }}
+                >
+                  {model} ×
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <span></span>
+          )}
+        </div> */}
+        <button 
+          className='clear'
+          onClick={() => {
+            setFilterItems({
+              DVS: false,
+              KPP: false,
+              RK: false,
+              hydrorasp: false
+            });
+            setFilterItems2({
+              K7: false,
+              K5: false,
+            });
+            setSelectedModel([])
+
+            // Уведомляем родителя
+            if (onFilterChange) onFilterChange([]);
+            if (onFilterChange2) onFilterChange2([]);
+            if (onModelChange) onModelChange([]);
+          }}
+          
+        >
+          Сброс
+        </button>
+
     </>
   )
 }
