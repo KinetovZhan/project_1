@@ -32,7 +32,7 @@ const groupTractors = (data) => {
       grouped[vin] = {
         ...common,
         dvs: '-',
-        transmition: '-',
+        kpp: '-',
         rk: '-',
         bk: '-',
         gr: '-',
@@ -40,21 +40,25 @@ const groupTractors = (data) => {
       };
     }
 
-    // Определяем, какой компонент указан в записи
     const type = item.component_type;
     const version = item.sw_name || '-';
 
     if (type === 'dvs') {
       grouped[vin].dvs = version;
-    } else if (type === 'transmition') {
-      grouped[vin].transmition = version;
+    } else if (type === 'kpp') {
+      grouped[vin].kpp = version;
     } else if (type === 'rk') {
       grouped[vin].rk = version;
     } else if (type === 'bk') {
       grouped[vin].bk = version;
+    } else if (type === 'gr') {
+      grouped[vin].gr = version;
+    } else if (type === 'ap') {
+      grouped[vin].ap = version;
     }
-    // Можно добавить другие типы по аналогии
+
   });
+  console.log(grouped)
 
   return Object.values(grouped);
 };

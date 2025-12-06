@@ -95,15 +95,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     
     
     const postData = {
-      trac_model: activeTractorModels[0],
-      type_comp: activeComponentTypes[0]
+      trac_model: activeTractorModels.lenght  > 0 ? activeTractorModels : [],
+      type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : []
     };
     
     
     try {
       setLoading(true);
       setError(null);
-      console.log('FJSDFJG;SDFV')
       const response = await fetch('http://localhost:8000/component-models', {
         method: 'POST',
         headers: {  
@@ -112,7 +111,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         },
         body: JSON.stringify(postData)
       });
-      console.log('FJSDFJG;SDFV')
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

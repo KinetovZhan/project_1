@@ -14,7 +14,7 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
 
     const hasComponentFilters = activeFilters.length > 0;
     const hasTractorFilter = activeFilters2.length > 0;
-    const hasSelectedModel = selectedModel && selectedModel > 0;
+    const hasSelectedModel = selectedModel && selectedModel.length > 0;
     
     const FilterToTypeMap = {
       'DVS': 'dvs',
