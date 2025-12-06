@@ -24,7 +24,7 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
     };
 
     const FilterToTractor = {
-      'K7': 'K-7'||'K7',
+      'K7': 'K-7',
       'K5': 'K-5'
     };
 
@@ -52,7 +52,8 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
     if (hasSelectedModel) {
       postData.model_comp = selectedModel;
     }
-
+    console.log('fasdgasvcdsgreavsdvc')
+    console.log(postData.model_comp)
     return postData;
   };
 
@@ -112,15 +113,15 @@ useEffect(() => {
 
 
 
-      downloadResponse = await fetch(`http://localhost:8000/software/download?${data.id_Firmwares}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
+      // downloadResponse = await fetch(`http://localhost:8000/software/download?${data.id_Firmwares}`, {
+      //   method: 'GET',
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-Type': 'application/json'
+      //   }
+      // });
 
-      downloadData = await downloadResponse.json();
+      // downloadData = await downloadResponse.json();
 
       if (data && data.status_code === 404) {
         console.log("404 - ничего не найдено");

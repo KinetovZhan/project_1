@@ -14,7 +14,11 @@ function MainPage() {
 
 
   const activeButton = searchParams.get('tab') || null;
-  const selectedModel = searchParams.get('model') || '';
+  const selectedModel = useMemo(() => {
+    const modelParam = searchParams.get('model');
+    if (!modelParam) return [];
+    return modelParam.split(',').filter(Boolean); // разбиваем по запятой
+}, [searchParams]);
   const showAddForm = activeButton === 'addPO';
   const showAddAggForm = activeButton === 'addAgg';
   const [activeFilters, setActiveFilters] = useState([]);
@@ -23,7 +27,7 @@ function MainPage() {
   const [activeFiltersTrac2, setActiveFiltersTrac2] = useState([]);
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('');
+
   
   // Поиск по дилеру
   const [searchDealer, setSearchDealer] =useState('');
@@ -49,15 +53,15 @@ function MainPage() {
     }
     setSearchParams(newParams);
   };
-  const handleModelChange = (model) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (model)
-      {newParams.set('model', model);
+  const handleModelChange = (models) => {
+  const newParams = new URLSearchParams(searchParams);
+  if (Array.isArray(models) && models.length > 0) {
+    newParams.set('model', models.join(',')); 
   } else {
     newParams.delete('model');
-  } 
+  }
   setSearchParams(newParams);
-}
+};
   const handleAddForm = () => {
     const newParams = new URLSearchParams(searchParams);
     if (activeButton === 'addPO') {
