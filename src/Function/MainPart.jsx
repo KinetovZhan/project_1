@@ -20,6 +20,7 @@ export function MainPart({
   showAddForm,
   onCloseAddForm,
   onAddSubmit, // ← для AddPoForm
+  searchDate,
 
   // --- Форма агрегата ---
   showAddAggForm,
@@ -88,6 +89,7 @@ export function MainPart({
             onSearch={onSearch}
             searchQuery={searchQuery}
             searchDealer={searchDealer}
+            searchDate={searchDate}
           />
         </>
       )}

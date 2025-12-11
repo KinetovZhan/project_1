@@ -28,6 +28,7 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDealer, setSearchDealer] = useState('');
+  const { logout, user } = useAuth();
 
   const navigate = useNavigate();
 

@@ -138,7 +138,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     const postData = {
       trac_model: [],
       status: [],
-      dealer: ""
+      dealer: "",
+      date_assemle: null
     };
 
     if (searchQuery && searchQuery.trim() !== '') {

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 
 // Трактор
-export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange}) {
-  const models = ['К-742МСТ', 'К-7', 'К-525', 'К-525'];
+export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
+  const models = ['К-742МСТ', 'К-7', 'К-525'];
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
     'К-742МСТ': false,
@@ -11,22 +11,12 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     'К-525': false
   });
 
-  const buildFilterToTractorMap = () => {
-    const mappingRules = {
-      'К-742МСТ': ['К-742МСТ', 'K-742MST', '742'],
-      'К-7': ['К-7', 'K-7', 'К7', 'K7', 'K 7'], 
-      'К-525': ['К-525', 'K-525', '525']
-    };
-    const map = {};
-    for (const [dbValue, uiNames] of Object.entries(mappingRules)) {
-      uiNames.forEach(name => {
-        map[name] = dbValue;
-      });
-    }
-    return map;
-};
 
-const FilterToTractor = buildFilterToTractorMap();
+  const FilterToTractor = {
+    'К-742МСТ': 'K742MST',
+    'К-7': 'K-7', 
+    'К-525': 'K525'
+  };
 
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
     Serial: false,
@@ -44,7 +34,7 @@ const FilterToTractor = buildFilterToTractorMap();
 
   const [Dealer, setDealer] = useState('')
 
-
+  const [releaseDate, setReleaseDate] = useState('');
 
 
 
@@ -61,6 +51,23 @@ const FilterToTractor = buildFilterToTractorMap();
       onDealerChange(Dealer);
     }
   };
+
+    const handleDateChange = (event) => {
+      const date = event.target.value;
+      console.log('Дата выбрана в фильтре:', date); // <-- Добавьте этот лог
+      setReleaseDate(date);
+      if (onDateChange && typeof onDateChange === 'function') {
+        onDateChange(date);
+      }
+    }
+
+      // Функция для сброса фильтра по дате
+    const handleClearDate = () => {
+      setReleaseDate('');
+      if (onDateChange && typeof onDateChange === 'function') {
+        onDateChange('');
+      }
+    };
 
   const handleKeydown = (e) => {
     if (e.key === 'Enter') {
@@ -122,8 +129,12 @@ const FilterToTractor = buildFilterToTractorMap();
       <div className='release-date'>
         <input 
           type="date" 
+
           placeholder="Дата выпуска"
           className='choose_date_release'
+          value = {releaseDate}
+          onChange = {handleDateChange}
+          onKeyDown={handleKeydown}
           />
       </div>
 
