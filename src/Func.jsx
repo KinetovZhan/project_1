@@ -1,7 +1,7 @@
 import Image from './img/Image.png'
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react';
-
+import Select from 'react-select';
 
 
 export function Header({ onLogout }) {
@@ -234,12 +234,11 @@ export function MainPart({activeButton, showAddForm, showAddAggForm, onCloseAddF
 export function AddPoForm({ onBack, onSubmit }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
-  const [selectedModel, setSelectedModel] = useState('');
-  const [selectedPartNumber, setSelectedPartNumber] = useState('');
+  const [selectedComponents, setSelectedComponents] = useState([]);
 
   // Загружаем список компонентов с частями
   useEffect(() => {
-    fetch('http://localhost:8000/component(parts)') // ← замени на реальный эндпоинт
+    fetch('http://localhost:8000/component-parts') // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();
@@ -271,8 +270,8 @@ export function AddPoForm({ onBack, onSubmit }) {
     const release_date = form.elements.releaseDate?.value || undefined;
 
     // Обязательный выбор компонента и части
-    if (!selectedModel || selectedPartNumber === '') {
-      alert('Пожалуйста, выберите компонент и часть');
+     if (selectedComponents.length === 0) {
+      alert('Пожалуйста, выберите хотя бы один компонент и часть');
       return;
     }
 
@@ -281,8 +280,19 @@ export function AddPoForm({ onBack, onSubmit }) {
     formData.append('file', file);
     formData.append('name', name);
     formData.append('is_major', is_major.toString());
-    formData.append('component_models', selectedModel);            // ← "ДВС-4122"
-    formData.append('part_number', selectedPartNumber); // ← 0
+    // Отправляем массив всех выбранных моделей
+    selectedComponents.forEach(opt => {
+      formData.append('component_models', opt.model);
+    });
+
+    // Отправляем массив всех выбранных номеров частей
+    selectedComponents.forEach(opt => {
+      if (opt?.part_number == null) {
+        alert(`Ошибка: у компонента "${opt?.model}" нет номера части`);
+        return;
+      }
+      formData.append('part_number', opt.part_number);
+    });
 
     if (inner_name) formData.append('inner_name', inner_name);
     if (description) formData.append('description', description);
@@ -316,7 +326,12 @@ export function AddPoForm({ onBack, onSubmit }) {
       alert(`Ошибка: ${err.message}`);
     }
   };
-
+  const selectOptions = componentOptions.map(item => ({
+    value: `${item.model}___${item.part_number}`,
+    label: item['model(part)'],
+    model: item.model,
+    part_number: item.part_number
+  }));
 
   return (
     <div className="maininfo add-po-form-container">
@@ -341,49 +356,58 @@ export function AddPoForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* 🔥 Выбор компонента и части */}
+        {/* 🔥 Мультивыбор компонентов и частей */}
         <div className="add-po-field">
           <label className="add-po-label">Компонент и часть </label>
-          <select
-            value={`${selectedModel} (${selectedPartNumber})`}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '') {
-                setSelectedModel('');
-                setSelectedPartNumber('');
-                return;
-              }
-              const item = componentOptions.find(x => 
-                `${x.model} (${x.part_number})` === value
-              );
-              if (item) {
-                setSelectedModel(item.model);
-                setSelectedPartNumber(item.part_number.toString());
-              }
-            }}
-            required
-            className="add-po-select"
-          >
-            <option value="">Выберите компонент и часть</option>
-            {componentOptions.map((item, idx) => (
-              <option key={idx} value={`${item.model} (${item.part_number})`}>
-                {item['model(part)']}
-              </option>
-            ))}
-          </select>
-        </div>
+          <Select
+            isMulti
+            options={componentOptions.map(item => ({
+              value: `${item.model}___${item.part_number}`,
+              label: item['model(part)'],
+              model: item.model,
+              part_number: item.part_number
+            }))}
+            value={selectedComponents}
+            onChange={(selected) => {
+              // Сохраняем выбранные значения
+              setSelectedComponents(selected || []);
 
-        {/* inner_name (опционально) */}
-        <div className="add-po-field">
-          <label className="add-po-label">Inner_name</label>
-          <input
-            type="text"
-            name="innerName"
-            placeholder="Т-150К"
-            className="add-po-input"
+              // Если нужно, можно извлечь первый компонент для совместимости с бэкендом
+              // но лучше отправлять все
+            }}
+            placeholder="Выберите компонент и часть"
+            
+            classNamePrefix="add-po-select"
+            isDisabled={componentOptions.length === 0}
+            noOptionsMessage={() => "Нет доступных компонентов"}
+            styles={{
+              // 🔹 Контрол (внешний контейнер) — как у твоего <select>
+              control: (base, state) => ({
+                ...base,
+                color: '#ccc',
+                height: '40px',
+                width: '100%',
+                border: '1px solid',
+                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                boxSizing: 'border-box',
+                padding: '0 12px',
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease',
+                outline: 'none',
+                boxShadow: 'none',
+              }),
+              
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 200,
+                padding: '4px 0',
+                backgroundColor: 'white'
+              }),
+            
+            }}
           />
         </div>
-
         {/* is_major */}
         <div className="add-po-field">
           <label className="add-po-label">Тип</label>
