@@ -33,12 +33,8 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
 
   const [Dealer, setDealer] = useState('')
  
-  const [releaseDate, setReleaseDate] = useState('');
-
-
-
-
-
+     // ОДНО поле для даты и состояние для отслеживания выбора
+    const [selectedDates, setSelectedDates] = useState([]);
 
   const handleDealer = (event) => {
     const dealer = event.target.value;
@@ -58,23 +54,92 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     } 
   };
 
-  // Изменение даты
-  const handleDateChange = (event) => {
-  const date = event.target.value;
-  console.log('Дата выбрана в фильтре:', date); // <-- Добавьте этот лог
-  setReleaseDate(date);
-  if (onDateChange && typeof onDateChange === 'function') {
-    onDateChange(date);
-  }
-}
+//   // Изменение даты
+//   const handleDateChange = (event) => {
+//   const date = event.target.value;
+//   console.log('Дата выбрана в фильтре:', date); // <-- Добавьте этот лог
+//   setReleaseDate(date);
+//   if (onDateChange && typeof onDateChange === 'function') {
+//     onDateChange(date);
+//   }
+// }
 
-    // Функция для сброса фильтра по дате
-  const handleClearDate = () => {
-    setReleaseDate('');
-    if (onDateChange && typeof onDateChange === 'function') {
-      onDateChange('');
-    }
-  };
+//     // Функция для сброса фильтра по дате
+//   const handleClearDate = () => {
+//     setReleaseDate('');
+//     if (onDateChange && typeof onDateChange === 'function') {
+//       onDateChange('');
+//     }
+//   };
+ // === ПРОСТАЯ ЛОГИКА: ОДНА ФУНКЦИЯ ДЛЯ ДАТЫ ===
+    const handleDateSelect = (event) => {
+        const selectedDate = event.target.value;
+        
+        if (!selectedDate) {
+            // Если поле очищено
+            setSelectedDates([]);
+            if (onDateChange) {
+                onDateChange({
+                    date_assemle: null,
+                    date_start: null,
+                    date_end: null
+                });
+            }
+            return;
+        }
+        
+        // Добавляем дату в массив
+        const newDates = [...selectedDates, selectedDate];
+        
+        // Если выбрана одна дата - это конкретная дата
+        if (newDates.length === 1) {
+            setSelectedDates(newDates);
+            if (onDateChange) {
+                onDateChange({
+                    date_assemle: selectedDate,
+                    date_start: null,
+                    date_end: null
+                });
+            }
+        }
+        // Если выбрана вторая дата - это диапазон
+        else if (newDates.length === 2) {
+            // Сортируем даты: первая - начало, вторая - конец
+            const sortedDates = [...newDates].sort();
+            setSelectedDates(sortedDates);
+            
+            if (onDateChange) {
+                onDateChange({
+                    date_assemle: null,
+                    date_start: sortedDates[0],
+                    date_end: sortedDates[1]
+                });
+            }
+        }
+        // Если выбрана третья дата - сбрасываем и начинаем заново
+        else {
+            setSelectedDates([selectedDate]);
+            if (onDateChange) {
+                onDateChange({
+                    date_assemle: selectedDate,
+                    date_start: null,
+                    date_end: null
+                });
+            }
+        }
+    };
+    
+    // Очистка даты
+    const handleClearDate = () => {
+        setSelectedDates([]);
+        if (onDateChange) {
+            onDateChange({
+                date_assemle: null,
+                date_start: null,
+                date_end: null
+            });
+        }
+    };
 
 
 
@@ -111,6 +176,14 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       onFilterChangeTracByModel(activeFiltersTrac);
     }
   }
+
+    // Получаем значение для поля ввода даты
+  const getDateInputValue = () => {
+    if (selectedDates.length === 0) return '';
+    if (selectedDates.length === 1) return selectedDates[0];
+    if (selectedDates.length === 2) return selectedDates[1]; // Показываем последнюю выбранную дату
+    return '';
+  };
   
 
   return (
@@ -133,8 +206,8 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
           type="date" 
           placeholder="Дата выпуска"
           className='choose_date_release'
-          value = {releaseDate}
-          onChange = {handleDateChange}
+          value = {getDateInputValue()}
+          onChange = {handleDateSelect}
           onKeyDown={handleKeydown}
           />
       </div>

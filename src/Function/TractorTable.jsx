@@ -21,7 +21,7 @@ const formatDateTime = (dateString) => {
 };
 
 
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate }) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter }) {
   // const [tractors, setTractors] = useState([]);
   const [tractors, setTractors] = useState([]); // все данные от сервера
 const [filteredTractors, setFilteredTractors] = useState([]); // то, что показываем
@@ -87,25 +87,7 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
   };
 }, []);
 
- // Эффект для фильтрации тракторов по дате выпуска
-  // useEffect(() => {
-  //   if (!searchDate || searchDate === '') {
-  //     setFilteredTractors(tractors);
-  //     return;
-  //   }
 
-  //   try {
-  //     const selectedDate = new Date(searchDate);
-  //     const filtered = tractors.filter(tractor => {
-  //       const tractorDate = new Date(tractor.assembly_date || tractor.releaseDate);
-  //       return tractorDate.toDateString() === selectedDate.toDateString();
-  //     });
-  //     setFilteredTractors(filtered);
-  //   } catch (error) {
-  //     console.error('Ошибка фильтрации по дате:', error);
-  //     setFilteredTractors(tractors);
-  //   }
-  // }, [searchDate, tractors]);
 
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
@@ -116,7 +98,9 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
       trac_model: [],
       status: [],
       dealer: "",
-      date_assemle: ""
+      date_assemle: null,
+      date_start: null,
+      date_end: null
     };
 
     if (searchQuery && searchQuery.trim() !== '') {
@@ -127,10 +111,26 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
       postData.dealer = searchDealer;
     }
     
-    if (searchDate && searchDate.trim() !== '') {
-    postData.date_assemle = searchDate;
-    console.log('Search date:', searchDate); // Добавьте эту строку
-  }
+  //   if (searchDate && searchDate.trim() !== '') {
+  //   postData.date_assemle = searchDate;
+  //   console.log('Search date:', searchDate); // Добавьте эту строку
+  // }
+  // Добавляем фильтры по дате (новая логика)
+    if (dateFilter) {
+        const { date_assemle, date_start, date_end } = dateFilter;
+        
+        if (date_assemle) {
+            // Одна конкретная дата
+            postData.date_assemle = date_assemle;
+            console.log('Поиск по одной дате:', date_assemle);
+        } else if (date_start || date_end) {
+            // Диапазон дат
+            postData.date_start = date_start || null;
+            postData.date_end = date_end || null;
+            console.log('Поиск по диапазону:', date_start, 'до', date_end);
+        }
+    }
+
 
 
     if (hasModelFilters) {
@@ -165,10 +165,10 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
           },
         });
       } else {
-        // Добавляем дату в запрос, если она есть
-        if (searchDate) {
-          postData.date_assemle = searchDate;
-        }
+        // // Добавляем дату в запрос, если она есть
+        // if (searchDate) {
+        //   postData.date_assemle = searchDate;
+        // }
         
         response = await fetch('http://localhost:8000/tractor-info', {
           method: 'POST',
@@ -223,7 +223,7 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
   };
 
   fetchTractors();
-}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate]);
+}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter]);
   // Обработка клика по строке
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
