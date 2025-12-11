@@ -66,7 +66,7 @@ const groupTractors = (data) => {
 
 
 
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer}) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -149,6 +149,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       postData.dealer = searchDealer;
     }
 
+    if (searchDate && searchDate.trim() !== '') {
+    postData.date_assemle = searchDate;
+    console.log('Search date:', searchDate); 
+  }
+
     if (hasModelFilters) {
       postData.trac_model = activeFiltersTrac;
     }
@@ -176,15 +181,20 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               'Content-Type': 'application/json'
             },
           })} else {
+            // Добавляем дату в запрос, если она есть
+            if (searchDate) {
+              postData.date_assemle = searchDate;
+            }
+            
             response = await fetch('http://172.20.46.66:8000/tractor-info', {
-            method: 'POST',
-            headers: {  
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-          });
-        }
+              method: 'POST',
+              headers: {  
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(postData)
+            });
+          }
 
         console.log('Статус ответа:', response.status);
 
@@ -223,7 +233,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer]);
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate]);
 
   // Обработка клика по строке
   const handleRowClick = (tractor) => {

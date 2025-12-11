@@ -110,8 +110,8 @@ function MainPage() {
     }
     setSearchParams(newParams);
   };
-  };
-  };
+
+
 
   const closeAddAggForm = () => {
     const newParams = new URLSearchParams(searchParams);
@@ -145,11 +145,7 @@ function MainPage() {
         <div className="table">
           <Sidebar
             activeButton={activeButton}
-        <div className="table">
-          <Sidebar
-            activeButton={activeButton}
             handleButtonClick={handleButtonClick}
-            onFilterChange={handleFilterChange}
             onFilterChange={handleFilterChange}
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
@@ -159,7 +155,6 @@ function MainPage() {
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onDealerChange={handleDealer}
             onFilterChangeByStatus={handleFilterByStatus}
-            onFilterChangeByStatus={handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
             handleMajMinButtonClick={handleMajMinButtonClick}
           />
@@ -167,7 +162,6 @@ function MainPage() {
           {/* Основной контент — ТОЛЬКО таблицы и фильтры */}
           <MainPart
             activeButton={activeButton}
-            activeFilters={memoizedActiveFilters}
             activeFilters={memoizedActiveFilters}
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
@@ -194,5 +188,4 @@ function MainPage() {
   );
 }
 
-export default MainPage;
 export default MainPage;
