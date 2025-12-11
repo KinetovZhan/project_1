@@ -449,12 +449,12 @@ button:active {
 .majmin_button:hover {
   background-color: #b6bbc1;
   margin: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 .majmin_button:active {
   background-color: #969aa0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
   margin: 4px;
 }
 
@@ -551,119 +551,150 @@ button:active {
   height: 16px;
 }
 
+/*Таблица тракторов*/
+.tractor-table-outer-wrapper {
+  margin: 100px;
+  position: relative;
+}
 
 .tractor-table-container {
-  margin: 100px;
-  overflow-x: auto;
-  background: #454343; /* Черный фон */
-  border-radius: 20px;
-  border: 1px solid #454343;
-  overflow: hidden; /* Важно! чтобы обрезать углы таблицы */
+  display: flex;
+  align-items: stretch;
+  background: #454343;
+  border-radius: 20px 20px 20px 20px;
+  padding: 0;
+  max-width: 1200px;
+  box-sizing: border-box;
+  
+}
+
+/* Вертикальный скролл для тела таблицы */
+.tractor-table-body-scroll {
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: white;
+  border-radius: 8px;
 }
 
 .tractor-table {
   width: 100%;
+  min-width: 1200px;
   border-collapse: collapse;
   background: white;
-  /* Убираем border-radius у таблицы, так как контейнер уже скруглен */
-  border-radius: 0;
+  table-layout: auto;
 }
 
-.tractor-table th {
+.tractor-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tractor-table thead th {
   background: #d7dadc;
-  color: rgb(8, 8, 8);
-  padding: 12px 16px;
+  color: #080808;
+  padding: 12px 8px;
   text-align: left;
   font-weight: 600;
   border-bottom: 1px solid #454343;
   border-right: 1px solid #454343;
-
+  min-width: 80px;
+  white-space: nowrap;
 }
 
-.table-info {
-  color: #030303;
+.tractor-table thead th:last-child { 
+  border-right: none; 
 }
 
 .tractor-table td {
-  padding: 12px 16px;
+  padding: 12px 8px;
   border-bottom: 1px solid #454343;
   color: #2c3e50;
   font-size: 14px;
-  border-right: 1px solid #454343
-}
-
-.tractor-table th:last-child {
-  border-top-right-radius: 0;
-  border-right: none;
-}
-
-.tractor-table td:last-child {
-
-  border-right: none;
-}
-
-.tractor-table tr:last-child td {
-  border-bottom: none;
-}
-
-
-
-
-/*Пока бесполезный мусор для таблицы тракторов*/
-/* .tractor-table-container {
-  margin: 100px;
-  overflow-x: auto;
-
-}
-
-.tractor-table {
-  width: 100%;
-  border-collapse: collapse; 
-  background: white;
-  border-radius: 20px;
+  border-right: 1px solid #454343;
+  min-width: 80px;
+  white-space: nowrap;
   overflow: hidden;
-  border-color: #007bff;
+  text-overflow: ellipsis;
 }
 
-.tractor-table th {
-  background: #d7dadc;
-  color: rgb(8, 8, 8);
-  padding: 12px 16px;
-  text-align: left;
-  font-weight: 600;
-  border: 1px solid #454343;
+.tractor-table td:last-child { 
+  border-right: none; 
 }
 
-.tractor-table th:first-child {
-  border-top-left-radius: 20px;
-   border-color: #000000;
+.tractor-table tr:last-child td { 
+  border-bottom: none; 
 }
 
-.tractor-table th:last-child {
-  border-top-right-radius: 20px;
-  
+/* Внешний горизонтальный скроллбар ЗА ПРЕДЕЛАМИ контейнера */
+.tractor-table-horizontal-scroll-outer {
+  height: 12px;
+  overflow-y: hidden;
+  overflow-x: auto;
+  background: #f1f1f1;
+  border-radius: none;
+  margin-top: 8px; /* Убираем зазор */
+  max-width: 1200px; /* Такая же ширина как у контейнера */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.table-info {
-  color: #030303;
+.scrollbar-spacer-horizontal {
+  height: 1px;
+  width: 1400px; /* Точно как ширина таблицы */
+  background: transparent;
+}
+/* Верктикальный внешний скроллбар*/
+.tractor-table-vertical-scroll-outer {
+  position: absolute;
+  right: -15px; /* Смещение вправо от таблицы */
+  top: 0;
+  z-index: 20; /* Над всеми элементами */
+  width: 12px;
+  max-height: 480px; /* Точно как у таблицы */
+  background: #f1f1f1;
+  border-radius: 0 8px 8px 0;
+  overflow-y: scroll;
+   overflow-x: hidden;
+
+}
+.scrollbar-spacer-vertical {
+  width: 1px;
+  height: 500px; /* Должен быть больше, чем высота контента таблицы */
+  background: transparent;
 }
 
-.tractor-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #ecf0f1;
-  color: #2c3e50;
-  font-size: 14px;
-  border: 0.5px solid #666060;
+/* Стилизация скроллбаров */
+.tractor-table-body-scroll::-webkit-scrollbar {
+  width: 12px;
 }
 
-/* Скругление для последней строки */
-.tractor-table tr:last-child td:first-child {
-  border-bottom-left-radius: 20px;
+.tractor-table-body-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
 }
 
-.tractor-table tr:last-child td:last-child {
-  border-bottom-right-radius: 20px;
-} */
+.tractor-table-body-scroll::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+  border: 2px solid #f1f1f1;
+}
+
+.tractor-table-horizontal-scroll-outer::-webkit-scrollbar {
+  height: 12px;
+}
+
+.tractor-table-horizontal-scroll-outer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 0 0 6px 6px;
+}
+
+.tractor-table-horizontal-scroll-outer::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px 6px 6px 6px;
+  border: 2px solid #f1f1f1;
+}
 
 .loading {
   background: transparent;
@@ -842,7 +873,7 @@ button:active {
   background-color: rgba(217, 217, 217, 1);
   width: 242px;
   height: 56px;
-  border-radius: 25px;
+  border-radius: 56px;
   position: absolute;
   top: 391px;
   left: 13px;
@@ -890,7 +921,7 @@ button.search_button {
   background-color: rgba(217, 217, 217, 1);
   width: 242px;
   height: 56px;
-  border-radius: 25px;
+  border-radius: 56px;
   position: absolute;
   top: 318px;
   left: 13px;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
 import {TractorDetails} from "./TractorDetails.jsx";
 
@@ -72,6 +72,63 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
 
+  const tableContainerRef = useRef(null);
+  const tableBodyRef = useRef(null);
+  const horizontalScrollRef = useRef(null);
+  const verticalScrollRef = useRef(null);
+
+
+  // Синхронизация горизонтального скролла
+  useEffect(() => {
+    const syncHScroll = () => {
+      if (tableBodyRef.current && horizontalScrollRef.current) {
+        tableBodyRef.current.scrollLeft = horizontalScrollRef.current.scrollLeft;
+      }
+    };
+
+    const syncHScrollReverse = () => {
+      if (tableBodyRef.current && horizontalScrollRef.current) {
+        horizontalScrollRef.current.scrollLeft = tableBodyRef.current.scrollLeft;
+      }
+    };
+
+    const horizontal = horizontalScrollRef.current;
+    const tableBody = tableBodyRef.current;
+    
+    horizontal?.addEventListener('scroll', syncHScroll);
+    tableBody?.addEventListener('scroll', syncHScrollReverse);
+
+    return () => {
+      horizontal?.removeEventListener('scroll', syncHScroll);
+      tableBody?.removeEventListener('scroll', syncHScrollReverse);
+    };
+  }, []);
+
+  // Синхронизация вертикального скролла
+  useEffect(() => {
+  const syncVScroll = () => {
+    if (tableBodyRef.current && verticalScrollRef.current) {
+      verticalScrollRef.current.scrollTop = tableBodyRef.current.scrollTop;
+    }
+  };
+
+  const syncVScrollReverse = () => {
+    if (tableBodyRef.current && verticalScrollRef.current) {
+      tableBodyRef.current.scrollTop = verticalScrollRef.current.scrollTop;
+    }
+  };
+
+  const tableBody = tableBodyRef.current;
+  const vertical = verticalScrollRef.current;
+  
+  tableBody?.addEventListener('scroll', syncVScroll);
+  vertical?.addEventListener('scroll', syncVScrollReverse);
+
+  return () => {
+    tableBody?.removeEventListener('scroll', syncVScroll);
+    vertical?.removeEventListener('scroll', syncVScrollReverse);
+  };
+}, []);
 
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
@@ -89,18 +146,15 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     }
 
     if (searchDealer && searchDealer.trim() !== ''){
-      postData.dealer = searchDealer
+      postData.dealer = searchDealer;
     }
 
-
-    // Добавляем фильтры по моделям из чекбоксов
     if (hasModelFilters) {
       postData.trac_model = activeFiltersTrac;
     }
     if (hasStatusFilters) {
       postData.status = activeFiltersTrac2;
     }
-    
 
     return postData;
   };
@@ -108,7 +162,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   useEffect(() => {
     const fetchTractors = async () => {
       const postData = getPostData();
-      let response
+      let response;
       try {
         setLoading(true);
         if (searchQuery && searchQuery.trim() !== '') {
@@ -129,9 +183,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(postData)
-          })
+          });
         }
-      
 
         console.log('Статус ответа:', response.status);
 
@@ -170,24 +223,18 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer]); 
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer]);
 
-  // Отладочная информация
-  console.log('=== РЕНДЕР TractorTable ===');
-  console.log('activeFiltersTrac:', activeFiltersTrac);
-  console.log('tractors:', tractors);
-  console.log('loading:', loading);
-    // Функция для обработки клика по строке
+  // Обработка клика по строке
   const handleRowClick = (tractor) => {
-  console.log('Клик по трактору:', tractor.vin);
-  setSelectedTractor(tractor.vin);
-};
+    console.log('Клик по трактору:', tractor.vin);
+    setSelectedTractor(tractor.vin);
+  };
 
   // Если выбран трактор, отображаем его детали
   if (selectedTractor) {
-  return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
-}
-
+    return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
+  }
 
   if (loading) {
     return (
@@ -213,26 +260,12 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   }
 
   return (
-    <div className="tractor-table-container">
-      {/* Информация о фильтрах
-      <div className="filter-info">
-        {activeFiltersTrac.length > 0 && activeFiltersTrac2.length > 0 && (
-          <div style={{marginBottom: '10px', color: '#666'}}>
-            Активные фильтры: {activeFiltersTrac.join(', ')} {activeFiltersTrac2.join(',')}
-          </div>
-        )}
-      </div>
-
-      {tractors.length === 0 ? (
-        <div className="no-data"> 
-          Нет тракторов, соответствующих выбранным фильтрам
-        </div>
-      ) : (
-        <>
-          <div className="table-info">
-            Показано {tractors.length} тракторов
-            {` (фильтр: ${activeFiltersTrac.join(', ')})`}
-          </div> */}
+    <div className="tractor-table-outer-wrapper" ref={tableContainerRef}>
+      <div className="tractor-table-container" >
+        <div 
+          className="tractor-table-body-scroll" 
+          ref={tableBodyRef}
+        >
           <table className="tractor-table">
             <thead>
               <tr>
@@ -248,14 +281,16 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>БК</th>
                 <th>ГР</th>
                 <th>Автопилот</th>
-              </tr>
+              </tr> 
             </thead>
             <tbody>
-              {tractors.map(tractor => (
-                <tr key={tractor.id || tractor.vin}
+              {tractors.map((tractor, index) => (
+                <tr 
+                  key={tractor.id || tractor.vin || index}
                   onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
-                  className="clickable-row">
+                  className="clickable-row"
+                >
                   <td>{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
@@ -272,6 +307,30 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+      
+      {/* Горизонтальный скроллбар */}
+      <div 
+        className="tractor-table-horizontal-scroll-outer" 
+        ref={horizontalScrollRef}
+      >
+        <div 
+          className="scrollbar-spacer-horizontal" 
+
+        />
+      </div>
+      
+      {/* Вертикальный скроллбар */}
+      <div 
+        className="tractor-table-vertical-scroll-outer" 
+        ref={verticalScrollRef}
+      >
+        <div 
+          className="scrollbar-spacer-vertical" 
+  
+        />
+      </div>
     </div>
   );
 }

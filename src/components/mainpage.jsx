@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../Function/Header.jsx';
 import { Sidebar } from '../Function/Sidebar.jsx';
 import { MainPart } from '../Function/MainPart.jsx';
-
+import { useAuth } from '../auth/AuthContext';
 // Убедитесь, что пути к формам правильные
 import { AddPoForm } from '../Function/AddPo.jsx';
 import { AddAggForm } from '../Function/AddAgg.jsx';
@@ -103,8 +103,14 @@ function MainPage() {
 
   const handleAggForm = () => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('tab', 'addAgg');
+    if (activeButton === 'addAgg') {
+      newParams.delete('tab');
+    } else {
+      newParams.set('tab', 'addAgg');
+    }
     setSearchParams(newParams);
+  };
+  };
   };
 
   const closeAddAggForm = () => {
@@ -119,6 +125,7 @@ function MainPage() {
 
   const handleMajMinButtonClick = (buttonName) => {
     setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
+    setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
   };
 
   const handleFilterChange = (filters) => setActiveFilters(filters);
@@ -127,17 +134,22 @@ function MainPage() {
   const handleFilterByStatus = (model) => setActiveFiltersTrac2(model);
 
   const handleLogout = () => {
-    navigate('/login');
+    logout(); // ← Удаляет токен + сбрасывает состояние
+    navigate('/login', { replace: true }); // ← Перенаправляем на логин
   };
 
   return (
     <>
-      <Header onLogout={handleLogout} />
+      <Header onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} />
       <main>
         <div className="table">
           <Sidebar
             activeButton={activeButton}
+        <div className="table">
+          <Sidebar
+            activeButton={activeButton}
             handleButtonClick={handleButtonClick}
+            onFilterChange={handleFilterChange}
             onFilterChange={handleFilterChange}
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
@@ -147,6 +159,7 @@ function MainPage() {
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onDealerChange={handleDealer}
             onFilterChangeByStatus={handleFilterByStatus}
+            onFilterChangeByStatus={handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
             handleMajMinButtonClick={handleMajMinButtonClick}
           />
@@ -154,6 +167,7 @@ function MainPage() {
           {/* Основной контент — ТОЛЬКО таблицы и фильтры */}
           <MainPart
             activeButton={activeButton}
+            activeFilters={memoizedActiveFilters}
             activeFilters={memoizedActiveFilters}
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
@@ -180,4 +194,5 @@ function MainPage() {
   );
 }
 
+export default MainPage;
 export default MainPage;
