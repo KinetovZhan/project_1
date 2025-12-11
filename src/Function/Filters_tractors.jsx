@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 
 
 // Трактор
-export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange}) {
-  const models = ['К-742МСТ', 'К7', 'К-525'];
+export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
+  const models = ['К-742МСТ', 'К-7', 'К-525'];
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
     'К-742МСТ': false,
-    'К7': false,
+    'К-7': false,
     'К-525': false
   });
 
   const FilterToTractor = {
     'К-742МСТ': 'K742MST',
-    'К7': 'K7', 
+    'К-7': 'K-7', 
     'К-525': 'K525'
   };
 
@@ -32,7 +32,8 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   }
 
   const [Dealer, setDealer] = useState('')
-
+ 
+  const [releaseDate, setReleaseDate] = useState('');
 
 
 
@@ -56,6 +57,25 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       handleSearch(); 
     } 
   };
+
+  // Изменение даты
+  const handleDateChange = (event) => {
+  const date = event.target.value;
+  console.log('Дата выбрана в фильтре:', date); // <-- Добавьте этот лог
+  setReleaseDate(date);
+  if (onDateChange && typeof onDateChange === 'function') {
+    onDateChange(date);
+  }
+}
+
+    // Функция для сброса фильтра по дате
+  const handleClearDate = () => {
+    setReleaseDate('');
+    if (onDateChange && typeof onDateChange === 'function') {
+      onDateChange('');
+    }
+  };
+
 
 
 
@@ -113,6 +133,9 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
           type="date" 
           placeholder="Дата выпуска"
           className='choose_date_release'
+          value = {releaseDate}
+          onChange = {handleDateChange}
+          onKeyDown={handleKeydown}
           />
       </div>
 

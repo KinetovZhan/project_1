@@ -131,7 +131,7 @@ const LoginPage = () => {
 
       const data = await response.json();
 
-      // ✅ Используем login из контекста вместо ручного localStorage.setItem
+      //  Используем login из контекста вместо ручного localStorage.setItem
       if (data.access_token) {
         loginContext(data.access_token); // ← сохраняет токен + обновляет состояние
         navigate('/main', { replace: true }); // replace — чтобы нельзя было вернуться назад на /login по кнопке "Назад"

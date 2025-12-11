@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import '../App.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../Function/Header.jsx';
@@ -216,6 +216,8 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDealer, setSearchDealer] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+
 
   // useMemo не обязателен, если вы не передаёте эти состояния в "тяжёлые" компоненты,
   // но оставим как есть
@@ -223,6 +225,10 @@ function MainPage() {
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
+
+  useEffect(() => {
+    console.log('Состояние searchDate в MainPage изменено:', searchDate);
+  }, [searchDate]);
 
   // --- Все ваши обработчики остаются без изменений ---
   const handleButtonClick = (buttonName) => {
@@ -288,6 +294,11 @@ function MainPage() {
     setSearchParams(newParams);
   };
 
+  const handleDateChange = (date) => {
+    console.log('Дата получена в MainPage:', date); // <-- Добавьте этот лог
+    setSearchDate(date);
+  }
+
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
@@ -316,7 +327,7 @@ function MainPage() {
     setActiveFiltersTrac2(model);
   };
 
-  // ✅ НОВАЯ ФУНКЦИЯ ВЫХОДА — через контекст
+  // НОВАЯ ФУНКЦИЯ ВЫХОДА — через контекст
   const handleLogout = () => {
     logout(); // ← Удаляет токен + сбрасывает состояние
     navigate('/login', { replace: true }); // ← Перенаправляем на логин
@@ -340,6 +351,7 @@ function MainPage() {
             onAddAggClick={handleAggForm}
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onDealerChange={handleDealer}
+            onDateChange={handleDateChange}
             onFilterChangeByStatus={handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
             handleMajMinButtonClick={handleMajMinButtonClick}
@@ -362,6 +374,7 @@ function MainPage() {
             searchQuery={searchQuery}
             searchDealer={searchDealer}
             onDealerSearch={handleDealer}
+            searchDate={searchDate}
           />
         </div>
       </main>
