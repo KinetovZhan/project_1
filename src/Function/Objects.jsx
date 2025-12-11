@@ -21,7 +21,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch('http://localhost:8000/component-info', {
+        const response = await fetch('http://172.20.46.66:8000/component-info', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
@@ -49,16 +49,16 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
   // --- 2. Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных ---
   const filteredItems = useMemo(() => {
-    if (!searchQuery) return softwareItems;
+      if (!searchQuery) return softwareItems;
 
-    const query = searchQuery.trim().toLowerCase();
-    return softwareItems.filter(item =>
-      (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
-      (item.type_component && item.type_component.toLowerCase().includes(query)) ||
-      (item.model_component && item.model_component.toLowerCase().includes(query)) ||
-      (item.comp_model && item.comp_model.toLowerCase().includes(query))
-    );
-  }, [softwareItems, searchQuery]);
+      const query = searchQuery.trim().toLowerCase();
+      return softwareItems.filter(item =>
+        (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
+        (item.type_component && item.type_component.toLowerCase().includes(query)) ||
+        (item.model_component && item.model_component.toLowerCase().includes(query)) ||
+        (item.comp_model && item.comp_model.toLowerCase().includes(query))
+      );
+    }, [softwareItems, searchQuery]);
 
   // --- Ваши функции (перенесены в начало!) ---
   const getAllActiveFilters = () => {
@@ -73,14 +73,23 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   };
 
   const getComponentName = () => {
-    const filterNames = { 'DVS': 'ДВС', 'KPP': 'КПП', 'RK': 'РК', 'hydrorasp': 'Гидрораспределитель' };
+    const filterNames = {
+      '': 'всех компонентов',
+      'DVS': 'ДВС',
+      'KPP': 'КПП',
+      'RK': 'РК',
+      'hydrorasp': 'Гидрораспределитель'
+    };
+
     if (activeFilters.length > 0) {
       return activeFilters
         .map(f => filterNames[f])
         .filter(Boolean)
         .join(', ') || 'компонентов';
     }
-    return softwareItems[0]?.type_component || 'компонентов';
+
+    // При отсутствии фильтров — показываем "Всех компонентов"
+    return 'всех компонентов';
   };
 
   const handleDownload = (item) => {
@@ -135,8 +144,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
               </div>
             </li>
           ) : (
-            filteredItems.map((item, index) => (
-              <li key={item.id_Firmwares || item.id || `comp-${index}`}>
+            filteredItems.map((item) => (
+              <li key={item.id_Firmwares}>
                 <div className='objectmenu'>
                   <img className='object' src={Image} alt='Компонент' />
                   <div className='inform'>

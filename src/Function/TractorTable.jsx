@@ -115,14 +115,14 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           const searchParams = new URLSearchParams({
             request: searchQuery.trim()
         });
-            response = await fetch(`http://localhost:8000/search-tractor?${searchParams}`, {
+            response = await fetch(`http://172.20.46.66:8000/search-tractor?${searchParams}`, {
             method: 'GET',
             headers: {  
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
           })} else {
-            response = await fetch('http://localhost:8000/tractor-info', {
+            response = await fetch('http://172.20.46.66:8000/tractor-info', {
             method: 'POST',
             headers: {  
               'Accept': 'application/json',

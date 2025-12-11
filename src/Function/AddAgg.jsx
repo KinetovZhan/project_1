@@ -23,14 +23,10 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    // Защита от ошибки e.preventDefault is not a function
-    if (e && typeof e.preventDefault === 'function') {
-      e.preventDefault();
-    }
-
+  // ✅ Вся логика отправки — внутри этой функции
+  const submitDataToServer = async () => {
     try {
-      setLoading(true); 
+      setLoading(true);
       setError(null);
 
       const submitData = {
@@ -39,17 +35,16 @@ export function AddAggForm({ onBack, onSubmit }) {
         model: formData.model,
         mounting_date: formData.mounting_date || null,
         comp_ser_num: formData.comp_ser_num || null,
-        tractor_id: formData.tractor_id ? parseInt(formData.tractor_id) : null,
-        number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts) : null,
+        tractor_id: formData.tractor_id ? parseInt(formData.tractor_id, 10) : null,
+        number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts, 10) : null,
         producer_comp: formData.producer_comp || null
       };
 
       console.log('Отправляемые данные:', submitData);
 
-      // Отправка данных на сервер
-      const response = await fetch('http://localhost:8000/component/', {
+      const response = await fetch('http://172.20.46.66:8000/component/', {
         method: 'POST',
-        headers: {  
+        headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
@@ -57,39 +52,35 @@ export function AddAggForm({ onBack, onSubmit }) {
       });
 
       const responseData = await response.json();
-      
+
       if (!response.ok) {
-        console.error('Детали ошибки от сервера:', responseData);
-        
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        if (responseData.detail) {
-          errorMessage = responseData.detail;
-        }
-        
+        const errorMessage = responseData.detail || `Ошибка ${response.status}`;
         throw new Error(errorMessage);
       }
 
+      // alert('Модель создана');
       console.log('Агрегат успешно добавлен:', responseData);
-      
-      // Защита от ошибки - проверяем, что onSubmit это функция
+
       if (typeof onSubmit === 'function') {
         onSubmit(responseData);
-      } else {
-        console.warn('onSubmit не является функцией:', onSubmit);
-        // Если onSubmit не функция, просто закрываем форму
-        if (typeof onBack === 'function') {
-          onBack();
-        }
+      } else if (typeof onBack === 'function') {
+        onBack();
       }
-      
-    } catch (error) {
-      console.error('Ошибка при добавлении агрегата:', error);
+
+    } catch (err) {
+      console.error('Ошибка при добавлении агрегата:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  return(
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Теперь безопасно — всегда вызывается из формы
+    submitDataToServer();
+  };
+
+  return (
     <div className="maininfo add-po-form-container">
       <button
         onClick={onBack}
@@ -101,17 +92,15 @@ export function AddAggForm({ onBack, onSubmit }) {
         </svg>
       </button>
 
-      <h3 className="add-po-title">
-        Добавление агрегата
-      </h3>
+      <h3 className="add-po-title">Добавление агрегата</h3>
 
       {error && (
-        <div className="error-message" style={{color: 'red', marginBottom: '15px'}}>
+        <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
           {error}
         </div>
       )}
 
-      <form className='add-po-form' onSubmit={handleSubmit}>
+      <form className="add-po-form" onSubmit={handleSubmit}>
         <div className='add-po-field'>
           <label className='add-po-label'>ID агрегата (обязательно)</label>
           <input

@@ -71,8 +71,8 @@ button:focus-visible {
 body {
   color:rgb(255, 255, 255); 
   margin: 0; 
-  /* width: 1920px;
-  height: 1080px; */
+  width: 100%;
+  height: 100px;
   background-image: url(img/test.jpg);
   background-size:cover;
 }

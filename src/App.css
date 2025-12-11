@@ -1,20 +1,13 @@
-/* #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+#root {
+  font-family:Arial
 }
-.mainText {
-  position: fixed;
-  text-align: center;
-}*/
 
 body {
-  font-family:Arial, Helvetica, sans-serif
+  font-family:Arial
 }
 /* Окно навигации */
 header {
-  height: 164px;
+  height: 140px;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -55,7 +48,7 @@ header {
 
 /* Основная страница */
 main {
-  padding-top: 164px;
+  padding-top: 150px;
   min-height: calc(100vh - 164px);/*Занимает всю высоту которая осталась*/
   box-sizing: border-box;
   
@@ -64,7 +57,7 @@ main {
 
 .table {
   display: flex;
-  margin-top: 67px;
+  margin-top: 0px;
   justify-content: center;
 }
 
@@ -1267,15 +1260,16 @@ button.search_button {
 
 .clear {
   position: absolute;
-  top: 720px;
+  top: 700px;
   left: 13px;
-  width: 100px;
-  height: 50px;
+  width: 360px;
+  height: 70px;
   color: black;
   background-color: rgba(217, 217, 217, 1);
   box-shadow: none;
-  border-radius: 20px;
+  border-radius: 25px;
   text-align: center;
+  font-size: medium;
 }
 
 
