@@ -21,10 +21,10 @@ const formatDateTime = (dateString) => {
 };
 
 
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter }) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton }) {
   // const [tractors, setTractors] = useState([]);
   const [tractors, setTractors] = useState([]); // все данные от сервера
-const [filteredTractors, setFilteredTractors] = useState([]); // то, что показываем
+  const [filteredTractors, setFilteredTractors] = useState([]); // то, что показываем
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
@@ -88,7 +88,6 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
 }, []);
 
 
-
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
     const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
@@ -100,7 +99,8 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
       dealer: "",
       date_assemle: null,
       date_start: null,
-      date_end: null
+      date_end: null,
+      is_major: null
     };
 
     if (searchQuery && searchQuery.trim() !== '') {
@@ -111,11 +111,6 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
       postData.dealer = searchDealer;
     }
     
-  //   if (searchDate && searchDate.trim() !== '') {
-  //   postData.date_assemle = searchDate;
-  //   console.log('Search date:', searchDate); // Добавьте эту строку
-  // }
-  // Добавляем фильтры по дате (новая логика)
     if (dateFilter) {
         const { date_assemle, date_start, date_end } = dateFilter;
         
@@ -129,6 +124,12 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
             postData.date_end = date_end || null;
             console.log('Поиск по диапазону:', date_start, 'до', date_end);
         }
+    }
+
+    if (activeMajMinButton === 'MAJ') {
+      postData.is_major = true;
+    } else if (activeMajMinButton === 'MIN') {
+      postData.is_major = false;
     }
 
 
@@ -165,11 +166,7 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
           },
         });
       } else {
-        // // Добавляем дату в запрос, если она есть
-        // if (searchDate) {
-        //   postData.date_assemle = searchDate;
-        // }
-        
+  
         response = await fetch('http://localhost:8000/tractor-info', {
           method: 'POST',
           headers: {  
@@ -223,7 +220,7 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
   };
 
   fetchTractors();
-}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter]);
+}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton]);
   // Обработка клика по строке
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
@@ -257,6 +254,16 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
       </div>
     );
   }
+   // Добавьте эту функцию в компонент
+const getTractorKey = (tractor, index) => {
+  // Используем комбинацию уникальных полей
+  const vin = tractor.vin || tractor.VIN || 'no-vin';
+  const componentId = tractor.component_id || tractor.componentParts_id || '0';
+  const type = tractor.component_type || 'unknown';
+  
+  // Создаем хэш для уникальности
+  return `${vin}-${componentId}-${type}-${index}`;
+};
 
   return (
     <div className="tractor-table-outer-wrapper" ref={tableContainerRef}>
@@ -283,13 +290,20 @@ const [filteredTractors, setFilteredTractors] = useState([]); // то, что п
               </tr> 
             </thead>
             <tbody>
-              {filteredTractors.map((tractor, index) => (
+              {/* {filteredTractors.map((tractor, index) => (
                 <tr 
-                  key={tractor.id || tractor.vin || index}
+                  key={`${tractor.vin || tractor.VIN || 'unknown'}-${index}-${Date.now()}`}
                   onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
                   className="clickable-row"
-                >
+                > */}
+                 {filteredTractors.map((tractor, index) => (
+    <tr 
+      key={getTractorKey(tractor, index)}
+      onClick={() => handleRowClick(tractor)}
+      style={{ cursor: 'pointer' }}
+      className="clickable-row"
+    >
                   <td>{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
