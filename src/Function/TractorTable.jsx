@@ -78,57 +78,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const verticalScrollRef = useRef(null);
 
 
-  // Синхронизация горизонтального скролла
-  useEffect(() => {
-    const syncHScroll = () => {
-      if (tableBodyRef.current && horizontalScrollRef.current) {
-        tableBodyRef.current.scrollLeft = horizontalScrollRef.current.scrollLeft;
-      }
-    };
-
-    const syncHScrollReverse = () => {
-      if (tableBodyRef.current && horizontalScrollRef.current) {
-        horizontalScrollRef.current.scrollLeft = tableBodyRef.current.scrollLeft;
-      }
-    };
-
-    const horizontal = horizontalScrollRef.current;
-    const tableBody = tableBodyRef.current;
-    
-    horizontal?.addEventListener('scroll', syncHScroll);
-    tableBody?.addEventListener('scroll', syncHScrollReverse);
-
-    return () => {
-      horizontal?.removeEventListener('scroll', syncHScroll);
-      tableBody?.removeEventListener('scroll', syncHScrollReverse);
-    };
-  }, []);
-
-  // Синхронизация вертикального скролла
-  useEffect(() => {
-  const syncVScroll = () => {
-    if (tableBodyRef.current && verticalScrollRef.current) {
-      verticalScrollRef.current.scrollTop = tableBodyRef.current.scrollTop;
-    }
-  };
-
-  const syncVScrollReverse = () => {
-    if (tableBodyRef.current && verticalScrollRef.current) {
-      tableBodyRef.current.scrollTop = verticalScrollRef.current.scrollTop;
-    }
-  };
-
-  const tableBody = tableBodyRef.current;
-  const vertical = verticalScrollRef.current;
   
-  tableBody?.addEventListener('scroll', syncVScroll);
-  vertical?.addEventListener('scroll', syncVScrollReverse);
-
-  return () => {
-    tableBody?.removeEventListener('scroll', syncVScroll);
-    vertical?.removeEventListener('scroll', syncVScrollReverse);
-  };
-}, []);
 
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
@@ -274,8 +224,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     <div className="tractor-table-outer-wrapper" ref={tableContainerRef}>
       <div className="tractor-table-container" >
         <div 
-          className="tractor-table-body-scroll" 
-          ref={tableBodyRef}
+          className="scroll-bar" 
+          
         >
           <table className="tractor-table">
             <thead>
@@ -319,28 +269,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
             </tbody>
           </table>
         </div>
-      </div>
-      
-      {/* Горизонтальный скроллбар */}
-      <div 
-        className="tractor-table-horizontal-scroll-outer" 
-        ref={horizontalScrollRef}
-      >
-        <div 
-          className="scrollbar-spacer-horizontal" 
-
-        />
-      </div>
-      
-      {/* Вертикальный скроллбар */}
-      <div 
-        className="tractor-table-vertical-scroll-outer" 
-        ref={verticalScrollRef}
-      >
-        <div 
-          className="scrollbar-spacer-vertical" 
-  
-        />
       </div>
     </div>
   );
