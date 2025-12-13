@@ -42,7 +42,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch('http://172.20.46.66:8000/component/', {
+      const response = await fetch('http://172.20.46.71:8000/component/', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

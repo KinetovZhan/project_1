@@ -21,7 +21,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch('http://172.20.46.66:8000/component-info', {
+        const response = await fetch('http://172.20.46.71:8000/component-info', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',

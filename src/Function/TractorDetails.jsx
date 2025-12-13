@@ -353,7 +353,7 @@ export function TractorDetails({ vin, onBack }) {
       try {
         console.log('Запрос деталей для VIN:', vin);
         
-        const response = await fetch(`http://172.20.46.66:8000/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        const response = await fetch(`http://172.20.46.71:8000/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -398,7 +398,7 @@ export function TractorDetails({ vin, onBack }) {
   useEffect(() => {
     const fetchPoDescriptions = async () => {
       try {
-        const response = await fetch('http://172.20.46.66:8000/get-po-descriptions', {
+        const response = await fetch('http://172.20.46.71:8000/get-po-descriptions', {
           method: 'GET',
           headers: {
             'Accept': 'application/json',

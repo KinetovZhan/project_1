@@ -103,7 +103,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('http://172.20.46.66:8000/component-models', {
+      const response = await fetch('http://172.20.46.71:8000/component-models', {
         method: 'POST',
         headers: {  
           'Accept': 'application/json',

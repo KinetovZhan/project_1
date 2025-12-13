@@ -75,12 +75,11 @@ function MainPage() {
   };
 
   // ===== Форма "ПО" =====
-  const handleAddSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const poNumber = formData.get('poNumber');
-    alert(`ПО №${poNumber} будет добавлено!`);
-    closeAddForm();
+  const handleAddSubmit = (responseData) => {
+  // ✅ Без preventDefault — это уже не событие, а ответ с бэка
+  const poNumber = responseData?.name || 'без номера';
+  alert(`✅ ПО «${poNumber}» успешно добавлено!`);
+  closeAddForm();
   };
 
   const handleAddForm = () => {
