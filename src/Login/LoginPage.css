@@ -74,3 +74,13 @@
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
+.error-message {
+  color: #b00020;
+  background-color: #fddede;
+  border: 1px solid #b00020;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}

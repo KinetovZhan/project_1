@@ -41,13 +41,12 @@ function MainPage() {
     setShowAddForm(false);
   };
 
-  const handleAddSubmit = (e) => {
-    e.preventDefault();
-    const formdata = new FormData(e.target);
-    const poNumber = formdata.get('poNumber');
-    alert(`ПО №${poNumber} будет добавлено!`);
-    closeAddForm();
-  };
+  const handleAddSubmit = (responseData) => {
+  // ✅ Без preventDefault — это уже не событие, а ответ с бэка
+  const poNumber = responseData?.name || 'без номера';
+  alert(`✅ ПО «${poNumber}» успешно добавлено!`);
+  closeAddForm();
+};
 
   const openAddAggForm = () => {
     setShowAddAggForm(true);

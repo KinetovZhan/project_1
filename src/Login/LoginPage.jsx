@@ -3,31 +3,60 @@ import { Header } from '../Func';
 import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 
-
 const LoginPage = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [authorizationError, setAuthorizationError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { login, password });
-    
-    if (login && password) {
+    setAuthorizationError('');
+
+    if (!login || !password) {
+      setAuthorizationError('Введите логин и пароль');
+      return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append('username', login);
+    formData.append('password', password);
+
+    try {
+      const response = await fetch('http://localhost:8000/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+      });
+
+      if (!response.ok) {
+        setAuthorizationError('Неверный логин или пароль');
+        return;
+      }
+
+      const data = await response.json();
+      // Сохраняем токен для последующих запросов
+      localStorage.setItem('access_token', data.access_token);
+      // Перенаправляем на главную страницу
       navigate('/main');
-    } else {
-      alert('Введите логин и пароль');
+    } catch (error) {
+      console.error('Ошибка при авторизации:', error);
+      setAuthorizationError('Ошибка сети');
     }
   };
 
   return (
     <>
-      <Header/>
-      
+      <Header />
       <main className="login-main">
         <div className="login-form-container">
           <form onSubmit={handleSubmit} className="login-form">
             <h2>Вход в систему</h2>
+            {authorizationError && (
+              <div className="error-message">{authorizationError}</div>
+            )}
             <div className="login-form-group">
               <label htmlFor="login-input">Логин</label>
               <input
@@ -36,7 +65,7 @@ const LoginPage = () => {
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
                 placeholder="Введите логин"
-                required
+                
               />
             </div>
             <div className="login-form-group">
@@ -47,7 +76,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Введите пароль"
-                required
+                
               />
             </div>
             <button type="submit" className="login-button">
