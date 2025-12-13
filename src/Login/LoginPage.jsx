@@ -25,7 +25,7 @@ import { useAuth } from '../auth/AuthContext';
 //     formData.append('password', password);
 
 //     try {
-//       const response = await fetch('http://localhost:8000/token', {
+//       const response = await fetch('http://172.20.46.61/token', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/x-www-form-urlencoded',
@@ -98,6 +98,7 @@ const LoginPage = () => {
   const [authorizationError, setAuthorizationError] = useState('');
   const navigate = useNavigate();
   const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
+  const ip = '172.20.46.61:8000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -113,7 +114,7 @@ const LoginPage = () => {
     formData.append('password', password);
 
     try {
-      const response = await fetch('http://localhost:8000/token', {
+      const response = await fetch(`http://${ip}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

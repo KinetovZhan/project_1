@@ -9,6 +9,8 @@ export function Objects({activeFilters, activeFilters2, selectedModel, searchQue
   const [filteredItems, setFilteredItems] = useState([]);
   const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
+  const ip = '172.20.46.61:8000';
+
 
   const getPostData = () => {
 
@@ -82,7 +84,7 @@ useEffect(() => {
           query: searchQuery.trim()
         });
         
-        response = await fetch(`http://localhost:8000/search-component?${searchParams}`, {
+        response = await fetch(`http://${ip}/search-component?${searchParams}`, {
           method: 'GET',
           headers: {  
             'Accept': 'application/json',
@@ -90,7 +92,7 @@ useEffect(() => {
           },
         });
       } else {
-        response = await fetch('http://localhost:8000/component-info', {
+        response = await fetch(`http://${ip}/component-info`, {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',

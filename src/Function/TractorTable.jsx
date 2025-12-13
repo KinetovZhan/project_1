@@ -29,6 +29,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
 
+  const ip = '172.20.46.61:8000';
+
   const tableContainerRef = useRef(null);
   const tableBodyRef = useRef(null);
   const horizontalScrollRef = useRef(null);
@@ -158,7 +160,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           request: searchQuery.trim()
         });
         
-        response = await fetch(`http://localhost:8000/search-tractor?${searchParams}`, {
+        response = await fetch(`http://${ip}/search-tractor?${searchParams}`, {
           method: 'GET',
           headers: {  
             'Accept': 'application/json',
@@ -167,7 +169,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
         });
       } else {
   
-        response = await fetch('http://localhost:8000/tractor-info', {
+        response = await fetch(`http://${ip}/tractor-info`, {
           method: 'POST',
           headers: {  
             'Accept': 'application/json',

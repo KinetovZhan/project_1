@@ -15,6 +15,8 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const ip = '172.20.46.61:8000';
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -47,7 +49,7 @@ export function AddAggForm({ onBack, onSubmit }) {
       console.log('Отправляемые данные:', submitData);
 
       // Отправка данных на сервер
-      const response = await fetch('http://localhost:8000/component/', {
+      const response = await fetch(`http://${ip}/component/`, {
         method: 'POST',
         headers: {  
           'Accept': 'application/json',
