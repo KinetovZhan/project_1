@@ -108,6 +108,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     }
   };
 
+
   // Кастомный инпут для DatePicker
    const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
   <div className="release-date">
@@ -136,6 +137,58 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     </div>
   </div>
 ));
+// Добавьте этот компонент перед return в Filters2
+const CustomHeader = ({
+  date,
+  changeYear,
+  decreaseMonth,
+  increaseMonth,
+  prevMonthButtonDisabled,
+  nextMonthButtonDisabled,
+}) => {
+  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+
+  return (
+    <div className="custom-datepicker-header">
+      <button
+        onClick={decreaseMonth}
+        disabled={prevMonthButtonDisabled}
+        className="nav-button"
+      >
+        &lt;
+      </button>
+      
+      <div className="month-year-display">
+        <span className="month-name">
+          {date.toLocaleDateString('ru-RU', { month: 'long' })}
+        </span>
+        <select
+          value={date.getFullYear()}
+          onChange={({ target: { value } }) => changeYear(Number(value))}
+          className="year-select"
+          style={{
+            maxHeight: '200px',
+            overflowY: 'auto'
+          }}
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <button
+        onClick={increaseMonth}
+        disabled={nextMonthButtonDisabled}
+        className="nav-button"
+      >
+        &gt;
+      </button>
+    </div>
+  );
+};
 
   const handleFilterByStatus = (FilterType) => {
     const newFilter = {
@@ -191,10 +244,17 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
           locale={ru}
           dateFormat="dd.MM.yyyy"
           customInput={<CustomInput />}
+          renderCustomHeader={CustomHeader}
           isClearable={true}
           onClear={handleClearDate}
           clearButtonTitle="Очистить"
           placeholderText="Дата выпуска"
+          // Добавляем параметры для выбора года
+          // showYearDropdown
+          // yearDropdownItemNumber={20}
+          // scrollableYearDropdown
+          // showMonthDropdown={false}
+          // dropdownMode="select"
         />
       </div>
 

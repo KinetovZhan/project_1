@@ -1444,3 +1444,103 @@ button.search_button {
   border-style: solid;
   border-color: transparent #333 transparent transparent;
 }
+
+/* Стили для выпадающих списков в календаре */
+.react-datepicker__year-dropdown,
+.react-datepicker__month-dropdown {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.react-datepicker__year-option,
+.react-datepicker__month-option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.react-datepicker__year-option:hover,
+.react-datepicker__month-option:hover {
+  background-color: #f0f0f0;
+}
+
+/* Стили для хедера с выпадающими списками */
+/* .react-datepicker__header--has-month-dropdown,
+.react-datepicker__header--has-year-dropdown {
+  padding-top: 8px;
+}
+
+.react-datepicker__month-dropdown-container,
+.react-datepicker__year-dropdown-container {
+  margin: 0 4px;
+}
+
+.react-datepicker__month-read-view,
+.react-datepicker__year-read-view {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.react-datepicker__month-read-view:hover,
+.react-datepicker__year-read-view:hover {
+  border-color: #80bdff;
+}
+
+.react-datepicker__month-read-view--down-arrow,
+.react-datepicker__year-read-view--down-arrow {
+  border-color: #333 transparent transparent transparent;
+  border-width: 5px 4px 0 4px;
+}
+
+.react-datepicker__month-dropdown,
+.react-datepicker__year-dropdown {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: white;
+  z-index: 1;
+} */
+.custom-datepicker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: #f8f9fa;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.nav-button:hover {
+  background-color: #e9ecef;
+}
+
+.month-year-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.month-name {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.year-select {
+  padding: 4px 8px;
+  font-weight: bold;
+  border-radius: 4px;
+  border: none;
+  background-color: #f8f9fa;
+  cursor: pointer;
+} 
