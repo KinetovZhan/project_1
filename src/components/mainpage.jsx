@@ -28,6 +28,11 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDealer, setSearchDealer] = useState('');
+  const [dateFilter, setDateFilter] = useState({
+    date_assemle: null,  // Для обратной совместимости
+    date_start: null,
+    date_end: null
+  });
   const { logout, user } = useAuth();
 
   const navigate = useNavigate();
@@ -82,9 +87,18 @@ function MainPage() {
   closeAddForm();
   };
 
-  const handleAddForm = () => {
+  // const handleAddForm = () => {
+  //   const newParams = new URLSearchParams(searchParams);
+  //   newParams.set('tab', 'addPO');
+  //   setSearchParams(newParams);
+  // };
+   const handleAddForm = () => {
     const newParams = new URLSearchParams(searchParams);
-    newParams.set('tab', 'addPO');
+    if (activeButton === 'addPO') {
+      newParams.delete('tab');
+    } else {
+      newParams.set('tab', 'addPO');
+    }
     setSearchParams(newParams);
   };
 
@@ -122,9 +136,13 @@ function MainPage() {
   // Остальные обработчики
   const handleSearch = (query) => setSearchQuery(query);
   const handleDealer = (query) => setSearchDealer(query);
+  const handleDateChange = (date) => {
+    console.log('Дата получена в MainPage:', date); // <-- Добавьте этот лог
+    setDateFilter(date);
+  }
+
 
   const handleMajMinButtonClick = (buttonName) => {
-    setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
     setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
   };
 
@@ -156,6 +174,7 @@ function MainPage() {
             onDealerChange={handleDealer}
             onFilterChangeByStatus={handleFilterByStatus}
             activeMajMinButton={activeMajMinButton}
+            onDateChange={handleDateChange}
             handleMajMinButtonClick={handleMajMinButtonClick}
           />
 
@@ -179,6 +198,7 @@ function MainPage() {
             onCloseAddAggForm={closeAddAggForm}
             onAddSubmit={handleAddSubmit}
             onAddAggSubmit={handleAddAggSubmit}
+            dateFilter={dateFilter}
 
           />
 

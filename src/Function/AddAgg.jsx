@@ -14,6 +14,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const ip = '172.20.46.61:8000';
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +24,8 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
-  // ✅ Вся логика отправки — внутри этой функции
+
+  //  Вся логика отправки — внутри этой функции
   const submitDataToServer = async () => {
     try {
       setLoading(true);
@@ -42,7 +44,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch('http://172.20.46.71:8000/component/', {
+      const response = await fetch(`http://${ip}/component/`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

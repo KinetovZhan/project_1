@@ -11,6 +11,7 @@ const LoginPage = () => {
   const [authorizationError, setAuthorizationError] = useState('');
   const navigate = useNavigate();
   const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
+  const ip = '172.20.46.61:8000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +27,7 @@ const LoginPage = () => {
     formData.append('password', password);
 
     try {
-      const response = await fetch('http://172.20.46.66:8000/token', {
+      const response = await fetch(`http://${ip}/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -44,7 +45,7 @@ const LoginPage = () => {
 
       const data = await response.json();
 
-      // ✅ Используем login из контекста вместо ручного localStorage.setItem
+      //  Используем login из контекста вместо ручного localStorage.setItem
       if (data.access_token) {
         loginContext(data.access_token); // ← сохраняет токен + обновляет состояние
         navigate('/main', { replace: true }); // replace — чтобы нельзя было вернуться назад на /login по кнопке "Назад"

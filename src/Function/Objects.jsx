@@ -5,7 +5,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [softwareItems, setSoftwareItems] = useState([]); // все данные по фильтрам
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const ip = '172.20.46.61:8000';
 
   useEffect(() => {
     const fetchFilteredData = async () => {
@@ -21,7 +21,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch('http://172.20.46.71:8000/component-info', {
+        const response = await fetch(`http://${ip}/component-info`, {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
