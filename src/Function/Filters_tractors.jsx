@@ -1,5 +1,8 @@
 import React, { useState } from 'react'; 
-
+import DatePicker from 'react-datepicker';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
@@ -33,12 +36,10 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   }
 
   const [Dealer, setDealer] = useState('')
-
-  const [releaseDate, setReleaseDate] = useState('');
-
-
-
-
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [isYearOpen,setIsYearOpen] = useState(false);
+  const ip = '172.20.46.61:8000';
 
   // const handleDealer = (event) => {
   //   const dealer = event.target.value;
@@ -62,29 +63,167 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   };
 
 
-    const handleDateChange = (event) => {
-      const date = event.target.value;
-      console.log('Дата выбрана в фильтре:', date); // <-- Добавьте этот лог
-      setReleaseDate(date);
-      if (onDateChange && typeof onDateChange === 'function') {
-        onDateChange(date);
+
+   // Обработчик выбора даты
+  const handleDateChange = (dates) => {
+    const [start, end] = dates;
+    setStartDate(start);
+    setEndDate(end);
+    
+    // Форматируем даты для передачи родительскому компоненту
+    if (onDateChange) {
+      const formatDate = (date) => {
+        if (!date) return null;
+        return format(date, 'yyyy-MM-dd');
+      };
+      
+      if (start && !end) {
+        // Выбрана только одна дата
+        onDateChange({
+          date_assemle: formatDate(start),
+          date_start: null,
+          date_end: null
+        });
+      } else if (start && end) {
+        // Выбран диапазон
+        onDateChange({
+          date_assemle: null,
+          date_start: formatDate(start),
+          date_end: formatDate(end)
+        });
+      } else {
+        // Сброс даты
+        onDateChange({
+          date_assemle: null,
+          date_start: null,
+          date_end: null
+        });
       }
     }
+  };
 
-      // Функция для сброса фильтра по дате
-    const handleClearDate = () => {
-      setReleaseDate('');
-      if (onDateChange && typeof onDateChange === 'function') {
-        onDateChange('');
-      }
-    };
+    // Очистка даты
+  const handleClearDate = () => {
+    setStartDate(null);
+    setEndDate(null);
+    if (onDateChange) {
+      onDateChange({
+        date_assemle: null,
+        date_start: null,
+        date_end: null
+      });
+    }
+  };
 
   const handleKeydown = (e) => {
     if (e.key === 'Enter') {
       handleSearch(); 
     } 
   };
+  
+    // Кастомный инпут для DatePicker
+   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
+  <div className="release-date">
+    <input
+      className="choose_date_release"
+      onClick={onClick}
+      ref={ref}
+      value={value || ""}
+      readOnly
+      placeholder="Дата выпуска"
+    />
+    <div className="calendar-icon" onClick={onClick}>
+      <svg 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2"
+      >
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </div>
+  </div>
+));
+// Добавьте этот компонент перед return в Filters2
+const CustomHeader = ({
+  date,
+  changeYear,
+  decreaseMonth,
+  increaseMonth,
+  prevMonthButtonDisabled,
+  nextMonthButtonDisabled,
+}) => {
+  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
 
+  return (
+    <div className="custom-datepicker-header">
+      <button
+        onClick={decreaseMonth}
+        disabled={prevMonthButtonDisabled}
+        className="nav-button"
+      >
+        &lt;
+      </button>
+      
+      <div className="month-year-display">
+        <span className="month-name">
+          {date.toLocaleDateString('ru-RU', { month: 'long' })}
+        </span>
+         <div className="custom-year-select">
+    <div 
+      className="selected-year"
+      onClick={() => setIsYearOpen(!isYearOpen)}
+    >
+      {date.getFullYear()}
+    </div>
+    
+    {isYearOpen && (
+      <div className="year-dropdown">
+        {years.map((year) => (
+          <div
+            key={year}
+            className={`year-option ${year === date.getFullYear() ? 'selected' : ''}`}
+            onClick={() => {
+              changeYear(year);
+              setIsYearOpen(false);
+            }}
+          >
+            {year}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+        {/* <select
+          value={date.getFullYear()}
+          onChange={({ target: { value } }) => changeYear(Number(value))}
+          className="year-select"
+          size = {1}
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select> */}
+        
+      </div>
+
+      <button
+        onClick={increaseMonth}
+        disabled={nextMonthButtonDisabled}
+        className="nav-button"
+      >
+        &gt;
+      </button>
+    </div>
+  );
+};
 
 
   const handleFilterByStatus = (FilterType) => {
@@ -136,20 +275,24 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
         ))}
       </div>
 
-      <div className='release-date'>
-        <input 
-          type="date" 
-
-          placeholder="Дата выпуска"
-          className='choose_date_release'
-          value = {releaseDate}
-          onChange = {handleDateChange}
-          onKeyDown={handleKeydown}
-          />
+     <div className='release-date-container'>
+        <DatePicker
+          selectsRange={true}
+          startDate={startDate}
+          endDate={endDate}
+          onChange={handleDateChange}
+          locale={ru}
+          dateFormat="dd.MM.yyyy"
+          customInput={<CustomInput />}
+          renderCustomHeader={CustomHeader}
+          isClearable={true}
+          onClear={handleClearDate}
+          clearButtonTitle="Очистить"
+          placeholderText="Дата выпуска"
+        />
       </div>
 
       <div className='search_by_dealer'>
-
         <input
           type="text"
           placeholder="Поиск по дилеру"
@@ -173,42 +316,50 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       <div className='filterstrac2'>
         <label>
           <span>Серийное</span>
-          <input type="checkbox"
-          checked={FilterTractor_by_status.Serial} 
-          onChange={() => handleFilterByStatus('Serial')}/>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.Serial} 
+            onChange={() => handleFilterByStatus('Serial')}
+          />
         </label>
 
         <label>
           <span>Опытное</span>
-          <input type="checkbox"
-          checked={FilterTractor_by_status.Experienced} 
-          onChange={() => handleFilterByStatus('Experienced')}/>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.Experienced} 
+            onChange={() => handleFilterByStatus('Experienced')}
+          />
         </label>
 
         <label>
           <span>Актуальное</span>
-          <input type="checkbox"
-          checked={FilterTractor_by_status.Actual} 
-          onChange={() => handleFilterByStatus('Actual')}/>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.Actual} 
+            onChange={() => handleFilterByStatus('Actual')}
+          />
         </label>
 
         <label>
           <span>Критические</span>
-          <input type="checkbox"
-          checked={FilterTractor_by_status.Critical} 
-          onChange={() => handleFilterByStatus('Critical')}/>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.Critical} 
+            onChange={() => handleFilterByStatus('Critical')}
+          />
         </label>
       </div>
 
       <div className='Majmin'>
         <button 
-          className={activeMajMinButton === 'MAJ'?'majmin_button_active' : 'majmin_button'}
+          className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
           onClick={() => handleMajMinButtonClick('MAJ')}
         >
           Требуется MAJ
         </button>
         <button 
-          className={activeMajMinButton === 'MIN'? 'majmin_button_active' : 'majmin_button'}
+          className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
           onClick={() => handleMajMinButtonClick('MIN')}
         >
           Требуется MIN

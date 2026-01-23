@@ -4,8 +4,7 @@ import {Filters2} from '../Function/Filters_tractors.jsx'
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, selectedModel, onDateChange}) {
   return (
-    <div className='sidebar'>
-      
+    <div className='sidebar'> 
       <div className='choose'>
         <button 
           className={activeButton === 'tractor' ? 'active' : ''}
@@ -23,7 +22,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       </div>
 
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addAgg' && (
+      {activeButton !== 'aggregates' && activeButton !== 'tractor'  && (
         <div className='add-po-container'>
           <button 
             onClick={onAddPoClick}> 
@@ -32,7 +31,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
+      {activeButton !== 'aggregates' && activeButton !== 'tractor'  &&(
         <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат

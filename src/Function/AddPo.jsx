@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function AddPoForm({ onBack, onSubmit }) {
   // Состояния
@@ -8,7 +9,7 @@ export function AddPoForm({ onBack, onSubmit }) {
 
   // Загружаем список компонентов с частями
   useEffect(() => {
-    fetch('http://172.20.46.66:8000/component-parts') // ← замени на реальный эндпоинт
+    fetch(`http://${ip}/component-parts`) // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();
@@ -69,7 +70,7 @@ export function AddPoForm({ onBack, onSubmit }) {
     if (release_date) formData.append('release_date', release_date);
 
     try {
-      const response = await fetch('http://172.20.46.66:8000/software/assign', {
+      const response = await fetch(`http://${ip}/software/assign`, {
         method: 'POST',
         body: formData,
       });
@@ -126,7 +127,7 @@ export function AddPoForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* 🔥 Мультивыбор компонентов и частей */}
+        {/*  Мультивыбор компонентов и частей */}
         <div className="add-po-field">
           <label className="add-po-label">Компонент и часть </label>
           <Select

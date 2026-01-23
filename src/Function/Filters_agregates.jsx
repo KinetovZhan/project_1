@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; 
 import Select from 'react-select';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
@@ -109,7 +110,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://172.20.46.66:8000/component-models', {
+
+      const response = await fetch(`http://${ip}/component-models`, {
         method: 'POST',
         headers,
         body: JSON.stringify(postData)

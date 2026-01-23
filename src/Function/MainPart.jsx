@@ -3,7 +3,7 @@ import { Objects } from '../Function/Objects';
 import { TractorTable } from '../Function/TractorTable';
 import { AddPoForm } from '../Function/AddPo';
 import { AddAggForm } from '../Function/AddAgg';
-import React, { useEffect } from 'react'; // ✅ исправлено: useEffect, а не useffect
+import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
 
 export function MainPart({
   activeButton,
@@ -20,7 +20,8 @@ export function MainPart({
   showAddForm,
   onCloseAddForm,
   onAddSubmit, // ← для AddPoForm
-  searchDate,
+  dateFilter,
+  activeMajMinButton,
 
   // --- Форма агрегата ---
   showAddAggForm,
@@ -89,7 +90,8 @@ export function MainPart({
             onSearch={onSearch}
             searchQuery={searchQuery}
             searchDealer={searchDealer}
-            searchDate={searchDate}
+            dateFilter={dateFilter}
+            activeMajMinButton={activeMajMinButton}
           />
         </>
       )}

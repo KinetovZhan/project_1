@@ -4,6 +4,7 @@ import {TractorDetails} from "./TractorDetails.jsx";
 import { useAuth } from '../auth/AuthContext';
 
 
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 
 const formatDateTime = (dateString) => {
@@ -69,13 +70,13 @@ const groupTractors = (data) => {
 };
 
 
-
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate}) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
-
+  // const ip = '172.20.46.61:8000';
+  
   const tableContainerRef = useRef(null);
   const tableBodyRef = useRef(null);
   const horizontalScrollRef = useRef(null);
@@ -93,8 +94,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       trac_model: [],
       status: [],
       dealer: "",
-      is_major: null,
-      date_assemle: null
+      date_assemle: null,
+      date_start: null,
+      date_end: null,
+      is_major: null
     };
 
     if (searchQuery && searchQuery.trim() !== '') {
@@ -104,18 +107,36 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     if (searchDealer && searchDealer.trim() !== ''){
       postData.dealer = searchDealer;
     }
+    if (dateFilter) {
+        const { date_assemle, date_start, date_end } = dateFilter;
+        
+        if (date_assemle) {
+            // Одна конкретная дата
+            postData.date_assemle = date_assemle;
+            console.log('Поиск по одной дате:', date_assemle);
+        } else if (date_start || date_end) {
+            // Диапазон дат
+            postData.date_start = date_start || null;
+            postData.date_end = date_end || null;
+            console.log('Поиск по диапазону:', date_start, 'до', date_end);
+        }
+    }
 
-    if (searchDate && searchDate.trim() !== '') {
-    postData.date_assemle = searchDate;
-    console.log('Search date:', searchDate); 
-  }
-
+    if (activeMajMinButton === 'MAJ') {
+      postData.is_major = true;
+    } else if (activeMajMinButton === 'MIN') {
+      postData.is_major = false;
+    } 
+    
     if (hasModelFilters) {
       postData.trac_model = activeFiltersTrac;
     }
     if (hasStatusFilters) {
       postData.status = activeFiltersTrac2;
     }
+     console.log('Отправляемые данные на бэкенд:', postData);
+    console.log('activeMajMinButton:', activeMajMinButton);
+    console.log('postData.is_major:', postData.is_major);
 
     return postData;
   };
@@ -137,20 +158,15 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           const searchParams = new URLSearchParams({
             request: searchQuery.trim()
         });
-            response = await fetch(`http://172.20.46.66:8000/search-tractor?${searchParams}`, {
+            response = await fetch(`http://${ip}/search-tractor?${searchParams}`, {
             method: 'GET',
             headers: {  
               "Authorization": `Bearer ${token}`,
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
-          })} else {
-            // Добавляем дату в запрос, если она есть
-            if (searchDate) {
-              postData.date_assemle = searchDate;
-            }
-            
-            response = await fetch('http://172.20.46.66:8000/tractor-info', {
+          })} else { 
+            response = await fetch(`http://${ip}/tractor-info`, {
               method: 'POST',
               headers: {  
                 "Authorization": `Bearer ${token}`,
@@ -198,7 +214,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate, token]);
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
 
   // Обработка клика по строке
   const handleRowClick = (tractor) => {
@@ -256,6 +272,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>БК</th>
                 <th>ГР</th>
                 <th>Автопилот</th>
+                <th>Дилер</th>
               </tr> 
             </thead>
             <tbody>
@@ -285,7 +302,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
                   <td>{tractor.ap || tractor.AP || '-'}</td> 
-               
+                  <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
                 </tr>
               ))}
             </tbody>

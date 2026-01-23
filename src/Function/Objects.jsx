@@ -1,6 +1,7 @@
 import Image from '../img/Image.png';
 import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
   const [softwareItems, setSoftwareItems] = useState([]);
@@ -30,7 +31,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch('http://172.20.46.66:8000/component-info', {
+        const response = await fetch(`http://${ip}/component-info`, {
           method: 'POST',
           headers: {
             "Authorization": `Bearer ${token}`,

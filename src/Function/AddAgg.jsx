@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -51,7 +52,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch('http://172.20.46.66:8000/component/', {
+      const response = await fetch(`http://${ip}/component/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
