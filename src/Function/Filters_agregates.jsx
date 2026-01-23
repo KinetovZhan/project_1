@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'; 
 import Select from 'react-select';
-
+import { useAuth } from '../auth/AuthContext';
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
 
@@ -35,6 +35,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
 
+  const { token } = useAuth();
 
   const handleModelChange = (selectedOptions) => {
     const values = selectedOptions 
@@ -103,12 +104,19 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('http://172.20.46.71:8000/component-models', {
+
+      const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch('http://172.20.46.66:8000/component-models', {
         method: 'POST',
-        headers: {  
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify(postData)
       });
       if (!response.ok) {
@@ -131,7 +139,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
        
     fetchModels();
     
-  }, [FilterItems,FilterItems2]);
+  }, [FilterItems,FilterItems2, token]);
 
 
   

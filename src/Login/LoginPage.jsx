@@ -34,6 +34,8 @@ const LoginPage = () => {
         body: formData.toString(),
       });
 
+
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         setAuthorizationError(

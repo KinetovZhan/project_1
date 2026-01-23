@@ -26,10 +26,10 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   });
 
   const FilterStatus = {
-    'Serial': 'Серийное',
-    'Experienced': 'Опытное',
-    'Actual': 'Актуальное',
-    'Critical': 'Критические'
+    'Serial': 's',
+    'Experienced': 't',
+    'Actual': 'b',
+    'Critical': 'o'
   }
 
   const [Dealer, setDealer] = useState('')

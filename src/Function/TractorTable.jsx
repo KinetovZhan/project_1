@@ -1,6 +1,9 @@
 import React, { useState,useRef, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
 import {TractorDetails} from "./TractorDetails.jsx";
+import { useAuth } from '../auth/AuthContext';
+
+
 
 
 const formatDateTime = (dateString) => {
@@ -36,7 +39,7 @@ const groupTractors = (data) => {
         rk: '-',
         bk: '-',
         gr: '-',
-        ap: '-'
+        ap: '-',
       };
     }
 
@@ -55,14 +58,15 @@ const groupTractors = (data) => {
       grouped[vin].gr = version;
     } else if (type === 'ap') {
       grouped[vin].ap = version;
-    }
+    } else if (type === 'engine') {
+      grouped[vin].engine = version;
+    } 
 
   });
   console.log(grouped)
 
   return Object.values(grouped);
 };
-
 
 
 
@@ -77,7 +81,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const horizontalScrollRef = useRef(null);
   const verticalScrollRef = useRef(null);
 
-
+  const { token } = useAuth();
   
 
   // Функция для подготовки данных запроса с учетом фильтров
@@ -89,6 +93,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       trac_model: [],
       status: [],
       dealer: "",
+      is_major: null,
       date_assemle: null
     };
 
@@ -117,17 +122,25 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
   useEffect(() => {
     const fetchTractors = async () => {
+      if (!token) {
+        setError("Пользователь не авторизован");
+        setLoading(false);
+        return;
+      }
       const postData = getPostData();
       let response;
+
+
       try {
         setLoading(true);
         if (searchQuery && searchQuery.trim() !== '') {
           const searchParams = new URLSearchParams({
             request: searchQuery.trim()
         });
-            response = await fetch(`http://172.20.46.71:8000/search-tractor?${searchParams}`, {
+            response = await fetch(`http://172.20.46.66:8000/search-tractor?${searchParams}`, {
             method: 'GET',
             headers: {  
+              "Authorization": `Bearer ${token}`,
               'Accept': 'application/json',
               'Content-Type': 'application/json'
             },
@@ -137,9 +150,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               postData.date_assemle = searchDate;
             }
             
-            response = await fetch('http://172.20.46.71:8000/tractor-info', {
+            response = await fetch('http://172.20.46.66:8000/tractor-info', {
               method: 'POST',
               headers: {  
+                "Authorization": `Bearer ${token}`,
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               },
@@ -184,7 +198,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     };
 
     fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate]);
+  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, searchDate, token]);
 
   // Обработка клика по строке
   const handleRowClick = (tractor) => {
@@ -245,12 +259,19 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
               </tr> 
             </thead>
             <tbody>
-              {tractors.map((tractor, index) => (
+              {[...tractors]
+                .sort((a, b) => {
+                  const vinA = (a.vin || a.VIN || '').toString();
+                  const vinB = (b.vin || b.VIN || '').toString();
+                  return vinA.localeCompare(vinB, undefined, { numeric: true, sensitivity: 'base' });
+                })
+                .map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}
                   onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
                   className="clickable-row"
+                  
                 >
                   <td>{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
@@ -263,7 +284,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
-                  <td>{tractor.ap || tractor.AP || '-'}</td>                  
+                  <td>{tractor.ap || tractor.AP || '-'}</td> 
+               
                 </tr>
               ))}
             </tbody>

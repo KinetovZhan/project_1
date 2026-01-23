@@ -1,16 +1,25 @@
 import Image from '../img/Image.png';
 import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
+import { useAuth } from '../auth/AuthContext';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
   const [softwareItems, setSoftwareItems] = useState([]); // все данные по фильтрам
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { token } = useAuth();
 
 
   useEffect(() => {
     const fetchFilteredData = async () => {
       setLoading(true);
       setError(null);
+;
+      if (!token) {
+        setError("Пользователь не авторизован");
+        setLoading(false);
+        return;
+      }
+
       try {
         const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp', 'RK': 'rk', 'hydrorasp': 'hydro' };
         const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
@@ -21,9 +30,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch('http://172.20.46.71:8000/component-info', {
+        const response = await fetch('http://172.20.46.66:8000/component-info', {
           method: 'POST',
           headers: {
+            "Authorization": `Bearer ${token}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
@@ -45,7 +55,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
 
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel]); 
+  }, [activeFilters, activeFilters2, selectedModel, token]); 
 
   // --- 2. Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных ---
   const filteredItems = useMemo(() => {

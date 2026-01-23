@@ -8,7 +8,7 @@ export function AddPoForm({ onBack, onSubmit }) {
 
   // Загружаем список компонентов с частями
   useEffect(() => {
-    fetch('http://172.20.46.71:8000/component-parts') // ← замени на реальный эндпоинт
+    fetch('http://172.20.46.66:8000/component-parts') // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();
@@ -69,7 +69,7 @@ export function AddPoForm({ onBack, onSubmit }) {
     if (release_date) formData.append('release_date', release_date);
 
     try {
-      const response = await fetch('http://172.20.46.71:8000/software/assign', {
+      const response = await fetch('http://172.20.46.66:8000/software/assign', {
         method: 'POST',
         body: formData,
       });
