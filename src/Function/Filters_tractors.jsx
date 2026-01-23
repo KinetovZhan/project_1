@@ -40,10 +40,10 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
 
 
 
-  const handleDealer = (event) => {
-    const dealer = event.target.value;
-    setDealer(dealer)
-  }
+  // const handleDealer = (event) => {
+  //   const dealer = event.target.value;
+  //   setDealer(dealer)
+  // }
 
 
     const handleSearch = () => {
@@ -51,6 +51,16 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       onDealerChange(Dealer);
     }
   };
+
+
+    const handleChange = (e) => {
+    const dealer = e.target.value;
+    setDealer(dealer);
+    if (onDealerChange && typeof onDealerChange === 'function') {
+      onDealerChange(dealer);
+    }
+  };
+
 
     const handleDateChange = (event) => {
       const date = event.target.value;
@@ -145,7 +155,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
           placeholder="Поиск по дилеру"
           className='searcher_dealer'
           value={Dealer}
-          onChange={handleDealer} 
+          onChange={handleChange} 
           onKeyDown={handleKeydown}
         />
         <button 

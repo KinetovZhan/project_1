@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useAuth } from '../auth/AuthContext';
+
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -15,6 +17,9 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const { token } = useAuth();
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -23,8 +28,12 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
-  // ✅ Вся логика отправки — внутри этой функции
+
   const submitDataToServer = async () => {
+    if (!token) {
+      setError('Пользователь не авторизован');
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
@@ -45,6 +54,7 @@ export function AddAggForm({ onBack, onSubmit }) {
       const response = await fetch('http://172.20.46.66:8000/component/', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },

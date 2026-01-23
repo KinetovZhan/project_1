@@ -4,7 +4,6 @@ import { useAuth } from '../auth/AuthContext';
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
 
-
   const componentTypeMap = {
     DVS: 'dvs',
     KPP: 'kpp',
@@ -49,7 +48,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     }
   };
 
-
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
 
   const handleFilterChange = (FilterType) => {
@@ -64,8 +62,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       onFilterChange(activeFilters);
     }
   };
-
-
   const handleFilterChange2 = (FilterType2) => {
     const newFilter2 = {
       ...FilterItems2,
@@ -99,7 +95,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       trac_model: activeTractorModels.length  > 0 ? activeTractorModels : [],
       type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : []
     };
-    
     
     try {
       setLoading(true);
@@ -141,8 +136,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     
   }, [FilterItems,FilterItems2, token]);
 
-
-  
   return(
     <>
       <div className='filters'>
@@ -230,40 +223,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             }}
           />
         </div>
-        {/* <div className="showModels">
-          <div className="showModelsHeader">
-            <strong>Выбранные модели:</strong>
-            <h2
-              className="deleteAll"
-              onClick={() => {
-                setSelectedModel([]);
-                if (onModel) onModelChange([]);
-              }}
-            >
-              Очистить
-            </h2>
-          </div>
-
-          {selectedModel.length > 0 ? (
-            <ul>
-              {selectedModel.map((model, index) => (
-                <li
-                  key={index}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => {
-                    const newSelectedModel = selectedModel.filter(m => m !== model);
-                    const newSelectedOptions = newSelectedModel.map(m => ({ value: m, label: m }));
-                    handleModelChange(newSelectedOptions);
-                  }}
-                >
-                  {model} ×
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span></span>
-          )}
-        </div> */}
         <button 
           className='clear'
           onClick={() => {
@@ -284,11 +243,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             if (onFilterChange2) onFilterChange2([]);
             if (onModelChange) onModelChange([]);
           }}
-          
         >
           Сброс
         </button>
-
     </>
   )
 }

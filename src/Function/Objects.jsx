@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react'; // ← добавьте us
 import { useAuth } from '../auth/AuthContext';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
-  const [softwareItems, setSoftwareItems] = useState([]); // все данные по фильтрам
+  const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { token } = useAuth();
@@ -139,7 +139,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
     <div className='maininfo'>
       <h3>Последние версии ПО для {getComponentName()}</h3>
       <div>
-        <h4>Компоненты ({filteredItems.length})</h4>
+        <h4>Компоненты ({filteredItems.filter(item => item.id_Firmwares).length})</h4>
         {activeFilters.length > 0 && (
           <div style={{ marginBottom: '10px', color: '#666' }}>
             Активные фильтры: {getAllActiveFilters()}
@@ -154,7 +154,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
               </div>
             </li>
           ) : (
-            filteredItems.map((item) => (
+            filteredItems
+            .filter(item => item.id_Firmwares)
+            .map((item) => (
               <li key={item.id_Firmwares}>
                 <div className='objectmenu'>
                   <img className='object' src={Image} alt='Компонент' />
