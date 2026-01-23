@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Header } from '../Function/Header';
-import './LoginPage.css';
+import '../cssfiles/LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-
+import {ip} from '../shrineofvsakoe/ip.jsx'
 
 const LoginPage = () => {
   const [login, setLogin] = useState('');
@@ -11,7 +11,6 @@ const LoginPage = () => {
   const [authorizationError, setAuthorizationError] = useState('');
   const navigate = useNavigate();
   const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
-  const ip = '172.20.46.61:8000';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

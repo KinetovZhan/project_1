@@ -1,0 +1,128 @@
+.sidebar {
+  margin-left: 98px;
+  height: 800px;
+  width: 387px;
+  background-color: rgba(85, 86, 90, 1);
+  border-radius: 30px;
+  flex-shrink: 0; /* Запрещаем уменьшение */
+  z-index: 2;
+  position: relative;
+}
+
+
+.choose{
+  margin: 44px 56px 65px 63px ;
+  text-align: center;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  color:black;
+  font-family: Arial Black, sans-serif;;
+}
+
+
+button {
+  width: 268px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+}
+
+
+.filters {
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+  width: 360px;
+  height: 160px;
+  border-radius: 20px;
+  padding: 12px 10px;
+  gap: 20px;
+
+  position: absolute;
+  top: 187px;
+  
+  background-color: rgba(217, 217, 217, 1);
+  margin-left: 13px;
+
+  color: black;
+}
+
+button.active {
+  background-color:rgba(139, 139, 139, 1);
+  color: black;
+}
+
+
+.filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ключевое свойство */
+  width: 100%;
+  position: relative;
+}
+
+
+.filter h3 {
+  margin: 0;
+  flex-shrink: 0; /* Запрещаем сжатие текста */
+}
+
+
+.filter input[type="checkbox"] {
+  position: absolute;
+  right: 0;
+  transform: scale(1.5);
+}
+
+.filters2 {
+  /* Размеры и визуал блока */
+  box-sizing: border-box;
+  width: 360px;
+  height: 120px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 20px;
+  color: black;
+
+  /* Положение */
+  position: absolute;
+  top: 369px;
+  left:13px;
+}
+
+#tractor-select {
+  /* Общий вид */
+  box-sizing: border-box;
+  width: 200px;
+  height: 53px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 25px;
+  border: none;
+
+  position: absolute;
+  left: 0px;
+  top: 143px;
+
+  
+  
+  /* Стили для кастомной стрелки */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  
+  /* Стрелка вправо */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3e%3cpath d='M10 7l5 5-5 5z' fill='%23000'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 16px;
+  
+  /* Отступ для текста */
+  padding: 0 40px 0 20px;
+  font-size: 16px;
+}

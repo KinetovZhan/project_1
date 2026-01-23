@@ -1,0 +1,97 @@
+.tractor-table-outer-wrapper {
+  margin: 100px;
+  position: relative;
+}
+
+.tractor-table-container {
+  display: flex;
+  align-items: stretch;
+  background: #ffffff;
+  border-radius: 10px 5px 10px 5px;
+  padding: 0;
+  max-width: 1200px;
+  box-sizing: border-box;
+  
+}
+
+/* скролл для тела таблицы */
+.scroll-bar {
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 10px;
+}
+
+.scroll-bar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color:#bebebe;
+}
+
+.scroll-bar::-webkit-scrollbar-corner {
+  border-radius: 10px;
+}
+
+.tractor-table {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: collapse;
+  background: white;
+  table-layout: auto;
+}
+
+.tractor-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tractor-table thead th {
+  background: #d7dadc;
+  color: #080808;
+  padding: 12px 8px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #454343;
+  border-right: 1px solid #454343;
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+.tractor-table thead th:last-child { 
+  border-right: none; 
+}
+
+.tractor-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #454343;
+  color: #2c3e50;
+  font-size: 14px;
+  border-right: 1px solid #454343;
+  min-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tractor-table td:last-child { 
+  border-right: none; 
+}
+
+.tractor-table tr:last-child td { 
+  border-bottom: none; 
+}
+
+.loading {
+  background: transparent;
+  color: #03070b;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+}

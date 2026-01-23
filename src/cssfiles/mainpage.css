@@ -1,0 +1,13 @@
+main {
+  padding-top: 150px;
+  min-height: calc(100vh - 164px);/*Занимает всю высоту которая осталась*/
+  box-sizing: border-box;
+  
+}
+
+
+.table {
+  display: flex;
+  margin-top: 0px;
+  justify-content: center;
+}

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import '../App.css';
+// import '../cssfiles/sidebar.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Header } from '../Function/Header.jsx';
 import { Sidebar } from '../Function/Sidebar.jsx';

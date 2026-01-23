@@ -1,0 +1,109 @@
+.MainPart {
+  width:1369px;
+  height: 800px;
+  background-color: rgba(217, 217, 217, 0.7);
+  flex-shrink: 0; /* Запрещаем уменьшение */
+  margin-left:-38px;
+  border-radius: 30px;
+  z-index: 1;
+  position: relative;
+}
+
+.maininfo {
+  /* Общий вид */
+  box-sizing: border-box;
+  width: 963px;
+  height: 624px;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+  padding: 50px 70px;
+
+
+  position: absolute;
+  left: 171px;
+  top: 80px;
+  right: 235px;
+}
+
+
+.object {
+  box-sizing: border-box;
+  width: 160px;
+  height: 160px;
+  margin: 24px;
+
+  
+}
+
+
+.objectmenu {
+  /* Внешний вид */
+  width: 835px;
+  height: 208px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 15px;
+  display: flex;
+  margin-left: 0;
+}
+
+
+.inform {
+  gap: 0px;
+}
+
+.textunder {
+  color: grey;
+}
+
+/* Кнопка */
+/* .download {
+  box-sizing: border-box;
+  width: 89px;
+
+  height: 40px;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+} */
+
+button:hover {
+  background-color: #b6bbc1;
+  /* transform: translateY(-2px); */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  background-color: #707479;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.back-button {
+
+  background-color: #55565a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  position: absolute;
+  top:60px;
+}
+
+.back-button:hover {
+  background-color: #6b6c70;
+}
+
+
+.List {
+  list-style-type: none;
+  padding-left: 0;  
+  overflow: auto;
+  overflow-y: auto;
+  max-height: 400px;
+  overflow-x: hidden;
+}
