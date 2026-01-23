@@ -1,5 +1,6 @@
 import Image from '../img/Image.png'
 import { useState, useEffect } from 'react';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 
 export function TractorDetails({ vin, onBack }) {
@@ -9,7 +10,6 @@ export function TractorDetails({ vin, onBack }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
-  const ip = '172.20.46.61:8000';
   useEffect(() => {
     const fetchTractorDetails = async () => {
       if (!vin) {

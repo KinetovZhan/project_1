@@ -1,6 +1,7 @@
 import React, { useState,useRef, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
 import {TractorDetails} from "./TractorDetails.jsx";
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 
 const formatDateTime = (dateString) => {
@@ -71,7 +72,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
-  const ip = '172.20.46.61:8000';
+  // const ip = '172.20.46.61:8000';
   
   const tableContainerRef = useRef(null);
   console.log('TractorTable: activeMajMinButton =', activeMajMinButton);
@@ -253,6 +254,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>БК</th>
                 <th>ГР</th>
                 <th>Автопилот</th>
+                <th>Дилер</th>
               </tr> 
             </thead>
             <tbody>
@@ -274,7 +276,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
-                  <td>{tractor.ap || tractor.AP || '-'}</td>                  
+                  <td>{tractor.ap || tractor.AP || '-'}</td> 
+                  <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
                 </tr>
               ))}
             </tbody>

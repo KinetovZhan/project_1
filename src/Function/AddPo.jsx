@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function AddPoForm({ onBack, onSubmit }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
   const [selectedComponents, setSelectedComponents] = useState([]);
-  const ip = '172.20.46.61:8000';
 
   // Загружаем список компонентов с частями
   useEffect(() => {

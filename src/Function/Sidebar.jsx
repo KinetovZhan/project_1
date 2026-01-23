@@ -22,7 +22,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       </div>
 
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addAgg' && (
+      {activeButton !== 'aggregates' && activeButton !== 'tractor'  && (
         <div className='add-po-container'>
           <button 
             onClick={onAddPoClick}> 
@@ -31,7 +31,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && activeButton !== 'addPO' &&(
+      {activeButton !== 'aggregates' && activeButton !== 'tractor'  &&(
         <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат

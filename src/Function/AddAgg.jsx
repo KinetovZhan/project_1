@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -14,7 +15,6 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const ip = '172.20.46.61:8000';
 
   const handleChange = (e) => {
     const { name, value } = e.target;

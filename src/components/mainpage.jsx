@@ -81,9 +81,9 @@ function MainPage() {
 
   // ===== Форма "ПО" =====
   const handleAddSubmit = (responseData) => {
-  // ✅ Без preventDefault — это уже не событие, а ответ с бэка
+  // Без preventDefault — это уже не событие, а ответ с бэка
   const poNumber = responseData?.name || 'без номера';
-  alert(`✅ ПО «${poNumber}» успешно добавлено!`);
+  alert(` ПО «${poNumber}» успешно добавлено!`);
   closeAddForm();
   };
 

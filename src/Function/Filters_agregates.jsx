@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'; 
 import Select from 'react-select';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
-
-  const ip = '172.20.46.61:8000';
 
   const componentTypeMap = {
     DVS: 'dvs',
