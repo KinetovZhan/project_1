@@ -45,24 +45,21 @@ const groupTractors = (data) => {
     }
 
     const type = item.component_type;
-    const version = item.sw_name || '-';
+    const model = item.comp_model || '-';
 
-    if (type === 'dvs') {
-      grouped[vin].dvs = version;
+    if ((type === 'dvs')|| (type === 'engine')) {
+      grouped[vin].dvs = model;
     } else if (type === 'kpp') {
-      grouped[vin].kpp = version;
+      grouped[vin].kpp = model;
     } else if (type === 'rk') {
-      grouped[vin].rk = version;
+      grouped[vin].rk = model;
     } else if (type === 'bk') {
-      grouped[vin].bk = version;
+      grouped[vin].bk = model;
     } else if (type === 'gr') {
-      grouped[vin].gr = version;
+      grouped[vin].gr = model;
     } else if (type === 'ap') {
-      grouped[vin].ap = version;
-    } else if (type === 'engine') {
-      grouped[vin].engine = version;
+      grouped[vin].ap = model;
     } 
-
   });
   console.log(grouped)
 

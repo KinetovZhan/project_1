@@ -1,4 +1,12 @@
-// src/Function/Filters.test.jsx
+// 1. Создаём мок
+const mockUseAuth = vi.hoisted(() => vi.fn());
+
+// 2. Мокаем модуль ДО импортов
+vi.mock('../auth/AuthContext', () => ({
+  useAuth: mockUseAuth
+}));
+
+
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
@@ -42,6 +50,7 @@ describe('Filters', () => {
   const mockOnModelChange = vi.fn()
 
   beforeEach(() => {
+    mockUseAuth.mockReturnValue({ token: 'mock-token' });
     mockOnFilterChange.mockClear()
     mockOnFilterChange2.mockClear()
     mockOnModelChange.mockClear()

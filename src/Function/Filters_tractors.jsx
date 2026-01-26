@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import {ip} from "../shrineofvsakoe/ip.jsx";
-import {ip} from "../shrineofvsakoe/ip.jsx";
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
@@ -282,6 +281,7 @@ const CustomHeader = ({
           type="button"
           onClick={handleSearch}
           className='search_button'
+          data-testid="search-button"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" />

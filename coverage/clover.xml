@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1769422034958" clover="3.2.0">
+  <project timestamp="1769422034959" name="All files">
+    <metrics statements="352" coveredstatements="253" conditionals="238" coveredconditionals="130" methods="86" coveredmethods="53" elements="676" coveredelements="436" complexity="0" loc="352" ncloc="352" packages="2" files="7" classes="7"/>
+    <package name="Function">
+      <metrics statements="352" coveredstatements="253" conditionals="238" coveredconditionals="130" methods="86" coveredmethods="53"/>
+      <file name="AddAgg.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\AddAgg.jsx">
+        <metrics statements="33" coveredstatements="27" conditionals="24" coveredconditionals="16" methods="5" coveredmethods="5"/>
+        <line num="7" count="12" type="stmt"/>
+        <line num="18" count="12" type="stmt"/>
+        <line num="19" count="12" type="stmt"/>
+        <line num="21" count="12" type="stmt"/>
+        <line num="24" count="12" type="stmt"/>
+        <line num="25" count="6" type="stmt"/>
+        <line num="26" count="6" type="stmt"/>
+        <line num="33" count="12" type="stmt"/>
+        <line num="34" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="42" count="1" type="stmt"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="55" count="2" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="67" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="68" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="69" count="0" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="75" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="76" count="1" type="stmt"/>
+        <line num="77" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="78" count="0" type="stmt"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="83" count="0" type="stmt"/>
+        <line num="85" count="1" type="stmt"/>
+        <line num="89" count="12" type="stmt"/>
+        <line num="90" count="2" type="stmt"/>
+        <line num="91" count="2" type="stmt"/>
+        <line num="94" count="12" type="stmt"/>
+      </file>
+      <file name="Filters_agregates.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\Filters_agregates.jsx">
+        <metrics statements="69" coveredstatements="37" conditionals="26" coveredconditionals="7" methods="24" coveredmethods="9"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="15" count="6" type="stmt"/>
+        <line num="20" count="6" type="stmt"/>
+        <line num="27" count="6" type="stmt"/>
+        <line num="33" count="6" type="stmt"/>
+        <line num="34" count="6" type="stmt"/>
+        <line num="36" count="6" type="stmt"/>
+        <line num="38" count="6" type="stmt"/>
+        <line num="40" count="6" type="stmt"/>
+        <line num="41" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="52" count="6" type="stmt"/>
+        <line num="54" count="6" type="stmt"/>
+        <line num="55" count="1" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="61" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="62" count="4" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="66" count="6" type="stmt"/>
+        <line num="67" count="0" type="stmt"/>
+        <line num="71" count="0" type="stmt"/>
+        <line num="73" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="79" count="6" type="stmt"/>
+        <line num="80" count="6" type="stmt"/>
+        <line num="83" count="6" type="stmt"/>
+        <line num="85" count="3" type="stmt"/>
+        <line num="86" count="12" type="stmt"/>
+        <line num="87" count="1" type="stmt"/>
+        <line num="89" count="3" type="stmt"/>
+        <line num="90" count="6" type="stmt"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="95" count="3" type="stmt"/>
+        <line num="100" count="3" type="stmt"/>
+        <line num="101" count="3" type="stmt"/>
+        <line num="102" count="3" type="stmt"/>
+        <line num="104" count="3" type="stmt"/>
+        <line num="109" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="110" count="3" type="stmt"/>
+        <line num="114" count="3" type="stmt"/>
+        <line num="119" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="120" count="0" type="stmt"/>
+        <line num="123" count="0" type="stmt"/>
+        <line num="124" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="126" count="0" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="130" count="0" type="stmt"/>
+        <line num="135" count="6" type="stmt"/>
+        <line num="137" count="3" type="stmt"/>
+        <line num="141" count="6" type="stmt"/>
+        <line num="150" count="1" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="168" count="0" type="stmt"/>
+        <line num="177" count="0" type="stmt"/>
+        <line num="194" count="0" type="stmt"/>
+        <line num="204" count="0" type="stmt"/>
+        <line num="220" count="0" type="stmt"/>
+        <line num="221" count="0" type="stmt"/>
+        <line num="228" count="0" type="stmt"/>
+        <line num="234" count="0" type="stmt"/>
+        <line num="238" count="0" type="stmt"/>
+        <line num="241" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="242" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="243" count="0" type="cond" truecount="0" falsecount="2"/>
+      </file>
+      <file name="Filters_tractors.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\Filters_tractors.jsx">
+        <metrics statements="72" coveredstatements="62" conditionals="38" coveredconditionals="23" methods="27" coveredmethods="19"/>
+        <line num="10" count="27" type="stmt"/>
+        <line num="12" count="27" type="stmt"/>
+        <line num="19" count="27" type="stmt"/>
+        <line num="25" count="27" type="stmt"/>
+        <line num="32" count="27" type="stmt"/>
+        <line num="39" count="27" type="stmt"/>
+        <line num="40" count="27" type="stmt"/>
+        <line num="41" count="27" type="stmt"/>
+        <line num="42" count="27" type="stmt"/>
+        <line num="44" count="27" type="stmt"/>
+        <line num="45" count="2" type="cond" truecount="3" falsecount="1"/>
+        <line num="46" count="2" type="stmt"/>
+        <line num="50" count="27" type="stmt"/>
+        <line num="51" count="3" type="stmt"/>
+        <line num="52" count="3" type="stmt"/>
+        <line num="53" count="3" type="cond" truecount="3" falsecount="1"/>
+        <line num="54" count="3" type="stmt"/>
+        <line num="59" count="27" type="stmt"/>
+        <line num="60" count="3" type="stmt"/>
+        <line num="61" count="3" type="stmt"/>
+        <line num="62" count="3" type="stmt"/>
+        <line num="65" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="66" count="3" type="stmt"/>
+        <line num="67" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="68" count="4" type="stmt"/>
+        <line num="71" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="73" count="2" type="stmt"/>
+        <line num="78" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="80" count="1" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="97" count="27" type="stmt"/>
+        <line num="98" count="1" type="stmt"/>
+        <line num="99" count="1" type="stmt"/>
+        <line num="100" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="101" count="1" type="stmt"/>
+        <line num="109" count="27" type="stmt"/>
+        <line num="110" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="111" count="1" type="stmt"/>
+        <line num="116" count="27" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="144" count="27" type="stmt"/>
+        <line num="152" count="0" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="171" count="0" type="stmt"/>
+        <line num="179" count="0" type="stmt"/>
+        <line num="183" count="0" type="stmt"/>
+        <line num="184" count="0" type="stmt"/>
+        <line num="206" count="27" type="stmt"/>
+        <line num="207" count="3" type="stmt"/>
+        <line num="211" count="3" type="stmt"/>
+        <line num="214" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="215" count="3" type="stmt"/>
+        <line num="216" count="12" type="stmt"/>
+        <line num="217" count="4" type="stmt"/>
+        <line num="218" count="3" type="stmt"/>
+        <line num="224" count="27" type="stmt"/>
+        <line num="225" count="3" type="stmt"/>
+        <line num="229" count="3" type="stmt"/>
+        <line num="231" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="232" count="3" type="stmt"/>
+        <line num="233" count="9" type="stmt"/>
+        <line num="234" count="4" type="stmt"/>
+        <line num="235" count="3" type="stmt"/>
+        <line num="239" count="27" type="stmt"/>
+        <line num="243" count="81" type="stmt"/>
+        <line num="248" count="3" type="stmt"/>
+        <line num="299" count="2" type="stmt"/>
+        <line num="308" count="1" type="stmt"/>
+        <line num="317" count="0" type="stmt"/>
+        <line num="326" count="0" type="stmt"/>
+        <line num="334" count="1" type="stmt"/>
+        <line num="340" count="1" type="stmt"/>
+      </file>
+      <file name="SearchBar.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\SearchBar.jsx">
+        <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+        <line num="5" count="7" type="stmt"/>
+        <line num="7" count="7" type="stmt"/>
+        <line num="8" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="13" count="7" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+      </file>
+      <file name="TractorDetails.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\TractorDetails.jsx">
+        <metrics statements="69" coveredstatements="38" conditionals="40" coveredconditionals="8" methods="14" coveredmethods="7"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="16" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="38" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="45" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="56" count="0" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="60" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="66" count="1" type="stmt"/>
+        <line num="70" count="2" type="stmt"/>
+        <line num="71" count="1" type="stmt"/>
+        <line num="72" count="1" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="81" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="82" count="0" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="94" count="0" type="stmt"/>
+        <line num="96" count="1" type="stmt"/>
+        <line num="98" count="1" type="stmt"/>
+        <line num="109" count="1" type="stmt"/>
+        <line num="113" count="2" type="stmt"/>
+        <line num="114" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="122" count="2" type="stmt"/>
+        <line num="123" count="1" type="stmt"/>
+        <line num="124" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="125" count="0" type="stmt"/>
+        <line num="129" count="1" type="stmt"/>
+        <line num="130" count="1" type="stmt"/>
+        <line num="131" count="1" type="stmt"/>
+        <line num="135" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="142" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="156" count="0" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="166" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="175" count="2" type="stmt"/>
+        <line num="204" count="0" type="stmt"/>
+        <line num="206" count="0" type="stmt"/>
+      </file>
+      <file name="TractorTable.jsx" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\Function\TractorTable.jsx">
+        <metrics statements="102" coveredstatements="82" conditionals="110" coveredconditionals="76" methods="13" coveredmethods="10"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="15" count="4" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="29" count="3" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="32" count="5" type="stmt"/>
+        <line num="33" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="35" count="3" type="stmt"/>
+        <line num="36" count="3" type="stmt"/>
+        <line num="47" count="5" type="stmt"/>
+        <line num="48" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="52" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="53" count="2" type="stmt"/>
+        <line num="54" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="56" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="58" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="60" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="62" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="63" count="0" type="stmt"/>
+        <line num="67" count="3" type="stmt"/>
+        <line num="69" count="3" type="stmt"/>
+        <line num="74" count="14" type="stmt"/>
+        <line num="75" count="14" type="stmt"/>
+        <line num="76" count="14" type="stmt"/>
+        <line num="77" count="14" type="stmt"/>
+        <line num="80" count="14" type="stmt"/>
+        <line num="82" count="14" type="stmt"/>
+        <line num="86" count="14" type="stmt"/>
+        <line num="90" count="4" type="stmt"/>
+        <line num="111" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="112" count="1" type="stmt"/>
+        <line num="114" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="116" count="0" type="stmt"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="118" count="1" type="cond" truecount="2" falsecount="2"/>
+        <line num="120" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="121" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="122" count="1" type="stmt"/>
+        <line num="126" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="127" count="1" type="stmt"/>
+        <line num="128" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="138" count="4" type="stmt"/>
+        <line num="139" count="4" type="stmt"/>
+        <line num="140" count="4" type="stmt"/>
+        <line num="142" count="4" type="stmt"/>
+        <line num="220" count="14" type="stmt"/>
+        <line num="221" count="5" type="stmt"/>
+        <line num="222" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="223" count="1" type="stmt"/>
+        <line num="224" count="1" type="stmt"/>
+        <line num="225" count="1" type="stmt"/>
+        <line num="228" count="4" type="stmt"/>
+        <line num="230" count="4" type="stmt"/>
+        <line num="231" count="4" type="stmt"/>
+        <line num="234" count="4" type="stmt"/>
+        <line num="244" count="3" type="stmt"/>
+        <line num="245" count="3" type="stmt"/>
+        <line num="246" count="3" type="stmt"/>
+        <line num="248" count="3" type="cond" truecount="3" falsecount="1"/>
+        <line num="249" count="0" type="stmt"/>
+        <line num="250" count="0" type="stmt"/>
+        <line num="251" count="0" type="stmt"/>
+        <line num="254" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="255" count="0" type="stmt"/>
+        <line num="258" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="259" count="2" type="stmt"/>
+        <line num="260" count="2" type="stmt"/>
+        <line num="261" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="262" count="1" type="stmt"/>
+        <line num="263" count="1" type="stmt"/>
+        <line num="265" count="0" type="stmt"/>
+        <line num="269" count="0" type="stmt"/>
+        <line num="270" count="0" type="stmt"/>
+        <line num="272" count="3" type="stmt"/>
+        <line num="276" count="5" type="stmt"/>
+        <line num="280" count="14" type="stmt"/>
+        <line num="281" count="1" type="stmt"/>
+        <line num="282" count="1" type="stmt"/>
+        <line num="286" count="14" type="cond" truecount="2" falsecount="0"/>
+        <line num="287" count="1" type="stmt"/>
+        <line num="290" count="13" type="cond" truecount="2" falsecount="0"/>
+        <line num="291" count="4" type="stmt"/>
+        <line num="299" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="300" count="1" type="stmt"/>
+        <line num="304" count="0" type="stmt"/>
+        <line num="313" count="8" type="stmt"/>
+        <line num="341" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="342" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="343" count="0" type="stmt"/>
+        <line num="346" count="3" type="stmt"/>
+        <line num="348" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="img">
+      <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="Image.png" path="C:\Users\krymkovdv\Desktop\vscode\project_1\src\img\Image.png">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+  </project>
+</coverage>
