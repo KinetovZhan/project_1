@@ -13,28 +13,32 @@ export const useAuth = () => {
 
 export function AuthProvider({children}) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null); 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // чтобы не мигало при загрузке
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       try {
         const decoded = jwtDecode(token);
         const isExpired = decoded.exp * 1000 < Date.now();
     
     if (isExpired) {
-      localStorage.removeItem('access_token');
+      localStorage.removeItem('accessToken');
       setUser(null);
+      setToken(null);
       setIsAuthenticated(false);
     } else {
       setUser(decoded);
+      setToken(token);
       setIsAuthenticated(true);
     }
   } catch (error) {
     console.error ('Invalid token', error);
-    localStirage.removeItem('access__token');
+    localStorage.removeItem('accessToken');
     setUser(null);
+    setToken(null);
     setIsAuthenticated(false);
   }
 }
@@ -42,21 +46,23 @@ setLoading(false);
 }, []);
 
 const login = (token) => {
-  localStorage.setItem('access_token', token);
+  localStorage.setItem('accessToken', token);
   const decoded = jwtDecode(token);
+  setUser(decoded);
+  setToken(token);
   setIsAuthenticated(true);
 };
 
 const logout = () => {
-  localStorage.removeItem('access_token');
+  localStorage.removeItem('accessToken');
   setUser(null);
+  setToken(null);
   setIsAuthenticated(false);
 };
 
 return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
 }
-

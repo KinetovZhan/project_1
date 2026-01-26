@@ -1,24 +1,86 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import { useAuth } from '../auth/AuthContext';
 
 export function AddPoForm({ onBack, onSubmit }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
   const [selectedComponents, setSelectedComponents] = useState([]);
+  const [softwareOptions, setSoftwareOptions] = useState([]);
+  const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(null);
+  const [loadingSoftware, setLoadingSoftware] = useState(false);
+  const [softwareError, setSoftwareError] = useState(null);
+  const { token } = useAuth();
 
   // Загружаем список компонентов с частями
   useEffect(() => {
+    console.log('Токен из useAuth:', token ? `Есть (${token.substring(0, 20)}...)` : 'Нет');
+
     fetch('http://172.20.46.71:8000/component-parts') // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();
       })
-      .then(data => setComponentOptions(data))
+      .then(data => {
+        console.log('Полученные данные:', data);
+        setComponentOptions(data);
+      })
       .catch(err => {
         console.error('Ошибка:', err);
         alert('Не удалось загрузить список компонентов');
       });
-  }, []);
+
+      // Загружаем список ПО для предыдущих версий
+    if (token) {
+      setLoadingSoftware(true);
+      setSoftwareError(null);
+
+      fetch('http://172.20.46.71:8000/software/', {
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
+      })
+        .then(res => {
+          console.log('Статус ответа ПО:', res.status, res.statusText);
+          if (res.status === 401) {
+            throw new Error('Токен недействителен. Пожалуйста, войдите заново.');
+          }
+          if (!res.ok) throw new Error('Не удалось загрузить список ПО');
+          return res.json();
+        })
+
+        .then(data => {
+          console.log('Полученные данные ПО:', data);
+          // Форматируем для Select
+          if (!Array.isArray(data)) {
+            throw new Error('Данные не являются массивом');
+          }
+          const options = data.map(item => ({
+            value: item.id, // ID ПО
+            label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+            id: item.id,
+            name: item.name,
+            inner_name: item.inner_name,
+            release_date: item.release_date
+          }));
+          console.log('Сформированные options:', options);
+          setSoftwareOptions(options);
+        })
+
+        .catch(err => {
+          console.error('Ошибка загрузки ПО:', err);
+          setSoftwareError(err.message);
+        })
+        .finally(() => {
+          setLoadingSoftware(false);
+        });
+      } else {
+        console.log('Токен отсутствует, пропускаем загрузку ПО');
+        setSoftwareError('Для загрузки списка ПО требуется авторизация');
+      }    
+  }, [token]);
+
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -49,6 +111,7 @@ export function AddPoForm({ onBack, onSubmit }) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('name', name);
+    formData.append('inner_name', inner_name);
     formData.append('is_major', is_major.toString());
     // Отправляем массив всех выбранных моделей
     selectedComponents.forEach(opt => {
@@ -57,16 +120,27 @@ export function AddPoForm({ onBack, onSubmit }) {
 
     // Отправляем массив всех выбранных номеров частей
     selectedComponents.forEach(opt => {
-      if (opt?.part_number == null) {
-        alert(`Ошибка: у компонента "${opt?.model}" нет номера части`);
+      if (opt?.part_type == null) {
+        alert(`Ошибка: у компонента "${opt?.model}" нет типа части`);
         return;
       }
-      formData.append('part_number', opt.part_number);
+      formData.append('part_type', opt.part_type);
     });
+
+    // Отправляем предыдущую версию ПО если выбрана
+    if (selectedPreviousVersion) {
+      formData.append('previous_sw_version_str', selectedPreviousVersion.value.toString());
+    }
 
     if (inner_name) formData.append('inner_name', inner_name);
     if (description) formData.append('description', description);
     if (release_date) formData.append('release_date', release_date);
+
+    // Для отладки
+    console.log('Отправляемые данные:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
 
     try {
       const response = await fetch('http://172.20.46.71:8000/software/assign', {
@@ -96,11 +170,12 @@ export function AddPoForm({ onBack, onSubmit }) {
       alert(`Ошибка: ${err.message}`);
     }
   };
+
   const selectOptions = componentOptions.map(item => ({
-    value: `${item.model}___${item.part_number}`,
+    value: `${item.model}___${item.part_type}`,
     label: item['model(part)'],
     model: item.model,
-    part_number: item.part_number
+    part_type: item.part_type
   }));
 
   return (
@@ -126,16 +201,28 @@ export function AddPoForm({ onBack, onSubmit }) {
           />
         </div>
 
+        {/* inner_name - НОВОЕ ПОЛЕ */}
+        <div className="add-po-field">
+          <label className="add-po-label">Внутреннее имя ПО</label>
+          <input
+            type="text"
+            name="innerName"
+            required
+            className="add-po-input"
+            placeholder="Введите внутреннее имя ПО"
+          />
+        </div>
+
         {/* 🔥 Мультивыбор компонентов и частей */}
         <div className="add-po-field">
           <label className="add-po-label">Компонент и часть </label>
           <Select
             isMulti
             options={componentOptions.map(item => ({
-              value: `${item.model}___${item.part_number}`,
+              value: `${item.model}___${item.part_type}`,
               label: item['model(part)'],
               model: item.model,
-              part_number: item.part_number
+              part_type: item.part_type
             }))}
             value={selectedComponents}
             onChange={(selected) => {
@@ -178,6 +265,47 @@ export function AddPoForm({ onBack, onSubmit }) {
             }}
           />
         </div>
+
+        {/* 🔥 Выбор предыдущей версии ПО */}
+        <div className="add-po-field">
+          <label className="add-po-label">Предыдущая версия ПО</label>
+          <Select
+            options={softwareOptions}
+            value={selectedPreviousVersion}
+            onChange={(selected) => {
+              setSelectedPreviousVersion(selected);
+            }}
+            placeholder="Выберите предыдущую версию ПО (необязательно)"
+            classNamePrefix="add-po-select"
+            isClearable={true}
+            isSearchable={true}
+            noOptionsMessage={() => "Нет доступных версий ПО"}
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                color: '#ccc',
+                height: '40px',
+                width: '100%',
+                border: '1px solid',
+                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                boxSizing: 'border-box',
+                padding: '0 12px',
+                fontSize: '16px',
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease',
+                outline: 'none',
+                boxShadow: 'none',
+              }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 200,
+                padding: '4px 0',
+                backgroundColor: 'white'
+              }),
+            }}
+          />
+        </div>
+
         {/* is_major */}
         <div className="add-po-field">
           <label className="add-po-label">Тип</label>
