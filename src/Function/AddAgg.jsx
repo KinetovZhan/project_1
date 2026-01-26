@@ -127,8 +127,9 @@ export function AddAggForm({ onBack, onSubmit }) {
         </div>
 
         <div className='add-po-field'>
-          <label className='add-po-label'>Тип</label>
+          <label htmlFor="type-select" className='add-po-label'>Тип</label>
           <select
+            id="type-select"
             name="type"
             required
             value={formData.type}

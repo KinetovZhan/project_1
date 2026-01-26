@@ -149,7 +149,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
               checked={FilterItems.DVS}
               onChange={() => handleFilterChange('DVS')}
             />
-            
           </label>
         </div>
         <div className='filter'>
@@ -180,7 +179,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           </label>
         </div>
       </div>
-
       <div className='filters2'>
         <div className='filter'>
           <label>
@@ -207,7 +205,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
               type="checkbox" />
           </label>
         </div>
-  
       </div>
         <div className='model'>
           <Select
@@ -249,5 +246,4 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           Сброс
         </button>
     </>
-  )
-}
+  )}

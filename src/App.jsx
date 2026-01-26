@@ -11,7 +11,6 @@ import './cssfiles/sidebar.css'
 import './cssfiles/searchBar.css'
 import './cssfiles/AddPO.css'
 import './cssfiles/LoginPage.css'
-// import './App.css'
 import LoginPage from './Login/LoginPage'
 import MainPage from './components/mainpage'
 import { Routes, Route, Navigate } from 'react-router-dom'; 

@@ -75,7 +75,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
-  // const ip = '172.20.46.61:8000';
+
   
   const tableContainerRef = useRef(null);
   const tableBodyRef = useRef(null);

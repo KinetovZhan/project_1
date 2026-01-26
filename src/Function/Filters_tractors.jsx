@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
@@ -39,20 +40,12 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen,setIsYearOpen] = useState(false);
-  const ip = '172.20.46.61:8000';
-
-  // const handleDealer = (event) => {
-  //   const dealer = event.target.value;
-  //   setDealer(dealer)
-  // }
-
 
     const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
       onDealerChange(Dealer);
     }
   };
-
 
     const handleChange = (e) => {
     const dealer = e.target.value;
@@ -61,8 +54,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       onDealerChange(dealer);
     }
   };
-
-
 
    // Обработчик выбора даты
   const handleDateChange = (dates) => {
@@ -199,21 +190,7 @@ const CustomHeader = ({
       </div>
     )}
   </div>
-        {/* <select
-          value={date.getFullYear()}
-          onChange={({ target: { value } }) => changeYear(Number(value))}
-          className="year-select"
-          size = {1}
-        >
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select> */}
-        
       </div>
-
       <button
         onClick={increaseMonth}
         disabled={nextMonthButtonDisabled}
@@ -259,7 +236,6 @@ const CustomHeader = ({
     }
   }
   
-
   return (
     <>
       <div className='filterstrac'>
