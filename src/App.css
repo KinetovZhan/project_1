@@ -219,8 +219,8 @@ button.active {
 
   position: absolute;
   left: 171px;
-  top: 80px;
-  right: 235px;
+  top: 40px;
+  /* right: 235px; */
 }
 
 
@@ -992,7 +992,7 @@ button.search_button {
 
 .add-po-back-button {
   position: absolute;
-  top: -50px;
+  top: -20px;
   left: -210px;
   background: none;
   border: none;
