@@ -1,10 +1,12 @@
-// 1. Сначала создаём переменную для мока
-const mockUseAuth = vi.fn();
+// 1. Объявляем переменную для мока через vi.hoisted
+const mockUseAuth = vi.hoisted(() => vi.fn());
 
 // 2. Потом мокаем модуль (обязательно до импортов!)
-vi.mock('../auth/AuthContext', () => ({
-  useAuth: mockUseAuth
-}));
+vi.mock('../auth/AuthContext', () => {
+  return {
+    useAuth: mockUseAuth
+  }
+});
 
 // 3. Мокаем ip
 vi.mock('../shrineofvsakoe/ip.jsx', () => ({
@@ -25,9 +27,11 @@ describe('AddAggForm', () => {
   const mockOnSubmit = vi.fn();
 
   beforeEach(() => {
+    vi.clearAllMocks()//очищаем историю мок-функций
     fetch.mockClear();
     mockOnBack.mockClear();
     mockOnSubmit.mockClear();
+    mockUseAuth.mockClear();
   });
 
   it('рендерит форму с полями', () => {
