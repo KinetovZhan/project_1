@@ -11,12 +11,13 @@
   padding: 0;
   max-width: 1200px;
   box-sizing: border-box;
+  height:60=50px;
   
 }
 
 /* скролл для тела таблицы */
 .scroll-bar {
-  max-height: 480px;
+  max-height: 650px;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 10px;

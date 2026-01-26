@@ -38,6 +38,12 @@
   box-sizing: border-box;
 }
 
+.search_by_dealer ::placeholder {
+  font-size:16px;
+  font-family:Arial;
+  padding :10px;
+}
+
 
 button.search_button {
   width:50px;

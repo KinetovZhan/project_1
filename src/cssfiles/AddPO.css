@@ -93,9 +93,22 @@
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }
 
+.add-po-container button {
+  font-family: Arial;
+  font-size:16px;
+  font-weight:600;
+}
+
 
 .add-po-container2 {
   position: absolute;
   top: 252px; /* отступ сверху */
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }
+
+.add-po-container2 button {
+  font-family: Arial;
+  font-size:16px;
+  font-weight:600;
+}
+

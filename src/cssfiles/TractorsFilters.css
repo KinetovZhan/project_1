@@ -61,7 +61,7 @@
   /* Размеры и визуал блока */
   box-sizing: border-box;
   width: 360px;
-  height: 160px;
+  height: 135px;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
   /* Внутренности */
@@ -70,8 +70,6 @@
   padding: 10px;
   gap: 13px;
   color: black;
-
-
   /* Положение */
   position: absolute;
   top: 485px;
@@ -79,11 +77,11 @@
 }
 
 
-.filterstrac2 h3 {
-  margin: 0;
-  flex-shrink: 0; /* Запрещаем сжатие текста */
-  font-size: 25px;
-
+.filterstrac2 span {
+  margin: 0px;
+  flex-shrink: 0; 
+  font-size: 16px;
+  font-family: Arial;
 }
 
 
@@ -114,6 +112,8 @@
   border-color: grey;
   border-radius: 20px;
   margin: 4px;
+  font-size: 16px;
+  font-family: Arial;
 }
 
 
@@ -247,15 +247,25 @@
   left: 13px; */
   padding: 0 10px;
   box-sizing: border-box;
-
+  font-size: 20px;
+  font-family: Arial;
 }
+.release-date ::placeholder {
+  font-size: 16px;
+  font-family: Arial;
+  padding:10px;
+}
+
 
 
 .release-date-container {
   position: absolute;
   top: 318px;
   left: 13px;
+   font-size: 25px;
+  font-family: Arial;
 }
+
 
 /* Стили для выделения диапазона дат в react-datepicker */
 /* Контейнер для кастомного инпута */
