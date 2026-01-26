@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
+import {ip} from "../shrineofvsakoe/ip.jsx";
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
@@ -39,7 +40,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen,setIsYearOpen] = useState(false);
-  const ip = '172.20.46.61:8000';
 
   // const handleDealer = (event) => {
   //   const dealer = event.target.value;

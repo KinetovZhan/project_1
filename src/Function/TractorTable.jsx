@@ -78,35 +78,36 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   // const ip = '172.20.46.61:8000';
   
   const tableContainerRef = useRef(null);
-  const tableBodyRef = useRef(null);
-  const horizontalScrollRef = useRef(null);
-  const verticalScrollRef = useRef(null);
 
   const { token } = useAuth();
   
 
   // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
-    const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
-    const hasStatusFilters = activeFiltersTrac2 && activeFiltersTrac2.length > 0;
+    // const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
+    // const hasStatusFilters = activeFiltersTrac2 && activeFiltersTrac2.length > 0;
 
     const postData = {
-      trac_model: [],
-      status: [],
-      dealer: "",
+      trac_model: activeFiltersTrac || [],
+      status: activeFiltersTrac2 || [],
+      // trac_model: [],
+      // status: [],
+      // // dealer: "",
       date_assemle: null,
       date_start: null,
       date_end: null,
-      is_major: null
+      is_major: null,
+      query: searchQuery?.trim() || "",
+      dealer: searchDealer?.trim() || ""
     };
 
-    if (searchQuery && searchQuery.trim() !== '') {
-      return { query: searchQuery.trim() };
-    }
+    // if (searchQuery && searchQuery.trim() !== '') {
+    //   return { query: searchQuery.trim() };
+    // }
 
-    if (searchDealer && searchDealer.trim() !== ''){
-      postData.dealer = searchDealer;
-    }
+    // if (searchDealer && searchDealer.trim() !== ''){
+    //   postData.dealer = searchDealer;
+    // }
     if (dateFilter) {
         const { date_assemle, date_start, date_end } = dateFilter;
         
@@ -128,12 +129,12 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       postData.is_major = false;
     } 
     
-    if (hasModelFilters) {
-      postData.trac_model = activeFiltersTrac;
-    }
-    if (hasStatusFilters) {
-      postData.status = activeFiltersTrac2;
-    }
+    // if (hasModelFilters) {
+    //   postData.trac_model = activeFiltersTrac;
+    // }
+    // if (hasStatusFilters) {
+    //   postData.status = activeFiltersTrac2;
+    // }
      console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
     console.log('postData.is_major:', postData.is_major);
@@ -141,44 +142,106 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     return postData;
   };
 
-  useEffect(() => {
+
+
+  // useEffect(() => {
+  //   const fetchTractors = async () => {
+  //     if (!token) {
+  //       setError("Пользователь не авторизован");
+  //       setLoading(false);
+  //       return;
+  //     }
+  //     const postData = getPostData();
+  //     try {
+  //       setLoading(true);
+  //       let response;
+  //       if (searchQuery && searchQuery.trim() !== '') {
+  //         const searchParams = new URLSearchParams({
+  //           request: searchQuery.trim()
+  //       });
+  //            response = await fetch(`http://${ip}/search-tractor?${searchParams}`, {
+  //           method: 'GET',
+  //           headers: {  
+  //             "Authorization": `Bearer ${token}`,
+  //             'Accept': 'application/json',
+  //             'Content-Type': 'application/json'
+  //           },
+  //         })
+  //       } else { 
+  //           response = await fetch(`http://${ip}/tractor-info`, {
+  //             method: 'POST',
+  //             headers: {  
+  //               "Authorization": `Bearer ${token}`,
+  //               'Accept': 'application/json',
+  //               'Content-Type': 'application/json'
+  //             },
+  //             body: JSON.stringify(postData)
+  //           });
+  //         }
+
+  //       console.log('Статус ответа:', response.status);
+
+  //       const data = await response.json();
+  //       console.log('Полученные данные:', data);
+
+  //       if (data && data.status_code === 404) {
+  //         console.log("404 - тракторы не найдены");
+  //         setTractors([]);
+  //         return;
+  //       }
+
+  //       if (!response.ok) {
+  //         throw new Error(`HTTP error! status: ${response.status}`);
+  //       }
+        
+  //       console.log('Успешно получены данные тракторов:', data);
+
+  //       if (Array.isArray(data) && data.length > 0) {
+  //         const grouped = groupTractors(data);
+  //         setTractors(grouped);
+  //       } else if (data && typeof data === 'object') {
+  //         // Если пришёл один объект — обрабатываем как массив из одного элемента
+  //         const grouped = groupTractors([data]);
+  //         setTractors(grouped);
+  //       } else {
+  //         setTractors([]);
+  //       }
+        
+  //     } catch (error) {
+  //       console.error('Ошибка загрузки данных:', error);
+  //       setError(`Ошибка подключения к серверу: ${error.message}`);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchTractors();
+  // }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
+   useEffect(() => {
     const fetchTractors = async () => {
       if (!token) {
         setError("Пользователь не авторизован");
         setLoading(false);
         return;
       }
-      const postData = getPostData();
-      let response;
 
+      const postData = getPostData();
 
       try {
         setLoading(true);
-        if (searchQuery && searchQuery.trim() !== '') {
-          const searchParams = new URLSearchParams({
-            request: searchQuery.trim()
+        
+        // ВСЕГДА используем POST с полными данными фильтров И поиском
+        const response = await fetch(`http://${ip}/tractor-info`, {
+          method: 'POST',
+          headers: {  
+            "Authorization": `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(postData)
         });
-            response = await fetch(`http://${ip}/search-tractor?${searchParams}`, {
-            method: 'GET',
-            headers: {  
-              "Authorization": `Bearer ${token}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-          })} else { 
-            response = await fetch(`http://${ip}/tractor-info`, {
-              method: 'POST',
-              headers: {  
-                "Authorization": `Bearer ${token}`,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(postData)
-            });
-          }
 
         console.log('Статус ответа:', response.status);
-
         const data = await response.json();
         console.log('Полученные данные:', data);
 
@@ -192,13 +255,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        console.log('Успешно получены данные тракторов:', data);
-
         if (Array.isArray(data) && data.length > 0) {
           const grouped = groupTractors(data);
           setTractors(grouped);
         } else if (data && typeof data === 'object') {
-          // Если пришёл один объект — обрабатываем как массив из одного элемента
           const grouped = groupTractors([data]);
           setTractors(grouped);
         } else {
