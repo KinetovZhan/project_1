@@ -1,5 +1,3 @@
-// src/Function/AddAgg.test.jsx
-
 // 1. Сначала создаём переменную для мока
 const mockUseAuth = vi.fn();
 

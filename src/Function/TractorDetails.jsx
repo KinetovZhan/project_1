@@ -1,7 +1,7 @@
 import Image from '../img/Image.png'
 import { useState, useEffect } from 'react';
 import {ip} from "../shrineofvsakoe/ip.jsx";
-
+import { useAuth } from '../auth/AuthContext';
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -10,6 +10,7 @@ export function TractorDetails({ vin, onBack }) {
   const [activeTooltip, setActiveTooltip] = useState(null);
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
+  const { token } = useAuth();
   useEffect(() => {
     const fetchTractorDetails = async () => {
       if (!vin) {
@@ -26,6 +27,7 @@ export function TractorDetails({ vin, onBack }) {
         const response = await fetch(`http://${ip}/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
           method: 'GET',
           headers: {
+            'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
