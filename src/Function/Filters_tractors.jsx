@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import {ip} from "../shrineofvsakoe/ip.jsx";
-import {ip} from "../shrineofvsakoe/ip.jsx";
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
