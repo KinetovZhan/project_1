@@ -6,15 +6,16 @@ import { useAuth } from '../auth/AuthContext';
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
 
   const componentTypeMap = {
-    DVS: 'dvs',
-    KPP: 'kpp',
-    RK: 'rk',
-    hydrorasp: 'hydro' 
+    'DVS': 'dvs',
+    'KPP': 'kpp',
+    'RK': 'rk',
+    'hydrorasp': 'hydro' ,
+    // 'hydrorasp': 'hydraulics'
   };
 
   const tractorModelMap = {
-    K7: 'K-7',
-    K5: 'K5'
+    'K7': 'K-7',
+    'K5': 'K5'
   };
 
   const [FilterItems, setFilterItems] = useState({
