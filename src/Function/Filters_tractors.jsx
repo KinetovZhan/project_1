@@ -17,9 +17,9 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
 
 
   const FilterToTractor = {
-    'К-742МСТ': 'К-742МСТ',
+    'К-742МСТ': 'K-742MCT',
     'К-7': 'K-7', 
-    'К-525': 'К-525'
+    'К-525': 'K-525'
   };
 
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
