@@ -214,18 +214,6 @@ export function AddPoForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* inner_name - НОВОЕ ПОЛЕ */}
-        <div className="add-po-field">
-          <label className="add-po-label">Внутреннее имя ПО</label>
-          <input
-            type="text"
-            name="innerName"
-            required
-            className="add-po-input"
-            placeholder="Введите внутреннее имя ПО"
-          />
-        </div>
-
         {/*  Мультивыбор компонентов и частей */}
         <div className="add-po-field">
           <label className="add-po-label">Компонент и часть </label>
