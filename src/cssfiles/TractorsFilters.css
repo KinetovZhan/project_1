@@ -99,12 +99,12 @@
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
   display: flex;
-  align-items: row;
+  align-items: center;
 
   /* Позиция */
   position: absolute;
-  left: 13px;
-  top: 694px;
+  left: 18px; 
+  top: 665px;
 }
 
 .majmin_button {

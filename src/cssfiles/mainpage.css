@@ -1,8 +1,9 @@
 main {
-  padding-top: 150px;
-  min-height: calc(100vh - 164px);/*Занимает всю высоту которая осталась*/
-  box-sizing: border-box;
-  
+  padding-top: 160px;
+  min-height: calc(100vh - 150px);/*Занимает всю высоту которая осталась*/
+  width:100%;
+  overflow-x: hidden; /* ← добавить */
+  box-sizing: border-box; /* ← добавить */
 }
 
 

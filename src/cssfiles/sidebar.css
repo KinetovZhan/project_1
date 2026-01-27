@@ -1,6 +1,7 @@
 .sidebar {
   margin-left: 98px;
-  height: 800px;
+  width:1369px;
+  height: 80vh;
   width: 387px;
   background-color: rgba(85, 86, 90, 1);
   border-radius: 30px;
