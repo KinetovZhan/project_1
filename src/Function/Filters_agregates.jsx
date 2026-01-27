@@ -15,7 +15,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
 
   const tractorModelMap = {
     'K7': 'K-7',
-    'K5': 'K5'
+    'K5': 'K-5'
   };
 
   const [FilterItems, setFilterItems] = useState({
