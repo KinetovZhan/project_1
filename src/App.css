@@ -999,6 +999,25 @@ button.search_button {
   top: 20px;
 }
 
+.add-po-agg-container {
+  padding: 50px 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  box-sizing: border-box;
+  width: 963px;
+  height: 680px;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+
+  position: absolute;
+  left: 171px;
+  top: 20px;
+}
+
 .add-po-back-button {
   position: absolute;
   top: 0px;

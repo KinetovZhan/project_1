@@ -81,7 +81,7 @@ export function AddAggForm({ onBack, onSubmit }) {
   };
 
   return (
-    <div className="maininfo add-po-form-container">
+    <div className="add-po-agg-container">
       <button
         onClick={onBack}
         className="add-po-back-button"
