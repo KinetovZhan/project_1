@@ -224,6 +224,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         </div>
         <button 
           className='clear'
+          data-testid="Clearbutton"
           onClick={() => {
             setFilterItems({
               DVS: false,
