@@ -281,6 +281,7 @@ const CustomHeader = ({
           type="button"
           onClick={handleSearch}
           className='search_button'
+          data-testid="search-button"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="11" cy="11" r="8" />

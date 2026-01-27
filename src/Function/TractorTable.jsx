@@ -23,8 +23,6 @@ const formatDateTime = (dateString) => {
     return '-';
   }
 };
-
-
 const groupTractors = (data) => {
   const grouped = {};
 
@@ -43,56 +41,38 @@ const groupTractors = (data) => {
         ap: '-',
       };
     }
-
     const type = item.component_type;
-    const version = item.sw_name || '-';
+    const model = item.comp_model || '-';
 
-    if (type === 'dvs') {
-      grouped[vin].dvs = version;
+    if ((type === 'dvs')|| (type === 'engine')) {
+      grouped[vin].dvs = model;
     } else if (type === 'kpp') {
-      grouped[vin].kpp = version;
+      grouped[vin].kpp = model;
     } else if (type === 'rk') {
-      grouped[vin].rk = version;
+      grouped[vin].rk = model;
     } else if (type === 'bk') {
-      grouped[vin].bk = version;
+      grouped[vin].bk = model;
     } else if (type === 'gr') {
-      grouped[vin].gr = version;
+      grouped[vin].gr = model;
     } else if (type === 'ap') {
-      grouped[vin].ap = version;
-    } else if (type === 'engine') {
-      grouped[vin].engine = version;
+      grouped[vin].ap = model;
     } 
-
   });
   console.log(grouped)
-
   return Object.values(grouped);
 };
-
-
 export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
-
-  
   const tableContainerRef = useRef(null);
-
   const { token } = useAuth();
-  
-
-  // Функция для подготовки данных запроса с учетом фильтров
   const getPostData = () => {
-    // const hasModelFilters = activeFiltersTrac && activeFiltersTrac.length > 0;
-    // const hasStatusFilters = activeFiltersTrac2 && activeFiltersTrac2.length > 0;
 
     const postData = {
       trac_model: activeFiltersTrac || [],
       status: activeFiltersTrac2 || [],
-      // trac_model: [],
-      // status: [],
-      // // dealer: "",
       date_assemle: null,
       date_start: null,
       date_end: null,
@@ -101,13 +81,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       dealer: searchDealer?.trim() || ""
     };
 
-    // if (searchQuery && searchQuery.trim() !== '') {
-    //   return { query: searchQuery.trim() };
-    // }
-
-    // if (searchDealer && searchDealer.trim() !== ''){
-    //   postData.dealer = searchDealer;
-    // }
     if (dateFilter) {
         const { date_assemle, date_start, date_end } = dateFilter;
         
@@ -128,13 +101,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     } else if (activeMajMinButton === 'MIN') {
       postData.is_major = false;
     } 
-    
-    // if (hasModelFilters) {
-    //   postData.trac_model = activeFiltersTrac;
-    // }
-    // if (hasStatusFilters) {
-    //   postData.status = activeFiltersTrac2;
-    // }
+
      console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
     console.log('postData.is_major:', postData.is_major);
@@ -142,81 +109,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     return postData;
   };
 
-
-
-  // useEffect(() => {
-  //   const fetchTractors = async () => {
-  //     if (!token) {
-  //       setError("Пользователь не авторизован");
-  //       setLoading(false);
-  //       return;
-  //     }
-  //     const postData = getPostData();
-  //     try {
-  //       setLoading(true);
-  //       let response;
-  //       if (searchQuery && searchQuery.trim() !== '') {
-  //         const searchParams = new URLSearchParams({
-  //           request: searchQuery.trim()
-  //       });
-  //            response = await fetch(`http://${ip}/search-tractor?${searchParams}`, {
-  //           method: 'GET',
-  //           headers: {  
-  //             "Authorization": `Bearer ${token}`,
-  //             'Accept': 'application/json',
-  //             'Content-Type': 'application/json'
-  //           },
-  //         })
-  //       } else { 
-  //           response = await fetch(`http://${ip}/tractor-info`, {
-  //             method: 'POST',
-  //             headers: {  
-  //               "Authorization": `Bearer ${token}`,
-  //               'Accept': 'application/json',
-  //               'Content-Type': 'application/json'
-  //             },
-  //             body: JSON.stringify(postData)
-  //           });
-  //         }
-
-  //       console.log('Статус ответа:', response.status);
-
-  //       const data = await response.json();
-  //       console.log('Полученные данные:', data);
-
-  //       if (data && data.status_code === 404) {
-  //         console.log("404 - тракторы не найдены");
-  //         setTractors([]);
-  //         return;
-  //       }
-
-  //       if (!response.ok) {
-  //         throw new Error(`HTTP error! status: ${response.status}`);
-  //       }
-        
-  //       console.log('Успешно получены данные тракторов:', data);
-
-  //       if (Array.isArray(data) && data.length > 0) {
-  //         const grouped = groupTractors(data);
-  //         setTractors(grouped);
-  //       } else if (data && typeof data === 'object') {
-  //         // Если пришёл один объект — обрабатываем как массив из одного элемента
-  //         const grouped = groupTractors([data]);
-  //         setTractors(grouped);
-  //       } else {
-  //         setTractors([]);
-  //       }
-        
-  //     } catch (error) {
-  //       console.error('Ошибка загрузки данных:', error);
-  //       setError(`Ошибка подключения к серверу: ${error.message}`);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchTractors();
-  // }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
    useEffect(() => {
     const fetchTractors = async () => {
       if (!token) {
@@ -229,8 +121,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
       try {
         setLoading(true);
-        
-        // ВСЕГДА используем POST с полными данными фильтров И поиском
         const response = await fetch(`http://${ip}/tractor-info`, {
           method: 'POST',
           headers: {  
@@ -276,13 +166,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     fetchTractors();
   }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
 
-  // Обработка клика по строке
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
     setSelectedTractor(tractor.vin);
   };
 
-  // Если выбран трактор, отображаем его детали
   if (selectedTractor) {
     return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
   }
@@ -369,6 +257,4 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           </table>
         </div>
       </div>
-    </div>
-  );
-}
+    </div>  );}

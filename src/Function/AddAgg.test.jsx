@@ -1,5 +1,5 @@
 // 1. Сначала создаём переменную для мока
-const mockUseAuth = vi.fn();
+const mockUseAuth = vi.hoisted(() => vi.fn());
 
 // 2. Потом мокаем модуль (обязательно до импортов!)
 vi.mock('../auth/AuthContext', () => ({
@@ -12,6 +12,7 @@ vi.mock('../shrineofvsakoe/ip.jsx', () => ({
 }));
 
 // 4. Импорты
+import { act } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
@@ -51,9 +52,10 @@ describe('AddAggForm', () => {
     fireEvent.change(screen.getByLabelText(/Тип/), { target: { value: 'dvs' } });
     fireEvent.change(screen.getByPlaceholderText(/название/i), { target: { value: 'Motor X' } });
 
-    fireEvent.click(screen.getByText(/Добавить/));
 
-    await new Promise(setImmediate);
+    await act(async () => {
+      fireEvent.click(screen.getByText(/Добавить/));
+    });
 
     expect(fetch).toHaveBeenCalledWith(
       'http://127.0.0.1/component/',
