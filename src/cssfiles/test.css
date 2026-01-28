@@ -1,0 +1,346 @@
+/* Кнопка гамбургер-меню для мобильных */
+.mobile-sidebar {
+  display: flex;
+  position: fixed;
+  top: 80px;
+  width:40px;
+  height:40px;
+  left: 0px;
+  z-index: 1000;
+  background: rgba(85, 86, 90, 1);
+  border: none;
+  border-radius: 0px 0px 10px 0px;
+  padding: 8px 5px;
+  color: white;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.mobile-sidebar:hover {
+  background: rgba(95, 96, 100, 1);
+}
+
+.toggle-line {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background: white;
+  transition: 0.3s;
+}
+
+.mobile-sidebar.active .toggle-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.mobile-sidebar.active .toggle-line:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-sidebar.active .toggle-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* .toggle-text {
+  font-size: 12px;
+  margin-top: 2px;
+} */
+
+/* Оверлей для закрытия */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 999;
+  display: none;
+}
+
+/* Контейнер мобильного сайдбара */
+.mobile-sidebar-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 85%;
+  max-width: 320px;
+  height: 100vh;
+  background: rgba(85, 86, 90, 1);
+  z-index: 1000;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+}
+
+.mobile-sidebar-container.open {
+  left: 0;
+}
+
+.mobile-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  background: rgba(75, 76, 80, 1);
+}
+
+.mobile-sidebar-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-sidebar {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.close-sidebar:hover {
+  transform: scale(1.1);
+}
+
+/* Для ПК*/
+@media (min-width:1200px) {
+.sidebar {
+  margin-left: 98px;
+  height: 80vh;
+  width: 387px;
+  background-color: rgba(85, 86, 90, 1);
+  border-radius: 30px;
+  flex-shrink: 1; /* Запрещаем уменьшение */
+  z-index: 2;
+  position: relative;
+  }
+
+  .choose{
+  margin: 44px 56px 65px 63px ;
+  text-align: center;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+ 
+}
+
+.choose button{
+  font-family: Arial;
+  font-size:16px;
+  font-weight:600;
+}
+
+button {
+  width: 268px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+}
+
+
+.filters {
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+  width: 360px;
+  height: 160px;
+  border-radius: 20px;
+  padding: 12px 10px;
+  gap: 20px;
+
+  position: absolute;
+  top: 187px;
+  
+  background-color: rgba(217, 217, 217, 1);
+  margin-left: 13px;
+
+  color: black;
+}
+
+.choose button.active {
+  background-color:rgba(139, 139, 139, 1);
+  color: black;
+}
+
+
+.filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Ключевое свойство */
+  width: 100%;
+  position: relative;
+}
+
+
+.filter h3 {
+  margin: 0;
+  flex-shrink: 0; /* Запрещаем сжатие текста */
+}
+
+
+.filter input[type="checkbox"] {
+  position: absolute;
+  right: 0;
+  transform: scale(1.5);
+}
+
+.filters2 {
+  /* Размеры и визуал блока */
+  box-sizing: border-box;
+  width: 360px;
+  height: 120px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 20px;
+  color: black;
+
+  /* Положение */
+  position: absolute;
+  top: 369px;
+  left:13px;
+}
+  
+  /* Скрываем мобильный тоггл на десктопах */
+  .mobile-sidebar {
+    display: none !important;
+  }
+  
+  .sidebar-overlay {
+    display: none !important;
+  }
+  
+  .mobile-sidebar-container {
+    display: none !important;
+  }
+}
+
+/* Для мобильного телефона */
+
+@media (max-width: 767px) {
+  .mobile-sidebar {
+    display: flex;
+  }
+  
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .mobile-sidebar-container {
+    display: block;
+  }
+  /* .sidebar {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 15px;
+    border-radius: 0;
+    background: transparent;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
+  } */
+
+
+ /* Стили внутри мобильного сайдбара */
+  .mobile-sidebar-container .choose {
+    margin: 10px;
+    padding: 0px;
+    width:40vw;
+    text-align: center;
+    background:rgba(217, 217, 217, 1);
+    border-radius: 15px;
+    height:100px;
+  }
+
+  button {
+  width: 200px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+}
+
+.choose button.active {
+  background-color:rgba(139, 139, 139, 1);
+  color: black;
+}
+  .add-po-container {
+  position: absolute;
+  top: 182px; /* отступ сверху */
+  padding: 10px; 
+  /* отступы по бокам, как у других кнопок */
+  width:50vw;
+  max-height:51vw;
+}
+
+.mobile-sidebar-container.add-po-container button {
+  font-family: Arial;
+  font-size:16px;
+  font-weight:600;
+}
+
+
+.add-po-container2 {
+  position: absolute;
+  top: 252px; /* отступ сверху */
+  padding: 0px 12px; /* отступы по бокам, как у других кнопок */
+  width:50vw;
+}
+
+.add-po-container2 button {
+  font-family: Arial;
+  font-size:16px;
+  font-weight:600;
+}
+  .mobile-sidebar-container .choose button {
+    width: 40vw;
+    margin: 0px 0;
+    height: 50px;
+    font-size: 16px;
+    border-radius: 15px;
+  }
+  
+  
+  /* Улучшаем читаемость на маленьких экранах */
+  .mobile-sidebar-container .filters,
+  .mobile-sidebar-container .filters2 {
+    color: white;
+    padding: 5px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+  
+  .mobile-sidebar-container .filter h3 {
+    color: white;
+  }
+  
+  .mobile-sidebar-container .filter input[type="checkbox"] {
+    accent-color: #55565a;
+  }
+  
+}
+
+
+
+

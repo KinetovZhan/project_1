@@ -1,4 +1,4 @@
-header {
+/* header {
   height: 140px;
   width: 100%;
   display: flex;
@@ -35,6 +35,102 @@ header {
 
 .mainText {
   position: relative;
+} */
+
+.header {
+  height: 80px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px 0 10px;
+  background-color: rgba(85, 86, 90, 1);
+  font-size: small;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+}
+@media (min-width: 768px) {
+  .header {
+  height: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: rgba(85, 86, 90, 1);
+  font-size: small;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;}
+}
+@media (min-width: 1200px) {
+  .header {
+  height: 140px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  background-color: rgba(85, 86, 90, 1);
+  font-size: small;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;}
+}
+.navigation {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+@media (min-width:1200px) {
+  .navigation {
+  display: flex;
+  gap: 20px;
+  margin-left: auto;
+  padding-right: 80px;
+  font-size: 14px;
+  }
+}
+
+.navigation h3 {
+  cursor: pointer;
+  margin-right: 0px;
+  font-style: Ag3;
+}
+
+@media (min-width:1200px) {
+  .navigation h3 {
+  cursor: pointer;
+  margin-right: 40px;
+  font-style: Ag3;
+}
+
+}
+
+.mainText h3 {
+  cursor: pointer;
+  padding: 0px;
+  font-size:12px;
+}
+@media (min-width:1200px) {
+  .mainText h3 {
+  cursor: pointer;
+  padding: 80px;
+  font-size:14px;
+}
+
 }
 
 
+.mainText {
+  position: relative;
+}

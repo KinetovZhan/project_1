@@ -1,21 +1,47 @@
 import {Filters} from '../Function/Filters_agregates.jsx'
 import {Filters2} from '../Function/Filters_tractors.jsx'
+import { useState, useEffect } from 'react';
 
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, selectedModel, onDateChange}) {
-  return (
+  const [isMobile,setIsMobile] = useState(false);
+  const [isOpen,setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize',checkMobile);
+
+    return () => window.removeEventListener('resize',checkMobile);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile&&activeButton) {
+      setIsOpen(false);
+    }
+  }, [activeButton, isMobile]);
+
+  const sidebarContent = (
     <div className='sidebar'> 
       <div className='choose'>
         <button 
           className={activeButton === 'tractor' ? 'active' : ''}
-          onClick={() => handleButtonClick('tractor')}
+          onClick={() => {
+            handleButtonClick('tractor');
+            if (isMobile) setIsOpen(false);
+          }}
         >
           Трактор
         </button>
         <br />
         <button
           className={activeButton === 'aggregates' ? 'active' : ''}
-          onClick={() => handleButtonClick('aggregates')}
+          onClick={() => {
+            handleButtonClick('aggregates');
+            if (isMobile) setIsOpen(false);
+          }}
         >
           Агрегаты
         </button>
@@ -25,7 +51,10 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       {activeButton !== 'aggregates' && activeButton !== 'tractor'  && (
         <div className='add-po-container'>
           <button 
-            onClick={onAddPoClick}> 
+            onClick={() =>{
+              onAddPoClick();
+              if (isMobile) setIsOpen(false);
+              }}> 
             Добавить ПО
           </button>
         </div>
@@ -44,4 +73,44 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange}/>}
     </div>
   )
-}
+  return (
+    <>
+     {isMobile && (
+      <button
+       className = {`mobile-sidebar ${isOpen ? 'active' : ''}`}
+       onClick = {()=>setIsOpen(!isOpen)}
+      >
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+          {/* <span className="toggle-text">Меню</span> */}
+      </button>
+     )}
+
+     {isMobile && isOpen && (
+      <div
+        className = "sidebar-overlay"
+        onClick ={() => setIsOpen(false)}
+       />
+     )} 
+     
+     {isMobile ? (
+      <div className = {`mobile-sidebar-container ${isOpen ? 'open' : ''}`}>
+        <div className = "mobile-sidebar-header">
+          <h3>Навигация</h3>
+          <button
+            className = "close-sidebar"
+            onClick = {() => setIsOpen(false)}
+          >
+            ×
+          </button>
+        </div>
+        {sidebarContent}
+      </div>
+     ) : (
+      sidebarContent
+     )}
+     </>
+    );
+   }
+  
