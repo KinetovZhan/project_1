@@ -121,7 +121,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
       try {
         setLoading(true);
-        const response = await fetch(`http://${ip}/tractor-info`, {
+        const response = await fetch(`http://${ip}/search/tractor-info`, {
           method: 'POST',
           headers: {  
             "Authorization": `Bearer ${token}`,

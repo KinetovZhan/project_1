@@ -112,7 +112,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       }
 
 
-      const response = await fetch(`http://${ip}/component-models`, {
+      const response = await fetch(`http://${ip}/search/component-models`, {
         method: 'POST',
         headers,
         body: JSON.stringify(postData)

@@ -24,7 +24,7 @@ export function TractorDetails({ vin, onBack }) {
       try {
         console.log('Запрос деталей для VIN:', vin);
         
-        const response = await fetch(`http://${ip}/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

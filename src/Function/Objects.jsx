@@ -31,7 +31,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           model_comp: Array.isArray(selectedModel) ? selectedModel : []
         };
 
-        const response = await fetch(`http://${ip}/component-info`, {
+        const response = await fetch(`http://${ip}/search/component-info`, {
           method: 'POST',
           headers: {
             "Authorization": `Bearer ${token}`,
