@@ -156,9 +156,15 @@ function MainPage() {
     navigate('/login', { replace: true }); // ← Перенаправляем на логин
   };
 
+  const handleHelp = () => {
+    navigate('/help/');
+  }
+
   return (
     <>
-      <Header onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} />
+      <Header 
+      onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} 
+      onHelp={handleHelp}/>
       <main>
         <div className="table">
           <Sidebar

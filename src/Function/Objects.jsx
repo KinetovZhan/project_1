@@ -22,7 +22,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       }
 
       try {
-        const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp', 'RK': 'rk', 'hydrorasp': 'hydro' };
+        const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission'};
         const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
 
         const postData = {

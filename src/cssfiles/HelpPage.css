@@ -1,0 +1,14 @@
+.formHelp {
+  margin-left: 300px;
+  height: 500px;
+  width: 800px;
+  background-color: rgba(85, 86, 90, 1);
+  border-radius: 30px;
+  position: relative;
+}
+.textHelp {
+ display: flex;
+  justify-content: center;    /* Горизонтально */
+  align-items: center;        /* Вертикально */
+  height: 200px;  
+}

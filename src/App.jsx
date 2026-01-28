@@ -11,7 +11,9 @@ import './cssfiles/sidebar.css'
 import './cssfiles/searchBar.css'
 import './cssfiles/AddPO.css'
 import './cssfiles/LoginPage.css'
+import './cssfiles/HelpPage.css'
 import LoginPage from './Login/LoginPage'
+import HelpPage from './Login/HelpPage.jsx'
 import MainPage from './components/mainpage'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
@@ -31,6 +33,14 @@ function App() {
         element={
           <ProtectedRoute>
             <MainPage />
+          </ProtectedRoute>
+        }
+      />
+        <Route 
+        path="/help/*" 
+        element={
+          <ProtectedRoute>
+            <HelpPage />
           </ProtectedRoute>
         }
       />

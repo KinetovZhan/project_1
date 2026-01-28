@@ -46,13 +46,13 @@ const groupTractors = (data) => {
 
     if ((type === 'dvs')|| (type === 'engine')) {
       grouped[vin].dvs = model;
-    } else if (type === 'kpp') {
+    } else if ((type === 'kpp')||(type === 'transmission')) {
       grouped[vin].kpp = model;
-    } else if (type === 'rk') {
+    } else if ((type === 'rk')||(type === 'suspension')) {
       grouped[vin].rk = model;
     } else if (type === 'bk') {
       grouped[vin].bk = model;
-    } else if (type === 'gr') {
+    } else if ((type === 'gr')||(type === 'hydraulics')) {
       grouped[vin].gr = model;
     } else if (type === 'ap') {
       grouped[vin].ap = model;
