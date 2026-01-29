@@ -7,7 +7,7 @@ vi.mock('../auth/AuthContext', () => ({
 }));
 
 // 3. Импорты
-import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { Filters } from '../Function/Filters_agregates'

@@ -159,7 +159,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
             .filter(item => item.id_Firmwares)
             .map((item) => (
               <li key={item.id_Firmwares}>
-                <div className='objectmenu'>
+                <div className='objectmenu' data-testid='objectmenu'>
                   <img className='object' src={Image} alt='Компонент' />
                   <div className='inform'>
                     <h4 className='poster'>

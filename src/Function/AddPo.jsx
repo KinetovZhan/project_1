@@ -3,7 +3,7 @@ import Select from 'react-select';
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
-export function AddPoForm({ onBack, onSubmit }) {
+export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
   const [selectedComponents, setSelectedComponents] = useState([]);
@@ -103,7 +103,7 @@ export function AddPoForm({ onBack, onSubmit }) {
     const release_date = form.elements.releaseDate?.value || undefined;
 
     // Обязательный выбор компонента и части
-     if (selectedComponents.length === 0) {
+     if (!skipValidation && selectedComponents.length === 0) { // ← добавьте !skipValidation &&
       alert('Пожалуйста, выберите хотя бы один компонент и часть');
       return;
     }
@@ -199,6 +199,7 @@ export function AddPoForm({ onBack, onSubmit }) {
             name="poNumber"
             required
             className="add-po-input"
+            data-testid="po-number-input"
           />
         </div>
 
@@ -211,6 +212,7 @@ export function AddPoForm({ onBack, onSubmit }) {
             required
             className="add-po-input"
             placeholder="Введите внутреннее имя ПО"
+            data-testid="po-number-input2"
           />
         </div>
 
@@ -238,6 +240,7 @@ export function AddPoForm({ onBack, onSubmit }) {
             classNamePrefix="add-po-select"
             isDisabled={componentOptions.length === 0}
             noOptionsMessage={() => "Нет доступных компонентов"}
+            data-testid="component-select"
             styles={{
               // 🔹 Контрол (внешний контейнер) — как у твоего <select>
               control: (base, state) => ({
@@ -281,6 +284,7 @@ export function AddPoForm({ onBack, onSubmit }) {
             isClearable={true}
             isSearchable={true}
             noOptionsMessage={() => "Нет доступных версий ПО"}
+            
             styles={{
               control: (base, state) => ({
                 ...base,
@@ -310,7 +314,7 @@ export function AddPoForm({ onBack, onSubmit }) {
         {/* is_major */}
         <div className="add-po-field">
           <label className="add-po-label">Тип</label>
-          <select name="majorMinor" required className="add-po-select">
+          <select name="majorMinor" required className="add-po-select" data-testid="type-select">
             <option value="">Выберите тип</option>
             <option value="major">Major</option>
             <option value="minor">Minor</option>
@@ -336,6 +340,7 @@ export function AddPoForm({ onBack, onSubmit }) {
             name="file"
             required
             className="add-po-input"
+            data-testid='filePo'
             accept=".bin,.hex,.zip,.elf,.doc,.docx"
           />
         </div>
