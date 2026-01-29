@@ -17,7 +17,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   useEffect(() => {
     console.log('Токен из useAuth:', token ? `Есть (${token.substring(0, 20)}...)` : 'Нет');
 
-    fetch(`http://${ip}/component-parts`) // ← замени на реальный эндпоинт
+    fetch(`http://${ip}/components/component-parts/`) // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();

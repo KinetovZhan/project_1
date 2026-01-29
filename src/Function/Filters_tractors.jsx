@@ -239,16 +239,18 @@ const CustomHeader = ({
   return (
     <>
       <div className='filterstrac'>
-        {models.map(model => (
-          <label key = {model}>
-            <span>{model}</span>
-            <input 
-              type="checkbox"
-              checked={FilterTractors_by_model[model]}
-              onChange={() => handleFilterByModelTractors(model)}
-            />
-          </label>
-        ))}
+        <div className='filters-scroll-bar' style={{ position: 'relative' }}>
+          {models.map(model => (
+            <label key = {model}>
+              <span>{model}</span>
+              <input 
+                type="checkbox"
+                checked={FilterTractors_by_model[model]}
+                onChange={() => handleFilterByModelTractors(model)}
+              />
+            </label>
+          ))}
+        </div>
       </div>
 
      <div className='release-date-container'>

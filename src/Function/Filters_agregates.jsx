@@ -112,7 +112,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       }
 
 
-      const response = await fetch(`http://${ip}/component-models`, {
+      const response = await fetch(`http://${ip}/search/component-models`, {
         method: 'POST',
         headers,
         body: JSON.stringify(postData)
@@ -142,69 +142,89 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   return(
     <>
       <div className='filters'>
-        <div className='filter'>
-          <label> 
-            <span>ДВС</span>
-            <input 
-              type="checkbox"
-              checked={FilterItems.DVS}
-              onChange={() => handleFilterChange('DVS')}
-            />
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>КПП</span>
-            <input 
-              checked={FilterItems.KPP}
-              onChange={() => handleFilterChange('KPP')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>РК</span>
-            <input 
-              checked={FilterItems.RK}
-              onChange={() => handleFilterChange('RK')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label> 
-            <span>Гидрораспределитель</span>
-            <input 
-              checked={FilterItems.hydrorasp}
-              onChange={() => handleFilterChange('hydrorasp')}
-              type="checkbox"/>
-          </label>
+        <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}> {/*стиль искать в src/cssfiles/TractorsFilters.css*/}
+          <div className='filter'>
+            <label> 
+              <span>ДВС</span>
+              <input 
+                type="checkbox"
+                checked={FilterItems.DVS}
+                onChange={() => handleFilterChange('DVS')}
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label> 
+              <span>ДВС</span>
+              <input 
+                type="checkbox"
+                checked={FilterItems.DVS}
+                onChange={() => handleFilterChange('DVS')}
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>КПП</span>
+              <input 
+                checked={FilterItems.KPP}
+                onChange={() => handleFilterChange('KPP')}
+                type="checkbox"/>
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>РК</span>
+              <input 
+                checked={FilterItems.RK}
+                onChange={() => handleFilterChange('RK')}
+                type="checkbox"/>
+            </label>
+          </div>
+          <div className='filter'>
+            <label> 
+              <span>Гидрораспределитель</span>
+              <input 
+                checked={FilterItems.hydrorasp}
+                onChange={() => handleFilterChange('hydrorasp')}
+                type="checkbox"/>
+            </label>
+          </div>
         </div>
       </div>
       <div className='filters2'>
-        <div className='filter'>
-          <label>
-            <span>Выбрать все</span>
-            <input type="checkbox" />
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>К-7</span>
-            <input 
-              checked={FilterItems2.K7}
-              onChange={() => handleFilterChange2('K7')}
-              type="checkbox" 
-            />
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>К-5</span>
-            <input 
-              checked={FilterItems2.K5}
-              onChange={() => handleFilterChange2('K5')}
-              type="checkbox" />
-          </label>
+        <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}> {/*стиль искать в src/cssfiles/TractorsFilters.css*/}
+          <div className='filter'>
+            <label>
+              <span>Выбрать все</span>
+              <input type="checkbox" />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>Выбрать все</span>
+              <input type="checkbox" />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>К-7</span>
+              <input 
+                checked={FilterItems2.K7}
+                onChange={() => handleFilterChange2('K7')}
+                type="checkbox" 
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>К-5</span>
+              <input 
+                checked={FilterItems2.K5}
+                onChange={() => handleFilterChange2('K5')}
+                type="checkbox" />
+            </label>
+          </div>
         </div>
       </div>
         <div className='model'>

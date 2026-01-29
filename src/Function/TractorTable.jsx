@@ -121,7 +121,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
       try {
         setLoading(true);
-        const response = await fetch(`http://${ip}/tractor-info`, {
+        const response = await fetch(`http://${ip}/search/tractor-info`, {
           method: 'POST',
           headers: {  
             "Authorization": `Bearer ${token}`,
@@ -202,7 +202,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     <div className="tractor-table-outer-wrapper" ref={tableContainerRef}>
       <div className="tractor-table-container" >
         <div 
-          className="scroll-bar" 
+          className="table-scroll-bar" 
           
         >
           <table className="tractor-table">

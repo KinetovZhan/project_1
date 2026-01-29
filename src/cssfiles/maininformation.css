@@ -107,3 +107,25 @@ button:active {
   max-height: 400px;
   overflow-x: hidden;
 }
+
+/* Стили для списка */
+.list-scroll-bar {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+}
+
+.list-scroll-bar::-webkit-scrollbar {
+  width: 10px; /* размер бегунка ес че */
+}
+
+.list-scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #bebebe;
+}
+
+.list-scroll-bar::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* ← Цвет фона дорожки */
+  border-radius: 10px;
+}

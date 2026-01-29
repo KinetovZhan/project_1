@@ -17,24 +17,24 @@
 }
 
 /* скролл для тела таблицы */
-.scroll-bar {
+.table-scroll-bar {
   max-height: 650px;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 10px;
 }
 
-.scroll-bar::-webkit-scrollbar {
+.table-scroll-bar::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.scroll-bar::-webkit-scrollbar-thumb {
+.table-scroll-bar::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color:#bebebe;
 }
 
-.scroll-bar::-webkit-scrollbar-corner {
+.table-scroll-bar::-webkit-scrollbar-corner {
   border-radius: 10px;
 }
 
