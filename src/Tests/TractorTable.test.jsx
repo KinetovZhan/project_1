@@ -29,7 +29,7 @@ describe('TractorTable', () => {
       oh_hour: 1200,
       last_activity: '2024-01-01T12:00:00Z',
       component_type: 'dvs',
-      sw_name: 'MotorX',
+      comp_model: 'MotorX',
     },
     {
       vin: 'VIN123',
@@ -39,7 +39,7 @@ describe('TractorTable', () => {
       oh_hour: 1200,
       last_activity: '2024-01-01T12:00:00Z',
       component_type: 'kpp',
-      sw_name: 'GearBoxY',
+      comp_model: 'GearBoxY',
     },
   ];
 

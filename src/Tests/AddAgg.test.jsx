@@ -16,7 +16,7 @@ import { act } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { AddAggForm } from './AddAgg';
+import { AddAggForm } from '../Function/AddAgg';
 
 // 5. Мокаем fetch глобально
 global.fetch = vi.fn();

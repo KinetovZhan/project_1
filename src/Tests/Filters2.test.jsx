@@ -2,7 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { Filters2 } from './Filters_tractors';
+import { Filters2 } from '../Function/Filters_tractors';
 
 // Мокаем IP
 vi.mock('../shrineofvsakoe/ip.jsx', () => ({ ip: '127.0.0.1' }));
@@ -224,4 +224,6 @@ describe('Filters2', () => {
     expect(screen.getByText('Требуется MIN')).toHaveClass('majmin_button_active');
     expect(screen.getByText('Требуется MAJ')).not.toHaveClass('majmin_button_active');
   });
+
+
 });

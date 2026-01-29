@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { SearchBar } from './SearchBar';
+import { SearchBar } from '../Function/SearchBar';
 
 describe('SearchBar', () => {
   it('рендерит поле ввода и кнопку', () => {
