@@ -8,7 +8,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     id: '',
     type: '',
     model: '',
-    mounting_date: '',
+    mounting_date: new Date().toISOString().split('T')[0],
     comp_ser_num: '',
     tractor_id: '',
     number_of_parts: '',
@@ -52,7 +52,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch(`http://${ip}/component/`, {
+      const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -181,6 +181,7 @@ export function AddAggForm({ onBack, onSubmit }) {
             onChange={handleChange}
             className='add-po-input'
             disabled={loading}
+
           />
         </div>
 

@@ -67,7 +67,7 @@ describe('Filters2', () => {
   it('рендерит все элементы', () => {
     renderComponent();
 
-    // Модели — ТОЧНЫЙ текст (без регулярных выражений!)
+    // ✅ Кириллическая "К" — потому что в интерфейсе отображается кириллица
     expect(screen.getByText('К-742МСТ')).toBeInTheDocument();
     expect(screen.getByText('К-7')).toBeInTheDocument();
     expect(screen.getByText('К-525')).toBeInTheDocument();
@@ -91,19 +91,23 @@ describe('Filters2', () => {
   it('вызывает onFilterChangeTracByModel при клике на чекбокс модели', () => {
     renderComponent();
 
+    // ✅ Кириллическая "К" — ищем в интерфейсе
     const checkbox = screen.getByLabelText('К-742МСТ').closest('input');
     fireEvent.click(checkbox);
 
-    expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K742MST']);
+    // ✅ Латинская "K" — компонент преобразует через FilterToTractor
+    expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K-742МСТ']);
   });
 
   it('поддерживает множественный выбор моделей', () => {
     renderComponent();
 
+    // ✅ Кириллическая "К" — ищем в интерфейсе
     fireEvent.click(screen.getByLabelText('К-742МСТ').closest('input'));
     fireEvent.click(screen.getByLabelText('К-7').closest('input'));
 
-    expect(mockOnFilterChangeTracByModel).toHaveBeenLastCalledWith(['K742MST', 'K-7']);
+    // ✅ Латинская "K" — компонент преобразует через FilterToTractor
+    expect(mockOnFilterChangeTracByModel).toHaveBeenLastCalledWith(['K-742МСТ', 'K-7']);
   });
 
   // === Фильтрация по статусу ===
@@ -124,7 +128,6 @@ describe('Filters2', () => {
     expect(mockOnFilterChangeByStatus).toHaveBeenLastCalledWith(['s', 't']);
   });
 
-  // === Поиск по дилеру ===
   it('вызывает onDealerChange при вводе текста', () => {
     renderComponent();
 
@@ -150,7 +153,6 @@ describe('Filters2', () => {
     const input = screen.getByPlaceholderText(/Поиск по дилеру/i);
     fireEvent.change(input, { target: { value: 'АгроТех' } });
 
-    // 🔑 Используем data-testid вместо поиска по имени кнопки
     const button = screen.getByTestId('search-button');
     fireEvent.click(button);
 
@@ -224,6 +226,4 @@ describe('Filters2', () => {
     expect(screen.getByText('Требуется MIN')).toHaveClass('majmin_button_active');
     expect(screen.getByText('Требуется MAJ')).not.toHaveClass('majmin_button_active');
   });
-
-
 });
