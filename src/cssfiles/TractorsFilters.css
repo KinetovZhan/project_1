@@ -8,7 +8,8 @@
   /* Внутренности */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  /* padding: 10px; */
+  padding: 10px 0 10px 10px; /* top right bottom left */
   gap: 10px;
   color: black;
   /* Полоса прокрутки */
@@ -17,7 +18,7 @@
   gap: 10px;
   border: 1px solid rgba(217, 217, 217, 1);
 
-
+  overflow: hidden;
 
   /* Положение */
   position: absolute;
@@ -26,7 +27,7 @@
 }
 
 
-.filterstrac::-webkit-scrollbar {
+/* .filterstrac::-webkit-scrollbar {
   width: 8px;
   height: 10px;
 }
@@ -38,6 +39,36 @@
 
 .filterstrac::-webkit-scrollbar-thumb {
   background: #888;
+  border-radius: 10px;
+} */
+
+/* Стили для прокрутки*/
+.filters-scroll-bar {
+  /* max-height: 100px; */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  padding: 3px 10px 0 0;
+  
+}
+
+.filters-scroll-bar::-webkit-scrollbar {
+  width: 10px; /* размер бегунка ес че */
+}
+
+.filters-scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #bebebe;
+}
+
+.filters-scroll-bar::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* ← Цвет фона дорожки */
   border-radius: 10px;
 }
 

@@ -42,6 +42,7 @@ button {
   height: 160px;
   border-radius: 20px;
   padding: 12px 10px;
+  /* padding: 12px 0 10px 10px; top right bottom left */
   gap: 20px;
 
   position: absolute;
@@ -51,6 +52,8 @@ button {
   margin-left: 13px;
 
   color: black;
+
+  overflow: hidden; 
 }
 
 button.active {
@@ -90,7 +93,7 @@ button.active {
   /* Внутренности */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 14px 10px;
   gap: 20px;
   color: black;
 
@@ -98,6 +101,8 @@ button.active {
   position: absolute;
   top: 369px;
   left:13px;
+
+  
 }
 
 #tractor-select {

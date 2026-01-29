@@ -146,41 +146,43 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
             Активные фильтры: {getAllActiveFilters()}
           </div>
         )}
-        <ul className='List'>
-          {filteredItems.length === 0 ? (
-            <li>
-              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                <h4>Ничего не найдено</h4>
-                <p>Попробуйте изменить фильтры или запрос</p>
-              </div>
-            </li>
-          ) : (
-            filteredItems
-            .filter(item => item.id_Firmwares)
-            .map((item) => (
-              <li key={item.id_Firmwares}>
-                <div className='objectmenu'>
-                  <img className='object' src={Image} alt='Компонент' />
-                  <div className='inform'>
-                    <h4 className='poster'>
-                      №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
-                    </h4>
-                    <h5 className='textunder'>
-                      Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
-                    </h5>
-                    <button 
-                      className='download'
-                      onClick={() => handleDownload(item)}
-                      disabled={!item.download_link}
-                    >
-                      Скачать
-                    </button>
-                  </div>
+        {/* <div className='list-scroll-bar'> */}
+          <ul className='List list-scroll-bar'>
+            {filteredItems.length === 0 ? (
+              <li>
+                <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                  <h4>Ничего не найдено</h4>
+                  <p>Попробуйте изменить фильтры или запрос</p>
                 </div>
               </li>
-            ))
-          )}
-        </ul>
+            ) : (
+              filteredItems
+              .filter(item => item.id_Firmwares)
+              .map((item) => (
+                <li key={item.id_Firmwares}>
+                  <div className='objectmenu'>
+                    <img className='object' src={Image} alt='Компонент' />
+                    <div className='inform'>
+                      <h4 className='poster'>
+                        №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
+                      </h4>
+                      <h5 className='textunder'>
+                        Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                      </h5>
+                      <button 
+                        className='download'
+                        onClick={() => handleDownload(item)}
+                        disabled={!item.download_link}
+                      >
+                        Скачать
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        {/* </div> */}
       </div>
     </div>
   );
