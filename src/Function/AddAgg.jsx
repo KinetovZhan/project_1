@@ -52,7 +52,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch(`http://${ip}/component/`, {
+      const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
