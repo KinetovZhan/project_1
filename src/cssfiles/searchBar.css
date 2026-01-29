@@ -50,3 +50,16 @@
   width: 16px;
   height: 16px;
 }
+
+@media (max-width:767px) {
+  .search-bar input {
+  border: none;
+  background: transparent;
+  color: rgb(245, 243, 243);
+  font-size: 14px;
+  padding: 16px 35px;
+  outline: none;
+  width: 220px;
+  border-radius: 4px;
+}
+}

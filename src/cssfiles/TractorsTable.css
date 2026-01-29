@@ -11,6 +11,7 @@
   padding: 0;
   max-width: 1200px;
   max-height: 650px;
+  width:100%;
   box-sizing: border-box;
   height:600px;
   
@@ -96,4 +97,31 @@
   align-items: center;
   justify-content: center;
   height: 50vh;
+}
+
+@media (max-width:767px) {
+  .tractor-table-container {
+  display: flex;
+  align-items: stretch;
+  background: #ffffff;
+  border-radius: 10px 5px 10px 5px;
+  padding: 0;
+  width:100%;
+  min-height: 200px;
+  box-sizing: border-box;
+  height:auto;
+  /* margin-left: -5px; */
+}
+.tractor-table-outer-wrapper {
+  margin: 70px 30px;
+  position: relative;
+}
+.scroll-bar {
+  min-height: 300px;
+  height:75vh;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 10px;
+}
+
 }

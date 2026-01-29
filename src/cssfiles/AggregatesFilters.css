@@ -22,74 +22,62 @@
 }
 
 
-/* Поиск диллера */
-
-.search_by_dealer {
-  display: flex;
-  align-items: center;
-  background-color: rgba(217, 217, 217, 1);
-  width: 242px;
-  height: 56px;
-  border-radius: 56px;
-  position: absolute;
-  top: 391px;
-  left: 13px;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.search_by_dealer ::placeholder {
-  font-size:16px;
-  font-family:Arial;
-  padding :10px;
-}
-
-
-button.search_button {
-  width:50px;
-  position:absolute;
-  border: none;
-  right: 0px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  cursor: pointer;
-  color:  black;
-  cursor: pointer;
-  padding: 1px;
-  border-radius: 10px;
-  box-shadow: none;
-}
-
-.searcher_dealer {
-  flex: 1;
-  align-items: center;
-  border: none;
-  background-color: transparent;
-  width: 192px;
-  height: 56px;
-  border-radius: 25px;
-  outline: none;
-}
-
-.searcher_dealer::placeholder {
-  color: #000000;
-}
-
-
-
-.poster {
-  white-space: nowrap;       
-  overflow: hidden;          
-  text-overflow: ellipsis;   
-  max-width: 300px;          
-}
-
-
 /* Страница 3 прокртука для select */
 .model {
   position: absolute;
   top: 512px;
+  left:13px;
+  width: 360px;
+}
+
+ /* styles={{ 
+              control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', 
+                backgroundColor:'rgba(217, 217, 217, 1)', width:'360px', borderRadius: '15px', height:'53px'}),
+              menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', 
+                backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
+            }} */
+/* .modelSelect {
+  position:relative;
+}
+
+.react-select__control {
+   max-height: 200px;
+   overflow-y: auto; 
+   color: black; 
+   background-Color:rgba(217, 217, 217, 1);
+   width:360px;
+   border-Radius: 15px;
+   height:53px;
+}
+
+.react-select__menu-list {
+  max-height: 200px;
+  overflow-y: auto; 
+  background-color:white;
+  color:black;
+  border: 1px solid rgba(217, 217, 217, 1);
+  scrollbar-width:thin; */
+
+
+ 
+.clear {
+  position: absolute;
+  top: 665px;
+  left: 13px;
+  width: 360px;
+  height: 70px;
+  color: black;
+  background-color: rgba(217, 217, 217, 1);
+  box-shadow: none;
+  border-radius: 25px;
+  text-align: center;
+  font-size: medium;
+}
+
+@media (max-width:767px) {
+  .model {
+  position: absolute;
+  top: 502px;
   left:13px;
   width: 360px;
 }
@@ -108,4 +96,5 @@ button.search_button {
   border-radius: 25px;
   text-align: center;
   font-size: medium;
+}
 }

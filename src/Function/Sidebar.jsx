@@ -22,6 +22,15 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       setIsOpen(false);
     }
   }, [activeButton, isMobile]);
+  useEffect(() => {
+    if ((activeButton === 'aggregates')||(activeButton === 'tractor')) {
+      if (onFilterChangeTracByModel) onFilterChangeTracByModel([]);
+      if (onFilterChangeByStatus) onFilterChangeByStatus([]);
+      if (onDealerChange) onDealerChange('');
+      if (onDateChange) onDateChange(null);
+      if (handleMajMinButtonClick) handleMajMinButtonClick(null);
+    }
+  },[activeButton]);
 
   const sidebarContent = (
     <div className='sidebar'> 

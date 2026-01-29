@@ -107,3 +107,12 @@ button:active {
   max-height: 400px;
   overflow-x: hidden;
 }
+
+@media (max-width:767px) {
+  .MainPart {
+ width:100vw;
+height: 85vh;
+margin-left:0px;
+background-color: transparent;
+}
+}

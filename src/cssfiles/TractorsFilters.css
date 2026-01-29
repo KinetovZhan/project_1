@@ -25,6 +25,17 @@
   left:13px;
 }
 
+@media (max-width:767px) {
+  .filterstrac {
+    width: 80%;
+    max-width:300px;
+    padding: 10px;
+    left:10px;
+    font-size:14px;
+    max-height: 92px;
+  }
+}
+
 
 .filterstrac::-webkit-scrollbar {
   width: 8px;
@@ -76,7 +87,6 @@
   left:13px;
 }
 
-
 .filterstrac2 span {
   margin: 0px;
   flex-shrink: 0; 
@@ -84,11 +94,38 @@
   font-family: Arial;
 }
 
-
 .filterstrac2 input[type="checkbox"] {
   position: absolute;
   right: 10px;
   transform: scale(1.5);
+}
+
+@media (max-width:767px) {
+  .filterstrac2 {
+  width: 80%;
+  max-width:300px;
+  min-width:230px;
+  height: 135px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  /* Внутренности */
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 13px;
+  color: black;
+  /* Положение */
+  position: absolute;
+  top: 435px;
+  left:13px;
+}
+
+.filterstrac2 span {
+  margin: 0px;
+  flex-shrink: 0; 
+  font-size: 14px;
+  font-family: Arial;
+}
 }
 
 
@@ -161,7 +198,32 @@
   color: white;
   margin: 4px;
 }
+@media (max-width:767px) {
+  .Majmin {
+  box-sizing: border-box;
+  width: 80%;
+  max-width: 300PX;
+  height: 65px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
 
+  /* Позиция */
+  position: absolute;
+  left: 13px; 
+  top: 600PX;
+}
+
+.majmin_button {
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 20px;
+  margin: 4px;
+  font-size: 14px;
+  font-family: Arial;
+}
+}
 
 
 
@@ -262,8 +324,42 @@
   position: absolute;
   top: 318px;
   left: 13px;
-   font-size: 25px;
+  font-size: 25px;
   font-family: Arial;
+}
+
+@media (max-width:767px) {
+  .release-date-container {
+  position: absolute;
+  top: 295px;
+  left: 13px;
+  font-family: Arial;
+  width: 80%;
+  max-width:270px;
+  min-width:230px;
+}
+.release-date ::placeholder {
+  font-size: 14px;
+  font-family: Arial;
+  padding:10px;
+}
+.release-date {
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 1);
+  width: 100%;
+  max-width:300px;
+  min-width:230px;
+  height: 50px;
+  border-radius: 56px;
+  /* position: absolute;
+  top: 318px;
+  left: 13px; */
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 20px;
+  font-family: Arial;
+}
 }
 
 
@@ -301,6 +397,26 @@
 .choose_date_release::placeholder {
   color: #000000;
   opacity: 1;
+}
+
+@media (max-width:767px) {
+.choose_date_release {
+  flex: 1;
+  border: none;
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  outline: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  color: #000000;
+  
+  /* Убираем стандартные стили для date input */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
 }
 
 /* Иконка календаря */
@@ -422,6 +538,14 @@
   box-shadow: none !important;
 }
 
+@media (max-width:767px) {
+  .react-datepicker__close-icon {
+
+  right: 35px !important;
+  top: 26px !important;
+}
+}
+
 .react-datepicker__close-icon::after {
   background-color: transparent !important;
   color: #666 !important;
@@ -507,4 +631,82 @@
 .year-option.selected {
   background-color: #007bff;
   color: white;
+}
+
+/* Поиск диллера */
+
+.search_by_dealer {
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 1);
+  width: 242px;
+  height: 56px;
+  border-radius: 56px;
+  position: absolute;
+  top: 391px;
+  left: 13px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.search_by_dealer ::placeholder {
+  font-size:16px;
+  font-family:Arial;
+  padding :10px;
+}
+
+
+button.search_button {
+  width:50px;
+  position:absolute;
+  border: none;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  cursor: pointer;
+  color:  black;
+  cursor: pointer;
+  padding: 1px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.searcher_dealer {
+  flex: 1;
+  align-items: center;
+  border: none;
+  background-color: transparent;
+  width: 192px;
+  height: 56px;
+  border-radius: 25px;
+  outline: none;
+}
+
+.searcher_dealer::placeholder {
+  color: #000000;
+}
+
+
+
+.poster {
+  white-space: nowrap;       
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+  max-width: 300px;          
+}
+
+@media (max-width:767px) {
+  .search_by_dealer {
+  width: 80%;
+  max-width:300px;
+  min-width:230px;
+  height: 50px;
+  top: 365px;
+}
+.search_by_dealer ::placeholder {
+  font-size:14px;
+  font-family:Arial;
+  padding :10px;
+}
 }

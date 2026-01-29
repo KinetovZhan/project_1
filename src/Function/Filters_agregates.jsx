@@ -4,6 +4,7 @@ import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
+  const [isMobile,setIsMobile] = useState(false);
 
   const componentTypeMap = {
     'DVS': 'dvs',
@@ -132,6 +133,16 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     }
   };
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize',checkMobile);
+
+    return () => window.removeEventListener('resize',checkMobile);
+  }, []);
+
 
   useEffect(() => { 
        
@@ -210,6 +221,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         <div className='model'>
           <Select
           className='modelSelect'
+          classNamePrefix="react-select"
             isMulti
             options={options}
             value={selectedOptions}
@@ -218,7 +230,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             placeholder="Модель"
             isDisabled={loading || componentModels.length === 0}
             styles={{ 
-              control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width:'360px', borderRadius: '15px', height:'53px'}),
+              control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width:isMobile ? '70%':'360px', borderRadius: '15px', height:'53px'}),
               menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
             }}
           />
