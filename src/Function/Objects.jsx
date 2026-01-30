@@ -146,6 +146,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
             Активные фильтры: {getAllActiveFilters()}
           </div>
         )}
+      </div>
+      <div className = 'list-container'>
         <ul className='List'>
           {filteredItems.length === 0 ? (
             <li>

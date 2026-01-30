@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
-
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
 export function AddAggForm({ onBack, onSubmit }) {
@@ -19,7 +18,6 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [error, setError] = useState(null);
 
   const { token } = useAuth();
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;

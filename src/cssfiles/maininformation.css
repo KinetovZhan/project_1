@@ -115,4 +115,77 @@ height: 85vh;
 margin-left:0px;
 background-color: transparent;
 }
+
+.maininfo {
+  /* Общий вид */
+  box-sizing: border-box;
+  width: 90%;
+  height: 88%;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+  padding: 10px 15px;
+  position: absolute;
+  left: 5vw;
+  top: 70px;
+  border: 1px solid blue;
+}
+
+.list-container {
+  list-style-type: none;
+  padding: 0;  
+  height: 85%;
+  border: 2px solid red;
+  box-sizing: border-box;
+}
+
+.List {
+  list-style-type: none;
+  padding-left: 0;  
+  overflow-y: auto;
+  width: 100%; /* Занимаем всю ширину */
+  height: 100%; /* Растягиваем на всю высоту контейнера */
+  overflow-x: auto;
+  border: 2px solid green;
+  box-sizing: border-box;
+  max-height: none;
+
+}
+
+/* Убираем отступы у заголовков в этом блоке */
+.maininfo h3 {
+  margin-top: 0;
+  margin-bottom: 10px; /* Или нужное значение */
+}
+
+.maininfo h4 {
+  margin-top: 0;
+  margin-bottom: 0px;
+}
+
+.list-container ul {
+  margin-block-end:0em;
+  margin-block-start:0em;
+}
+
+.object {
+  box-sizing: border-box;
+  width: 130px;
+  height: 130px;
+  margin: 24px;
+
+  
+}
+
+.objectmenu {
+  /* Внешний вид */
+  width: 500px;
+  height: 208px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 15px;
+  display: flex;
+  margin-left: 0;
+}
 }
