@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, selectedModel, onDateChange}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
