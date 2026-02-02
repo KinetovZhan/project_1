@@ -4,6 +4,7 @@ import { TractorTable } from '../Function/TractorTable';
 import { AddPoForm } from '../Function/AddPo';
 import { AddAggForm } from '../Function/AddAgg';
 import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
+import { AddComponentPart } from './AddComponentPart';
 
 export function MainPart({
   activeButton,
@@ -28,6 +29,11 @@ export function MainPart({
   onCloseAddAggForm,
   onAddAggSubmit, // ← ДОБАВЛЕНО: отдельный колбэк для агрегата
 
+
+  showAddCompPartForm,
+  onCloseAddCompPartForm,
+  onAddCompPartSubmit
+
   // onBack — не нужен, используйте onClose...
 }) {
   // Закрываем форму ПО, если переключились на другую вкладку
@@ -43,6 +49,13 @@ export function MainPart({
       onCloseAddAggForm();
     }
   }, [activeButton, showAddAggForm, onCloseAddAggForm]);
+
+
+  useEffect(() => {
+    if (activeButton && activeButton !== 'AddCompPart' && showAddCompPartForm) {
+      onCloseAddCompPartForm();
+    }
+  }, [activeButton, showAddCompPartForm, onCloseAddCompPartForm]);
 
   // Отображаем форму ПО
   if (showAddForm) {
@@ -60,6 +73,14 @@ export function MainPart({
         <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} />
       </div>
     );
+  }
+
+  if (showAddCompPartForm) {
+    return (
+      <div className='MainPart'>
+        <AddComponentPart onBack={onCloseAddCompPartForm} onSubmit={onAddCompPartSubmit}/>
+      </div>
+    )
   }
 
   // Основной контент

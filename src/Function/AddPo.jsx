@@ -17,7 +17,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   useEffect(() => {
     console.log('Токен из useAuth:', token ? `Есть (${token.substring(0, 20)}...)` : 'Нет');
 
-    fetch(`http://${ip}/components/component-parts/`) // ← замени на реальный эндпоинт
+    fetch(`http://${ip}/search/component-parts/`) // ← замени на реальный эндпоинт
       .then(res => {
         if (!res.ok) throw new Error('Не удалось загрузить компоненты');
         return res.json();
@@ -147,6 +147,9 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       const response = await fetch(`http://${ip}/software/assign`, {
         method: 'POST',
         body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
 
       const contentType = response.headers.get('content-type');

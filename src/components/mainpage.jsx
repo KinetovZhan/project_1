@@ -20,6 +20,7 @@ function MainPage() {
 
   const showAddForm = activeButton === 'addPO';
   const showAddAggForm = activeButton === 'addAgg';
+  const showAddCompPartForm = activeButton === 'AddCompPart'
 
   const [activeFilters, setActiveFilters] = useState([]);
   const [activeFilters2, setActiveFilters2] = useState([]);
@@ -87,11 +88,6 @@ function MainPage() {
   closeAddForm();
   };
 
-  // const handleAddForm = () => {
-  //   const newParams = new URLSearchParams(searchParams);
-  //   newParams.set('tab', 'addPO');
-  //   setSearchParams(newParams);
-  // };
    const handleAddForm = () => {
     const newParams = new URLSearchParams(searchParams);
     if (activeButton === 'addPO') {
@@ -126,12 +122,37 @@ function MainPage() {
   };
 
 
-
   const closeAddAggForm = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('tab');
     setSearchParams(newParams);
   };
+  
+
+
+
+  const handleCompPartForm = () => {
+    const newParams = new URLSearchParams(searchParams)
+    if (activeButton === 'AddCompPart') {
+      newParams.delete('tab')
+    } else {
+      newParams.set('tab', 'AddCompPart')
+    }
+    setSearchParams(newParams)
+  }
+
+  const closeAddCompPartForm = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('tab');
+    setSearchParams(newParams)
+  }
+
+  const handleAddCompPartSubmit = (responseData) => {
+    console.log('Часть агрегата добавлен:', responseData);
+    alert('Часть агрегата создана!');
+    closeAddCompPartForm();
+  }
+
 
   // Остальные обработчики
   const handleSearch = (query) => setSearchQuery(query);
@@ -176,6 +197,7 @@ function MainPage() {
             onAddPoClick={handleAddForm}
             selectedModel={selectedModel}
             onAddAggClick={handleAggForm}
+            onAddCompPartClick={handleCompPartForm}
             onFilterChangeTracByModel={handleFilterByModelTractors}
             onDealerChange={handleDealer}
             onFilterChangeByStatus={handleFilterByStatus}
@@ -200,10 +222,13 @@ function MainPage() {
 
             showAddForm={showAddForm}
             showAddAggForm={showAddAggForm}
+            showAddCompPartForm={showAddCompPartForm}
             onCloseAddForm={closeAddForm}
             onCloseAddAggForm={closeAddAggForm}
+            onCloseAddCompPartForm={closeAddCompPartForm}
             onAddSubmit={handleAddSubmit}
             onAddAggSubmit={handleAddAggSubmit}
+            onAddCompPartSubmit={handleAddCompPartSubmit}
             dateFilter={dateFilter}
 
           />

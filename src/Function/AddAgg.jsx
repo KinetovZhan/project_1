@@ -1,25 +1,57 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
-
-import {ip} from "../shrineofvsakoe/ip.jsx";
+import { ip } from "../shrineofvsakoe/ip.jsx";
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
-    id: '',
     type: '',
     model: '',
     mounting_date: new Date().toISOString().split('T')[0],
     comp_ser_num: '',
-    tractor_id: '',
+    selected_tractor_id: '', // Это поле должно соответствовать select
     number_of_parts: '',
     producer_comp: ''
   });
 
+  const [tractors, setTractors] = useState([])
+  const [loadingTractors, setLoadingTractors] = useState(false)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { token } = useAuth();
 
+  useEffect(() => {
+    const loadTractors = async () => {
+      if (!token) {
+        setLoadingTractors(false);
+        return;
+      }
+      try {
+        setLoadingTractors(true);
+        const responseTractors = await fetch(`http://${ip}/tractors/`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!responseTractors.ok) {
+          const errorMessage = `Ошибка ${responseTractors.status}`;
+          throw new Error(errorMessage);
+        }
+        const responseTractorsData = await responseTractors.json();
+        setTractors(responseTractorsData);
+        console.log('Трактора успешно загружены:', responseTractorsData);
+      } catch (err) {
+        console.error('Ошибка при загрузке тракторов:', err);
+        setError('Не удалось загрузить список тракторов');
+      } finally {
+        setLoadingTractors(false);
+      }
+    };
+    loadTractors();
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,6 +61,13 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
+  const handleTractorChange = (e) => {
+    const selectedId = e.target.value; // Исправлено: e.target.value (не e.targer.value)
+    setFormData(prev => ({
+      ...prev,
+      selected_tractor_id: selectedId
+    }));
+  };
 
   const submitDataToServer = async () => {
     if (!token) {
@@ -39,20 +78,26 @@ export function AddAggForm({ onBack, onSubmit }) {
       setLoading(true);
       setError(null);
 
+      const selectedTractor = tractors.find(t => t.id === parseInt(formData.selected_tractor_id)); // Исправлено: parseInt (не perseInt)
+
       const submitData = {
-        id: formData.id,
         type: formData.type,
         model: formData.model,
         mounting_date: formData.mounting_date || null,
         comp_ser_num: formData.comp_ser_num || null,
-        tractor_id: formData.tractor_id ? parseInt(formData.tractor_id, 10) : null,
+        tractor_id: formData.selected_tractor_id ? parseInt(formData.selected_tractor_id, 10) : null,
         number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts, 10) : null,
         producer_comp: formData.producer_comp || null
       };
 
       console.log('Отправляемые данные:', submitData);
+      console.log('Выбранный трактор:', selectedTractor);
 
-      const response = await fetch(`http://${ip}/component/`, {
+      if (formData.selected_tractor_id && !selectedTractor) {
+        throw new Error('Выбранный трактор не найден');
+      }
+
+      const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -69,7 +114,6 @@ export function AddAggForm({ onBack, onSubmit }) {
         throw new Error(errorMessage);
       }
 
-      // alert('Модель создана');
       console.log('Агрегат успешно добавлен:', responseData);
 
       if (typeof onSubmit === 'function') {
@@ -83,11 +127,11 @@ export function AddAggForm({ onBack, onSubmit }) {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
+    } 
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Теперь безопасно — всегда вызывается из формы
+    e.preventDefault();
     submitDataToServer();
   };
 
@@ -112,20 +156,6 @@ export function AddAggForm({ onBack, onSubmit }) {
       )}
 
       <form className="add-po-form" onSubmit={handleSubmit}>
-        <div className='add-po-field'>
-          <label className='add-po-label'>ID агрегата (обязательно)</label>
-          <input
-            type="text"
-            name="id"
-            placeholder="Введите уникальный ID агрегата"
-            value={formData.id}
-            onChange={handleChange}
-            required
-            className='add-po-input'
-            disabled={loading}
-          />
-        </div>
-
         <div className='add-po-field'>
           <label htmlFor="type-select" className='add-po-label'>Тип</label>
           <select
@@ -181,21 +211,35 @@ export function AddAggForm({ onBack, onSubmit }) {
             onChange={handleChange}
             className='add-po-input'
             disabled={loading}
-
           />
         </div>
 
         <div className='add-po-field'>
-          <label className='add-po-label'>ID Трактора</label>
-          <input
-            type="number"
-            name="tractor_id"
-            value={formData.tractor_id}
-            onChange={handleChange}
-            placeholder="Введите ID трактора"
-            className='add-po-input'
-            disabled={loading}
-          />
+          <label className='add-po-label'>Трактор</label>
+          <select
+            name="selected_tractor_id" // Должно соответствовать полю в состоянии
+            value={formData.selected_tractor_id} // Должно соответствовать полю в состоянии
+            onChange={handleTractorChange} // Использует правильный обработчик
+            className='add-po-select' // Для select должен быть add-po-select, а не add-po-input
+            disabled={loading || loadingTractors}
+          >
+            <option value="">Выберите трактор</option>
+            {loadingTractors ? (
+              <option value="" disabled>Загрузка тракторов...</option>
+            ) : (
+              tractors.map(tractor => ( // Исправлено: tractor (в единственном числе)
+                <option key={tractor.id} value={tractor.id}>
+                  {tractor.vin}
+                </option>
+              ))
+            )}
+          </select>
+          {/* Дополнительная информация о выбранном тракторе */}
+          {formData.selected_tractor_id && !loadingTractors && (
+            <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+              Выбран трактор VIN: {tractors.find(t => t.id === parseInt(formData.selected_tractor_id))?.vin}
+            </div>
+          )}
         </div>
 
         <div className='add-po-field'>
@@ -227,11 +271,11 @@ export function AddAggForm({ onBack, onSubmit }) {
         <button
           type="submit"
           className='add-po-submit-button'
-          disabled={loading}
+          disabled={loading || loadingTractors} // Нельзя отправлять пока грузятся тракторы
         >
           {loading ? 'Добавление...' : 'Добавить'}
-        </button> 
-      </form> 
-    </div>   
+        </button>
+      </form>
+    </div>
   );
 }
