@@ -98,7 +98,6 @@ export function AddAggForm({ onBack, onSubmit }) {
       }
 
       const response = await fetch(`http://${ip}/components/`, {
-      const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
