@@ -220,8 +220,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   }
 
   return (
-    <div className="tractor-table-outer-wrapper" ref={tableContainerRef}>
-      <div className="tractor-table-container" >
+    <div className="tractor-table-container" >
         <div 
           className="table-scroll-bar" 
           
@@ -277,5 +276,4 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
             </tbody>
           </table>
         </div>
-      </div>
     </div>  );}

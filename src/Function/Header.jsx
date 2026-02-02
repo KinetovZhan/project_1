@@ -1,7 +1,7 @@
 
 export function Header({ onLogout,onHelp }) {
   return(
-    <header>
+    <header className = "header">
       <div className='mainText'>
         <h3>Сервис просмотра версий ПО</h3>
       </div>

@@ -22,70 +22,6 @@
 }
 
 
-/* Поиск диллера */
-
-.search_by_dealer {
-  display: flex;
-  align-items: center;
-  background-color: rgba(217, 217, 217, 1);
-  width: 242px;
-  height: 56px;
-  border-radius: 56px;
-  position: absolute;
-  top: 391px;
-  left: 13px;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-.search_by_dealer ::placeholder {
-  font-size:16px;
-  font-family:Arial;
-  padding :10px;
-}
-
-
-button.search_button {
-  width:50px;
-  position:absolute;
-  border: none;
-  right: 0px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  cursor: pointer;
-  color:  black;
-  cursor: pointer;
-  padding: 1px;
-  border-radius: 10px;
-  box-shadow: none;
-}
-
-.searcher_dealer {
-  flex: 1;
-  align-items: center;
-  border: none;
-  background-color: transparent;
-  width: 192px;
-  height: 56px;
-  border-radius: 25px;
-  outline: none;
-}
-
-.searcher_dealer::placeholder {
-  color: #000000;
-}
-
-
-
-.poster {
-  white-space: nowrap;       
-  overflow: hidden;          
-  text-overflow: ellipsis;   
-  max-width: 300px;          
-}
-
-
 /* Страница 3 прокртука для select */
 .model {
   position: absolute;
@@ -94,11 +30,9 @@ button.search_button {
   width: 360px;
 }
 
-
-
 .clear {
   position: absolute;
-  top: 700px;
+  top: 665px;
   left: 13px;
   width: 360px;
   height: 70px;
@@ -108,4 +42,37 @@ button.search_button {
   border-radius: 25px;
   text-align: center;
   font-size: medium;
+}
+
+@media (max-width:767px) {
+  .model {
+  position: absolute;
+  top: 502px;
+  left:13px;
+  width: 80%;
+}
+
+.clear {
+  position: absolute;
+  top: 80vh;
+  left: 13px;
+  width: 80%;
+  height: 70px;
+  color: black;
+  background-color: rgba(217, 217, 217, 1);
+  box-shadow: none;
+  border-radius: 25px;
+  text-align: center;
+  font-size: medium;
+}
+
+.download {
+  width: 200px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color:transparent;
+  margin: 4px;
+}
+
 }

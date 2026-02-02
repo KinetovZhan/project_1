@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
+import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   // Состояния
@@ -12,6 +13,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [loadingSoftware, setLoadingSoftware] = useState(false);
   const [softwareError, setSoftwareError] = useState(null);
   const { token } = useAuth();
+  const isMobile = useCheckMobile();
 
   // Загружаем список компонентов с частями
   useEffect(() => {
@@ -258,7 +260,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
                 padding: '0 12px',
-                fontSize: '16px',
+                fontSize: isMobile ? '14px':'16px',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',
                 outline: 'none',
@@ -301,7 +303,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
                 padding: '0 12px',
-                fontSize: '16px',
+                fontSize: isMobile ? '14px':'16px',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',
                 outline: 'none',

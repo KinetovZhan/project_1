@@ -1,13 +1,45 @@
-main {
-  padding-top: 150px;
-  min-height: calc(100vh - 164px);/*Занимает всю высоту которая осталась*/
-  box-sizing: border-box;
-  
+/* main {
+  padding-top: 160px;
+  min-height: calc(100vh - 150px);
+  width:100%;
+  overflow-x: hidden; 
+  box-sizing: border-box; 
 }
-
 
 .table {
   display: flex;
   margin-top: 0px;
   justify-content: center;
+} */
+ main {
+  padding-top: 90px;
+  min-height: 100vh;
+  width:100%;
+  overflow-x: hidden; 
+  box-sizing: border-box; 
+}
+
+@media (min-width:1200px) {
+ main {
+  padding-top: 160px;
+  min-height:100vh;
+  width:100%;
+  overflow-x: hidden; 
+  box-sizing: border-box; 
+}
+}
+.table {
+  display: flex;
+  margin-top: 0px;
+  justify-content: center;
+  height:auto;
+  box-sizing: border-box;
+} 
+@media (min-width:1200px) {
+.table {
+  display: flex;
+  margin-top: 0px;
+  justify-content: center;
+  height:auto;
+} 
 }

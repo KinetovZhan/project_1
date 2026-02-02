@@ -165,3 +165,126 @@
   font-weight:600;
 } */
 
+@media (max-width:767px) {
+  .add-po-form-container {
+  padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+  position: absolute;
+  left: 0vw;
+  top: 4vh;
+}
+
+/* .add-po-back-button {
+  position: absolute;
+  top: 0px;
+  left: -210px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0 ;
+  box-shadow: none !important;
+  background-color: transparent !important;
+} */
+
+.add-po-title {
+  margin-top: -40px; 
+  margin-bottom: 15px; 
+  font-size: bold;
+  font-size: 20px;
+  justify-content:center;
+}
+
+.add-po-form {
+  flex-grow: 1;
+  display: flex; 
+  flex-direction: column;
+}
+
+.add-po-field {
+  margin-bottom: 0;
+}
+
+.add-po-label {
+  display: block; 
+  margin-bottom: 5px; 
+  font-weight: bold;
+}
+
+.add-po-input {
+  width: 97.28%;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-po-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-po-textarea {
+  box-sizing: border-box;
+  /* width: 97.28%; */
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: none;
+  /* resize: vertical; */
+  /* min-height: 20px;
+  max-height: 140px; */
+  height: 107px;
+}
+
+.add-po-submit-button {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 15px;
+}
+}
+
+@media (max-width: 767px) {
+  .add-po-agg-container {
+  padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+
+  position: absolute;
+  left: 0px;
+  top: 4vh;
+}
+
+}
