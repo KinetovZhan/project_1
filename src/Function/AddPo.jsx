@@ -146,6 +146,9 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     try {
       const response = await fetch(`http://${ip}/software/assign`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
         headers: {
           'Authorization': `Bearer ${token}`

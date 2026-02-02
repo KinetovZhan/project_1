@@ -110,61 +110,82 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   };
 
    useEffect(() => {
-    const fetchTractors = async () => {
-      if (!token) {
-        setError("Пользователь не авторизован");
-        setLoading(false);
-        return;
-      }
+  const fetchTractors = async () => {
+    if (!token) {
+      setError("Пользователь не авторизован");
+      setLoading(false);
+      return;
+    }
 
-      const postData = getPostData();
+    const postData = getPostData();
 
-      try {
-        setLoading(true);
-        const response = await fetch(`http://${ip}/search/tractor-info`, {
+    try {
+      setLoading(true);
+
+      // 1. Получаем тракторы
+      const response = await fetch(`http://${ip}/search/tractor-info`, {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+      });
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const tractors = await response.json();
+
+      // 2. Если есть тракторы — получаем компоненты
+      let enrichedTractors = tractors;
+      if (tractors.length > 0) {
+        const vins = tractors.map(t => t.vin);
+        const compResponse = await fetch(`http://${ip}/search/tractor-components`, {
           method: 'POST',
-          headers: {  
+          headers: {
             "Authorization": `Bearer ${token}`,
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(postData)
+          body: JSON.stringify({ vins })
         });
 
-        console.log('Статус ответа:', response.status);
-        const data = await response.json();
-        console.log('Полученные данные:', data);
+        if (compResponse.ok) {
+          const components = await compResponse.json();
+          const vinToComponents = {};
+          components.forEach(c => {
+            if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
+            vinToComponents[c.vin].push(c);
+          });
 
-        if (data && data.status_code === 404) {
-          console.log("404 - тракторы не найдены");
-          setTractors([]);
-          return;
+          enrichedTractors = tractors.map(t => {
+            const comps = vinToComponents[t.vin] || [];
+            const enriched = { ...t };
+            comps.forEach(c => {
+              const type = c.component_type?.toLowerCase();
+              if (type === 'dvs' || type === 'engine') enriched.dvs = c.comp_model;
+              else if (type === 'kpp' || type === 'transmission') enriched.kpp = c.comp_model;
+              else if (type === 'rk' || type === 'suspension') enriched.rk = c.comp_model;
+              else if (type === 'bk') enriched.bk = c.comp_model;
+              else if (type === 'gr' || type === 'hydraulics') enriched.gr = c.comp_model;
+              else if (type === 'ap') enriched.ap = c.comp_model;
+            });
+            return enriched;
+          });
         }
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        if (Array.isArray(data) && data.length > 0) {
-          const grouped = groupTractors(data);
-          setTractors(grouped);
-        } else if (data && typeof data === 'object') {
-          const grouped = groupTractors([data]);
-          setTractors(grouped);
-        } else {
-          setTractors([]);
-        }
-        
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-        setError(`Ошибка подключения к серверу: ${error.message}`);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchTractors();
-  }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
+      setTractors(enrichedTractors);
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      setError(`Ошибка подключения к серверу: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchTractors();
+}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
 
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
