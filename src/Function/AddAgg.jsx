@@ -124,7 +124,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
     } catch (err) {
       console.error('Ошибка при добавлении агрегата:', err);
-      setError(err.message);
+      alert(err.message);
     } finally {
       setLoading(false);
     } 

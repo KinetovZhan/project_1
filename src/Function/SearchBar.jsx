@@ -1,9 +1,14 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export function SearchBar({ onSearch }) {
+export function SearchBar({ onSearch, activeButton }) {
   const [query, setQuery] = useState('');
 
+  useEffect(() => {
+    setQuery('')
+    onSearch?.(query)
+  }, [activeButton])
+  
   const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);

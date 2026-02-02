@@ -7,6 +7,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [downloading, setDownloading] = useState(null)
   const { token } = useAuth();
 
 
@@ -56,7 +57,107 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
 
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel, token]); 
+  }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
+
+
+  const handleDownload = async (item) => {
+  if (!item?.id_Firmwares) {
+    alert('ID файла не указан');
+    return;
+  }
+
+  if (!token) {
+    alert('Требуется авторизация');
+    return;
+  }
+
+  try {
+    setDownloading(item.id_Firmwares);
+
+    const response = await fetch(`http://${ip}/software/download/${item.id_Firmwares}`, {
+      method: 'GET',
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Текст ошибки:', errorText);
+      throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
+    }
+
+    // Получаем имя файла из заголовка или используем ID
+    let filename = `firmware_${item.id_Firmwares}`;
+    const contentDisposition = response.headers.get('content-disposition');
+    
+    if (contentDisposition) {
+      const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+      if (matches && matches[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+      }
+    }
+
+    // Улучшенное определение расширения
+    let extension = '';
+    const contentType = response.headers.get('content-type') || '';
+    
+    // Проверяем расширение в имени файла
+    const nameMatch = filename.match(/\.([a-zA-Z0-9]+)$/);
+    if (nameMatch) {
+      extension = `.${nameMatch[1]}`;
+    } else {
+      // Определяем по типу контента
+      const extensionMap = {
+        'application/octet-stream': '.bin',
+        'application/zip': '.zip',
+        'application/x-rar-compressed': '.rar',
+        'application/x-7z-compressed': '.7z',
+        'application/x-tar': '.tar',
+        'application/x-gzip': '.gz',
+        'application/pdf': '.pdf',
+        'application/x-binary': '.bin',
+        'binary/octet-stream': '.bin'
+      };
+      
+      extension = extensionMap[contentType] || '.bin';
+      filename += extension;
+    }
+
+    console.log('Скачиваем файл:', filename, 'Content-Type:', contentType);
+
+    const blob = await response.blob();
+    
+    if (blob.size === 0) {
+      throw new Error('Файл пустой');
+    }
+
+    // Создаем ссылку для скачивания
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 100);
+
+    console.log('Файл успешно скачан:', filename);
+
+  } catch (error) {
+    console.error('Ошибка при скачивании:', error);
+    alert(`Ошибка при скачивании: ${error.message}`);
+  } finally {
+    setDownloading(null);
+  }
+};
+
 
   // --- 2. Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных ---
   const filteredItems = useMemo(() => {
@@ -103,19 +204,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
     return 'всех компонентов';
   };
 
-  const handleDownload = (item) => {
-    const url = item?.download_link?.trim();
-    if (!url) {
-      alert('Файл недоступен');
-      return;
-    }
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
 
   // --- Рендер ---
   if (loading) {
@@ -173,7 +261,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
                     <button 
                       className='download'
                       onClick={() => handleDownload(item)}
-                      disabled={!item.download_link}
+                      disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
                     >
                       Скачать
                     </button>

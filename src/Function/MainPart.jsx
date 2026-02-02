@@ -92,7 +92,7 @@ export function MainPart({
     <div className="MainPart">
       {activeButton === 'aggregates' && (
         <>
-          <SearchBar onSearch={onSearch} />
+          <SearchBar onSearch={onSearch} activeButton={activeButton} />
           <Objects
             activeFilters={activeFilters}
             activeFilters2={activeFilters2}
@@ -104,7 +104,7 @@ export function MainPart({
       )}
       {activeButton === 'tractor' && (
         <>
-          <SearchBar onSearch={onSearch} />
+          <SearchBar onSearch={onSearch} activeButton={activeButton}/>
           <TractorTable
             activeFiltersTrac={activeFiltersTrac}
             activeFiltersTrac2={activeFiltersTrac2}

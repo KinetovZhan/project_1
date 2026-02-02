@@ -222,7 +222,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   return (
     <div className="tractor-table-container" >
         <div 
-          className="table-scroll-bar" 
+          className="scroll-bar" 
           
         >
           <table className="tractor-table">
