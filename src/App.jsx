@@ -15,7 +15,7 @@ import './cssfiles/HelpPage.css'
 import './cssfiles/AddCompPartButton.css'
 import './cssfiles/test.css'
 import LoginPage from './Login/LoginPage'
-import HelpPage from './Login/HelpPage.jsx'
+import {HelpPage} from './Login/HelpPage.jsx'
 import MainPage from './components/mainpage'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
