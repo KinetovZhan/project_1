@@ -1,6 +1,6 @@
 .MainPart {
   width:70vw;
-  height: 80vh;
+  height: 770px;
   background-color: rgba(217, 217, 217, 0.7);
   flex-shrink: 1; /* Запрещаем уменьшение */
   margin-left:-38px;
