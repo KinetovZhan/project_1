@@ -204,6 +204,114 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
     return 'всех компонентов';
   };
 
+  const [downloadingId, setDownloadingId] = useState(null);
+
+const handleDownload = async (item) => {
+  if (!item?.download_link) {
+    alert('Файл недоступен');
+    return;
+  }
+
+  setDownloadingId(item.id_Firmwares);
+
+  try {
+    // 1. Формируем URL (если относительный путь)
+    let url = item.download_link.trim();
+    
+    // Если путь начинается с /, добавляем IP
+    if (url.startsWith('/')) {
+      url = `http://${ip}${url}`;
+    }
+
+    console.log('Скачиваем с URL:', url);
+
+    // 2. Делаем запрос с авторизацией
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    // 3. Проверяем ответ
+    if (response.status === 404) {
+      throw new Error('Файл не найден на сервере');
+    }
+
+    if (!response.ok) {
+      throw new Error(`Ошибка сервера: ${response.status}`);
+    }
+
+    // 4. Определяем тип файла и имя
+    const contentType = response.headers.get('content-type') || '';
+    const contentDisposition = response.headers.get('content-disposition') || '';
+    
+    let filename = 'firmware.bin';
+    let fileExtension = '.bin';
+
+    // Определяем имя файла из заголовка
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+
+    // Если имени нет, создаем из данных
+    if (filename === 'firmware.bin') {
+      filename = `firmware_${item.producer_version || item.id_Firmwares}`;
+      
+      // Определяем расширение по content-type
+      if (contentType.includes('application/zip')) {
+        fileExtension = '.zip';
+      } else if (contentType.includes('application/rar')) {
+        fileExtension = '.rar';
+      } else if (contentType.includes('application/x-7z-compressed')) {
+        fileExtension = '.7z';
+      } else if (contentType.includes('text/plain')) {
+        fileExtension = '.txt';
+      } else if (contentType.includes('application/pdf')) {
+        fileExtension = '.pdf';
+      } else if (contentType.includes('application/vnd.ms-excel')) {
+        fileExtension = '.xls';
+      } else if (contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+        fileExtension = '.xlsx';
+      }
+      
+      filename += fileExtension;
+    }
+
+    console.log('Тип файла:', contentType);
+    console.log('Имя файла:', filename);
+
+    // 5. Получаем файл и создаем ссылку для скачивания
+    const blob = await response.blob();
+    
+    // Создаем Blob с правильным типом
+    const typedBlob = new Blob([blob], { type: contentType });
+    const downloadUrl = window.URL.createObjectURL(typedBlob);
+    
+    // 6. Создаем и кликаем ссылку
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    
+    // 7. Очистка
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      setDownloadingId(null);
+    }, 100);
+
+  } catch (err) {
+    console.error('Ошибка скачивания:', err);
+    alert(`Не удалось скачать файл: ${err.message}`);
+    setDownloadingId(null);
+  }
+};
 
   // --- Рендер ---
   if (loading) {

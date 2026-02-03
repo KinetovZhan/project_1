@@ -142,132 +142,117 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   }, [FilterItems,FilterItems2, token]);
 
   return(
-    <>
-      <div className='filters'>
-        <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}> {/*стиль искать в src/cssfiles/TractorsFilters.css*/}
-          <div className='filter'>
-            <label> 
-              <span>ДВС</span>
-              <input 
-                type="checkbox"
-                checked={FilterItems.DVS}
-                onChange={() => handleFilterChange('DVS')}
-              />
-            </label>
-          </div>
-          <div className='filter'>
-            <label> 
-              <span>ДВС</span>
-              <input 
-                type="checkbox"
-                checked={FilterItems.DVS}
-                onChange={() => handleFilterChange('DVS')}
-              />
-            </label>
-          </div>
-          <div className='filter'>
-            <label>
-              <span>КПП</span>
-              <input 
-                checked={FilterItems.KPP}
-                onChange={() => handleFilterChange('KPP')}
-                type="checkbox"/>
-            </label>
-          </div>
-          <div className='filter'>
-            <label>
-              <span>РК</span>
-              <input 
-                checked={FilterItems.RK}
-                onChange={() => handleFilterChange('RK')}
-                type="checkbox"/>
-            </label>
-          </div>
-          <div className='filter'>
-            <label> 
-              <span>Гидрораспределитель</span>
-              <input 
-                checked={FilterItems.hydrorasp}
-                onChange={() => handleFilterChange('hydrorasp')}
-                type="checkbox"/>
-            </label>
-          </div>
+  <>
+    <div className='filters'>
+      <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}>
+        <div className='filter'>
+          <label> 
+            <span>ДВС</span>
+            <input 
+              type="checkbox"
+              checked={FilterItems.DVS}
+              onChange={() => handleFilterChange('DVS')}
+            />
+          </label>
+        </div>
+        {/* УДАЛЕНО: второй "ДВС" */}
+        <div className='filter'>
+          <label>
+            <span>КПП</span>
+            <input 
+              checked={FilterItems.KPP}
+              onChange={() => handleFilterChange('KPP')}
+              type="checkbox"/>
+          </label>
+        </div>
+        <div className='filter'>
+          <label>
+            <span>РК</span>
+            <input 
+              checked={FilterItems.RK}
+              onChange={() => handleFilterChange('RK')}
+              type="checkbox"/>
+          </label>
+        </div>
+        <div className='filter'>
+          <label> 
+            <span>Гидрораспределитель</span>
+            <input 
+              checked={FilterItems.hydrorasp}
+              onChange={() => handleFilterChange('hydrorasp')}
+              type="checkbox"/>
+          </label>
         </div>
       </div>
-      <div className='filters2'>
-        <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}> {/*стиль искать в src/cssfiles/TractorsFilters.css*/}
-          <div className='filter'>
-            <label>
-              <span>Выбрать все</span>
-              <input type="checkbox" />
-            </label>
-          </div>
-          <div className='filter'>
-            <label>
-              <span>Выбрать все</span>
-              <input type="checkbox" />
-            </label>
-          </div>
-          <div className='filter'>
-            <label>
-              <span>К-7</span>
-              <input 
-                checked={FilterItems2.K7}
-                onChange={() => handleFilterChange2('K7')}
-                type="checkbox" 
-              />
-            </label>
-          </div>
-          <div className='filter'>
-            <label>
-              <span>К-5</span>
-              <input 
-                checked={FilterItems2.K5}
-                onChange={() => handleFilterChange2('K5')}
-                type="checkbox" />
-            </label>
-          </div>
+    </div>
+    <div className='filters2'>
+      <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}>
+        <div className='filter'>
+          <label>
+            <span>Выбрать все</span>
+            <input type="checkbox" />
+          </label>
+        </div>
+        {/* УДАЛЕНО: второй "Выбрать все" */}
+        <div className='filter'>
+          <label>
+            <span>К-7</span>
+            <input 
+              checked={FilterItems2.K7}
+              onChange={() => handleFilterChange2('K7')}
+              type="checkbox" 
+            />
+          </label>
+        </div>
+        <div className='filter'>
+          <label>
+            <span>К-5</span>
+            <input 
+              checked={FilterItems2.K5}
+              onChange={() => handleFilterChange2('K5')}
+              type="checkbox" />
+          </label>
         </div>
       </div>
-        <div className='model'>
-          <Select
-          className='modelSelect'
-            isMulti
-            options={options}
-            value={selectedOptions}
-            onChange={handleModelChange}
-            // controlShouldRenderValue={false}          
-            placeholder="Модель"
-            isDisabled={loading || componentModels.length === 0}
-            styles={{ 
-              control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width: isMobile ? '100%':'360px', borderRadius: '15px', height:'53px'}),
-              menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
-            }}
-          />
-        </div>
-        <button 
-          className='clear'
-          data-testid="Clearbutton"
-          onClick={() => {
-            setFilterItems({
-              DVS: false,
-              KPP: false,
-              RK: false,
-              hydrorasp: false
-            });
-            setFilterItems2({
-              K7: false,
-              K5: false,
-            });
-            setSelectedModel([])
+    </div>
+    <div className='model'>
+      <Select
+        className='modelSelect'
+        isMulti
+        options={options}
+        value={selectedOptions}
+        onChange={handleModelChange}
+        placeholder="Модель"
+        isDisabled={loading || componentModels.length === 0}
+        styles={{ 
+          control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width: isMobile ? '100%':'360px', borderRadius: '15px', height:'53px'}),
+          menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
+        }}
+      />
+    </div>
+    <button 
+      className='clear'
+      data-testid="Clearbutton"
+      onClick={() => {
+        setFilterItems({
+          DVS: false,
+          KPP: false,
+          RK: false,
+          hydrorasp: false
+        });
+        setFilterItems2({
+          K7: false,
+          K5: false,
+        });
+        setSelectedModel([]);
 
-            // Уведомляем родителя
-            if (onFilterChange) onFilterChange([]);
-            if (onFilterChange2) onFilterChange2([]);
-            if (onModelChange) onModelChange([]);
-          }}
-        >
-          Сброс
-        </button>
-    </>
-  )}
+        if (onFilterChange) onFilterChange([]);
+        if (onFilterChange2) onFilterChange2([]);
+        if (onModelChange) onModelChange([]);
+      }}
+    >
+      Сброс
+    </button>
+  </>
+);
+}
