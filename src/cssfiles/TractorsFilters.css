@@ -186,9 +186,14 @@
 
 
 .majmin_button_active {
-  background-color: black;
-  color: white;
+  border-width: 1px;
+  border-color: grey;
+  border-radius: 20px;
   margin: 4px;
+  font-size: 16px;
+  font-family: Arial;
+  color: white;
+  background-color: black;
 }
 .majmin_button_active:hover {
   background: transparent;

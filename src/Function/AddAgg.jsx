@@ -17,6 +17,8 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [loadingTractors, setLoadingTractors] = useState(false)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [tractorSearch, setTractorSearch] = useState('');
+
 
   const { token } = useAuth();
 
@@ -135,6 +137,11 @@ export function AddAggForm({ onBack, onSubmit }) {
     submitDataToServer();
   };
 
+
+  const filteredTractors = tractors.filter(tractor => 
+    tractor.vin.toLowerCase().includes(tractorSearch.toLowerCase())
+  );
+
   return (
     <div className="add-po-agg-container">
       <button
@@ -216,29 +223,77 @@ export function AddAggForm({ onBack, onSubmit }) {
 
         <div className='add-po-field'>
           <label className='add-po-label'>Трактор</label>
-          <select
-            name="selected_tractor_id" // Должно соответствовать полю в состоянии
-            value={formData.selected_tractor_id} // Должно соответствовать полю в состоянии
-            onChange={handleTractorChange} // Использует правильный обработчик
-            className='add-po-select' // Для select должен быть add-po-select, а не add-po-input
+          
+          {/* Поле поиска */}
+          <input
+            type="text"
+            placeholder="Поиск по VIN..."
+            value={tractorSearch}
+            onChange={(e) => setTractorSearch(e.target.value)}
+            className='add-po-input'
+            style={{ marginBottom: '8px' }}
             disabled={loading || loadingTractors}
+          />
+          
+          {/* Выпадающий список */}
+          <select
+            name="selected_tractor_id"
+            value={formData.selected_tractor_id}
+            onChange={handleTractorChange}
+            className='add-po-select'
+            disabled={loading || loadingTractors}
+            style={{ 
+              maxHeight: '200px', 
+              overflowY: 'auto' 
+            }}
           >
             <option value="">Выберите трактор</option>
             {loadingTractors ? (
               <option value="" disabled>Загрузка тракторов...</option>
+            ) : filteredTractors.length === 0 ? (
+              <option value="" disabled>Тракторы не найдены</option>
             ) : (
-              tractors.map(tractor => ( // Исправлено: tractor (в единственном числе)
+              filteredTractors.map(tractor => (
                 <option key={tractor.id} value={tractor.id}>
                   {tractor.vin}
                 </option>
               ))
             )}
           </select>
-          {/* Дополнительная информация о выбранном тракторе */}
+          
+          {/* Информация о выбранном тракторе */}
           {formData.selected_tractor_id && !loadingTractors && (
-            <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
-              Выбран трактор VIN: {tractors.find(t => t.id === parseInt(formData.selected_tractor_id))?.vin}
+            <div style={{ 
+              fontSize: '12px', 
+              color: '#666', 
+              marginTop: '5px',
+              padding: '6px 8px',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px'
+            }}>
+              Выбран: {tractors.find(t => t.id === parseInt(formData.selected_tractor_id))?.vin}
             </div>
+          )}
+          
+          {/* Кнопка очистки поиска */}
+          {tractorSearch && (
+            <button
+              type="button"
+              onClick={() => setTractorSearch('')}
+              style={{ 
+                marginTop: '8px', 
+                fontSize: '12px',
+                padding: '4px 8px',
+                backgroundColor: '#2e2323',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                height: '30px'
+              }}
+            >
+              Очистить поиск
+            </button>
           )}
         </div>
 
