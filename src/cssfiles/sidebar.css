@@ -1,6 +1,6 @@
 .sidebar {
   margin-left: 0px;
-  height: 80vh;
+  /* height: 850px; */
   width: 80vw;
   background-color: rgba(85, 86, 90, 1);
   border-radius: 30px;
@@ -367,7 +367,7 @@
 @media (min-width: 1200px) {
  .sidebar {
   margin-left: 98px;
-  height: 80vh;
+  height: 770px;
   width: 387px;
   background-color: rgba(85, 86, 90, 1);
   border-radius: 30px;

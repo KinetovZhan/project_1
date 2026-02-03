@@ -8,7 +8,7 @@
 
   box-sizing: border-box;
   width: 963px;
-  height: 760px;
+  height: 750px;
   background-color: white;
   border-radius: 30px;
   color: black;
@@ -58,6 +58,24 @@
   top: 20px;
 }
 
+@media (max-width:767px) {
+  .add-po-comp-part-container {
+ padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+  position: absolute;
+  left: 0vw;
+  top: 20vh;
+}
+}
 
 .add-po-back-button {
   position: absolute;
