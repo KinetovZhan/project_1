@@ -15,6 +15,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const { token } = useAuth();
   const isMobile = useCheckMobile();
 
+
   // Загружаем список компонентов с частями
   useEffect(() => {
     console.log('Токен из useAuth:', token ? `Есть (${token.substring(0, 20)}...)` : 'Нет');
@@ -186,6 +187,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     model: item.model,
     part_type: item.part_type
   }));
+
+
 
   return (
     <div className="add-po-form-container">
