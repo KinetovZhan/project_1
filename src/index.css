@@ -67,13 +67,12 @@ button:focus-visible {
   }
 } */
 
-
 body {
   color:rgb(255, 255, 255); 
   margin: 0; 
   width: 100%;
   height: 100px;
-  background-image: url(img/mobile.jpg);
+  background-image: url(img/backside.jpg);
   background-size:cover;
 }
 
