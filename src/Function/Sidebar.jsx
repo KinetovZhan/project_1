@@ -108,8 +108,8 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
      {isMobile && isOpen && (
       <div
-        className = "sidebar-overlay"
-        onClick ={() => setIsOpen(false)}
+      className = "sidebar-overlay"
+      onClick ={() => setIsOpen(false)}
        />
      )} 
      

@@ -11,6 +11,10 @@ export function TractorDetails({ vin, onBack }) {
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
   const { token } = useAuth();
+
+
+ 
+
   useEffect(() => {
     const fetchTractorDetails = async () => {
       if (!vin) {
@@ -140,6 +144,8 @@ export function TractorDetails({ vin, onBack }) {
     { name: 'ГР', version: '-', model: '-' },
     { name: 'Автопилот', version: '-', model: '-' }
   ];
+
+  
 
   return (
     <div className="tractor-details-container">
