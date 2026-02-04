@@ -249,7 +249,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   const vinA = (a.vin || a.VIN || '').toString();
                   const vinB = (b.vin || b.VIN || '').toString();
                   return vinA.localeCompare(vinB, undefined, { numeric: true, sensitivity: 'base' });
-                })
+                }).filter(tractor => tractor.vin !== 'TEMPLATE_SOFTWARE_ASSIGNMENT')
                 .map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}

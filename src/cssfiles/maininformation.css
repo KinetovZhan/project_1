@@ -56,7 +56,14 @@
 
 .textunder {
   color: grey;
+  white-space: nowrap;       
+  overflow: hidden;          
+  text-overflow: ellipsis;   
+  max-width: 500px;  
+  position: relative;
 }
+
+
 
 /* Кнопка */
 /* .download {
@@ -211,3 +218,8 @@ background-color: transparent;
   margin-left: 0;
 }
 }
+
+
+
+
+

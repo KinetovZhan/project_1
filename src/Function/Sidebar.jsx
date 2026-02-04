@@ -2,12 +2,17 @@ import {Filters} from '../Function/Filters_agregates.jsx'
 import {Filters2} from '../Function/Filters_tractors.jsx'
 import { useState, useEffect } from 'react';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { useAuth } from '../auth/AuthContext';
 
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
+  const { user, isAuthenticated } = useAuth();
+
+
+  const userRole = user?.role || 'user';
 
   // useEffect(() => {
   //   const checkMobile = () => {
@@ -34,6 +39,8 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
     }
   },[activeButton]);
 
+  const { token } = useAuth();
+
   const sidebarContent = (
     <div className='sidebar'> 
       <div className='choose'>
@@ -59,7 +66,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       </div>
 
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor'  && (
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && userRole === 'moderator'  && (
         <div className='add-po-container'>
           <button 
             onClick={() =>{
@@ -71,7 +78,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor'  &&(
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат
@@ -79,7 +86,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' &&(
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container3'>
           <button onClick={onAddCompPartClick}>
             Добавить часть агрегата
