@@ -681,14 +681,14 @@
   position: absolute;
   top: 391px;
   left: 13px;
-  padding: 0 10px;
+  padding: 0 20px;
   box-sizing: border-box;
 }
 
 .search_by_dealer ::placeholder {
   font-size:16px;
   font-family:Arial;
-  padding :10px;
+  padding :0px;
 }
 
 
