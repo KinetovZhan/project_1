@@ -11,6 +11,10 @@ export function TractorDetails({ vin, onBack }) {
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
   const { token } = useAuth();
+
+
+ 
+
   useEffect(() => {
     const fetchTractorDetails = async () => {
       if (!vin) {
@@ -53,6 +57,15 @@ export function TractorDetails({ vin, onBack }) {
           // Извлекаем компоненты из всех данных
           const componentData = data.filter(item => item.component_type && item.comp_model);
           console.log('Компоненты:', componentData);
+
+          // Создаем объект для хранения описаний ПО
+          const poDescriptions = {};
+          componentData.forEach(component => {
+            if (component.description && component.component_type) {
+              poDescriptions[component.component_type] = component.description;
+            }
+          });
+
           setComponents(componentData);
         }
       } catch (err) {
@@ -66,48 +79,7 @@ export function TractorDetails({ vin, onBack }) {
     fetchTractorDetails();
   }, [vin]);
 
-    // Загружаем описания компонентов из базы данных
-  useEffect(() => {
-    const fetchPoDescriptions = async () => {
-      try {
-        const response = await fetch(`http://${ip}/get-po-descriptions`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
 
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log('Полученные описания компонентов:', data);
-        
-        // Преобразуем данные в нужный формат
-        const descriptions = {};
-        data.forEach(item => {
-          descriptions[item.component_name] = item.description;
-        });
-        
-        setPoDescriptions(descriptions);
-      } catch (err) {
-        console.error('Ошибка загрузки описаний компонентов:', err);
-        // Можно установить значения по умолчанию в случае ошибки
-        setPoDescriptions({
-          'ДВС': 'Описание временно недоступно',
-          'КПП': 'Описание временно недоступно',
-          'РК': 'Описание временно недоступно',
-          'ГР': 'Описание временно недоступно',
-          'БК': 'Описание временно недоступно',
-          'Автопилот': 'Описание временно недоступно'
-        });
-      }
-    };
-
-    fetchPoDescriptions();
-  }, []);
 
 
   const handleItemClick = (index) => {
@@ -159,7 +131,8 @@ export function TractorDetails({ vin, onBack }) {
   const poList = components.map(component => ({
     name: component.component_type,
     version: component.recommend_sw_version || component.sw_name || '-',
-    model: component.comp_model
+    model: component.comp_model,
+    description: component.description || 'Нет описания' 
   }));
 
   // Если компонентов нет, показываем заглушку
@@ -171,6 +144,8 @@ export function TractorDetails({ vin, onBack }) {
     { name: 'ГР', version: '-', model: '-' },
     { name: 'Автопилот', version: '-', model: '-' }
   ];
+
+  
 
   return (
     <div className="tractor-details-container">
@@ -220,7 +195,7 @@ export function TractorDetails({ vin, onBack }) {
                     </div>
                     {activeTooltip === index && (
                       <div className="tooltip">
-                        {poDescriptions[item.name] || 'Нет описания'}
+                        {/* {poDescriptions[item.name] || 'Нет описания'} */}{item.description}
                       </div>
                     )}
                   </li>

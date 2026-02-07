@@ -57,7 +57,8 @@
   border-bottom: 1px solid #454343;
   border-right: 1px solid #454343;
   min-width: 80px;
-  white-space: nowrap;
+  white-space: nowrap; 
+  max-width:200px;
 }
 
 .tractor-table thead th:last-child { 
@@ -71,9 +72,12 @@
   font-size: 14px;
   border-right: 1px solid #454343;
   min-width: 80px;
+  max-width:200px;
+  /* word-wrap: break-word; */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative; /* Добавьте это */
 }
 
 .tractor-table td:last-child { 
@@ -92,6 +96,29 @@
   align-items: center;
   justify-content: center;
   height: 50vh;
+}
+
+.tractor-cell {
+  cursor: help;
+  position: relative;
+}
+
+/* Опционально: красивый тултип вместо стандартного */
+.tractor-cell:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  background: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: normal;
+  z-index: 1000;
+  max-width: 300px;
+  font-size: 13px;
+  margin-bottom: 5px;
 }
 
 @media (max-width:767px) {

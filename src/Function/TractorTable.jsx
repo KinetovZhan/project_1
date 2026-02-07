@@ -249,7 +249,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   const vinA = (a.vin || a.VIN || '').toString();
                   const vinB = (b.vin || b.VIN || '').toString();
                   return vinA.localeCompare(vinB, undefined, { numeric: true, sensitivity: 'base' });
-                })
+                }).filter(tractor => tractor.vin !== 'TEMPLATE_SOFTWARE_ASSIGNMENT')
                 .map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}
@@ -258,7 +258,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   className="clickable-row"
                   
                 >
-                  <td>{tractor.vin || tractor.VIN || '-'}</td>
+                  <td   title={tractor.vin || tractor.VIN || '-'}
+  className="tractor-cell">{tractor.vin || tractor.VIN || '-'}</td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
                   <td>{tractor.region || '-'}</td>
@@ -266,7 +267,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   <td>{tractor.dvs || tractor.DVS || '-'}</td>
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
-                  <td>{tractor.rk || tractor.RK || '-'}</td>
+                  <td   title={tractor.rk || tractor.RK || '-'}
+  className="tractor-cell">{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
                   <td>{tractor.ap || tractor.AP || '-'}</td> 

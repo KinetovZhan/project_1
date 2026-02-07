@@ -2,13 +2,18 @@ import {Filters} from '../Function/Filters_agregates.jsx'
 import {Filters2} from '../Function/Filters_tractors.jsx'
 import { useState, useEffect } from 'react';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { useAuth } from '../auth/AuthContext';
 
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
+  const { user, isAuthenticated } = useAuth();
 
+
+  // const userRole = user?.role || 'user';
+  const userRole = 'moderator'; // 🔧 ВРЕМЕННО ХАРДКОДИМ
   // useEffect(() => {
   //   const checkMobile = () => {
   //     setIsMobile(window.innerWidth <= 768);
@@ -33,6 +38,8 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       if (handleMajMinButtonClick) handleMajMinButtonClick(null);
     }
   },[activeButton]);
+
+  const { token } = useAuth();
 
   const sidebarContent = (
     <div className='sidebar'> 
@@ -59,7 +66,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       </div>
 
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor'  && (
+      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && userRole === 'moderator'  && ( */}
         <div className='add-po-container'>
           <button 
             onClick={() =>{
@@ -69,23 +76,23 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             Добавить ПО
           </button>
         </div>
-      )}
+      {/* )} */}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor'  &&(
+      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&( */}
         <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат
           </button>
         </div>
-      )}
+      {/* )} */}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' &&(
+      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&( */}
         <div className='add-po-container3'>
           <button onClick={onAddCompPartClick}>
             Добавить часть агрегата
           </button>
         </div>
-      )}
+      {/* )} */}
       
       
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
@@ -108,8 +115,8 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
      {isMobile && isOpen && (
       <div
-        className = "sidebar-overlay"
-        onClick ={() => setIsOpen(false)}
+      className = "sidebar-overlay"
+      onClick ={() => setIsOpen(false)}
        />
      )} 
      

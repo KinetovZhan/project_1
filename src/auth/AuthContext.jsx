@@ -15,7 +15,8 @@ export function AuthProvider({children}) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null); 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // чтобы не мигало при загрузке
+  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -29,10 +30,14 @@ export function AuthProvider({children}) {
       setUser(null);
       setToken(null);
       setIsAuthenticated(false);
+      setUserRole(null)
     } else {
       setUser(decoded);
       setToken(token);
       setIsAuthenticated(true);
+
+      // setUserRole(decoded.role || 'user');
+      setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
     }
   } catch (error) {
     console.error ('Invalid token', error);
@@ -40,6 +45,7 @@ export function AuthProvider({children}) {
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
+    setUserRole(null);
   }
 }
 setLoading(false);
@@ -51,6 +57,8 @@ const login = (token) => {
   setUser(decoded);
   setToken(token);
   setIsAuthenticated(true);
+  // setUserRole(decoded.role || 'user');
+  setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
 };
 
 const logout = () => {
@@ -58,10 +66,30 @@ const logout = () => {
   setUser(null);
   setToken(null);
   setIsAuthenticated(false);
+  setUserRole(null);
 };
 
-return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated, login, logout, loading }}>
+  const hasRole = (role) => {
+    return userRole === role;
+  };
+
+  // Функция для проверки любой из ролей
+  const hasAnyRole = (roles) => {
+    return roles.includes(userRole);
+  };
+
+  return (
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      isAuthenticated, 
+      userRole, // Добавляем роль в контекст
+      login, 
+      logout, 
+      loading,
+      hasRole,
+      hasAnyRole
+    }}>
       {children}
     </AuthContext.Provider>
   );

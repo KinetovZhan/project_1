@@ -9,6 +9,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null)
   const { token } = useAuth();
+  const [isVisible, setIsVisible] = useState(null)
 
 
   useEffect(() => {
@@ -256,9 +257,14 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
                     <h4 className='poster'>
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
                     </h4>
-                    <h5 className='textunder'>
-                      Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
-                    </h5>
+                    <div className='infodisc'>
+                      <h5 className='textunder' onMouseEnter={() => setIsVisible(item.id_Firmwares)} onMouseLeave={() => setIsVisible(null)}>
+                        Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                      </h5>
+                      {isVisible === item.id_Firmwares && (
+                        <div className='popup-window'>{item.type_component || '—'}: {item.model_component || item.comp_model || '—'}</div>
+                    )}
+                    </div>
                     <button 
                       className='download'
                       onClick={() => handleDownload(item)}

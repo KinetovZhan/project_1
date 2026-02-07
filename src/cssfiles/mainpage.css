@@ -43,3 +43,24 @@
   height:auto;
 } 
 }
+
+.popup-window {
+  background-color: rgb(255, 255, 255);
+  max-width: 200px;
+  display: block;
+  overflow-wrap: break-word;
+  border-radius: 4px;
+  z-index: 2000;
+  position: absolute;
+  margin-top: 1px;
+  margin-left: 300px;
+  border: 1px solid #ddd;
+  border-color: black;
+  padding: 5px;
+  color: grey;
+}
+
+
+.infodisc {
+  position: relative;
+}
