@@ -26,6 +26,13 @@
   left:13px;
 }
 
+.tractorModel {
+  position: absolute;
+  top: 185px;
+  left:13px;
+  width: 360px;
+}
+
 @media (max-width:767px) {
   .filterstrac {
     width: 80%;
@@ -114,7 +121,7 @@
   color: black;
   /* Положение */
   position: absolute;
-  top: 485px;
+  top: 402px;
   left:13px;
 }
 
@@ -358,7 +365,7 @@
 
 .release-date-container {
   position: absolute;
-  top: 318px;
+  top: 255px;
   left: 13px;
   font-size: 25px;
   font-family: Arial;
@@ -679,7 +686,7 @@
   height: 56px;
   border-radius: 56px;
   position: absolute;
-  top: 391px;
+  top: 327px;
   left: 13px;
   padding: 0 10px;
   box-sizing: border-box;
