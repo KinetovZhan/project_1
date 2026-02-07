@@ -15,16 +15,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const { token } = useAuth();
   const [isVisible, setIsVisible] = useState(null)
 
-   const ImageToComponent = (type_component) => {
-      const ImageJpg = {
-        'engine': K5Image,
-        'kpp': K7Image,
-        'suspension': K525Image,
-        'hydraulics': K742Image,
-      }
-  
-      return ImageJpg[type_component]|| DefaultImage;
-    }
+
 
 
   useEffect(() => {
@@ -74,6 +65,19 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
     fetchFilteredData();
   }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
+
+
+     const ImageToComponent = (type_component) => {
+      const ImageJpg = {
+        'engine': K5Image,
+        'kpp': K7Image,
+        'suspension': K525Image,
+        'hydraulics': K742Image,
+      }
+  
+      return ImageJpg[type_component]|| DefaultImage;
+    }
+
 
 
   const handleDownload = async (item) => {
