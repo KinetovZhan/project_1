@@ -36,8 +36,8 @@ export function AuthProvider({children}) {
       setToken(token);
       setIsAuthenticated(true);
 
-      // setUserRole(decoded.role || 'user');
-      setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
+      setUserRole(decoded.role || 'user');
+      // setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
     }
   } catch (error) {
     console.error ('Invalid token', error);
@@ -57,8 +57,8 @@ const login = (token) => {
   setUser(decoded);
   setToken(token);
   setIsAuthenticated(true);
-  // setUserRole(decoded.role || 'user');
-  setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
+  setUserRole(decoded.role || 'user');
+  // setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
 };
 
 const logout = () => {

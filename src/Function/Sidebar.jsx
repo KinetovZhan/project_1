@@ -12,8 +12,8 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
   const { user, isAuthenticated } = useAuth();
 
 
-  // const userRole = user?.role || 'user';
-  const userRole = 'moderator'; // 🔧 ВРЕМЕННО ХАРДКОДИМ
+  const userRole = user?.role || 'user';
+  // const userRole = 'moderator'; // 🔧 ВРЕМЕННО ХАРДКОДИМ
   // useEffect(() => {
   //   const checkMobile = () => {
   //     setIsMobile(window.innerWidth <= 768);
@@ -66,7 +66,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       </div>
 
 
-      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && userRole === 'moderator'  && ( */}
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && userRole === 'moderator'  && (
         <div className='add-po-container'>
           <button 
             onClick={() =>{
@@ -76,23 +76,23 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             Добавить ПО
           </button>
         </div>
-      {/* )} */}
+      )}
 
-      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&( */}
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container2 '>
           <button onClick={onAddAggClick}> 
             Добавить агрегат
           </button>
         </div>
-      {/* )} */}
+      )}
 
-      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&( */}
+      {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container3'>
           <button onClick={onAddCompPartClick}>
             Добавить часть агрегата
           </button>
         </div>
-      {/* )} */}
+      )}
       
       
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange}/>}
