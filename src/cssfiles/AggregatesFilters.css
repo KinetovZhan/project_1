@@ -25,7 +25,7 @@
 /* Страница 3 прокртука для select */
 .model {
   position: absolute;
-  top: 512px;
+  /* top: 512px; */
   left:13px;
   width: 360px;
 }

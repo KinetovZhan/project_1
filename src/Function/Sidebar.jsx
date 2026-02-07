@@ -13,7 +13,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
 
   const userRole = user?.role || 'user';
-
+  // const userRole = 'moderator'; // 🔧 ВРЕМЕННО ХАРДКОДИМ
   // useEffect(() => {
   //   const checkMobile = () => {
   //     setIsMobile(window.innerWidth <= 768);

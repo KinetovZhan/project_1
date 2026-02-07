@@ -448,7 +448,7 @@ button {
   right: 0;
   transform: scale(1.5);
 }
-
+/* ББОЛЬШЕ НЕ ИСПОЛЬЗУЕТСЯ В ФИЛЬТРАХ АГРЕГАТА  */
 .filters2 {
   /* Размеры и визуал блока */
   box-sizing: border-box;

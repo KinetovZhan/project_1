@@ -14,10 +14,10 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     // 'hydrorasp': 'hydraulics'
   };
 
-  const tractorModelMap = {
-    'K7': 'K-7',
-    'K5': 'K-5'
-  };
+  const tractorModelOptions = [
+    { value: 'K7', label: 'К-7' },
+    { value: 'K5', label: 'К-5' }
+  ];
 
   const [FilterItems, setFilterItems] = useState({
     DVS: false,
@@ -26,12 +26,12 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     hydrorasp: false
   });
 
-  const [FilterItems2, setFilterItems2] = useState({
-    K7: false,
-    K5: false,
-  })
+  // const [FilterItems2, setFilterItems2] = useState({
+  //   K7: false,
+  //   K5: false,
+  // })
 
-
+  const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   const isMobile = useCheckMobile();
@@ -52,7 +52,25 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     }
   };
 
+  const handleTractorModelChange = (selectedOptions) => {
+    const values = selectedOptions 
+      ? selectedOptions.map(opt => opt.value) 
+      : [];
+    
+    setSelectedTractorModels(values);
+    
+    if (onFilterChange2) {
+      const activeTractorModels = values.map(key => 
+        key === 'K7' ? 'K-7' : 'K-5'
+      );
+      onFilterChange2(activeTractorModels);
+    }
+  };
+
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
+  const selectedTractorOptions = tractorModelOptions.filter(opt => 
+    selectedTractorModels.includes(opt.value)
+  );
 
   const handleFilterChange = (FilterType) => {
     const newFilter = {
@@ -66,18 +84,18 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       onFilterChange(activeFilters);
     }
   };
-  const handleFilterChange2 = (FilterType2) => {
-    const newFilter2 = {
-      ...FilterItems2,
-      [FilterType2]: !FilterItems2[FilterType2]
-    }
-    setFilterItems2(newFilter2);
+  // const handleFilterChange2 = (FilterType2) => {
+  //   const newFilter2 = {
+  //     ...FilterItems2,
+  //     [FilterType2]: !FilterItems2[FilterType2]
+  //   }
+  //   setFilterItems2(newFilter2);
 
-    if (onFilterChange2) {
-      const activeFilters2 = Object.keys(newFilter2).filter(key => newFilter2[key]);
-      onFilterChange2(activeFilters2);
-    }
-  }
+  //   if (onFilterChange2) {
+  //     const activeFilters2 = Object.keys(newFilter2).filter(key => newFilter2[key]);
+  //     onFilterChange2(activeFilters2);
+  //   }
+  // }
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -89,9 +107,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       .filter(key => FilterItems[key])
       .map(key => componentTypeMap[key]);
     
-    const activeTractorModels = Object.keys(FilterItems2)
-      .filter(key => FilterItems2[key])
-      .map(key => tractorModelMap[key]);
+    const activeTractorModels = selectedTractorModels.map(key => 
+      key === 'K7' ? 'K-7' : 'K-5'
+    );
 
     
     
@@ -139,7 +157,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
        
     fetchModels();
     
-  }, [FilterItems,FilterItems2, token]);
+  }, [FilterItems,selectedTractorModels, token]);
 
   return(
   <>
@@ -185,37 +203,40 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         </div>
       </div>
     </div>
-    <div className='filters2'>
-      <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}>
-        <div className='filter'>
-          <label>
-            <span>Выбрать все</span>
-            <input type="checkbox" />
-          </label>
-        </div>
-        {/* УДАЛЕНО: второй "Выбрать все" */}
-        <div className='filter'>
-          <label>
-            <span>К-7</span>
-            <input 
-              checked={FilterItems2.K7}
-              onChange={() => handleFilterChange2('K7')}
-              type="checkbox" 
-            />
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>К-5</span>
-            <input 
-              checked={FilterItems2.K5}
-              onChange={() => handleFilterChange2('K5')}
-              type="checkbox" />
-          </label>
-        </div>
-      </div>
+
+    <div className='model' style={{top: '370px'}}>
+      <Select
+        className='modelSelect'
+        isMulti
+        options={tractorModelOptions}
+        value={selectedTractorOptions}
+        onChange={handleTractorModelChange}
+        placeholder="Модель трактора"
+        styles={{ 
+          control: (base) => ({ 
+            ...base, 
+            maxHeight: 200, 
+            overflowY: 'auto', 
+            color: 'black', 
+            backgroundColor:'rgba(217, 217, 217, 1)', 
+            width: isMobile ? '100%' : '360px', 
+            borderRadius: '15px', 
+            height:'53px'
+          }),
+          menuList: (base) => ({ 
+            ...base, 
+            maxHeight: 150, 
+            overflowY: 'auto', 
+            backgroundColor:'white',
+            color:'black', 
+            border: '1px solid rgba(217, 217, 217, 1)',
+            scrollbarWidth:'thin'
+          }),
+        }}
+      />
     </div>
-    <div className='model'>
+
+    <div className='model' style={{top: '444px'}}>
       <Select
         className='modelSelect'
         isMulti
@@ -225,8 +246,25 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         placeholder="Модель"
         isDisabled={loading || componentModels.length === 0}
         styles={{ 
-          control: (base) => ({ ...base, maxHeight: 200, overflowY: 'auto', color: 'black', backgroundColor:'rgba(217, 217, 217, 1)', width: isMobile ? '100%':'360px', borderRadius: '15px', height:'53px'}),
-          menuList: (base) => ({ ...base, maxHeight: 150, overflowY: 'auto', backgroundColor:'white',color:'black', border: '1px solid rgba(217, 217, 217, 1)',scrollbarWidth:'thin'}),
+          control: (base) => ({ 
+            ...base, 
+            maxHeight: 200, 
+            overflowY: 'auto', 
+            color: 'black', 
+            backgroundColor:'rgba(217, 217, 217, 1)', 
+            width: isMobile ? '100%':'360px', 
+            borderRadius: '15px', 
+            height:'53px'
+          }),
+          menuList: (base) => ({ 
+            ...base, 
+            maxHeight: 150, 
+            overflowY: 'auto', 
+            backgroundColor:'white',
+            color:'black', 
+            border: '1px solid rgba(217, 217, 217, 1)',
+            scrollbarWidth:'thin'
+          }),
         }}
       />
     </div>

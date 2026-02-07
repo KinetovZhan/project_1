@@ -152,10 +152,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         headers: {
           'Authorization': `Bearer ${token}`
         },
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        body: formData
       });
 
       const contentType = response.headers.get('content-type');

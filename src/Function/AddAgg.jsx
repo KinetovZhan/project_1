@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { ip } from "../shrineofvsakoe/ip.jsx";
+import Select from 'react-select';
+
+// Статические данные тракторов для тестирования
+const MOCK_TRACTORS = [
+  { id: 1, vin: 'XW8ZZZ1KZCG000001' },
+  { id: 2, vin: 'XW8ZZZ1KZCG000002' },
+  { id: 3, vin: 'XW8ZZZ1KZCG000003' },
+  { id: 4, vin: 'XW8ZZZ1KZCG000004' },
+  { id: 5, vin: 'XW8ZZZ1KZCG000005' },
+];
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -8,52 +18,36 @@ export function AddAggForm({ onBack, onSubmit }) {
     model: '',
     mounting_date: new Date().toISOString().split('T')[0],
     comp_ser_num: '',
-    selected_tractor_id: '', // Это поле должно соответствовать select
+    selected_tractor_id: '',
     number_of_parts: '',
     producer_comp: ''
   });
 
-  const [tractors, setTractors] = useState([])
-  const [loadingTractors, setLoadingTractors] = useState(false)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tractorSearch, setTractorSearch] = useState('');
-
-
   const { token } = useAuth();
 
+  const [tractorOptions, setTractorOptions] = useState([]);
+  const [selectedTractor, setSelectedTractor] = useState(null);
+
   useEffect(() => {
-    const loadTractors = async () => {
-      if (!token) {
-        setLoadingTractors(false);
-        return;
-      }
-      try {
-        setLoadingTractors(true);
-        const responseTractors = await fetch(`http://${ip}/tractors/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        if (!responseTractors.ok) {
-          const errorMessage = `Ошибка ${responseTractors.status}`;
-          throw new Error(errorMessage);
-        }
-        const responseTractorsData = await responseTractors.json();
-        setTractors(responseTractorsData);
-        console.log('Трактора успешно загружены:', responseTractorsData);
-      } catch (err) {
-        console.error('Ошибка при загрузке тракторов:', err);
-        setError('Не удалось загрузить список тракторов');
-      } finally {
-        setLoadingTractors(false);
-      }
-    };
-    loadTractors();
-  }, [token]);
+    // Преобразуем моковые данные в формат для react-select
+    const options = MOCK_TRACTORS.map(tractor => ({
+      value: tractor.id,
+      label: tractor.vin
+    }));
+    
+    setTractorOptions(options);
+  }, []);
+
+  const handleTractorSelectChange = (selectedOption) => {
+    setSelectedTractor(selectedOption);
+    
+    setFormData(prev => ({
+      ...prev,
+      selected_tractor_id: selectedOption ? selectedOption.value : ''
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,24 +57,15 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
-  const handleTractorChange = (e) => {
-    const selectedId = e.target.value; // Исправлено: e.target.value (не e.targer.value)
-    setFormData(prev => ({
-      ...prev,
-      selected_tractor_id: selectedId
-    }));
-  };
-
   const submitDataToServer = async () => {
     if (!token) {
       setError('Пользователь не авторизован');
       return;
     }
+    
     try {
       setLoading(true);
       setError(null);
-
-      const selectedTractor = tractors.find(t => t.id === parseInt(formData.selected_tractor_id)); // Исправлено: parseInt (не perseInt)
 
       const submitData = {
         type: formData.type,
@@ -93,11 +78,6 @@ export function AddAggForm({ onBack, onSubmit }) {
       };
 
       console.log('Отправляемые данные:', submitData);
-      console.log('Выбранный трактор:', selectedTractor);
-
-      if (formData.selected_tractor_id && !selectedTractor) {
-        throw new Error('Выбранный трактор не найден');
-      }
 
       const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
@@ -136,11 +116,6 @@ export function AddAggForm({ onBack, onSubmit }) {
     e.preventDefault();
     submitDataToServer();
   };
-
-
-  const filteredTractors = tractors.filter(tractor => 
-    tractor.vin.toLowerCase().includes(tractorSearch.toLowerCase())
-  );
 
   return (
     <div className="add-po-agg-container">
@@ -221,80 +196,63 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        <div className='add-po-field'>
-          <label className='add-po-label'>Трактор</label>
-          
-          {/* Поле поиска */}
-          <input
-            type="text"
-            placeholder="Поиск по VIN..."
-            value={tractorSearch}
-            onChange={(e) => setTractorSearch(e.target.value)}
-            className='add-po-input'
-            style={{ marginBottom: '8px' }}
-            disabled={loading || loadingTractors}
-          />
-          
-          {/* Выпадающий список */}
-          <select
-            name="selected_tractor_id"
-            value={formData.selected_tractor_id}
-            onChange={handleTractorChange}
-            className='add-po-select'
-            disabled={loading || loadingTractors}
-            style={{ 
-              maxHeight: '200px', 
-              overflowY: 'auto' 
-            }}
-          >
-            <option value="">Выберите трактор</option>
-            {loadingTractors ? (
-              <option value="" disabled>Загрузка тракторов...</option>
-            ) : filteredTractors.length === 0 ? (
-              <option value="" disabled>Тракторы не найдены</option>
-            ) : (
-              filteredTractors.map(tractor => (
-                <option key={tractor.id} value={tractor.id}>
-                  {tractor.vin}
-                </option>
-              ))
-            )}
-          </select>
-          
-          {/* Информация о выбранном тракторе */}
-          {formData.selected_tractor_id && !loadingTractors && (
-            <div style={{ 
-              fontSize: '12px', 
-              color: '#666', 
-              marginTop: '5px',
-              padding: '6px 8px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px'
-            }}>
-              Выбран: {tractors.find(t => t.id === parseInt(formData.selected_tractor_id))?.vin}
-            </div>
-          )}
-          
-          {/* Кнопка очистки поиска */}
-          {tractorSearch && (
-            <button
-              type="button"
-              onClick={() => setTractorSearch('')}
-              style={{ 
-                marginTop: '8px', 
-                fontSize: '12px',
-                padding: '4px 8px',
-                backgroundColor: '#2e2323',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
+        <div className="add-po-field">
+          <label className="add-po-label">Трактор</label>
+          <Select
+            options={tractorOptions}
+            value={selectedTractor}
+            onChange={handleTractorSelectChange}
+            placeholder="Выберите трактор"
+            classNamePrefix="add-po-select"
+            isClearable={true}
+            isSearchable={true}
+            noOptionsMessage={() => "Нет доступных тракторов"}
+            
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                height: '40px',
+                minHeight: '40px',
+                width: '100%',
+                border: '1px solid',
+                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                boxSizing: 'border-box',
+                padding: '0 12px',
+                fontSize: '16px',
                 cursor: 'pointer',
-                height: '30px'
-              }}
-            >
-              Очистить поиск
-            </button>
-          )}
+                transition: 'border-color 0.15s ease',
+                outline: 'none',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: '#13be00'
+                }
+              }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 200,
+                padding: '4px 0',
+                backgroundColor: 'white'
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isSelected ? '#13be00' : 
+                                state.isFocused ? '#f0f9ff' : 'white',
+                color: state.isSelected ? 'white' : '#1E1E1E',
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: '#f0f9ff'
+                }
+              }),
+              singleValue: (base) => ({
+                ...base,
+                color: '#1E1E1E'
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#999'
+              })
+            }}
+          />
         </div>
 
         <div className='add-po-field'>
@@ -326,7 +284,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         <button
           type="submit"
           className='add-po-submit-button'
-          disabled={loading || loadingTractors} // Нельзя отправлять пока грузятся тракторы
+          disabled={loading}
         >
           {loading ? 'Добавление...' : 'Добавить'}
         </button>
@@ -334,3 +292,357 @@ export function AddAggForm({ onBack, onSubmit }) {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+// import { useEffect, useState } from 'react';
+// import { useAuth } from '../auth/AuthContext';
+// import { ip } from "../shrineofvsakoe/ip.jsx";
+// import Select from 'react-select';
+
+// export function AddAggForm({ onBack, onSubmit }) {
+//   const [formData, setFormData] = useState({
+//     type: '',
+//     model: '',
+//     mounting_date: new Date().toISOString().split('T')[0],
+//     comp_ser_num: '',
+//     selected_tractor_id: '',
+//     number_of_parts: '',
+//     producer_comp: ''
+//   });
+
+//   const [tractors, setTractors] = useState([])
+//   const [loadingTractors, setLoadingTractors] = useState(false)
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const { token } = useAuth();
+
+//   // Для react-select нужен формат { value, label }
+//   const [tractorOptions, setTractorOptions] = useState([]);
+//   const [selectedTractor, setSelectedTractor] = useState(null);
+
+//   useEffect(() => {
+//     const loadTractors = async () => {
+//       if (!token) {
+//         setLoadingTractors(false);
+//         return;
+//       }
+//       try {
+//         setLoadingTractors(true);
+//         const responseTractors = await fetch(`http://${ip}/tractors/`, {
+//           method: 'GET',
+//           headers: {
+//             'Authorization': `Bearer ${token}`,
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json'
+//           }
+//         });
+//         if (!responseTractors.ok) {
+//           const errorMessage = `Ошибка ${responseTractors.status}`;
+//           throw new Error(errorMessage);
+//         }
+//         const responseTractorsData = await responseTractors.json();
+        
+//         // Сохраняем исходные данные
+//         setTractors(responseTractorsData);
+        
+//         // Преобразуем в формат для react-select
+//         const options = responseTractorsData.map(tractor => ({
+//           value: tractor.id,
+//           label: tractor.vin,
+//           data: tractor // сохраняем полные данные трактора
+//         }));
+        
+//         setTractorOptions(options);
+//         console.log('Трактора успешно загружены:', responseTractorsData);
+//       } catch (err) {
+//         console.error('Ошибка при загрузке тракторов:', err);
+//         setError('Не удалось загрузить список тракторов');
+//       } finally {
+//         setLoadingTractors(false);
+//       }
+//     };
+//     loadTractors();
+//   }, [token]);
+
+//   // Обработчик выбора трактора из react-select
+//   const handleTractorSelectChange = (selectedOption) => {
+//     setSelectedTractor(selectedOption);
+    
+//     // Обновляем formData с выбранным ID трактора
+//     setFormData(prev => ({
+//       ...prev,
+//       selected_tractor_id: selectedOption ? selectedOption.value : ''
+//     }));
+//   };
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData(prev => ({
+//       ...prev,
+//       [name]: value
+//     }));
+//   };
+
+//   const submitDataToServer = async () => {
+//     if (!token) {
+//       setError('Пользователь не авторизован');
+//       return;
+//     }
+//     try {
+//       setLoading(true);
+//       setError(null);
+
+//       const submitData = {
+//         type: formData.type,
+//         model: formData.model,
+//         mounting_date: formData.mounting_date || null,
+//         comp_ser_num: formData.comp_ser_num || null,
+//         tractor_id: formData.selected_tractor_id ? parseInt(formData.selected_tractor_id, 10) : null,
+//         number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts, 10) : null,
+//         producer_comp: formData.producer_comp || null
+//       };
+
+//       console.log('Отправляемые данные:', submitData);
+
+//       const response = await fetch(`http://${ip}/components/`, {
+//         method: 'POST',
+//         headers: {
+//           'Authorization': `Bearer ${token}`,
+//           'Accept': 'application/json',
+//           'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(submitData)
+//       });
+
+//       const responseData = await response.json();
+
+//       if (!response.ok) {
+//         const errorMessage = responseData.detail || `Ошибка ${response.status}`;
+//         throw new Error(errorMessage);
+//       }
+
+//       console.log('Агрегат успешно добавлен:', responseData);
+
+//       if (typeof onSubmit === 'function') {
+//         onSubmit(responseData);
+//       } else if (typeof onBack === 'function') {
+//         onBack();
+//       }
+
+//     } catch (err) {
+//       console.error('Ошибка при добавлении агрегата:', err);
+//       alert(err.message);
+//     } finally {
+//       setLoading(false);
+//     } 
+//   };
+
+//   const handleSubmit = (e) => {
+//     e.preventDefault();
+//     submitDataToServer();
+//   };
+
+//   return (
+//     <div className="add-po-agg-container">
+//       <button
+//         onClick={onBack}
+//         className="add-po-back-button"
+//         disabled={loading}
+//       >
+//         <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+//           <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+//         </svg>
+//       </button>
+
+//       <h3 className="add-po-title">Добавление агрегата</h3>
+
+//       {error && (
+//         <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
+//           {error}
+//         </div>
+//       )}
+
+//       <form className="add-po-form" onSubmit={handleSubmit}>
+//         <div className='add-po-field'>
+//           <label htmlFor="type-select" className='add-po-label'>Тип</label>
+//           <select
+//             id="type-select"
+//             name="type"
+//             required
+//             value={formData.type}
+//             onChange={handleChange}
+//             className='add-po-select'
+//             disabled={loading}
+//           >
+//             <option value="">Выберите агрегат</option>
+//             <option value="dvs">ДВС</option>
+//             <option value="kpp">КПП</option>
+//             <option value="rk">РК</option>
+//             <option value="hydro">Гидрораспределитель</option>
+//           </select>
+//         </div>
+
+//         <div className='add-po-field'>
+//           <label className='add-po-label'>Название</label>
+//           <input
+//             type="text"
+//             name="model"
+//             placeholder="Введите название"
+//             value={formData.model}
+//             onChange={handleChange}
+//             required
+//             className='add-po-input'
+//             disabled={loading}
+//           />
+//         </div>
+
+//         <div className='add-po-field'>
+//           <label className='add-po-label'>Серийный номер</label>
+//           <input
+//             type="text"
+//             name="comp_ser_num"
+//             placeholder="Введите серийный номер"
+//             value={formData.comp_ser_num}
+//             onChange={handleChange}
+//             className='add-po-input'
+//             disabled={loading}
+//           />
+//         </div>
+
+//         <div className='add-po-field'>
+//           <label className='add-po-label'>Дата установки</label>
+//           <input
+//             type="date"
+//             name="mounting_date"
+//             value={formData.mounting_date}
+//             onChange={handleChange}
+//             className='add-po-input'
+//             disabled={loading}
+//           />
+//         </div>
+
+//         {/* 🔥 Выбор трактора с использованием react-select */}
+//         <div className="add-po-field">
+//           <label className="add-po-label">Трактор</label>
+//           <Select
+//             options={tractorOptions}
+//             value={selectedTractor}
+//             onChange={handleTractorSelectChange}
+//             placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите трактор"}
+//             classNamePrefix="add-po-select"
+//             isClearable={true}
+//             isSearchable={true}
+//             isLoading={loadingTractors}
+//             noOptionsMessage={() => "Нет доступных тракторов"}
+            
+//             // Кастомизация стилей как в примере
+//             styles={{
+//               control: (base, state) => ({
+//                 ...base,
+//                 color: '#ccc',
+//                 height: '40px',
+//                 minHeight: '40px',
+//                 width: '100%',
+//                 border: '1px solid',
+//                 borderColor: state.isFocused ? '#13be00' : '#ccc',
+//                 boxSizing: 'border-box',
+//                 padding: '0 12px',
+//                 fontSize: '16px', // Можно добавить проверку на isMobile если нужно
+//                 cursor: 'pointer',
+//                 transition: 'border-color 0.15s ease',
+//                 outline: 'none',
+//                 boxShadow: 'none',
+//                 '&:hover': {
+//                   borderColor: '#13be00'
+//                 }
+//               }),
+//               menuList: (base) => ({
+//                 ...base,
+//                 maxHeight: 200,
+//                 padding: '4px 0',
+//                 backgroundColor: 'white'
+//               }),
+//               option: (base, state) => ({
+//                 ...base,
+//                 backgroundColor: state.isSelected ? '#13be00' : 
+//                                 state.isFocused ? '#f0f9ff' : 'white',
+//                 color: state.isSelected ? 'white' : '#1E1E1E',
+//                 cursor: 'pointer',
+//                 '&:hover': {
+//                   backgroundColor: '#f0f9ff'
+//                 }
+//               }),
+//               singleValue: (base) => ({
+//                 ...base,
+//                 color: '#1E1E1E'
+//               }),
+//               placeholder: (base) => ({
+//                 ...base,
+//                 color: '#999'
+//               }),
+//               loadingIndicator: (base) => ({
+//                 ...base,
+//                 color: '#13be00'
+//               })
+//             }}
+//           />
+          
+//           {/* Информация о выбранном тракторе */}
+//           {selectedTractor && !loadingTractors && (
+//             <div style={{ 
+//               fontSize: '12px', 
+//               color: '#666', 
+//               marginTop: '5px',
+//               padding: '6px 8px',
+//               backgroundColor: '#f5f5f5',
+//               borderRadius: '4px'
+//             }}>
+//               Выбран: {selectedTractor.label}
+//             </div>
+//           )}
+//         </div>
+
+//         <div className='add-po-field'>
+//           <label className='add-po-label'>Количество подчастей</label>
+//           <input
+//             type="number"
+//             name="number_of_parts"
+//             placeholder="Введите количество"
+//             value={formData.number_of_parts}
+//             onChange={handleChange}
+//             className='add-po-input'
+//             disabled={loading}
+//           />
+//         </div>
+
+//         <div className='add-po-field'>
+//           <label className='add-po-label'>Производитель</label>
+//           <input
+//             type="text"
+//             name="producer_comp"
+//             placeholder="Введите производителя"
+//             value={formData.producer_comp}
+//             onChange={handleChange}
+//             className='add-po-input'
+//             disabled={loading}
+//           />
+//         </div>
+
+//         <button
+//           type="submit"
+//           className='add-po-submit-button'
+//           disabled={loading || loadingTractors}
+//         >
+//           {loading ? 'Добавление...' : 'Добавить'}
+//         </button>
+//       </form>
+//     </div>
+//   );
+// }
