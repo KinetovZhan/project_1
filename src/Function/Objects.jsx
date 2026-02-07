@@ -1,4 +1,8 @@
-import Image from '../img/Image.png';
+import DefaultImage from '../img/Image.png';
+import K5Image from '../img/к5.jpg';
+import K7Image from '../img/к7.jpg';
+import K525Image from '../img/к525.jpg';
+import K742Image from '../img/к742.jpg';
 import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
@@ -10,6 +14,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [downloading, setDownloading] = useState(null)
   const { token } = useAuth();
   const [isVisible, setIsVisible] = useState(null)
+
+
 
 
   useEffect(() => {
@@ -59,6 +65,19 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
     fetchFilteredData();
   }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
+
+
+     const ImageToComponent = (type_component) => {
+      const ImageJpg = {
+        'engine': K5Image,
+        'kpp': K7Image,
+        'suspension': K525Image,
+        'hydraulics': K742Image,
+      }
+  
+      return ImageJpg[type_component]|| DefaultImage;
+    }
+
 
 
   const handleDownload = async (item) => {
@@ -252,7 +271,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
             .map((item) => (
               <li key={item.id_Firmwares}>
                 <div className='objectmenu' data-testid='objectmenu'>
-                  <img className='object' src={Image} alt='Компонент' />
+                  <img className='object' src={ImageToComponent(item.type_component)} alt={item.type_component} />
                   <div className='inform'>
                     <h4 className='poster'>
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
