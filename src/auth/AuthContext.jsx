@@ -58,7 +58,7 @@ const login = (token) => {
   setToken(token);
   setIsAuthenticated(true);
   setUserRole(decoded.role || 'user');
-  // setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
+//   setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
 };
 
 const logout = () => {
