@@ -7,6 +7,9 @@ import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
 
+
+
+
 const formatDateTime = (dateString) => {
   if (!dateString) return '-';
   
@@ -67,7 +70,12 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
   const tableContainerRef = useRef(null);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+
+
+  const userRole = user?.role || 'user';
+
+
   const getPostData = () => {
 
     const postData = {
@@ -102,15 +110,19 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       postData.is_major = false;
     } 
 
-     console.log('Отправляемые данные на бэкенд:', postData);
+    console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
     console.log('postData.is_major:', postData.is_major);
 
     return postData;
   };
 
-   useEffect(() => {
+  useEffect(() => {
   const fetchTractors = async () => {
+
+    console.log('DEBUG: userRole =', userRole);
+    console.log('DEBUG: user =', user); 
+
     if (!token) {
       setError("Пользователь не авторизован");
       setLoading(false);
@@ -134,7 +146,22 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const tractors = await response.json();
+      let tractors = await response.json();
+
+      console.log(`dfsdfdasfdasvasdv ${userRole}`)
+
+      if (userRole === 'dealer') {
+        tractors = tractors.filter(tractor => {
+          // Проверяем разные поля, где может быть информация о дилере
+          const tractorConsumer = tractor.consumer || tractor.dealer || '';
+          const userName = user?.sub || user?.name || user?.username || '';
+          
+          console.log (`dsfasdadfd ${tractorConsumer}`)
+          // Ищем совпадение по имени пользователя или ID
+          return tractorConsumer.toLowerCase().includes(userName.toLowerCase())
+        });
+        console.log(`Для дилера ${user?.username || user?.sub} отфильтровано ${tractors.length} тракторов`);
+      }
 
       // 2. Если есть тракторы — получаем компоненты
       let enrichedTractors = tractors;
@@ -185,7 +212,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   };
 
   fetchTractors();
-}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token]);
+}, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token, userRole, user]);
 
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
