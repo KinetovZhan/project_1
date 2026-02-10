@@ -730,7 +730,7 @@ button.search_button {
   height: 56px;
   border-radius: 25px;
   outline: none;
-  padding-left: 20px;
+  padding-left: 0px;
   font-size: 16px;
 }
 
