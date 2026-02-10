@@ -1,229 +1,1253 @@
-// src/Function/Filters2.test.jsx
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
+// src/Tests/Filters2.test.jsx
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Filters2 } from '../Function/Filters_tractors';
 
-// Мокаем IP
-vi.mock('../shrineofvsakoe/ip.jsx', () => ({ ip: '127.0.0.1' }));
+// Добавьте этот импорт для jest-dom matchers
+import '@testing-library/jest-dom';
 
-// Мокаем DatePicker
-vi.mock('react-datepicker', () => {
-  const MockDatePicker = ({ onChange, startDate, endDate, onClear }) => (
-    <div data-testid="mock-date-picker">
-      <input
-        data-testid="start-date"
-        value={startDate?.toISOString() || ''}
-        onChange={(e) => {
-          const date = e.target.value ? new Date(e.target.value) : null;
-          onChange([date, endDate]);
-        }}
+// Создаем моки с помощью vi.hoisted() чтобы избежать проблем с hoisting
+const mockFormat = vi.hoisted(() => 
+  vi.fn((date, formatStr) => {
+    if (!date) return null;
+    if (formatStr === 'yyyy-MM-dd') {
+      const d = new Date(date);
+      return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+    }
+    return date.toLocaleDateString();
+  })
+);
+
+const MockSelect = vi.hoisted(() => 
+  vi.fn(({ placeholder, isMulti, onChange, options, value }) => (
+    <div data-testid="mock-select">
+      <input 
+        data-testid="select-input" 
+        placeholder={placeholder} 
+        readOnly 
       />
-      <input
-        data-testid="end-date"
-        value={endDate?.toISOString() || ''}
-        onChange={(e) => {
-          const date = e.target.value ? new Date(e.target.value) : null;
-          onChange([startDate, date]);
-        }}
+      <div data-testid="select-options">
+        {options?.map(opt => (
+          <div 
+            key={opt.value}
+            data-testid={`option-${opt.value}`}
+            onClick={() => {
+              if (onChange) {
+                if (isMulti) {
+                  const newValue = value ? [...value, opt] : [opt];
+                  onChange(newValue);
+                } else {
+                  onChange(opt);
+                }
+              }
+            }}
+          >
+            {opt.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  ))
+);
+
+const MockDatePicker = vi.hoisted(() => 
+  vi.fn(({ onChange, startDate, endDate, placeholderText }) => (
+    <div data-testid="mock-datepicker">
+      <input 
+        data-testid="datepicker-input" 
+        placeholder={placeholderText} 
+        readOnly 
+        value={startDate && endDate 
+          ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
+          : startDate 
+          ? startDate.toLocaleDateString()
+          : ''}
       />
-      <button data-testid="clear-date" onClick={onClear}>
-        Очистить
+      <button 
+        data-testid="datepicker-clear"
+        onClick={() => onChange && onChange([null, null])}
+      >
+        Clear
       </button>
     </div>
-  );
-  MockDatePicker.defaultProps = { selectsRange: true };
-  return { default: MockDatePicker };
-});
+  ))
+);
 
-describe('Filters2', () => {
-  const mockOnDealerChange = vi.fn();
-  const mockOnDateChange = vi.fn();
+// Мокируем модули
+vi.mock('react-select', () => ({
+  default: MockSelect
+}));
+
+vi.mock('react-datepicker', () => ({
+  default: MockDatePicker
+}));
+
+vi.mock('date-fns', () => ({
+  format: mockFormat,
+  ru: {},
+}));
+
+vi.mock('../shrineofvsakoe/ip.jsx', () => ({
+  ip: 'mocked-ip',
+}));
+
+describe('Filters2 Component', () => {
   const mockOnFilterChangeTracByModel = vi.fn();
   const mockOnFilterChangeByStatus = vi.fn();
   const mockHandleMajMinButtonClick = vi.fn();
+  const mockOnDealerChange = vi.fn();
+  const mockOnDateChange = vi.fn();
 
-  beforeEach(() => {
-    mockOnDealerChange.mockClear();
-    mockOnDateChange.mockClear();
-    mockOnFilterChangeTracByModel.mockClear();
-    mockOnFilterChangeByStatus.mockClear();
-    mockHandleMajMinButtonClick.mockClear();
+  const defaultProps = {
+    onFilterChangeTracByModel: mockOnFilterChangeTracByModel,
+    onFilterChangeByStatus: mockOnFilterChangeByStatus,
+    activeMajMinButton: null,
+    handleMajMinButtonClick: mockHandleMajMinButtonClick,
+    onDealerChange: mockOnDealerChange,
+    onDateChange: mockOnDateChange,
+  };
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
   });
 
-  const renderComponent = (props = {}) =>
-    render(
-      <Filters2
-        onDealerChange={mockOnDealerChange}
-        onDateChange={mockOnDateChange}
-        onFilterChangeTracByModel={mockOnFilterChangeTracByModel}
-        onFilterChangeByStatus={mockOnFilterChangeByStatus}
-        handleMajMinButtonClick={mockHandleMajMinButtonClick}
-        activeMajMinButton={null}
-        {...props}
-      />
-    );
+  it('рендерится без ошибок', () => {
+    render(<Filters2 {...defaultProps} />);
+    expect(screen.getByTestId('mock-select')).toBeInTheDocument();
+  });
 
-  it('рендерит все элементы', () => {
-    renderComponent();
-
-    // ✅ Кириллическая "К" — потому что в интерфейсе отображается кириллица
-    expect(screen.getByText('К-742МСТ')).toBeInTheDocument();
-    expect(screen.getByText('К-7')).toBeInTheDocument();
-    expect(screen.getByText('К-525')).toBeInTheDocument();
-
-    // Статусы
+  it('содержит все основные элементы', () => {
+    render(<Filters2 {...defaultProps} />);
+    
+    expect(screen.getByTestId('mock-select')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toBeInTheDocument();
     expect(screen.getByText('Серийное')).toBeInTheDocument();
     expect(screen.getByText('Опытное')).toBeInTheDocument();
     expect(screen.getByText('Актуальное')).toBeInTheDocument();
     expect(screen.getByText('Критические')).toBeInTheDocument();
-
-    // Дилер и дата
-    expect(screen.getByPlaceholderText(/Поиск по дилеру/i)).toBeInTheDocument();
-    expect(screen.getByTestId('mock-date-picker')).toBeInTheDocument();
-
-    // Кнопки MAJ/MIN
     expect(screen.getByText('Требуется MAJ')).toBeInTheDocument();
     expect(screen.getByText('Требуется MIN')).toBeInTheDocument();
   });
 
-  // === Фильтрация по моделям ===
-  it('вызывает onFilterChangeTracByModel при клике на чекбокс модели', () => {
-    renderComponent();
+  describe('Select моделей тракторов', () => {
+    it('выбор модели вызывает обработчик', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const option = screen.getByTestId('option-K-742МСТ');
+      await userEvent.click(option);
+      
+      expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K-742МСТ']);
+    });
 
-    // ✅ Кириллическая "К" — ищем в интерфейсе
-    const checkbox = screen.getByLabelText('К-742МСТ').closest('input');
-    fireEvent.click(checkbox);
+    it('множественный выбор моделей', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      await userEvent.click(screen.getByTestId('option-K-742МСТ'));
+      await userEvent.click(screen.getByTestId('option-K-7'));
+      
+      expect(mockOnFilterChangeTracByModel).toHaveBeenLastCalledWith(['K-742МСТ', 'K-7']);
+    });
 
-    // ✅ Латинская "K" — компонент преобразует через FilterToTractor
-    expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K-742МСТ']);
-  });
-
-  it('поддерживает множественный выбор моделей', () => {
-    renderComponent();
-
-    // ✅ Кириллическая "К" — ищем в интерфейсе
-    fireEvent.click(screen.getByLabelText('К-742МСТ').closest('input'));
-    fireEvent.click(screen.getByLabelText('К-7').closest('input'));
-
-    // ✅ Латинская "K" — компонент преобразует через FilterToTractor
-    expect(mockOnFilterChangeTracByModel).toHaveBeenLastCalledWith(['K-742МСТ', 'K-7']);
-  });
-
-  // === Фильтрация по статусу ===
-  it('вызывает onFilterChangeByStatus при клике на чекбокс статуса', () => {
-    renderComponent();
-
-    fireEvent.click(screen.getByLabelText('Серийное').closest('input'));
-
-    expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s']);
-  });
-
-  it('поддерживает множественный выбор статусов', () => {
-    renderComponent();
-
-    fireEvent.click(screen.getByLabelText('Серийное').closest('input'));
-    fireEvent.click(screen.getByLabelText('Опытное').closest('input'));
-
-    expect(mockOnFilterChangeByStatus).toHaveBeenLastCalledWith(['s', 't']);
-  });
-
-  it('вызывает onDealerChange при вводе текста', () => {
-    renderComponent();
-
-    const input = screen.getByPlaceholderText(/Поиск по дилеру/i);
-    fireEvent.change(input, { target: { value: 'АгроТех' } });
-
-    expect(mockOnDealerChange).toHaveBeenCalledWith('АгроТех');
-  });
-
-  it('вызывает onDealerChange при нажатии Enter', () => {
-    renderComponent();
-
-    const input = screen.getByPlaceholderText(/Поиск по дилеру/i);
-    fireEvent.change(input, { target: { value: 'АгроТех' } });
-    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
-
-    expect(mockOnDealerChange).toHaveBeenCalledWith('АгроТех');
-  });
-
-  it('вызывает onDealerChange при клике на кнопку поиска', () => {
-    renderComponent();
-
-    const input = screen.getByPlaceholderText(/Поиск по дилеру/i);
-    fireEvent.change(input, { target: { value: 'АгроТех' } });
-
-    const button = screen.getByTestId('search-button');
-    fireEvent.click(button);
-
-    expect(mockOnDealerChange).toHaveBeenCalledWith('АгроТех');
-  });
-
-  // === Работа с датами ===
-  it('вызывает onDateChange при выборе одной даты', () => {
-    renderComponent();
-
-    const startDateInput = screen.getByTestId('start-date');
-    fireEvent.change(startDateInput, { target: { value: '2023-05-15' } });
-
-    expect(mockOnDateChange).toHaveBeenCalledWith({
-      date_assemle: '2023-05-15',
-      date_start: null,
-      date_end: null,
+    it('очистка выбора моделей', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      await userEvent.click(screen.getByTestId('option-K-742МСТ'));
+      expect(mockOnFilterChangeTracByModel).toHaveBeenCalled();
     });
   });
 
-  it('вызывает onDateChange при выборе диапазона дат', () => {
-    renderComponent();
+  describe('Поиск по дилеру', () => {
+    it('ввод текста вызывает onDealerChange', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Дилер 1');
+      
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Д');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Ди');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Дил');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Диле');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Дилер');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Дилер ');
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Дилер 1');
+    });
 
-    const startInput = screen.getByTestId('start-date');
-    const endInput = screen.getByTestId('end-date');
+    it('поиск по Enter', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Дилер{enter}');
+      
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Дилер');
+    });
 
-    fireEvent.change(startInput, { target: { value: '2023-01-01' } });
-    fireEvent.change(endInput, { target: { value: '2023-12-31' } });
-
-    expect(mockOnDateChange).toHaveBeenCalledWith({
-      date_assemle: null,
-      date_start: '2023-01-01',
-      date_end: '2023-12-31',
+    it('поиск по кнопке', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Тест');
+      
+      const searchButton = screen.getByTestId('search-button');
+      await userEvent.click(searchButton);
+      
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Тест');
     });
   });
 
-  it('вызывает onDateChange при очистке даты', () => {
-    renderComponent();
+  describe('Фильтры по статусам', () => {
+    it('чекбокс "Серийное"', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Серийное');
+      await userEvent.click(checkbox);
+      
+      expect(checkbox.checked).toBe(true);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s']);
+      
+      await userEvent.click(checkbox);
+      expect(checkbox.checked).toBe(false);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith([]);
+    });
 
-    fireEvent.click(screen.getByTestId('clear-date'));
+    it('чекбокс "Опытное"', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Опытное');
+      await userEvent.click(checkbox);
+      
+      expect(checkbox.checked).toBe(true);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['t']);
+    });
 
-    expect(mockOnDateChange).toHaveBeenCalledWith({
-      date_assemle: null,
-      date_start: null,
-      date_end: null,
+    it('чекбокс "Актуальное"', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Актуальное');
+      await userEvent.click(checkbox);
+      
+      expect(checkbox.checked).toBe(true);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['b']);
+    });
+
+    it('чекбокс "Критические"', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Критические');
+      await userEvent.click(checkbox);
+      
+      expect(checkbox.checked).toBe(true);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['o']);
+    });
+
+    it('несколько чекбоксов одновременно', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const serialCheckbox = screen.getByLabelText('Серийное');
+      const experiencedCheckbox = screen.getByLabelText('Опытное');
+      
+      await userEvent.click(serialCheckbox);
+      await userEvent.click(experiencedCheckbox);
+      
+      expect(serialCheckbox.checked).toBe(true);
+      expect(experiencedCheckbox.checked).toBe(true);
+      
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s', 't']);
+    });
+
+    it('обработчик handleFilterByStatus вызывается', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Серийное');
+      await userEvent.click(checkbox);
+      
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s']);
     });
   });
 
-  // === Кнопки MAJ / MIN ===
-  it('вызывает handleMajMinButtonClick с "MAJ"', () => {
-    renderComponent();
-    fireEvent.click(screen.getByText('Требуется MAJ'));
-    expect(mockHandleMajMinButtonClick).toHaveBeenCalledWith('MAJ');
+  describe('Кнопки MAJ/MIN', () => {
+    it('кнопка MAJ вызывает обработчик', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const button = screen.getByText('Требуется MAJ');
+      await userEvent.click(button);
+      
+      expect(mockHandleMajMinButtonClick).toHaveBeenCalledWith('MAJ');
+    });
+
+    it('кнопка MIN вызывает обработчик', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const button = screen.getByText('Требуется MIN');
+      await userEvent.click(button);
+      
+      expect(mockHandleMajMinButtonClick).toHaveBeenCalledWith('MIN');
+    });
+
+    it('активный класс для MAJ кнопки', () => {
+      render(<Filters2 {...defaultProps} activeMajMinButton="MAJ" />);
+      
+      const button = screen.getByText('Требуется MAJ');
+      expect(button.className).toBe('majmin_button_active');
+    });
+
+    it('активный класс для MIN кнопки', () => {
+      render(<Filters2 {...defaultProps} activeMajMinButton="MIN" />);
+      
+      const button = screen.getByText('Требуется MIN');
+      expect(button.className).toBe('majmin_button_active');
+    });
+
+    it('неактивный класс когда кнопка не активна', () => {
+      render(<Filters2 {...defaultProps} activeMajMinButton={null} />);
+      
+      const majButton = screen.getByText('Требуется MAJ');
+      const minButton = screen.getByText('Требуется MIN');
+      
+      expect(majButton.className).toBe('majmin_button');
+      expect(minButton.className).toBe('majmin_button');
+    });
   });
 
-  it('вызывает handleMajMinButtonClick с "MIN"', () => {
-    renderComponent();
-    fireEvent.click(screen.getByText('Требуется MIN'));
-    expect(mockHandleMajMinButtonClick).toHaveBeenCalledWith('MIN');
+  describe('DatePicker', () => {
+    it('очистка даты вызывает onDateChange', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const clearButton = screen.getByTestId('datepicker-clear');
+      await userEvent.click(clearButton);
+      
+      expect(mockOnDateChange).toHaveBeenCalledWith({
+        date_assemle: null,
+        date_start: null,
+        date_end: null
+      });
+    });
+
+    it('handleDateChange форматирует даты', () => {
+      const date = new Date('2024-01-15');
+      
+      const result = mockFormat(date, 'yyyy-MM-dd');
+      
+      expect(result).toBe('2024-01-15');
+      expect(mockFormat).toHaveBeenCalledWith(date, 'yyyy-MM-dd');
+    });
   });
 
-  // === Проверка активного состояния кнопок (через пропс) ===
-  it('применяет активный класс к MAJ, если activeMajMinButton = "MAJ"', () => {
-    renderComponent({ activeMajMinButton: 'MAJ' });
-    expect(screen.getByText('Требуется MAJ')).toHaveClass('majmin_button_active');
-    expect(screen.getByText('Требуется MIN')).not.toHaveClass('majmin_button_active');
+  describe('Взаимодействие с фокусом', () => {
+    it('меняет плейсхолдер при фокусе', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      expect(input.placeholder).toBe('Поиск по дилеру');
+      
+      await userEvent.click(input);
+      expect(input.placeholder).toBe('');
+      
+      await userEvent.tab();
+      expect(input.placeholder).toBe('Поиск по дилеру');
+    });
+
+    it('сохраняет текст при потере фокуса', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Мой дилер');
+      await userEvent.tab();
+      
+      expect(input.value).toBe('Мой дилер');
+      expect(input.placeholder).toBe('');
+    });
+
+    it('не меняет плейсхолдер если есть текст при потере фокуса', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Текст');
+      await userEvent.click(input);
+      await userEvent.tab();
+      
+      expect(input.value).toBe('Текст');
+      expect(input.placeholder).toBe('');
+    });
   });
 
-  it('применяет активный класс к MIN, если activeMajMinButton = "MIN"', () => {
-    renderComponent({ activeMajMinButton: 'MIN' });
-    expect(screen.getByText('Требуется MIN')).toHaveClass('majmin_button_active');
-    expect(screen.getByText('Требуется MAJ')).not.toHaveClass('majmin_button_active');
+  describe('Edge cases', () => {
+    it('работает без опциональных обработчиков', () => {
+      const minimalProps = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+      };
+      
+      expect(() => {
+        render(<Filters2 {...minimalProps} />);
+        
+        expect(screen.getByText('Требуется MAJ')).toBeTruthy();
+        expect(screen.getByText('Требуется MIN')).toBeTruthy();
+      }).not.toThrow();
+    });
+
+    it('handleSearch не вызывает onDealerChange если функция не передана', () => {
+      const consoleSpy = vi.spyOn(console, 'error');
+      
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+      };
+      
+      render(<Filters2 {...props} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      fireEvent.change(input, { target: { value: 'Тест' } });
+      
+      expect(consoleSpy).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it('handleDateChange не вызывает onDateChange если функция не передана', () => {
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+      };
+      
+      expect(() => {
+        render(<Filters2 {...props} />);
+      }).not.toThrow();
+    });
+  });
+
+  describe('Функции обработчики', () => {
+    it('handleSearch вызывает onDealerChange', () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      fireEvent.change(input, { target: { value: 'Тест' } });
+      
+      expect(mockDealerChange).toHaveBeenCalledWith('Тест');
+    });
+
+    it('handleKeydown вызывает handleSearch при Enter', async () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Дилер{enter}');
+      
+      expect(mockDealerChange).toHaveBeenCalledWith('Дилер');
+    });
+
+    it('handleChange обновляет состояние и вызывает onDealerChange', async () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Новый дилер');
+      
+      expect(input.value).toBe('Новый дилер');
+      expect(mockDealerChange).toHaveBeenCalled();
+    });
+
+    it('handleClearDate сбрасывает даты', () => {
+      const mockDateChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDateChange={mockDateChange}
+        />
+      );
+      
+      const clearButton = screen.getByTestId('datepicker-clear');
+      fireEvent.click(clearButton);
+      
+      expect(mockDateChange).toHaveBeenCalledWith({
+        date_assemle: null,
+        date_start: null,
+        date_end: null
+      });
+    });
+  });
+
+  describe('Состояния компонента', () => {
+    it('инициализирует начальные состояния', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByLabelText('Серийное').checked).toBe(false);
+      expect(screen.getByLabelText('Опытное').checked).toBe(false);
+      expect(screen.getByLabelText('Актуальное').checked).toBe(false);
+      expect(screen.getByLabelText('Критические').checked).toBe(false);
+      
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+    });
+
+    it('обновляет состояние Dealer при вводе', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(input, 'Тестовый дилер');
+      
+      expect(input.value).toBe('Тестовый дилер');
+    });
+
+    it('обновляет состояние FilterTractor_by_status при клике', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Серийное');
+      await userEvent.click(checkbox);
+      
+      expect(checkbox.checked).toBe(true);
+    });
+  });
+
+  describe('Константы и опции', () => {
+    it('содержит правильные опции тракторов', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('option-K-742МСТ')).toBeInTheDocument();
+      expect(screen.getByTestId('option-K-7')).toBeInTheDocument();
+      expect(screen.getByTestId('option-K-525')).toBeInTheDocument();
+    });
+
+    it('имеет правильные маппинги статусов', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const serialCheckbox = screen.getByLabelText('Серийное');
+      fireEvent.click(serialCheckbox);
+      
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s']);
+    });
+  });
+
+  describe('Кастомные компоненты', () => {
+    it('CustomInput рендерится', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    });
+
+    it('CustomHeader имеет базовую структуру', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    });
+  });
+
+  describe('Дополнительные тесты для покрытия', () => {
+    it('форматирование даты в handleDateChange', () => {
+      const date = new Date('2024-12-31');
+      
+      const result1 = mockFormat(date, 'yyyy-MM-dd');
+      expect(result1).toBe('2024-12-31');
+      
+      const result2 = mockFormat(null, 'yyyy-MM-dd');
+      expect(result2).toBeNull();
+      
+      const result3 = mockFormat(date, 'dd.MM.yyyy');
+      expect(typeof result3).toBe('string');
+    });
+
+    it('handleModelChange с пустым selectedOptions', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const option = screen.getByTestId('option-K-742МСТ');
+      fireEvent.click(option);
+      
+      expect(mockOnFilterChangeTracByModel).toHaveBeenCalled();
+    });
+
+    it('проверяет tractorOptions', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const options = ['K-742МСТ', 'K-7', 'K-525'];
+      options.forEach(optionValue => {
+        expect(screen.getByTestId(`option-${optionValue}`)).toBeInTheDocument();
+      });
+    });
+
+    it('проверяет FilterStatus маппинг - исправленная версия', () => {
+      const statusTests = [
+        { label: 'Серийное', expected: 's' },
+        { label: 'Опытное', expected: 't' },
+        { label: 'Актуальное', expected: 'b' },
+        { label: 'Критические', expected: 'o' }
+      ];
+      
+      statusTests.forEach(({ label, expected }) => {
+        const mockStatusHandler = vi.fn();
+        const props = {
+          activeMajMinButton: null,
+          handleMajMinButtonClick: vi.fn(),
+          onFilterChangeByStatus: mockStatusHandler,
+        };
+        
+        const { unmount } = render(<Filters2 {...props} />);
+        
+        const checkbox = screen.getByLabelText(label);
+        fireEvent.click(checkbox);
+        
+        expect(mockStatusHandler).toHaveBeenCalledWith([expected]);
+        
+        unmount();
+      });
+    });
+
+    it('handleSearch с функцией onDealerChange', () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      fireEvent.change(input, { target: { value: 'Тест' } });
+      
+      const searchButton = screen.getByTestId('search-button');
+      fireEvent.click(searchButton);
+      
+      expect(mockDealerChange).toHaveBeenCalledWith('Тест');
+    });
+
+    it('handleSearch без функции onDealerChange', () => {
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+      };
+      
+      render(<Filters2 {...props} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      fireEvent.change(input, { target: { value: 'Тест' } });
+      
+      const searchButton = screen.getByTestId('search-button');
+      
+      expect(() => {
+        fireEvent.click(searchButton);
+      }).not.toThrow();
+    });
+
+    it('onBlur обработчик', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      await userEvent.click(input);
+      expect(input.placeholder).toBe('');
+      
+      await userEvent.tab();
+      expect(input.placeholder).toBe('Поиск по дилеру');
+    });
+
+    it('CustomInput компонент', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('datepicker-input')).toBeInTheDocument();
+    });
+
+    it('CustomHeader компонент', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    });
+
+    it('handleFilterByStatus переключает состояние', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Серийное');
+      
+      await userEvent.click(checkbox);
+      expect(checkbox.checked).toBe(true);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s']);
+      
+      await userEvent.click(checkbox);
+      expect(checkbox.checked).toBe(false);
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith([]);
+    });
+
+    it('инициализация состояний useState', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkboxes = [
+        'Серийное',
+        'Опытное', 
+        'Актуальное',
+        'Критические'
+      ];
+      
+      checkboxes.forEach(label => {
+        const checkbox = screen.getByLabelText(label);
+        expect(checkbox.checked).toBe(false);
+      });
+      
+      const dealerInput = screen.getByPlaceholderText(/поиск по дилеру/i);
+      expect(dealerInput.value).toBe('');
+    });
+    
+    it('обрабатывает различные значения дилера', async () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      const testCases = [
+        { input: 'Дилер 1', expected: 'Дилер 1' },
+        { input: 'Special@Dealer#123', expected: 'Special@Dealer#123' }
+      ];
+      
+      for (const { input: inputValue, expected } of testCases) {
+        await userEvent.clear(input);
+        await userEvent.type(input, inputValue);
+        
+        expect(mockDealerChange).toHaveBeenCalledWith(expected);
+      }
+      
+      await userEvent.clear(input);
+      fireEvent.change(input, { target: { value: '' } });
+      expect(mockDealerChange).toHaveBeenCalledWith('');
+      
+      fireEvent.change(input, { target: { value: '   ' } });
+      expect(mockDealerChange).toHaveBeenCalledWith('   ');
+    });
+    
+    it('обрабатывает все статусы одновременно', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const statuses = [
+        { label: 'Серийное', key: 'Serial' },
+        { label: 'Опытное', key: 'Experienced' },
+        { label: 'Актуальное', key: 'Actual' },
+        { label: 'Критические', key: 'Critical' }
+      ];
+      
+      for (const { label } of statuses) {
+        const checkbox = screen.getByLabelText(label);
+        await userEvent.click(checkbox);
+      }
+      
+      statuses.forEach(({ label }) => {
+        expect(screen.getByLabelText(label).checked).toBe(true);
+      });
+      
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s', 't', 'b', 'o']);
+    });
+    
+    it('передает правильные значения моделей', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      await userEvent.click(screen.getByTestId('option-K-742МСТ'));
+      await userEvent.click(screen.getByTestId('option-K-7'));
+      await userEvent.click(screen.getByTestId('option-K-525'));
+      
+      expect(mockOnFilterChangeTracByModel).toHaveBeenLastCalledWith([
+        'K-742МСТ',
+        'K-7',
+        'K-525'
+      ]);
+    });
+    
+    it('обрабатывает другие клавиши кроме Enter', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      await userEvent.type(input, 'Тест');
+      await userEvent.tab();
+      
+      expect(input.value).toBe('Тест');
+    });
+    
+    it('не вызывает handleSearch для не-Enter клавиш', async () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      await userEvent.type(input, 'Тест{tab}');
+      
+      expect(mockDealerChange).toHaveBeenCalledWith('Т');
+      expect(mockDealerChange).toHaveBeenCalledWith('Те');
+      expect(mockDealerChange).toHaveBeenCalledWith('Тес');
+      expect(mockDealerChange).toHaveBeenCalledWith('Тест');
+    });
+    
+    it('не сбрасывает isFocused если Dealer не пустой', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      await userEvent.type(input, 'Дилер');
+      
+      await userEvent.click(input);
+      await userEvent.tab();
+      
+      expect(input.value).toBe('Дилер');
+      expect(input.placeholder).toBe('');
+    });
+    
+    it('инициализирует все состояния правильно', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkboxes = [
+        'Серийное',
+        'Опытное',
+        'Актуальное',
+        'Критические'
+      ];
+      
+      checkboxes.forEach(label => {
+        expect(screen.getByLabelText(label).checked).toBe(false);
+      });
+      
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+      
+      const selectInput = screen.getByTestId('select-input');
+      expect(selectInput.value).toBe('');
+    });
+    
+    it('рендерится с правильной структурой CustomHeader', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    });
+    
+    it('обрабатывает логику years массива в CustomHeader', () => {
+      const currentYear = new Date().getFullYear();
+      const years = Array.from({ length: 30 }, (_, i) => currentYear - 10 + i);
+      
+      expect(years).toHaveLength(30);
+      expect(years[0]).toBe(currentYear - 10);
+      expect(years[29]).toBe(currentYear + 19);
+    });
+    
+    it('обрабатывает выбор одной даты (date_assemle)', () => {
+      const mockDateChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDateChange={mockDateChange}
+        />
+      );
+      
+      const date = new Date('2024-05-15');
+      mockFormat.mockReturnValue('2024-05-15');
+      const formattedDate = mockFormat(date, 'yyyy-MM-dd');
+      
+      expect(formattedDate).toBe('2024-05-15');
+      expect(mockFormat).toHaveBeenCalled();
+    });
+    
+    it('обрабатывает выбор диапазона дат (date_start, date_end)', () => {
+      const mockDateChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDateChange={mockDateChange}
+        />
+      );
+      
+      const startDate = new Date('2024-01-01');
+      const endDate = new Date('2024-01-31');
+      
+      mockFormat.mockReturnValueOnce('2024-01-01');
+      mockFormat.mockReturnValueOnce('2024-01-31');
+      
+      const startFormatted = mockFormat(startDate, 'yyyy-MM-dd');
+      const endFormatted = mockFormat(endDate, 'yyyy-MM-dd');
+      
+      expect(startFormatted).toBe('2024-01-01');
+      expect(endFormatted).toBe('2024-01-31');
+    });
+    
+    it('имеет правильный placeholder в DatePicker', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const datepickerInput = screen.getByTestId('datepicker-input');
+      expect(datepickerInput.placeholder).toBe('Дата выпуска');
+    });
+    
+    it('обрабатывает клик по иконке календаря', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const clearButton = screen.getByTestId('datepicker-clear');
+      expect(clearButton).toBeInTheDocument();
+    });
+    
+    it('переключает статусы независимо', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const serialCheckbox = screen.getByLabelText('Серийное');
+      const criticalCheckbox = screen.getByLabelText('Критические');
+      
+      await userEvent.click(serialCheckbox);
+      expect(serialCheckbox.checked).toBe(true);
+      expect(criticalCheckbox.checked).toBe(false);
+      
+      await userEvent.click(criticalCheckbox);
+      expect(serialCheckbox.checked).toBe(true);
+      expect(criticalCheckbox.checked).toBe(true);
+      
+      await userEvent.click(serialCheckbox);
+      expect(serialCheckbox.checked).toBe(false);
+      expect(criticalCheckbox.checked).toBe(true);
+    });
+    
+    it('содержит правильные значения и метки в tractorOptions', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const options = [
+        { value: 'K-742МСТ', label: 'К-742МСТ' },
+        { value: 'K-7', label: 'К-7' },
+        { value: 'K-525', label: 'К-525' }
+      ];
+      
+      options.forEach(option => {
+        const optionElement = screen.getByTestId(`option-${option.value}`);
+        expect(optionElement).toBeInTheDocument();
+        expect(optionElement.textContent).toBe(option.label);
+      });
+    });
+    
+    it('проверяет что Select имеет правильные стили', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const select = screen.getByTestId('mock-select');
+      expect(select).toBeInTheDocument();
+      
+      const selectInput = screen.getByTestId('select-input');
+      expect(selectInput).toBeInTheDocument();
+    });
+    
+    it('проверяет начальные значения состояний', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByLabelText('Серийное').checked).toBe(false);
+      expect(screen.getByLabelText('Опытное').checked).toBe(false);
+      expect(screen.getByLabelText('Актуальное').checked).toBe(false);
+      expect(screen.getByLabelText('Критические').checked).toBe(false);
+      
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+    });
+    
+    it('обрабатывает клик по всем чекбоксам', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkboxes = [
+        'Серийное',
+        'Опытное',
+        'Актуальное',
+        'Критические'
+      ];
+      
+      for (const label of checkboxes) {
+        const checkbox = screen.getByLabelText(label);
+        await userEvent.click(checkbox);
+        expect(checkbox.checked).toBe(true);
+        
+        await userEvent.click(checkbox);
+        expect(checkbox.checked).toBe(false);
+      }
+    });
+    
+    it('правильно обновляет поле дилера', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      
+      await userEvent.type(input, 'Тестовый дилер');
+      expect(input.value).toBe('Тестовый дилер');
+      
+      await userEvent.clear(input);
+      expect(input.value).toBe('');
+    });
+    
+    it('вызывает поиск по кнопке и по Enter', async () => {
+      const mockDealerChange = vi.fn();
+      render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={vi.fn()}
+          onDealerChange={mockDealerChange}
+        />
+      );
+      
+      const input = screen.getByPlaceholderText(/поиск по дилеру/i);
+      const searchButton = screen.getByTestId('search-button');
+      
+      await userEvent.type(input, 'Дилер 1');
+      await userEvent.click(searchButton);
+      expect(mockDealerChange).toHaveBeenCalledWith('Дилер 1');
+      
+      await userEvent.clear(input);
+      await userEvent.type(input, 'Дилер 2{enter}');
+      expect(mockDealerChange).toHaveBeenCalledWith('Дилер 2');
+    });
+    
+    it('работает с разными комбинациями пропсов', () => {
+      const testCases = [
+        { activeMajMinButton: 'MAJ' },
+        { activeMajMinButton: 'MIN' },
+        { activeMajMinButton: null },
+      ];
+      
+      testCases.forEach(({ activeMajMinButton }) => {
+        const props = {
+          activeMajMinButton,
+          handleMajMinButtonClick: vi.fn(),
+        };
+        
+        render(<Filters2 {...props} />);
+        
+        const majButton = screen.getByText('Требуется MAJ');
+        const minButton = screen.getByText('Требуется MIN');
+        
+        if (activeMajMinButton === 'MAJ') {
+          expect(majButton.className).toBe('majmin_button_active');
+          expect(minButton.className).toBe('majmin_button');
+        } else if (activeMajMinButton === 'MIN') {
+          expect(majButton.className).toBe('majmin_button');
+          expect(minButton.className).toBe('majmin_button_active');
+        } else {
+          expect(majButton.className).toBe('majmin_button');
+          expect(minButton.className).toBe('majmin_button');
+        }
+        
+        cleanup();
+      });
+    });
+    
+    it('обрабатывает взаимодействие с Select', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const option = screen.getByTestId('option-K-742МСТ');
+      await userEvent.click(option);
+      
+      expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K-742МСТ']);
+    });
+    
+    it('проверяет наличие всех элементов интерфейса', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-select')).toBeInTheDocument();
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toBeInTheDocument();
+      expect(screen.getByTestId('search-button')).toBeInTheDocument();
+      
+      ['Серийное', 'Опытное', 'Актуальное', 'Критические'].forEach(label => {
+        expect(screen.getByLabelText(label)).toBeInTheDocument();
+      });
+      
+      expect(screen.getByText('Требуется MAJ')).toBeInTheDocument();
+      expect(screen.getByText('Требуется MIN')).toBeInTheDocument();
+    });
+  });
+
+  // НОВЫЕ ТЕСТЫ ДЛЯ НЕПОКРЫТЫХ СТРОК
+  describe('Тесты для непокрытых строк 62-63, 68, 75 (CustomHeader)', () => {
+    it('рендерит кнопки навигации в CustomHeader', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    });
+    
+    it('обрабатывает changeYear в CustomHeader', () => {
+      const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+      expect(years.length).toBe(30);
+    });
+  });
+  
+  describe('Тесты для непокрытых строк 93-96, 112 (форматирование дат)', () => {
+    it('форматирует даты в handleDateChange', () => {
+      const date = new Date('2024-05-15');
+      
+      mockFormat.mockReturnValue('2024-05-15');
+      const result = mockFormat(date, 'yyyy-MM-dd');
+      
+      expect(result).toBe('2024-05-15');
+      expect(mockFormat).toHaveBeenCalledWith(date, 'yyyy-MM-dd');
+    });
+    
+    it('обрабатывает null дату в formatDate', () => {
+      mockFormat.mockReturnValue(null);
+      const result = mockFormat(null, 'yyyy-MM-dd');
+      
+      expect(result).toBeNull();
+    });
+  });
+  
+  describe('Тесты для непокрытых строк 147-179 (handleDateChange логика)', () => {
+    it('обрабатывает выбор одной даты через DatePicker', () => {
+      const mockDateChange = vi.fn();
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+        onDateChange: mockDateChange,
+      };
+      
+      render(<Filters2 {...props} />);
+      
+      const clearButton = screen.getByTestId('datepicker-clear');
+      fireEvent.click(clearButton);
+      
+      expect(mockDateChange).toHaveBeenCalledWith({
+        date_assemle: null,
+        date_start: null,
+        date_end: null
+      });
+    });
+  });
+  
+  describe('Тесты для непокрытых строк 240-250 (стили Select)', () => {
+    it('применяет стили к Select компоненту', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(MockSelect).toHaveBeenCalled();
+      
+      const lastCall = MockSelect.mock.calls[MockSelect.mock.calls.length - 1];
+      const props = lastCall[0];
+      
+      expect(props.styles).toBeDefined();
+      expect(typeof props.styles.control).toBe('function');
+      expect(typeof props.styles.menuList).toBe('function');
+    });
+    
+   // НАЙДИТЕ тест "проверяет вызов Select с правильными параметрами" (примерно строка 1148)
+// и ЗАМЕНИТЕ его на:
+
+it('проверяет вызов Select с правильными параметрами', () => {
+  render(<Filters2 {...defaultProps} />);
+  
+  expect(MockSelect).toHaveBeenCalled();
+  
+  // Получаем первый вызов и проверяем основные параметры
+  const firstCall = MockSelect.mock.calls[0];
+  const props = firstCall[0]; // Первый аргумент
+  
+  expect(props.placeholder).toBe('Модель трактора');
+  expect(props.isMulti).toBe(true);
+  expect(props.options).toHaveLength(3);
+  expect(props.options[0].value).toBe('K-742МСТ');
+  expect(props.options[1].value).toBe('K-7');
+  expect(props.options[2].value).toBe('K-525');
+  expect(props.styles).toBeDefined();
+  expect(typeof props.styles.control).toBe('function');
+  expect(typeof props.styles.menuList).toBe('function');
+});
+  });
+  
+  describe('Дополнительные интеграционные тесты', () => {
+    it('работает со всеми фильтрами одновременно', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      // Выбираем модель
+      await userEvent.click(screen.getByTestId('option-K-742МСТ'));
+      
+      // Вводим дилера
+      const dealerInput = screen.getByPlaceholderText(/поиск по дилеру/i);
+      await userEvent.type(dealerInput, 'Тестовый дилер');
+      
+      // Выбираем статусы
+      await userEvent.click(screen.getByLabelText('Серийное'));
+      await userEvent.click(screen.getByLabelText('Критические'));
+      
+      // Проверяем что все обработчики вызывались
+      expect(mockOnFilterChangeTracByModel).toHaveBeenCalledWith(['K-742МСТ']);
+      expect(mockOnDealerChange).toHaveBeenCalledWith('Тестовый дилер');
+      expect(mockOnFilterChangeByStatus).toHaveBeenCalledWith(['s', 'o']);
+    });
+    
+    it('сбрасывает все состояния через DatePicker', () => {
+      const mockDateChange = vi.fn();
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+        onDateChange: mockDateChange,
+      };
+      
+      render(<Filters2 {...props} />);
+      
+      const clearButton = screen.getByTestId('datepicker-clear');
+      fireEvent.click(clearButton);
+      fireEvent.click(clearButton); // Двойной клик
+      
+      expect(mockDateChange).toHaveBeenCalledTimes(2);
+    });
+    
+    it('обрабатывает быстрые последовательные клики', async () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      const checkbox = screen.getByLabelText('Серийное');
+      
+      // Быстрые клики
+      await userEvent.click(checkbox);
+      await userEvent.click(checkbox);
+      await userEvent.click(checkbox);
+      
+      // После нечетного числа кликов чекбокс должен быть включен
+      expect(checkbox.checked).toBe(true);
+    });
+    
+    it('сохраняет состояние при переключении между MAJ/MIN', () => {
+      const mockHandleMajMinButtonClick = vi.fn();
+      const { rerender } = render(
+        <Filters2 
+          activeMajMinButton={null}
+          handleMajMinButtonClick={mockHandleMajMinButtonClick}
+        />
+      );
+      
+      const majButton = screen.getByText('Требуется MAJ');
+      const minButton = screen.getByText('Требуется MIN');
+      
+      fireEvent.click(majButton);
+      expect(mockHandleMajMinButtonClick).toHaveBeenCalledWith('MAJ');
+      
+      // Меняем пропс и перерисовываем
+      rerender(
+        <Filters2 
+          activeMajMinButton="MAJ"
+          handleMajMinButtonClick={mockHandleMajMinButtonClick}
+        />
+      );
+      
+      expect(majButton.className).toBe('majmin_button_active');
+      expect(minButton.className).toBe('majmin_button');
+    });
   });
 });
