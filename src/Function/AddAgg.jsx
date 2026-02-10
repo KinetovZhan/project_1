@@ -183,6 +183,8 @@ export function AddAggForm({ onBack, onSubmit }) {
             <option value="kpp">КПП</option>
             <option value="rk">РК</option>
             <option value="hydro">Гидрораспределитель</option>
+            <option value="ap">Автопилот</option>
+            <option value="bk">БК</option>
           </select>
         </div>
 

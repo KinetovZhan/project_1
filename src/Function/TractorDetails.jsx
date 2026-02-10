@@ -2,11 +2,10 @@
 import { useState, useEffect } from 'react';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
-import DefaultImage from '../img/Image.png';
-import K5Image from '../img/м1.jpg';
-import K7Image from '../img/м2.jpg';
-import K525Image from '../img/м3.png';
-import K742Image from '../img/м4.jpg';
+import DefaultImage from '../img/default.jpg';
+import K5Image from '../img/К5.png';
+import K7Image from '../img/К7М.png';
+
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -21,8 +20,6 @@ export function TractorDetails({ vin, onBack }) {
     const ImageJpg = {
       'K-5': K5Image,
       'K-7': K7Image,
-      'K-525': K525Image,
-      'K-742МСТ': K742Image,
     }
 
     return ImageJpg[model]|| DefaultImage;
