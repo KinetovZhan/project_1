@@ -33,12 +33,12 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       }
       if (userRole !== 'dealer') {
         try {
-          const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission'};
+          const FilterToTypeMap = { 'DVS': ['dvs', 'engine'], 'KPP': ['kpp', 'transmission'],'RK': ['suspension'], 'hydrorasp': ['hydraulics']};
           const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
   
           const postData = {
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-            type_comp: activeFilters.map(f => FilterToTypeMap[f] || f),
+            type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
             model_comp: Array.isArray(selectedModel) ? selectedModel : []
           };
           

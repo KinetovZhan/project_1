@@ -26,10 +26,10 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     hydrorasp: false
   });
 
-  // const [FilterItems2, setFilterItems2] = useState({
-  //   K7: false,
-  //   K5: false,
-  // })
+  const [FilterItems2, setFilterItems2] = useState({
+    K7: false,
+    K5: false,
+  })
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
@@ -112,7 +112,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
-      .map(key => componentTypeMap[key]);
+      .flatMap(key => componentTypeMap[key]);
     
     const activeTractorModels = selectedTractorModels.map(key => 
       key === 'K7' ? 'K-7' : 'K-5'
