@@ -3,7 +3,7 @@ import K5Image from '../img/м1.jpg';
 import K7Image from '../img/м2.jpg';
 import K525Image from '../img/м3.png';
 import K742Image from '../img/м4.jpg';
-import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
+import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
@@ -14,6 +14,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [downloading, setDownloading] = useState(null)
   const { token, user } = useAuth();
   const [isVisible, setIsVisible] = useState(null)
+
+  const hoverTimers = useRef({})
 
   
   const userRole = user?.role || 'user';

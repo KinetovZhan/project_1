@@ -34,6 +34,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen,setIsYearOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); 
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {

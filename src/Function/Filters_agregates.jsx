@@ -35,6 +35,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   const [selectedModel, setSelectedModel] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   const isMobile = useCheckMobile();
+
   
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
 
@@ -102,6 +103,12 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
 
 
   const fetchModels = async () => {
+
+    if (!token) {
+      console.log('Нет токена, очищаем список моделей');
+      setComponentModels([]);
+      return; 
+    }
     
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
@@ -121,16 +128,15 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     try {
       setLoading(true);
       setError(null);
-
+      
       const headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+         'Authorization': `Bearer ${token}`
       };
 
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
+      
+      console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
       const response = await fetch(`http://${ip}/search/component-models`, {
         method: 'POST',
