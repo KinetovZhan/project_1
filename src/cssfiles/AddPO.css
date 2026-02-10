@@ -160,32 +160,42 @@
   cursor: pointer;
   font-weight: bold;
   margin-top: 15px;
+  
 }
 
 .add-po-container {
   position: absolute;
   top: 182px; /* отступ сверху */
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
+  
 }
 
-/* .add-po-container button {
+.add-po-container button {
   font-family: Arial;
-  font-size:16px;
+  font-size:14px;
   font-weight:600;
-} */
+} 
+
+
+.active{
+  font-family: Arial;
+  font-size:14px;
+  font-weight:600;
+  background-color:rgba(139, 139, 139, 1);
+} 
 
 
 .add-po-container2 {
   position: absolute;
-  top: 252px; /* отступ сверху */
+  top: 260px; /* отступ сверху */
   padding: 0 63px; /* отступы по бокам, как у других кнопок */
 }
 
-/* .add-po-container2 button {
+.add-po-container2 button {
   font-family: Arial;
-  font-size:16px;
+  font-size:14px;
   font-weight:600;
-} */
+} 
 
 @media (max-width:767px) {
   .add-po-form-container {

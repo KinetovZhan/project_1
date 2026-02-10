@@ -30,15 +30,16 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     BK:false
   });
 
-  // const [FilterItems2, setFilterItems2] = useState({
-  //   K7: false,
-  //   K5: false,
-  // })
+  const [FilterItems2, setFilterItems2] = useState({
+    K7: false,
+    K5: false,
+  })
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   const isMobile = useCheckMobile();
+
   
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
 
@@ -106,10 +107,16 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
 
 
   const fetchModels = async () => {
+
+    if (!token) {
+      console.log('Нет токена, очищаем список моделей');
+      setComponentModels([]);
+      return; 
+    }
     
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
-      .map(key => componentTypeMap[key]);
+      .flatMap(key => componentTypeMap[key]);
     
     const activeTractorModels = selectedTractorModels.map(key => 
       key === 'K7' ? 'K-7' : 'K-5'
@@ -125,16 +132,15 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     try {
       setLoading(true);
       setError(null);
-
+      
       const headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+         'Authorization': `Bearer ${token}`
       };
 
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
+      
+      console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
       const response = await fetch(`http://${ip}/search/component-models`, {
         method: 'POST',

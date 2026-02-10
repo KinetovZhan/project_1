@@ -34,6 +34,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen,setIsYearOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); 
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
@@ -279,11 +280,17 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
       <div className='search_by_dealer'>
         <input
           type="text"
-          placeholder="Поиск по дилеру"
+          placeholder={isFocused || Dealer ? '' : "Поиск по дилеру"}
           className='searcher_dealer'
           value={Dealer}
           onChange={handleChange} 
+          onFocus={() => setIsFocused(true)}
           onKeyDown={handleKeydown}
+          onBlur={() => {
+            if (!Dealer) {
+              setIsFocused(false);
+            }
+          }}
         />
         <button 
           type="button"

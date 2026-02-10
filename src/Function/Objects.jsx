@@ -8,7 +8,7 @@ import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import DisplayImage from '../img/БК дисплей.png';
 import ContrImage from '../img/БК Контроллер.png';
-import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
+import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
@@ -19,6 +19,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [downloading, setDownloading] = useState(null)
   const { token, user } = useAuth();
   const [isVisible, setIsVisible] = useState(null)
+
+  const hoverTimers = useRef({})
 
   
   const userRole = user?.role || 'user';
@@ -36,12 +38,12 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       }
       if (userRole !== 'dealer') {
         try {
-          const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission','AP':'ap','BK':'bk'};
+          const FilterToTypeMap = { 'DVS': ['dvs', 'engine'], 'KPP': ['kpp', 'transmission'],'RK': ['suspension'], 'hydrorasp': ['hydraulics']};
           const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
   
           const postData = {
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-            type_comp: activeFilters.map(f => FilterToTypeMap[f] || f),
+            type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
             model_comp: Array.isArray(selectedModel) ? selectedModel : []
           };
           
@@ -215,6 +217,32 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   }
 };
 
+const handleMouseEnter = (id) => {
+    // Очищаем предыдущий таймер для этого элемента
+    if (hoverTimers.current[id]) {
+      clearTimeout(hoverTimers.current[id]);
+      delete hoverTimers.current[id];
+    }
+    
+    // Устанавливаем таймер на 3 секунды для показа popup
+    hoverTimers.current[id] = setTimeout(() => {
+      setIsVisible(id);
+      delete hoverTimers.current[id];
+    }, 3000); // 3 секунды = 3000 миллисекунд
+  };
+
+  // Функция для обработки ухода мыши
+  const handleMouseLeave = (id) => {
+    // Очищаем таймер при уходе мыши
+    if (hoverTimers.current[id]) {
+      clearTimeout(hoverTimers.current[id]);
+      delete hoverTimers.current[id];
+    }
+    
+    // Скрываем popup сразу при уходе мыши
+    setIsVisible(null);
+  };
+
 
   // --- 2. Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных ---
   const filteredItems = useMemo(() => {
@@ -316,7 +344,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
                     </h4>
                     <div className='infodisc'>
-                      <h5 className='textunder' onMouseEnter={() => setIsVisible(item.id_Firmwares)} onMouseLeave={() => setIsVisible(null)}>
+                      <h5 className='textunder' onMouseEnter={() => handleMouseEnter(item.id_Firmwares)}  onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
                         Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
                         {item.part_type ? ` (${item.part_type})` : ' (—)'}
                       </h5>

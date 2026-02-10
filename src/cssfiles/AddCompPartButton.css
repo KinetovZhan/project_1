@@ -1,8 +1,17 @@
 .add-po-container3 {
   position: absolute;
-  top: 322px; 
+  top: 337px; 
   left:63px;
+  
 }
+
+
+.add-po-container3 button {
+  font-family: Arial;
+  font-size:14px;
+  font-weight:600;
+}
+
 
 .addCompParmForm {
     background-color:red;
@@ -12,9 +21,6 @@
 
 }
 
-.formforCompPart {
-
-}
 
 @media (max-width:767px) {
   .add-po-container3 {
