@@ -68,10 +68,10 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && userRole === 'moderator'  && (
         <div className='add-po-container'>
-          <button 
+          <button className={activeButton === 'addPO' ? 'active':''}
             onClick={() =>{
               onAddPoClick();
-              // if (isMobile) setIsOpen(false);
+              handleButtonClick('addPO');
               }}> 
             Добавить ПО
           </button>
@@ -80,7 +80,11 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container2 '>
-          <button onClick={onAddAggClick}> 
+          <button className={activeButton === 'addAgg' ? 'active':''}
+            onClick={() =>{
+            onAddAggClick 
+            handleButtonClick('addAgg')
+          }}> 
             Добавить агрегат
           </button>
         </div>
@@ -88,7 +92,11 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
 
       {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container3'>
-          <button onClick={onAddCompPartClick}>
+          <button className={activeButton === 'AddCompPart' ? 'active':''}
+            onClick={() => {
+            onAddCompPartClick
+            handleButtonClick('AddCompPart')
+          }}>
             Добавить часть агрегата
           </button>
         </div>

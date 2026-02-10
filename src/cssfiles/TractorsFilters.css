@@ -688,25 +688,31 @@
 .search_by_dealer ::placeholder {
   font-size:16px;
   font-family:Arial;
-  padding :10px;
+  padding :0px;
 }
 
 
 button.search_button {
   width:50px;
+  height: 56px;
   position:absolute;
   border: none;
   right: 0px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
+  background-color: rgba(217, 217, 217, 1);
   cursor: pointer;
   color:  black;
-  cursor: pointer;
   padding: 1px;
-  border-radius: 10px;
+  border-radius: 25px;
   box-shadow: none;
 }
+
+
+.search_button:hover {
+  border: none;
+  background-color: rgba(217, 217, 217, 1);
+  box-shadow: none;
+}
+
 
 .searcher_dealer {
   flex: 1;
@@ -717,10 +723,14 @@ button.search_button {
   height: 56px;
   border-radius: 25px;
   outline: none;
+  padding-left: 20px;
+  font-size: 16px;
 }
 
 .searcher_dealer::placeholder {
   color: #000000;
+  text-align: left;
+
 }
 
 

@@ -8,6 +8,7 @@ import {ip} from "../shrineofvsakoe/ip.jsx";
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
   const models = ['К-742МСТ', 'К-7', 'К-525'];
+  const [isFocused, setIsFocused] = useState(false);
 
   const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
     'К-742МСТ': false,
@@ -273,11 +274,17 @@ const CustomHeader = ({
       <div className='search_by_dealer'>
         <input
           type="text"
-          placeholder="Поиск по дилеру"
+          placeholder={isFocused || Dealer ? '' : "Поиск по дилеру"}
           className='searcher_dealer'
           value={Dealer}
           onChange={handleChange} 
+          onFocus={() => setIsFocused(true)}
           onKeyDown={handleKeydown}
+          onBlur={() => {
+            if (!Dealer) {
+              setIsFocused(false);
+            }
+          }}
         />
         <button 
           type="button"
