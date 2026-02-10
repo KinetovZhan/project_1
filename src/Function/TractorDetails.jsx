@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import DefaultImage from '../img/Image.png';
 import K5Image from '../img/м1.jpg';
 import K7Image from '../img/м2.jpg';
-import K525Image from '../img/м3.jpg';
+import K525Image from '../img/м3.png';
 import K742Image from '../img/м4.jpg';
 
 export function TractorDetails({ vin, onBack }) {

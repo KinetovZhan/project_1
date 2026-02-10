@@ -1,8 +1,8 @@
 import DefaultImage from '../img/Image.png';
-import K5Image from '../img/к5.jpg';
-import K7Image from '../img/к7.jpg';
-import K525Image from '../img/к525.jpg';
-import K742Image from '../img/к742.jpg';
+import K5Image from '../img/м1.jpg';
+import K7Image from '../img/м2.jpg';
+import K525Image from '../img/м3.png';
+import K742Image from '../img/м4.jpg';
 import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
