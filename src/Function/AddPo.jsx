@@ -208,6 +208,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
             required
             className="add-po-input"
             data-testid="po-number-input"
+            placeholder='Введите имя / номер ПО'
           />
         </div>
 
