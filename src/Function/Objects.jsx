@@ -1,8 +1,13 @@
-import DefaultImage from '../img/Image.png';
-import K5Image from '../img/м1.jpg';
-import K7Image from '../img/м2.jpg';
-import K525Image from '../img/м3.png';
-import K742Image from '../img/м4.jpg';
+import DefaultImage from '../img/default.jpg';
+import KPPImage from '../img/КПП.png';
+import RKImage from '../img/РК.png';
+import HRImage from '../img/Гидрораспределитель.png';
+import APImage from '../img/Автопилот.png';
+import WeiImage from '../img/ДВС Weichai.png';
+import TMZImage from '../img/ДВС ТМЗ.png';
+import JMZImage from '../img/ДВС ЯМЗ.png';
+import DisplayImage from '../img/БК дисплей.png';
+import ContrImage from '../img/БК Контроллер.png';
 import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
@@ -31,7 +36,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       }
       if (userRole !== 'dealer') {
         try {
-          const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission'};
+          const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission','AP':'ap','BK':'bk'};
           const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
   
           const postData = {
@@ -84,15 +89,30 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
 
 
-    const ImageToComponent = (type_component) => {
-      const ImageJpg = {
-        'engine': K5Image,
-        'kpp': K7Image,
-        'suspension': K525Image,
-        'hydraulics': K742Image,
-      }
-  
-      return ImageJpg[type_component]|| DefaultImage;
+    const ImageToComponent = (type_component,model_component,part_type) => {
+      if(type_component && type_component !== 'engine'&& type_component !== 'dvs' &&type_component !== 'bk'){
+      const ImageByType = {
+        'transmission': KPPImage,
+        'suspension': RKImage,
+        'hydraulics': HRImage,
+        'ap':APImage,
+      };
+      return ImageByType[type_component]|| DefaultImage;
+    }
+      if(model_component && (type_component == 'engine'|| type_component == 'dvs' )){
+      const ImageByModel = {
+        'Weichai': WeiImage,
+      };
+      return ImageByModel[model_component]|| DefaultImage;
+    }
+
+      if(type_component == 'bk'&&part_type){
+      const ImageByPart = {
+        'Дисплей': DisplayImage,
+        'Контроллер': ContrImage
+      };
+      return ImageByPart[part_type]|| DefaultImage;
+    }
     }
 
 
@@ -212,7 +232,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   // --- Ваши функции (перенесены в начало!) ---
   const getAllActiveFilters = () => {
     const filterNames = {
-      'DVS': 'ДВС', 'KPP': 'КПП', 'RK': 'РК', 'hydrorasp': 'Гидрораспределитель',
+      'DVS': 'ДВС', 'KPP': 'КПП', 'RK': 'РК', 'hydrorasp': 'Гидрораспределитель', 'AP': 'Автопилот','BK':'БК',
       'K7': 'К-7', 'K5': 'К-5'
     };
     return [...activeFilters, ...activeFilters2]
@@ -227,7 +247,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       'DVS': 'ДВС',
       'KPP': 'КПП',
       'RK': 'РК',
-      'hydrorasp': 'Гидрораспределитель'
+      'hydrorasp': 'Гидрораспределитель',
+      'AP': 'Автопилот',
+      'BK':'БК'
     };
 
     if (activeFilters.length > 0) {
@@ -288,7 +310,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
             .map((item) => (
               <li key={item.id_Firmwares}>
                 <div className='objectmenu' data-testid='objectmenu'>
-                  <img className='object' src={ImageToComponent(item.type_component)} alt={item.type_component} />
+                  <img className='object' src={ImageToComponent(item.type_component,item.model_component || item.comp_model,item.part_type)} alt={item.type_component} />
                   <div className='inform'>
                     <h4 className='poster'>
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
@@ -296,6 +318,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
                     <div className='infodisc'>
                       <h5 className='textunder' onMouseEnter={() => setIsVisible(item.id_Firmwares)} onMouseLeave={() => setIsVisible(null)}>
                         Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                        {item.part_type ? ` (${item.part_type})` : ' (—)'}
                       </h5>
                       {isVisible === item.id_Firmwares && (
                         <div className='popup-window'>{item.type_component || '—'}: {item.model_component || item.comp_model || '—'}</div>

@@ -12,6 +12,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     'RK': 'rk',
     'hydrorasp': 'hydro' ,
     // 'hydrorasp': 'hydraulics'
+    'AP':'ap',
+    'BK':'bk',
   };
 
   const tractorModelOptions = [
@@ -23,7 +25,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     DVS: false,
     KPP: false,
     RK: false,
-    hydrorasp: false
+    hydrorasp: false,
+    AP:false,
+    BK:false
   });
 
   // const [FilterItems2, setFilterItems2] = useState({
@@ -201,6 +205,24 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
               type="checkbox"/>
           </label>
         </div>
+        <div className='filter'>
+          <label> 
+            <span>Автопилот</span>
+            <input 
+              checked={FilterItems.AP}
+              onChange={() => handleFilterChange('AP')}
+              type="checkbox"/>
+          </label>
+        </div>
+        <div className='filter'>
+          <label> 
+            <span>БК</span>
+            <input 
+              checked={FilterItems.BK}
+              onChange={() => handleFilterChange('BK')}
+              type="checkbox"/>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -276,7 +298,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           DVS: false,
           KPP: false,
           RK: false,
-          hydrorasp: false
+          hydrorasp: false,
+          AP:false,
+          BK:false
         });
         setFilterItems2({
           K7: false,
