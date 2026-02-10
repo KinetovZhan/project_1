@@ -152,10 +152,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         headers: {
           'Authorization': `Bearer ${token}`
         },
-        body: formData,
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        body: formData
       });
 
       const contentType = response.headers.get('content-type');
@@ -262,7 +259,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 border: '1px solid',
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
-                padding: '0 12px',
+                // padding: '0 12px',
                 fontSize: isMobile ? '14px':'16px',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',
@@ -305,7 +302,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 border: '1px solid',
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
-                padding: '0 12px',
+                // padding: '0 12px',
                 fontSize: isMobile ? '14px':'16px',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',

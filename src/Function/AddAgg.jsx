@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { ip } from "../shrineofvsakoe/ip.jsx";
+import Select from 'react-select';
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -8,7 +9,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     model: '',
     mounting_date: new Date().toISOString().split('T')[0],
     comp_ser_num: '',
-    selected_tractor_id: '', // Это поле должно соответствовать select
+    selected_tractor_id: '',
     number_of_parts: '',
     producer_comp: ''
   });
@@ -17,10 +18,11 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [loadingTractors, setLoadingTractors] = useState(false)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [tractorSearch, setTractorSearch] = useState('');
-
-
   const { token } = useAuth();
+
+  // Для react-select нужен формат { value, label }
+  const [tractorOptions, setTractorOptions] = useState([]);
+  const [selectedTractor, setSelectedTractor] = useState(null);
 
   useEffect(() => {
     const loadTractors = async () => {
@@ -43,7 +45,18 @@ export function AddAggForm({ onBack, onSubmit }) {
           throw new Error(errorMessage);
         }
         const responseTractorsData = await responseTractors.json();
+        
+        // Сохраняем исходные данные
         setTractors(responseTractorsData);
+        
+        // Преобразуем в формат для react-select
+        const options = responseTractorsData.map(tractor => ({
+          value: tractor.id,
+          label: tractor.vin,
+          data: tractor // сохраняем полные данные трактора
+        }));
+        
+        setTractorOptions(options);
         console.log('Трактора успешно загружены:', responseTractorsData);
       } catch (err) {
         console.error('Ошибка при загрузке тракторов:', err);
@@ -55,19 +68,22 @@ export function AddAggForm({ onBack, onSubmit }) {
     loadTractors();
   }, [token]);
 
+  // Обработчик выбора трактора из react-select
+  const handleTractorSelectChange = (selectedOption) => {
+    setSelectedTractor(selectedOption);
+    
+    // Обновляем formData с выбранным ID трактора
+    setFormData(prev => ({
+      ...prev,
+      selected_tractor_id: selectedOption ? selectedOption.value : ''
+    }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
-    }));
-  };
-
-  const handleTractorChange = (e) => {
-    const selectedId = e.target.value; // Исправлено: e.target.value (не e.targer.value)
-    setFormData(prev => ({
-      ...prev,
-      selected_tractor_id: selectedId
     }));
   };
 
@@ -80,8 +96,6 @@ export function AddAggForm({ onBack, onSubmit }) {
       setLoading(true);
       setError(null);
 
-      const selectedTractor = tractors.find(t => t.id === parseInt(formData.selected_tractor_id)); // Исправлено: parseInt (не perseInt)
-
       const submitData = {
         type: formData.type,
         model: formData.model,
@@ -93,11 +107,6 @@ export function AddAggForm({ onBack, onSubmit }) {
       };
 
       console.log('Отправляемые данные:', submitData);
-      console.log('Выбранный трактор:', selectedTractor);
-
-      if (formData.selected_tractor_id && !selectedTractor) {
-        throw new Error('Выбранный трактор не найден');
-      }
 
       const response = await fetch(`http://${ip}/components/`, {
         method: 'POST',
@@ -136,11 +145,6 @@ export function AddAggForm({ onBack, onSubmit }) {
     e.preventDefault();
     submitDataToServer();
   };
-
-
-  const filteredTractors = tractors.filter(tractor => 
-    tractor.vin.toLowerCase().includes(tractorSearch.toLowerCase())
-  );
 
   return (
     <div className="add-po-agg-container">
@@ -221,48 +225,74 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        <div className='add-po-field'>
-          <label className='add-po-label'>Трактор</label>
-          
-          {/* Поле поиска */}
-          <input
-            type="text"
-            placeholder="Поиск по VIN..."
-            value={tractorSearch}
-            onChange={(e) => setTractorSearch(e.target.value)}
-            className='add-po-input'
-            style={{ marginBottom: '8px' }}
-            disabled={loading || loadingTractors}
+        {/* 🔥 Выбор трактора с использованием react-select */}
+        <div className="add-po-field">
+          <label className="add-po-label">Трактор</label>
+          <Select
+            options={tractorOptions}
+            value={selectedTractor}
+            onChange={handleTractorSelectChange}
+            placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите трактор"}
+            classNamePrefix="add-po-select"
+            isClearable={true}
+            isSearchable={true}
+            isLoading={loadingTractors}
+            noOptionsMessage={() => "Нет доступных тракторов"}
+            
+            // Кастомизация стилей как в примере
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                color: '#ccc',
+                height: '40px',
+                minHeight: '40px',
+                width: '100%',
+                border: '1px solid',
+                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                boxSizing: 'border-box',
+                // padding: '0 12px',
+                fontSize: '16px', // Можно добавить проверку на isMobile если нужно
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease',
+                outline: 'none',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: '#13be00'
+                }
+              }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 200,
+                padding: '4px 0',
+                backgroundColor: 'white'
+              }),
+              option: (base, state) => ({
+                ...base,
+                backgroundColor: state.isSelected ? '#13be00' : 
+                                state.isFocused ? '#f0f9ff' : 'white',
+                color: state.isSelected ? 'white' : '#1E1E1E',
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: '#f0f9ff'
+                }
+              }),
+              singleValue: (base) => ({
+                ...base,
+                color: '#1E1E1E'
+              }),
+              placeholder: (base) => ({
+                ...base,
+                color: '#999'
+              }),
+              loadingIndicator: (base) => ({
+                ...base,
+                color: '#13be00'
+              })
+            }}
           />
           
-          {/* Выпадающий список */}
-          <select
-            name="selected_tractor_id"
-            value={formData.selected_tractor_id}
-            onChange={handleTractorChange}
-            className='add-po-select'
-            disabled={loading || loadingTractors}
-            style={{ 
-              maxHeight: '200px', 
-              overflowY: 'auto' 
-            }}
-          >
-            <option value="">Выберите трактор</option>
-            {loadingTractors ? (
-              <option value="" disabled>Загрузка тракторов...</option>
-            ) : filteredTractors.length === 0 ? (
-              <option value="" disabled>Тракторы не найдены</option>
-            ) : (
-              filteredTractors.map(tractor => (
-                <option key={tractor.id} value={tractor.id}>
-                  {tractor.vin}
-                </option>
-              ))
-            )}
-          </select>
-          
           {/* Информация о выбранном тракторе */}
-          {formData.selected_tractor_id && !loadingTractors && (
+          {selectedTractor && !loadingTractors && (
             <div style={{ 
               fontSize: '12px', 
               color: '#666', 
@@ -271,29 +301,8 @@ export function AddAggForm({ onBack, onSubmit }) {
               backgroundColor: '#f5f5f5',
               borderRadius: '4px'
             }}>
-              Выбран: {tractors.find(t => t.id === parseInt(formData.selected_tractor_id))?.vin}
+              Выбран: {selectedTractor.label}
             </div>
-          )}
-          
-          {/* Кнопка очистки поиска */}
-          {tractorSearch && (
-            <button
-              type="button"
-              onClick={() => setTractorSearch('')}
-              style={{ 
-                marginTop: '8px', 
-                fontSize: '12px',
-                padding: '4px 8px',
-                backgroundColor: '#2e2323',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                height: '30px'
-              }}
-            >
-              Очистить поиск
-            </button>
           )}
         </div>
 
@@ -326,7 +335,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         <button
           type="submit"
           className='add-po-submit-button'
-          disabled={loading || loadingTractors} // Нельзя отправлять пока грузятся тракторы
+          disabled={loading || loadingTractors}
         >
           {loading ? 'Добавление...' : 'Добавить'}
         </button>

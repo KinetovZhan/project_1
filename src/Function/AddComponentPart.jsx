@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { ip } from "../shrineofvsakoe/ip.jsx";
-
+import Select from 'react-select';
 
 export function AddComponentPart({ onBack, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -15,6 +15,9 @@ export function AddComponentPart({ onBack, onSubmit }) {
     const {token} = useAuth();
     const [loading, setLoading] = useState(false)
 
+    // Для react-select
+    const [componentOptions, setComponentOptions] = useState([])
+    const [selectedComponent, setSelectedComponent] = useState(null)
     
     useEffect(() => {
         const loadComponentsModels = async () => {
@@ -33,20 +36,25 @@ export function AddComponentPart({ onBack, onSubmit }) {
                         }
                     })
 
-
                     if (!responseModels.ok) {
                     throw new Error(`Ошибка ${responseModels.status}`)
                     }
                 const responseModelsData = await responseModels.json()
                 setComponentsModels(responseModelsData)
+                
+                // Преобразуем данные для react-select
+                const options = responseModelsData.map(component => ({
+                    value: component.id,
+                    label: `${component.model} (${component.type})`
+                }))
+                setComponentOptions(options)
+                
             }catch(err){
-                console.error('Ошибка загрузки данных о тракторах', err)
-                setError('Не удалось загрузить данные о тракторах')
+                console.error('Ошибка загрузки данных о компонентах', err)
+                setError('Не удалось загрузить данные о компонентах')
             }finally{
                 setLoadingModels(false)
             }
-
-
         }
         loadComponentsModels()
     }, [token]);
@@ -60,6 +68,15 @@ export function AddComponentPart({ onBack, onSubmit }) {
         }));
     };
 
+    // Обработчик выбора компонента через react-select
+    const handleComponentSelectChange = (selectedOption) => {
+        setSelectedComponent(selectedOption);
+        setFormData(prev => ({
+            ...prev,
+            component_model: selectedOption ? selectedOption.value : ''
+        }));
+    };
+
     const SubmitCompPartToServer = async () => {
         if (!token) {
             setError('Пользователь не авторизован');
@@ -67,8 +84,6 @@ export function AddComponentPart({ onBack, onSubmit }) {
         }
 
         try {
-
-
             const submitData = {
                 component: formData.component_model,
                 part_type: formData.part_type
@@ -94,7 +109,7 @@ export function AddComponentPart({ onBack, onSubmit }) {
                 onBack()
             }  
         } catch (err) {
-            console.error('Ошибка при добавлении агрегата:', err);
+            console.error('Ошибка при добавлении части агрегата:', err);
             setError(err.message);
         } finally {
             setLoading(false);
@@ -127,27 +142,65 @@ export function AddComponentPart({ onBack, onSubmit }) {
             )}
 
             <form className="add-po-form" onSubmit={handleSubmit}>
-                <div className='add-po-field'>
-                    <label className='add-po-label'>Компонент</label>
-                    <select
-                        name="component_model"
-                        value={formData.component_model}
-                        onChange={handleChange}
-                        className='add-po-select'
-                        disabled={loading || loadingModels}
-                        required
-                    >
-                        <option value="">Выберите компонент</option>
-                        {loadingModels ? (
-                            <option value="" disabled>Загрузка компонентов...</option>
-                        ) : (
-                            componentsModels.map(component => (
-                                <option key={component.id} value={component.id}>
-                                    {component.model} ({component.type})
-                                </option>
-                            ))
-                        )}
-                    </select>
+                {/* 🔥 Выбор компонента через react-select */}
+                <div className="add-po-field">
+                    <label className="add-po-label">Компонент</label>
+                    <Select
+                        options={componentOptions}
+                        value={selectedComponent}
+                        onChange={handleComponentSelectChange}
+                        placeholder={loadingModels ? "Загрузка компонентов..." : "Выберите компонент"}
+                        classNamePrefix="add-po-select"
+                        isClearable={true}
+                        isSearchable={true}
+                        isLoading={loadingModels}
+                        noOptionsMessage={() => "Нет доступных компонентов"}
+                        
+                        styles={{
+                            control: (base, state) => ({
+                                ...base,
+                                height: '40px',
+                                minHeight: '40px',
+                                width: '100%',
+                                border: '1px solid',
+                                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                                boxSizing: 'border-box',
+                                // padding: '0 12px',
+                                fontSize: '16px',
+                                cursor: 'pointer',
+                                transition: 'border-color 0.15s ease',
+                                outline: 'none',
+                                boxShadow: 'none',
+                                '&:hover': {
+                                    borderColor: '#13be00'
+                                }
+                            }),
+                            menuList: (base) => ({
+                                ...base,
+                                maxHeight: 200,
+                                padding: '4px 0',
+                                backgroundColor: 'white'
+                            }),
+                            option: (base, state) => ({
+                                ...base,
+                                backgroundColor: state.isSelected ? '#13be00' : 
+                                                state.isFocused ? '#f0f9ff' : 'white',
+                                color: state.isSelected ? 'white' : '#1E1E1E',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    backgroundColor: '#f0f9ff'
+                                }
+                            }),
+                            singleValue: (base) => ({
+                                ...base,
+                                color: '#1E1E1E'
+                            }),
+                            placeholder: (base) => ({
+                                ...base,
+                                color: '#999'
+                            })
+                        }}
+                    />
                 </div>
 
                 <div className='add-po-field'>
@@ -174,6 +227,4 @@ export function AddComponentPart({ onBack, onSubmit }) {
             </form>
         </div>
     );
-
-
 }

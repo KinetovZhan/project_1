@@ -1,7 +1,12 @@
-import Image from '../img/Image.png'
+
 import { useState, useEffect } from 'react';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
+import DefaultImage from '../img/Image.png';
+import K5Image from '../img/м1.jpg';
+import K7Image from '../img/м2.jpg';
+import K525Image from '../img/м3.png';
+import K742Image from '../img/м4.jpg';
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -12,8 +17,16 @@ export function TractorDetails({ vin, onBack }) {
   const [poDescriptions, setPoDescriptions] = useState({});
   const { token } = useAuth();
 
+  const ImageToModel = (model) => {
+    const ImageJpg = {
+      'K-5': K5Image,
+      'K-7': K7Image,
+      'K-525': K525Image,
+      'K-742МСТ': K742Image,
+    }
 
- 
+    return ImageJpg[model]|| DefaultImage;
+  }
 
   useEffect(() => {
     const fetchTractorDetails = async () => {
@@ -157,7 +170,7 @@ export function TractorDetails({ vin, onBack }) {
       <div className="tractor-details-content">
         <div className="tractor-info">
           <h2>{model}</h2>
-          <img src={Image} alt={model} className="tractor-image" />
+          <img src={ImageToModel(model)} alt={model} className="tractor-image" />
         </div>
 
         <div className="details-columns">

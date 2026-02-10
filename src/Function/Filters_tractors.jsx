@@ -1,5 +1,6 @@
 import React, { useState } from 'react'; 
 import DatePicker from 'react-datepicker';
+import Select from 'react-select';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -7,22 +8,14 @@ import {ip} from "../shrineofvsakoe/ip.jsx";
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
-  const models = ['К-742МСТ', 'К-7', 'К-525'];
-  const [isFocused, setIsFocused] = useState(false);
+  // Опции для Select с моделями тракторов
+  const tractorOptions = [
+    { value: 'K-742МСТ', label: 'К-742МСТ' },
+    { value: 'K-7', label: 'К-7' },
+    { value: 'K-525', label: 'К-525' }
+  ];
 
-  const [FilterTractors_by_model, setFilterTractors_by_model] = useState({
-    'К-742МСТ': false,
-    'К-7': false,
-    'К-525': false
-  });
-
-
-  const FilterToTractor = {
-    'К-742МСТ': 'K-742МСТ',
-    'К-7': 'K-7', 
-    'К-525': 'K-525'
-  };
-
+  const [selectedModels, setSelectedModels] = useState([]);
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
     Serial: false,
     Experienced: false,
@@ -42,13 +35,13 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen,setIsYearOpen] = useState(false);
 
-    const handleSearch = () => {
+  const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
       onDealerChange(Dealer);
     }
   };
 
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const dealer = e.target.value;
     setDealer(dealer);
     if (onDealerChange && typeof onDealerChange === 'function') {
@@ -56,7 +49,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     }
   };
 
-   // Обработчик выбора даты
+  // Обработчик выбора даты
   const handleDateChange = (dates) => {
     const [start, end] = dates;
     setStartDate(start);
@@ -94,7 +87,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     }
   };
 
-    // Очистка даты
+  // Очистка даты
   const handleClearDate = () => {
     setStartDate(null);
     setEndDate(null);
@@ -113,96 +106,108 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     } 
   };
   
-    // Кастомный инпут для DatePicker
-   const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
-  <div className="release-date">
-    <input
-      className="choose_date_release"
-      onClick={onClick}
-      ref={ref}
-      value={value || ""}
-      readOnly
-      placeholder="Дата выпуска"
-    />
-    <div className="calendar-icon" onClick={onClick}>
-      <svg 
-        width="20" 
-        height="20" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2"
-      >
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
+  // Кастомный инпут для DatePicker
+  const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
+    <div className="release-date">
+      <input
+        className="choose_date_release"
+        onClick={onClick}
+        ref={ref}
+        value={value || ""}
+        readOnly
+        placeholder="Дата выпуска"
+      />
+      <div className="calendar-icon" onClick={onClick}>
+        <svg 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
     </div>
-  </div>
-));
-// Добавьте этот компонент перед return в Filters2
-const CustomHeader = ({
-  date,
-  changeYear,
-  decreaseMonth,
-  increaseMonth,
-  prevMonthButtonDisabled,
-  nextMonthButtonDisabled,
-}) => {
-  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+  ));
 
-  return (
-    <div className="custom-datepicker-header">
-      <button
-        onClick={decreaseMonth}
-        disabled={prevMonthButtonDisabled}
-        className="nav-button"
-      >
-        &lt;
-      </button>
-      
-      <div className="month-year-display">
-        <span className="month-name">
-          {date.toLocaleDateString('ru-RU', { month: 'long' })}
-        </span>
-         <div className="custom-year-select">
-    <div 
-      className="selected-year"
-      onClick={() => setIsYearOpen(!isYearOpen)}
-    >
-      {date.getFullYear()}
-    </div>
-    
-    {isYearOpen && (
-      <div className="year-dropdown">
-        {years.map((year) => (
-          <div
-            key={year}
-            className={`year-option ${year === date.getFullYear() ? 'selected' : ''}`}
-            onClick={() => {
-              changeYear(year);
-              setIsYearOpen(false);
-            }}
-          >
-            {year}
+  const CustomHeader = ({
+    date,
+    changeYear,
+    decreaseMonth,
+    increaseMonth,
+    prevMonthButtonDisabled,
+    nextMonthButtonDisabled,
+  }) => {
+    const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+
+    return (
+      <div className="custom-datepicker-header">
+        <button
+          onClick={decreaseMonth}
+          disabled={prevMonthButtonDisabled}
+          className="nav-button"
+        >
+          &lt;
+        </button>
+        
+        <div className="month-year-display">
+          <span className="month-name">
+            {date.toLocaleDateString('ru-RU', { month: 'long' })}
+          </span>
+          <div className="custom-year-select">
+            <div 
+              className="selected-year"
+              onClick={() => setIsYearOpen(!isYearOpen)}
+            >
+              {date.getFullYear()}
+            </div>
+            
+            {isYearOpen && (
+              <div className="year-dropdown">
+                {years.map((year) => (
+                  <div
+                    key={year}
+                    className={`year-option ${year === date.getFullYear() ? 'selected' : ''}`}
+                    onClick={() => {
+                      changeYear(year);
+                      setIsYearOpen(false);
+                    }}
+                  >
+                    {year}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
+        </div>
+        <button
+          onClick={increaseMonth}
+          disabled={nextMonthButtonDisabled}
+          className="nav-button"
+        >
+          &gt;
+        </button>
       </div>
-    )}
-  </div>
-      </div>
-      <button
-        onClick={increaseMonth}
-        disabled={nextMonthButtonDisabled}
-        className="nav-button"
-      >
-        &gt;
-      </button>
-    </div>
-  );
-};
+    );
+  };
 
+  // Обработчик для Select с моделями тракторов
+  const handleModelChange = (selectedOptions) => {
+    const values = selectedOptions 
+      ? selectedOptions.map(opt => opt.value) 
+      : [];
+    
+    setSelectedModels(selectedOptions || []);
+    
+    if (onFilterChangeTracByModel) {
+      onFilterChangeTracByModel(values);
+    }
+  };
 
   const handleFilterByStatus = (FilterType) => {
     const newFilter = {
@@ -210,7 +215,6 @@ const CustomHeader = ({
       [FilterType]: !FilterTractor_by_status[FilterType]
     };
     setFilterTractor_by_status(newFilter)
-
 
     if(onFilterChangeByStatus) {
       const activeFiltersTrac2 = Object.keys(newFilter)
@@ -220,41 +224,42 @@ const CustomHeader = ({
     }
   }
   
-
-
-  const handleFilterByModelTractors = (FilterType) => {
-    const newFilter = {
-      ...FilterTractors_by_model,
-      [FilterType]: !FilterTractors_by_model[FilterType]
-    };
-    setFilterTractors_by_model(newFilter)
-
-    if (onFilterChangeTracByModel) {
-      const activeFiltersTrac = Object.keys(newFilter)
-        .filter(key => newFilter[key])
-        .map(filter => FilterToTractor[filter]);
-      onFilterChangeTracByModel(activeFiltersTrac);
-    }
-  }
-  
   return (
     <>
-      <div className='filterstrac'>
-        <div className='filters-scroll-bar' style={{ position: 'relative' }}>
-          {models.map(model => (
-            <label key = {model}>
-              <span>{model}</span>
-              <input 
-                type="checkbox"
-                checked={FilterTractors_by_model[model]}
-                onChange={() => handleFilterByModelTractors(model)}
-              />
-            </label>
-          ))}
-        </div>
+      {/* Фильтр по моделям тракторов - заменен на Select */}
+      <div className='tractorModel'>
+        <Select
+          className='modelSelect'
+          isMulti
+          options={tractorOptions}
+          value={selectedModels}
+          onChange={handleModelChange}
+          placeholder="Модель трактора"
+          styles={{ 
+            control: (base) => ({ 
+              ...base, 
+              maxHeight: 200, 
+              overflowY: 'auto', 
+              color: 'black', 
+              backgroundColor:'rgba(217, 217, 217, 1)', 
+              // width: isMobile ? '100%':'360px', 
+              borderRadius: '15px', 
+              height:'53px'
+            }),
+            menuList: (base) => ({ 
+              ...base, 
+              maxHeight: 150, 
+              overflowY: 'auto', 
+              backgroundColor:'white',
+              color:'black', 
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth:'thin'
+            })
+          }}
+        />
       </div>
 
-     <div className='release-date-container'>
+      <div className='release-date-container'>
         <DatePicker
           selectsRange={true}
           startDate={startDate}
@@ -299,6 +304,7 @@ const CustomHeader = ({
         </button>  
       </div>
 
+      {/* Фильтр по статусам - оставлен без изменений (чекбоксы) */}
       <div className='filterstrac2'>
         <label>
           <span>Серийное</span>

@@ -1,5 +1,9 @@
-import Image from '../img/Image.png';
-import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
+import DefaultImage from '../img/Image.png';
+import K5Image from '../img/м1.jpg';
+import K7Image from '../img/м2.jpg';
+import K525Image from '../img/м3.png';
+import K742Image from '../img/м4.jpg';
+import { useState, useEffect, useMemo } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
@@ -8,68 +12,89 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null)
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [isVisible, setIsVisible] = useState(null)
 
-  const hoverTimers = useRef({});
+  
+  const userRole = user?.role || 'user';
 
-
+  console.log(`dfadsjgosajif ${userRole}`)
   useEffect(() => {
     const fetchFilteredData = async () => {
       setLoading(true);
       setError(null);
-;
+
       if (!token) {
         setError("Пользователь не авторизован");
         setLoading(false);
         return;
       }
-
-      try {
-        const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission'};
-        const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
-
-        const postData = {
-          trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-          type_comp: activeFilters.map(f => FilterToTypeMap[f] || f),
-          model_comp: Array.isArray(selectedModel) ? selectedModel : []
-        };
-
-        const response = await fetch(`http://${ip}/search/component-info`, {
-          method: 'POST',
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(postData)
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-        const data = await response.json();
-        const items = Array.isArray(data) ? data : (data ? [data] : []);
-        setSoftwareItems(items);
-      } catch (err) {
-        console.error('Ошибка:', err);
-        setError(`Ошибка: ${err.message}`);
-      } finally {
-        setLoading(false);
+      if (userRole !== 'dealer') {
+        try {
+          const FilterToTypeMap = { 'DVS': 'dvs', 'KPP': 'kpp','RK': 'suspension', 'hydrorasp': 'hydraulics', 'DVS': 'engine', 'KPP': 'transmission'};
+          const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
+  
+          const postData = {
+            trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
+            type_comp: activeFilters.map(f => FilterToTypeMap[f] || f),
+            model_comp: Array.isArray(selectedModel) ? selectedModel : []
+          };
+          
+  
+          const response = await fetch(`http://${ip}/search/component-info`, {
+            method: 'POST',
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+          });
+  
+          if (!response.ok) {
+            let errorMessage = `HTTP error! status: ${response.status}`;
+            try {
+              const errorData = await response.json();
+              errorMessage += ` — ${JSON.stringify(errorData)}`;
+            } catch (e) {
+              // Если не JSON — попробуем текст
+              const errorText = await response.text();
+              errorMessage += ` — ${errorText}`;
+            }
+            throw new Error(errorMessage);
+          }
+  
+  
+  
+          const data = await response.json();
+          const items = Array.isArray(data) ? data : (data ? [data] : []);
+          setSoftwareItems(items);
+        } catch (err) {
+          console.error('Ошибка:', err);
+          setError(`Ошибка: ${err.message}`);
+        } finally {
+          setLoading(false);
+        }
+      };
+      setLoading(false)
       }
-    };
 
 
     fetchFilteredData();
   }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
 
 
-  useEffect(() => {
-    return () => {
-      Object.values(hoverTimers.current).forEach(timerId => {
-        if (timerId) clearTimeout(timerId);
-      });
-    };
-  }, []);
+    const ImageToComponent = (type_component) => {
+      const ImageJpg = {
+        'engine': K5Image,
+        'kpp': K7Image,
+        'suspension': K525Image,
+        'hydraulics': K742Image,
+      }
+  
+      return ImageJpg[type_component]|| DefaultImage;
+    }
+
 
 
   const handleDownload = async (item) => {
@@ -289,7 +314,7 @@ const handleMouseEnter = (id) => {
             .map((item) => (
               <li key={item.id_Firmwares}>
                 <div className='objectmenu' data-testid='objectmenu'>
-                  <img className='object' src={Image} alt='Компонент' />
+                  <img className='object' src={ImageToComponent(item.type_component)} alt={item.type_component} />
                   <div className='inform'>
                     <h4 className='poster'>
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
