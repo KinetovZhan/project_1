@@ -1,47 +1,18 @@
-/* main {
-  padding-top: 160px;
-  min-height: calc(100vh - 150px);
-  width:100%;
-  overflow-x: hidden; 
-  box-sizing: border-box; 
-}
-
-.table {
-  display: flex;
-  margin-top: 0px;
-  justify-content: center;
-} */
- main {
-  padding-top: 90px;
-  min-height: 100vh;
-  width:100%;
-  overflow-x: hidden; 
-  box-sizing: border-box; 
-}
-
-@media (min-width:1200px) {
- main {
-  padding-top: 160px;
-  min-height:100vh;
-  width:100%;
-  overflow-x: hidden; 
-  box-sizing: border-box; 
-}
-}
-.table {
-  display: flex;
-  margin-top: 0px;
-  justify-content: center;
-  height:auto;
+/* Базовые стили - для ПК и ноутбуков (1200px и выше) */
+main {
+  padding-top: 18vh;
+  height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
   box-sizing: border-box;
-} 
-@media (min-width:1200px) {
+}
+
 .table {
   display: flex;
-  margin-top: 0px;
+  margin-top: 0;
   justify-content: center;
-  height:auto;
-} 
+  height: auto;
+  box-sizing: border-box;
 }
 
 .popup-window {
@@ -60,7 +31,56 @@
   color: grey;
 }
 
-
 .infodisc {
   position: relative;
+}
+
+/* Ноутбуки (992px - 1199px) */
+@media (max-width: 1199px) {
+  main {
+    padding-top: 140px;
+  }
+  
+  .popup-window {
+    margin-left: 280px;
+    max-width: 180px;
+  }
+}
+
+/* Планшеты (768px - 991px) */
+@media (max-width: 991px) {
+  main {
+    padding-top: 120px;
+  }
+  
+  .table {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .popup-window {
+    margin-left: 260px;
+    max-width: 160px;
+  }
+}
+
+/* Мобильные (767px и меньше) */
+@media (max-width: 767px) {
+  main {
+    padding-top: 100px;
+  }
+  
+  .table {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .popup-window {
+    position: fixed; /* или absolute с пересчетом позиции */
+    max-width: 90%;
+    margin-left: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 120px;
+  }
 }
