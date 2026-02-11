@@ -33,8 +33,9 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [Dealer, setDealer] = useState('')
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [isYearOpen,setIsYearOpen] = useState(false);
+  const [isYearOpen, setIsYearOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false); 
+  const [activeDateField, setActiveDateField] = useState(null); // 'start' или 'end'
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
@@ -50,73 +51,82 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     }
   };
 
-  // Обработчик выбора даты
-  const handleDateChange = (dates) => {
-    const [start, end] = dates;
-    setStartDate(start);
-    setEndDate(end);
-    
-    // Форматируем даты для передачи родительскому компоненту
+  // Обработчик для начальной даты
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
     if (onDateChange) {
       const formatDate = (date) => {
         if (!date) return null;
         return format(date, 'yyyy-MM-dd');
       };
       
-      if (start && !end) {
-        // Выбрана только одна дата
-        onDateChange({
-          date_assemle: formatDate(start),
-          date_start: null,
-          date_end: null
-        });
-      } else if (start && end) {
-        // Выбран диапазон
-        onDateChange({
-          date_assemle: null,
-          date_start: formatDate(start),
-          date_end: formatDate(end)
-        });
-      } else {
-        // Сброс даты
-        onDateChange({
-          date_assemle: null,
-          date_start: null,
-          date_end: null
-        });
-      }
+      onDateChange({
+        date_assemle: null,
+        date_start: formatDate(date),
+        date_end: endDate ? formatDate(endDate) : null
+      });
     }
   };
 
-  // Очистка даты
-  const handleClearDate = () => {
+  // Обработчик для конечной даты
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+    if (onDateChange) {
+      const formatDate = (date) => {
+        if (!date) return null;
+        return format(date, 'yyyy-MM-dd');
+      };
+      
+      onDateChange({
+        date_assemle: null,
+        date_start: startDate ? formatDate(startDate) : null,
+        date_end: formatDate(date)
+      });
+    }
+  };
+
+  // Очистка начальной даты
+  const handleClearStartDate = () => {
     setStartDate(null);
-    setEndDate(null);
     if (onDateChange) {
       onDateChange({
         date_assemle: null,
         date_start: null,
+        date_end: endDate ? format(endDate, 'yyyy-MM-dd') : null
+      });
+    }
+  };
+
+  // Очистка конечной даты
+  const handleClearEndDate = () => {
+    setEndDate(null);
+    if (onDateChange) {
+      onDateChange({
+        date_assemle: null,
+        date_start: startDate ? format(startDate, 'yyyy-MM-dd') : null,
         date_end: null
       });
     }
   };
 
+  // Обработчик нажатия клавиш (Enter для поиска)
   const handleKeydown = (e) => {
     if (e.key === 'Enter') {
       handleSearch(); 
     } 
   };
-  
-  // Кастомный инпут для DatePicker
-  const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
+
+  // Кастомный инпут для DatePicker с метками
+  const CustomInput = React.forwardRef(({ value, onClick, label }, ref) => (
     <div className="release-date">
+      {label && <span className="date-label">{label}</span>}
       <input
         className="choose_date_release"
         onClick={onClick}
         ref={ref}
         value={value || ""}
         readOnly
-        placeholder="Дата выпуска"
+        placeholder={label ? "" : "Дата выпуска"}
       />
       <div className="calendar-icon" onClick={onClick}>
         <svg 
@@ -227,7 +237,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   
   return (
     <>
-      {/* Фильтр по моделям тракторов - заменен на Select */}
+      {/* Фильтр по моделям тракторов */}
       <div className='tractorModel'>
         <Select
           className='modelSelect'
@@ -262,21 +272,34 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
         />
       </div>
 
+      {/* Два отдельных поля для дат */}
       <div className='release-date-container'>
-        <DatePicker
-          selectsRange={true}
-          startDate={startDate}
-          endDate={endDate}
-          onChange={handleDateChange}
-          locale={ru}
-          dateFormat="dd.MM.yyyy"
-          customInput={<CustomInput />}
-          renderCustomHeader={CustomHeader}
-          isClearable={true}
-          onClear={handleClearDate}
-          clearButtonTitle="Очистить"
-          placeholderText="Дата выпуска"
-        />
+        <div className='date-range'>
+          <DatePicker
+            selected={startDate}
+            onChange={handleStartDateChange}
+            locale={ru}
+            dateFormat="dd.MM.yyyy"
+            customInput={<CustomInput label="С:" />}
+            renderCustomHeader={CustomHeader}
+            isClearable={true}
+            onClear={handleClearStartDate}
+            clearButtonTitle="Очистить"
+            placeholderText="Начальная дата"
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={handleEndDateChange}
+            locale={ru}
+            dateFormat="dd.MM.yyyy"
+            customInput={<CustomInput label="По:" />}
+            renderCustomHeader={CustomHeader}
+            isClearable={true}
+            onClear={handleClearEndDate}
+            clearButtonTitle="Очистить"
+            placeholderText="Конечная дата"
+          />
+        </div>
       </div>
 
       <div className='search_by_dealer'>
@@ -307,7 +330,7 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
         </button>  
       </div>
 
-      {/* Фильтр по статусам - оставлен без изменений (чекбоксы) */}
+      {/* Фильтр по статусам */}
       <div className='filterstrac2'>
         <label>
           <span>Серийное</span>
@@ -317,7 +340,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
             onChange={() => handleFilterByStatus('Serial')}
           />
         </label>
-
         <label>
           <span>Опытное</span>
           <input 
@@ -326,7 +348,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
             onChange={() => handleFilterByStatus('Experienced')}
           />
         </label>
-
         <label>
           <span>Актуальное</span>
           <input 
@@ -335,7 +356,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
             onChange={() => handleFilterByStatus('Actual')}
           />
         </label>
-
         <label>
           <span>Критические</span>
           <input 
