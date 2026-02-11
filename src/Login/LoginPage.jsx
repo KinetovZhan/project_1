@@ -13,51 +13,64 @@ const LoginPage = () => {
   const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setAuthorizationError('');
+  e.preventDefault();
+  setAuthorizationError('');
 
-    if (!login || !password) {
-      setAuthorizationError('Введите логин и пароль');
-      return;
-    }
+  if (!login || !password) {
+    setAuthorizationError('Введите логин и пароль');
+    return;
+  }
 
-    const formData = new URLSearchParams();
-    formData.append('username', login);
-    formData.append('password', password);
+  const formData = new URLSearchParams();
+  formData.append('username', login);
+  formData.append('password', password);
 
-    try {
-      const response = await fetch(`http://${ip}/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString(),
-      });
+  console.log('Отправка запроса на:', `http://${ip}/token/`);
+  console.log('Данные:', formData.toString());
 
+  try {
+    const response = await fetch(`http://${ip}/token/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData.toString(),
+      mode: 'cors',  // Добавьте это
+    });
 
+    console.log('Статус ответа:', response.status);
+    console.log('Заголовки ответа:', [...response.headers.entries()]);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Текст ошибки:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
         setAuthorizationError(
           errorData.detail || 'Неверный логин или пароль'
         );
-        return;
+      } catch {
+        setAuthorizationError(`Ошибка сервера: ${errorText}`);
       }
-
-      const data = await response.json();
-
-      //  Используем login из контекста вместо ручного localStorage.setItem
-      if (data.access_token) {
-        loginContext(data.access_token); // ← сохраняет токен + обновляет состояние
-        navigate('/main', { replace: true }); // replace — чтобы нельзя было вернуться назад на /login по кнопке "Назад"
-      } else {
-        setAuthorizationError('Сервер не вернул токен');
-      }
-    } catch (error) {
-      console.error('Ошибка при авторизации:', error);
-      setAuthorizationError('Ошибка сети. Проверьте подключение.');
+      return;
     }
-  };
+
+    const data = await response.json();
+    console.log('Полученные данные:', data);
+
+    if (data.access_token) {
+      loginContext(data.access_token);
+      navigate('/main', { replace: true });
+    } else {
+      setAuthorizationError('Сервер не вернул токен');
+    }
+  } catch (error) {
+    console.error('Ошибка при авторизации:', error);
+    console.error('Тип ошибки:', error.name);
+    console.error('Сообщение ошибки:', error.message);
+    setAuthorizationError('Ошибка сети. Проверьте подключение.');
+  }
+};
 
   return (
     <>

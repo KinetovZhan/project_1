@@ -344,7 +344,7 @@
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
-  width: 242px;
+  width: 180px;
   height: 56px;
   border-radius: 56px;
   /* position: absolute;
@@ -366,8 +366,20 @@
 .release-date-container {
   position: absolute;
   top: 255px;
-  left: 13px;
-  font-size: 25px;
+  left: 10px;
+  font-family: Arial;
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 1);
+  width: 360px;
+  height: 56px;
+  border-radius: 56px;
+  /* position: absolute;
+  top: 318px;
+  left: 13px; */
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 20px;
   font-family: Arial;
 }
 
@@ -676,6 +688,27 @@
   color: white;
 }
 
+
+
+
+
+
+/* Добавленные стили для двух полей дат */
+.date-range {
+  display: flex;
+  gap: 0px;
+}
+
+.date-range .react-datepicker-wrapper {
+  flex: 1;
+}
+
+.date-label {
+  margin-right: 5px;
+  font-weight: 100;
+  font-size: 16px;
+  color: #000000 !important; 
+}
 /* Поиск диллера */
 
 .search_by_dealer {
