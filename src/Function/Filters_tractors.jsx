@@ -244,17 +244,19 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
               color: 'black', 
               backgroundColor:'rgba(217, 217, 217, 1)', 
               // width: isMobile ? '100%':'360px', 
+              width: '42vh',
               borderRadius: '15px', 
               height:'53px'
             }),
             menuList: (base) => ({ 
               ...base, 
               maxHeight: 150, 
+              // width:'42vh',
               overflowY: 'auto', 
               backgroundColor:'white',
               color:'black', 
               border: '1px solid rgba(217, 217, 217, 1)',
-              scrollbarWidth:'thin'
+              scrollbarWidth:'thin',
             })
           }}
         />
