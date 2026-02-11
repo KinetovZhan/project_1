@@ -149,12 +149,20 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const CustomHeader = ({
     date,
     changeYear,
+    changeMonth,
     decreaseMonth,
     increaseMonth,
     prevMonthButtonDisabled,
     nextMonthButtonDisabled,
   }) => {
     const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+     const months = [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+  ];
+  
+  const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
 
     return (
       <div className="custom-datepicker-header">
@@ -167,6 +175,33 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
         </button>
         
         <div className="month-year-display">
+          {/* Выпадающий список для месяца */}
+        <div className="custom-month-select">
+          <div 
+            className="selected-month"
+            onClick={() => setIsMonthOpen(!isMonthOpen)}
+          >
+            {months[date.getMonth()]}
+          </div>
+          
+          {isMonthOpen && (
+            <div className="month-dropdown">
+              {months.map((month, index) => (
+                <div
+                  key={month}
+                  className={`month-option ${index === date.getMonth() ? 'selected' : ''}`}
+                  onClick={() => {
+                    changeMonth(index);
+                    setIsMonthOpen(false);
+                  }}
+                >
+                  {month}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
           <span className="month-name">
             {date.toLocaleDateString('ru-RU', { month: 'long' })}
           </span>
