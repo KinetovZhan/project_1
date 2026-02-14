@@ -1,0 +1,75 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Header > Snapshots > соответствует снимку без onLogout 1`] = `
+<header
+  class="header"
+>
+  <div
+    class="mainText"
+  >
+    <h3>
+      Сервис просмотра версий ПО
+    </h3>
+  </div>
+  <div
+    class="navigation"
+  >
+    <h3
+      style="cursor: pointer;"
+    >
+      Помощь
+    </h3>
+  </div>
+</header>
+`;
+
+exports[`Header > Snapshots > соответствует снимку без обработчиков 1`] = `
+<header
+  class="header"
+>
+  <div
+    class="mainText"
+  >
+    <h3>
+      Сервис просмотра версий ПО
+    </h3>
+  </div>
+  <div
+    class="navigation"
+  >
+    <h3
+      style="cursor: pointer;"
+    >
+      Помощь
+    </h3>
+  </div>
+</header>
+`;
+
+exports[`Header > Snapshots > соответствует снимку с полными пропсами 1`] = `
+<header
+  class="header"
+>
+  <div
+    class="mainText"
+  >
+    <h3>
+      Сервис просмотра версий ПО
+    </h3>
+  </div>
+  <div
+    class="navigation"
+  >
+    <h3
+      style="cursor: pointer;"
+    >
+      Помощь
+    </h3>
+    <h3
+      style="cursor: pointer;"
+    >
+      Выйти
+    </h3>
+  </div>
+</header>
+`;
