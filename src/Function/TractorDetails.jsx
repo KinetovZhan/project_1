@@ -6,6 +6,11 @@ import DefaultImage from '../img/default.jpg';
 import K5Image from '../img/К5.png';
 import K7Image from '../img/К7М.png';
 
+// Определяем базовый URL API в зависимости от окружения
+
+const API_BASE_URL = import.meta.env.PROD 
+  ? (import.meta.env.VITE_API_URL)
+  : 'http://localhost:8000';
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -39,8 +44,16 @@ export function TractorDetails({ vin, onBack }) {
       setError(null);
       try {
         console.log('Запрос деталей для VIN:', vin);
+        console.log('API URL:', `${API_BASE_URL}/search/search-tractor-vin`); // Для отладки
         
-        const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        // const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        //   method: 'GET',
+        //   headers: {
+        //     'Authorization': `Bearer ${token}`,
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json',
+        //   },
+        const response = await fetch(`${API_BASE_URL}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
