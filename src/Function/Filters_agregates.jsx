@@ -239,6 +239,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         options={tractorModelOptions}
         value={selectedTractorOptions}
         onChange={handleTractorModelChange}
+        menuPortalTarget={document.body}
         placeholder="Модель трактора"
         styles={{ 
           control: (base) => ({ 
@@ -251,7 +252,20 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             borderRadius: '15px', 
             height:'53px',
             left: '50%',
-            transform: 'Translate(-50%)'
+            transform: 'Translate(-50%)',
+            position: 'relative',
+            zIndex: 1
+          }),
+          menu: (base) => ({ 
+            ...base,
+            zIndex: 9999,
+            position: 'absolute',
+            backgroundColor: 'white',
+            marginBottom: '5px'
+          }),
+          menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
+            ...base,
+            zIndex: 9999
           }),
           menuList: (base) => ({ 
             ...base, 
@@ -260,7 +274,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             backgroundColor:'white',
             color:'black', 
             border: '1px solid rgba(217, 217, 217, 1)',
-            scrollbarWidth:'thin'
+            scrollbarWidth:'thin',
+            zIndex: 9999
           }),
         }}
       />
@@ -274,6 +289,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
         value={selectedOptions}
         onChange={handleModelChange}
         placeholder="Модель"
+        menuPortalTarget={document.body}
+        menuPlacement="top" 
         isDisabled={loading || componentModels.length === 0}
         styles={{ 
           control: (base) => ({ 
@@ -286,7 +303,20 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             borderRadius: '15px', 
             height:'53px',
             left: '50%',
-            transform: 'Translate(-50%)'
+            transform: 'Translate(-50%)',
+            position: 'relative',
+            zIndex: 1
+          }),
+          menu: (base) => ({ 
+            ...base,
+            zIndex: 9999,
+            position: 'absolute',
+            backgroundColor: 'white',
+            marginBottom: '5px'
+          }),
+          menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
+            ...base,
+            zIndex: 9999
           }),
           menuList: (base) => ({ 
             ...base, 

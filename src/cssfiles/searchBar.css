@@ -63,3 +63,13 @@
   border-radius: 4px;
 }
 }
+
+@media (min-width: 1000px) and (max-width: 1600px) {
+  .search-bar {
+    height: 5vh;
+    width: 40vh;
+    display: flex;
+    text-align: center;
+    top: 5vh;
+  }
+}

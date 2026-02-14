@@ -291,7 +291,9 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
               // width: isMobile ? '100%':'360px', 
               width: '42vh',
               borderRadius: '15px', 
-              height:'53px'
+              height:'53px',
+              left: '50%',
+              transform: 'Translate(-50%)', 
             }),
             menuList: (base) => ({ 
               ...base, 
