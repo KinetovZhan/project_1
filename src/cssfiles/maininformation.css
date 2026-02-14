@@ -1,6 +1,6 @@
 .MainPart {
   width:70vw;
-  height: 785px;
+  height: 80vh;
   background-color: rgba(217, 217, 217, 0.7);
   flex-shrink: 1; /* Запрещаем уменьшение */
   margin-left:-38px;
@@ -12,8 +12,8 @@
 .maininfo {
   /* Общий вид */
   box-sizing: border-box;
-  width: 963px;
-  height: 624px;
+  width: 110vh;
+  height: 65vh;
   background-color: white;
   border-radius: 30px;
   color: black;
@@ -21,7 +21,7 @@
 
 
   position: absolute;
-  left: 171px;
+  left: 8%;
   top: 80px;
   right: 235px;
 }
@@ -29,8 +29,8 @@
 
 .object {
   box-sizing: border-box;
-  width: 160px;
-  height: 160px;
+  width: 16vh;
+  height: 16vh;
   margin: 24px;
 
   
@@ -139,7 +139,7 @@ button:active {
 
 @media (max-width:767px) {
   .MainPart {
- width:100vw;
+width:100vw;
 height: 85vh;
 margin-left:0px;
 background-color: transparent;
@@ -199,16 +199,16 @@ background-color: transparent;
 
 .object {
   box-sizing: border-box;
-  width: 130px;
-  height: 130px;
-  margin: 24px;
+  width: 100vh;
+  height: 100vh;
+  margin: 12px;
 
   
 }
 
 .objectmenu {
   /* Внешний вид */
-  width: 500px;
+  width: 100vh;
   height: 208px;
   border-style: solid;
   border-width: 1px;

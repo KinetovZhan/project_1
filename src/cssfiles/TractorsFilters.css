@@ -109,7 +109,7 @@
 .filterstrac2 {
   /* Размеры и визуал блока */
   box-sizing: border-box;
-  width: 360px;
+  width: 42vh;
   height: 135px;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
@@ -117,7 +117,7 @@
   display: flex;
   flex-direction: column;
   padding: 10px;
-  gap: 13px;
+  gap: 10px;
   color: black;
   /* Положение */
   position: absolute;
@@ -179,7 +179,8 @@
   /* Позиция */
   position: absolute;
   left: 18px; 
-  top: 665px;
+  top: 70vh;
+  
 }
 
 .majmin_button {
@@ -344,7 +345,7 @@
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
-  width: 242px;
+  width: 180px;
   height: 56px;
   border-radius: 56px;
   /* position: absolute;
@@ -366,8 +367,20 @@
 .release-date-container {
   position: absolute;
   top: 255px;
-  left: 13px;
-  font-size: 25px;
+  left: 10px;
+  font-family: Arial;
+  display: flex;
+  align-items: center;
+  background-color: rgba(217, 217, 217, 1);
+  width: 360px;
+  height: 56px;
+  border-radius: 56px;
+  /* position: absolute;
+  top: 318px;
+  left: 13px; */
+  padding: 0 10px;
+  box-sizing: border-box;
+  font-size: 20px;
   font-family: Arial;
 }
 
@@ -675,7 +688,80 @@
   background-color: #007bff;
   color: white;
 }
+/* Стили для выпадающего списка месяцев */
+.custom-month-select {
+  position: relative;
+  display: inline-block;
+}
 
+.selected-month {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #f8f9fa;
+  min-width: 100px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: capitalize;
+}
+
+.selected-month:hover {
+  background-color: #e9ecef;
+}
+
+.month-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.month-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.month-option:hover {
+  background-color: #f0f0f0;
+}
+
+.month-option.selected {
+  background-color: #007bff;
+  color: white;
+}
+
+
+
+
+
+/* Добавленные стили для двух полей дат */
+.date-range {
+  display: flex;
+  gap: 0px;
+}
+
+.date-range .react-datepicker-wrapper {
+  flex: 1;
+}
+
+.date-label {
+  margin-right: 5px;
+  font-weight: 100;
+  font-size: 16px;
+  color: #000000 !important; 
+}
 /* Поиск диллера */
 
 .search_by_dealer {

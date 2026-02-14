@@ -20,6 +20,8 @@ export function TractorDetails({ vin, onBack }) {
     const ImageJpg = {
       'K-5': K5Image,
       'K-7': K7Image,
+      'K-742МСТ':K7Image,
+      'K-525':K5Image,
     }
 
     return ImageJpg[model]|| DefaultImage;

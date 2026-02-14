@@ -247,9 +247,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             overflowY: 'auto', 
             color: 'black', 
             backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%' : '360px', 
+            width: isMobile ? '100%' : '42vh', 
             borderRadius: '15px', 
-            height:'53px'
+            height:'53px',
+            left: '50%',
+            transform: 'Translate(-50%)'
           }),
           menuList: (base) => ({ 
             ...base, 
@@ -280,9 +282,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             overflowY: 'auto', 
             color: 'black', 
             backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%':'360px', 
+            width: isMobile ? '100%':'42vh', 
             borderRadius: '15px', 
-            height:'53px'
+            height:'53px',
+            left: '50%',
+            transform: 'Translate(-50%)'
           }),
           menuList: (base) => ({ 
             ...base, 
