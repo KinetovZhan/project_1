@@ -1,5 +1,5 @@
 .MainPart {
-  width:70vw;
+  width:140vh;
   height: 80vh;
   background-color: rgba(217, 217, 217, 0.7);
   flex-shrink: 1; /* Запрещаем уменьшение */
@@ -111,20 +111,20 @@ button:active {
   padding-left: 0;  
   overflow: auto;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 40vh;
   overflow-x: hidden;
 }
 
 /* Стили для списка */
 .list-scroll-bar {
-  max-height: 400px;
+  max-height: 40vh;
   overflow-y: auto;
   overflow-x: hidden;
   border-radius: 10px;
 }
 
 .list-scroll-bar::-webkit-scrollbar {
-  width: 10px; /* размер бегунка ес че */
+  width: 10px; 
 }
 
 .list-scroll-bar::-webkit-scrollbar-thumb {
@@ -220,6 +220,38 @@ background-color: transparent;
 }
 
 
+@media (min-width: 1200px) and (max-width: 1600px) {
+
+  .MainPart {
+    width: 130vh; /* Чуть меньше для этого диапазона */
+    margin-left: -20px;
+    font-size: 12px;
+  }
+
+  .maininfo {
+    width: 100vh; /* Адаптируем ширину */
+    padding: 30px 50px;
+    height: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .objectmenu {
+    width: 700px;
+    height: auto;
+  }
+
+  .object {
+    width: 14vh;
+    height: 14vh;
+  }
+  .download {
+    width: 30vh;
+    height: 6vh;
+    border-radius: 15px;
+    font-size: 12px;
+  }
+}
 
 
 

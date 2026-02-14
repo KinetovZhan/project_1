@@ -1,5 +1,6 @@
-
+import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 export function Header({ onLogout,onHelp }) {
+  const isMobile = useCheckMobile();
   return(
     <header className = "header">
       <div className='mainText'>
