@@ -1,10 +1,100 @@
-/* Кнопка гамбургер-меню для мобильных */
-.mobile-sidebar {
+/* ========== БАЗОВЫЕ СТИЛИ - ДЛЯ ПК И НОУТБУКОВ (от 992px) ========== */
+.sidebar {
+  margin-left: 98px;
+  height: 80vh;
+  width: 387px;
+  background-color: rgba(85, 86, 90, 1);
+  border-radius: 30px;
+  flex-shrink: 1;
+  z-index: 2;
+  position: relative;
+}
+
+.choose {
+  margin: 44px 56px 65px 63px;
+  text-align: center;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+}
+
+.choose button {
+  font-family: Arial;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+button {
+  width: 268px;
+  height: 60px;
+  border-radius: 20px;
+  background-color: rgba(217, 217, 217, 1);
+  border-color: transparent;
+}
+
+.filters {
   display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 42vh;
+  height: 160px;
+  border-radius: 20px;
+  padding: 12px 10px;
+  gap: 20px;
+  position: absolute;
+  top: 187px;
+  background-color: rgba(217, 217, 217, 1);
+  left: 50%;
+  transform: translateX(-50%);
+  color: black;
+}
+
+.choose button.active {
+  background-color: rgba(139, 139, 139, 1);
+  color: black;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+}
+
+.filter h3 {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.filter input[type="checkbox"] {
+  position: absolute;
+  right: 0;
+  transform: scale(1.5);
+}
+
+.filters2 {
+  box-sizing: border-box;
+  width: 360px;
+  height: 120px;
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  gap: 20px;
+  color: black;
+  position: absolute;
+  top: 369px;
+  left: 13px;
+}
+
+/* Гамбургер - ПО УМОЛЧАНИЮ СКРЫТ (показываем только на мобилках) */
+.mobile-sidebar {
+  display: none;
   position: fixed;
   top: 80px;
-  width:40px;
-  height:40px;
+  width: 40px;
+  height: 40px;
   left: 0px;
   z-index: 1000;
   background: rgba(85, 86, 90, 1);
@@ -44,24 +134,17 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* .toggle-text {
-  font-size: 12px;
-  margin-top: 2px;
-} */
-
-/* Оверлей для закрытия */
 .sidebar-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 999;
   display: none;
 }
 
-/* Контейнер мобильного сайдбара */
 .mobile-sidebar-container {
   display: none;
   position: fixed;
@@ -74,7 +157,7 @@
   z-index: 1000;
   transition: left 0.3s ease;
   overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-sidebar-container.open {
@@ -86,7 +169,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   background: rgba(75, 76, 80, 1);
 }
@@ -117,126 +200,78 @@
   transform: scale(1.1);
 }
 
-/* Для ПК*/
-@media (min-width:1200px) {
-.sidebar {
-  margin-left: 98px;
-  height: 785px;
-  width: 387px;
-  background-color: rgba(85, 86, 90, 1);
-  border-radius: 30px;
-  flex-shrink: 1; /* Запрещаем уменьшение */
-  z-index: 2;
-  position: relative;
-  }
-
-  .choose{
-  margin: 44px 56px 65px 63px ;
-  text-align: center;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
- 
-}
-
-.choose button{
-  font-family: Arial;
-  font-size:16px;
-  font-weight:600;
-}
-
-button {
-  width: 268px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: rgba(217, 217, 217, 1);
-  border-color:transparent;
-}
-
-
-.filters {
-  display: flex;
-  flex-direction: column;
-
-  box-sizing: border-box;
-  width: 360px;
-  height: 160px;
-  border-radius: 20px;
-  padding: 12px 10px;
-  gap: 20px;
-
-  position: absolute;
-  top: 187px;
-  
-  background-color: rgba(217, 217, 217, 1);
-  margin-left: 13px;
-
-  color: black;
-}
-
-.choose button.active {
-  background-color:rgba(139, 139, 139, 1);
-  color: black;
-}
-
-
-.filter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Ключевое свойство */
-  width: 100%;
-  position: relative;
-}
-
-
-.filter h3 {
-  margin: 0;
-  flex-shrink: 0; /* Запрещаем сжатие текста */
-}
-
-
-.filter input[type="checkbox"] {
-  position: absolute;
-  right: 0;
-  transform: scale(1.5);
-}
-
-.filters2 {
-  /* Размеры и визуал блока */
-  box-sizing: border-box;
-  width: 360px;
-  height: 120px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
-  /* Внутренности */
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 20px;
-  color: black;
-
-  /* Положение */
-  position: absolute;
-  top: 369px;
-  left:13px;
-}
-  
-  /* Скрываем мобильный тоггл на десктопах */
-  .mobile-sidebar {
-    display: none !important;
+/* ========== НОУТБУКИ (992px - 1199px) ========== */
+@media (max-width: 999px) {
+  .sidebar {
+    margin-left: 40px;
+    width: 320px;
+    height: 720px;
   }
   
-  .sidebar-overlay {
-    display: none !important;
+  .choose {
+    margin: 30px 30px 40px 30px;
   }
   
-  .mobile-sidebar-container {
-    display: none !important;
+  button {
+    width: 240px;
+  }
+  
+  .filters {
+    width: 300px;
+    margin-left: 10px;
+  }
+  
+  .filters2 {
+    width: 300px;
+    left: 10px;
   }
 }
 
-/* Для мобильного телефона */
+/* ========== ПЛАНШЕТЫ (768px - 991px) ========== */
+@media (max-width: 991px) {
+  .sidebar {
+    margin-left: 20px;
+    width: 280px;
+    height: auto;
+    min-height: 700px;
+  }
+  
+  .choose {
+    margin: 25px 20px 30px 20px;
+  }
+  
+  .choose button {
+    font-size: 15px;
+  }
+  
+  button {
+    width: 220px;
+    height: 55px;
+  }
+  
+  .filters {
+    width: 260px;
+    height: auto;
+    min-height: 160px;
+    margin-left: 10px;
+  }
+  
+  .filters2 {
+    width: 260px;
+    height: auto;
+    min-height: 120px;
+    left: 10px;
+  }
+}
 
+/* ========== МОБИЛЬНЫЕ (до 767px) ========== */
 @media (max-width: 767px) {
+  /* Прячем десктопный сайдбар */
+  .sidebar {
+    display: none;
+  }
+  
+  /* Показываем гамбургер */
   .mobile-sidebar {
     display: flex;
   }
@@ -248,137 +283,200 @@ button {
   .mobile-sidebar-container {
     display: block;
   }
-
- /* Стили внутри мобильного сайдбара */
+  
+  /* Стили для контента внутри мобильного сайдбара */
   .mobile-sidebar-container .choose {
-    margin: 10px;
-    padding: 0px;
-    width:80%;
-    max-width:300px;
+    margin: 20px auto;
+    padding: 15px;
+    width: 90%;
+    max-width: 280px;
     text-align: center;
-    background:rgba(217, 217, 217, 1);
+    background: rgba(217, 217, 217, 1);
     border-radius: 15px;
-    height:100px;
+    height: auto;
   }
-
-  button {
-  width: 200px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: rgba(217, 217, 217, 1);
-  border-color:transparent;
-}
-
-.choose button.active {
-  background-color:rgba(139, 139, 139, 1);
-  color: black;
-}
-  .add-po-container {
-  position: absolute;
-  top: 182px; /* отступ сверху */
-  padding: 10px; 
-  /* отступы по бокам, как у других кнопок */
-  width:80%;
-  max-width:300px;
-  max-height:51vw;
-}
-
-.add-po-container button {
-  font-family: Arial;
-  font-size:16px;
-  font-weight:100;
-  width:100%;
-  max-width:300px;
-}
-
-
-.add-po-container2 {
-  position: absolute;
-  top: 252px; /* отступ сверху */
-  padding: 10px 10px; /* отступы по бокам, как у других кнопок */
-  width:80%;
-  max-width:300px;
-}
-
-.add-po-container2 button {
-  font-family: Arial;
-  font-size:16px;
-  font-weight:100;
-  width:100%;
-  max-width:300px;
-}
+  
   .mobile-sidebar-container .choose button {
     width: 100%;
-    max-width:300px;
-    margin: 0px 0;
+    max-width: 250px;
+    margin: 5px auto;
     height: 50px;
     font-size: 16px;
     border-radius: 15px;
   }
   
+  button {
+    width: 200px;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgba(217, 217, 217, 1);
+    border-color: transparent;
+  }
   
-  /* Улучшаем читаемость на маленьких экранах */
-  .mobile-sidebar-container .filters
- {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  width: 80%;
-  height: 150px;
-  border-radius: 20px;
-  padding: 12px 10px;
-  gap: 20px;
-  position: absolute;
-  top: 187px;
-  background-color: rgba(217, 217, 217, 1);
-  margin-left: 13px;
-  color: black;
+  .choose button.active {
+    background-color: rgba(139, 139, 139, 1);
+    color: black;
+  }
+  
+  .add-po-container {
+    position: relative;
+    top: 0;
+    margin: 10px auto;
+    padding: 10px;
+    width: 90%;
+    max-width: 280px;
+  }
+  
+  .add-po-container button,
+  .add-po-container2 button {
+    font-family: Arial;
+    font-size: 16px;
+    font-weight: 100;
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .add-po-container2 {
+    position: relative;
+    top: 0;
+    margin: 10px auto;
+    padding: 10px;
+    width: 90%;
+    max-width: 280px;
+  }
+  
+  .mobile-sidebar-container .filters {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    width: 90%;
+    max-width: 280px;
+    height: auto;
+    min-height: 150px;
+    border-radius: 20px;
+    padding: 15px;
+    gap: 15px;
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 15px auto;
+    background-color: rgba(217, 217, 217, 1);
+    color: black;
+  }
+  
+  .mobile-sidebar-container .filters2 {
+    box-sizing: border-box;
+    width: 90%;
+    max-width: 280px;
+    height: auto;
+    min-height: 110px;
+    background-color: rgba(217, 217, 217, 1);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    gap: 15px;
+    color: black;
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 15px auto;
+  }
+  
+  .filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    font-size: 14px;
+  }
+  
+  .filter h3 {
+    margin: 0;
+    flex-shrink: 0;
+  }
+  
+  .filter input[type="checkbox"] {
+    position: absolute;
+    right: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* ========== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ (до 480px) ========== */
+@media (max-width: 480px) {
+  .mobile-sidebar {
+    top: 70px;
+    width: 35px;
+    height: 35px;
+  }
+  
+  .toggle-line {
+    width: 20px;
+    height: 2px;
+  }
+  
+  .mobile-sidebar-container {
+    width: 90%;
+    max-width: 280px;
+  }
+  
+  .filter {
+    font-size: 13px;
+  }
+  
+  .filter input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+}
+
+
+@media (min-width: 1000px), (max-width: 1600px) {
+  .sidebar {
+    display: flex;
+    margin-left: 98px;
+    height: 80vh;
+    width: 45vh;
+    background-color: rgba(85, 86, 90, 1);
+    border-radius: 30px;
+    flex-shrink: 1;
+    z-index: 2;
+    position: relative;
+    justify-content: center;
   }
 
-  .mobile-sidebar-container .filters2 {
-   /* Размеры и визуал блока */
-  box-sizing: border-box;
-  width: 80%;
-  height: 110px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
-  /* Внутренности */
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  gap: 20px;
-  color: black;
+  .choose {
+    display: flex;
+    width: 30vh;
+    height: 120px;
+    text-align: center;
+    background-color: rgba(217, 217, 217, 1);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 0;
+  }
 
-  /* Положение */
-  position: absolute;
-  top: 369px;
-  left:13px;
-   }
+  .choose button {
+    font-family: Arial;
+    font-size: 16px;
+    font-weight: 600;
+    width: 30vh;
+    height: 60px;
+    margin: 0;
+    padding: 0;
+    
+  }
 
-  .filter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Ключевое свойство */
-  width: 100%;
-  position: relative;
-  font-size:14px;
+  button {
+    width: 30vh;
+    height: 60px;
+    border-radius: 20px;
+    background-color: rgba(217, 217, 217, 1);
+    border-color: transparent;
+  }
+
 }
-
-
-.filter h3 {
-  margin: 0;
-  flex-shrink: 0; /* Запрещаем сжатие текста */
-}
-
-
-.filter input[type="checkbox"] {
-  position: absolute;
-  right: 0;
-  transform: scale(1.5);
-}
-  
-}
-
-
-
-

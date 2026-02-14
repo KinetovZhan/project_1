@@ -1,13 +1,18 @@
-/* Кнопка загрузки */
+/* ===== КНОПКА ЗАГРУЗКИ ===== */
 .download {
   width: 268px;
   height: 60px;
   border-radius: 20px;
   background-color: rgba(217, 217, 217, 1);
-  border-color:transparent;
-  margin: 4px;
+  border-color: transparent;
+  margin: 4px auto;        /* ИЗМЕНЕНО: auto по бокам для центрирования */
+  display: block;          /* Добавлено: для работы margin: auto */
+  font-family: Arial;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-
 
 .download:hover {
   background-color: #b6bbc1;
@@ -21,58 +26,144 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-
-/* Страница 3 прокртука для select */
+/* ===== СТРАНИЦА 3 - ВЫБОР МОДЕЛИ ===== */
 .model {
   position: absolute;
-  /* top: 512px; */
-  left:13px;
+  left: 50%;                    /* Центрирование */
+  transform: translateX(-50%);  /* Центрирование */
+  bottom: 120px;               /* Отступ снизу */
   width: 360px;
+  max-width: 90%;             /* Адаптивность */
 }
 
+.model select {
+  width: 100%;
+  height: 50px;
+  border-radius: 15px;
+  padding: 0 15px;
+  background-color: rgba(217, 217, 217, 1);
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* ===== КНОПКА CLEAR ===== */
 .clear {
   position: absolute;
-  top: 665px;
-  left: 13px;
-  width: 360px;
-  height: 70px;
+  left: 50%;                    /* Центрирование */
+  transform: translateX(-50%);  /* Центрирование */
+  bottom: 30px;               /* Отступ снизу */
+  width: 42vh;
+  max-width: 90%;
+  height: 6vh;
   color: black;
   background-color: rgba(217, 217, 217, 1);
-  box-shadow: none;
+  border: none;
   border-radius: 25px;
   text-align: center;
-  font-size: medium;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (max-width:767px) {
+.clear:hover {
+  background-color: #b6bbc1;
+  transform: translateX(-50%) translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.clear:active {
+  background-color: #707479;
+  transform: translateX(-50%) translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== МОБИЛЬНЫЕ ===== */
+@media (max-width: 767px) {
+  .download {
+    width: 90%;
+    max-width: 268px;
+    height: 55px;
+    margin: 10px auto;
+    font-size: 15px;
+  }
+  
   .model {
-  position: absolute;
-  top: 502px;
-  left:13px;
-  width: 80%;
+    position: relative;        /* Меняем на relative */
+    left: 0;                  /* Сбрасываем left */
+    transform: none;         /* Сбрасываем transform */
+    width: 90%;
+    max-width: 300px;
+    margin: 15px auto;       /* Центрирование */
+    bottom: auto;           /* Сбрасываем bottom */
+    top: auto;             /* Сбрасываем top */
+  }
+  
+  .model select {
+    height: 48px;
+    font-size: 14px;
+  }
+  
+  .clear {
+    position: relative;      /* Меняем на relative */
+    left: 0;                /* Сбрасываем left */
+    transform: none;       /* Сбрасываем transform */
+    width: 90%;
+    max-width: 300px;
+    height: 55px;
+    margin: 15px auto;     /* Центрирование */
+    bottom: auto;         /* Сбрасываем bottom */
+    font-size: 15px;
+  }
 }
 
-.clear {
-  position: absolute;
-  top: 80vh;
-  left: 13px;
-  width: 80%;
-  height: 70px;
-  color: black;
-  background-color: rgba(217, 217, 217, 1);
-  box-shadow: none;
-  border-radius: 25px;
-  text-align: center;
-  font-size: medium;
+/* ===== ОЧЕНЬ МАЛЕНЬКИЕ ТЕЛЕФОНЫ ===== */
+@media (max-width: 480px) {
+  .download {
+    height: 50px;
+    font-size: 14px;
+  }
+  
+  .model select {
+    height: 44px;
+    font-size: 13px;
+  }
+  
+  .clear {
+    height: 50px;
+    font-size: 14px;
+  }
 }
 
-.download {
-  width: 200px;
-  height: 60px;
-  border-radius: 20px;
-  background-color: rgba(217, 217, 217, 1);
-  border-color:transparent;
-  margin: 4px;
+/* ===== ПЛАНШЕТЫ ===== */
+@media (min-width: 768px) and (max-width: 991px) {
+  .model {
+    width: 300px;
+    bottom: 100px;
+  }
+  
+  .clear {
+    width: 300px;
+    bottom: 25px;
+  }
+  
+  .download {
+    width: 240px;
+    height: 55px;
+  }
 }
 
+/* ===== НОУТБУКИ ===== */
+@media (min-width: 992px) and (max-width: 1199px) {
+  .model {
+    width: 320px;
+  }
+  
+  .clear {
+    width: 320px;
+  }
 }

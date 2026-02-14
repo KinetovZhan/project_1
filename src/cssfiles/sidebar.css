@@ -404,7 +404,7 @@ button {
   flex-direction: column;
 
   box-sizing: border-box;
-  width: 360px;
+  width: 50vh;
   height: 160px;
   border-radius: 20px;
   padding: 12px 10px;

@@ -29,14 +29,14 @@ import { useAuth } from './AuthContext';
 export function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
-  // if (loading) {
-  //   // Опционально: показать спиннер, но можно и просто ничего не рендерить
-  //   return null; // или <div>Загрузка...</div>
-  // }
+  if (loading) {
+    // Опционально: показать спиннер, но можно и просто ничего не рендерить
+    return null; // или <div>Загрузка...</div>
+  }
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" replace />;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return children;
 }

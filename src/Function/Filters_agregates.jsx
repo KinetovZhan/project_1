@@ -12,6 +12,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     'RK': 'rk',
     'hydrorasp': 'hydro' ,
     // 'hydrorasp': 'hydraulics'
+    'AP':'ap',
+    'BK':'bk',
   };
 
   const tractorModelOptions = [
@@ -23,13 +25,15 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     DVS: false,
     KPP: false,
     RK: false,
-    hydrorasp: false
+    hydrorasp: false,
+    AP:false,
+    BK:false
   });
 
-  // const [FilterItems2, setFilterItems2] = useState({
-  //   K7: false,
-  //   K5: false,
-  // })
+  const [FilterItems2, setFilterItems2] = useState({
+    K7: false,
+    K5: false,
+  })
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
@@ -112,7 +116,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
-      .map(key => componentTypeMap[key]);
+      .flatMap(key => componentTypeMap[key]);
     
     const activeTractorModels = selectedTractorModels.map(key => 
       key === 'K7' ? 'K-7' : 'K-5'
@@ -207,6 +211,24 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
               type="checkbox"/>
           </label>
         </div>
+        <div className='filter'>
+          <label> 
+            <span>Автопилот</span>
+            <input 
+              checked={FilterItems.AP}
+              onChange={() => handleFilterChange('AP')}
+              type="checkbox"/>
+          </label>
+        </div>
+        <div className='filter'>
+          <label> 
+            <span>БК</span>
+            <input 
+              checked={FilterItems.BK}
+              onChange={() => handleFilterChange('BK')}
+              type="checkbox"/>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -225,9 +247,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             overflowY: 'auto', 
             color: 'black', 
             backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%' : '360px', 
+            width: isMobile ? '100%' : '42vh', 
             borderRadius: '15px', 
-            height:'53px'
+            height:'53px',
+            left: '50%',
+            transform: 'Translate(-50%)'
           }),
           menuList: (base) => ({ 
             ...base, 
@@ -258,9 +282,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
             overflowY: 'auto', 
             color: 'black', 
             backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%':'360px', 
+            width: isMobile ? '100%':'42vh', 
             borderRadius: '15px', 
-            height:'53px'
+            height:'53px',
+            left: '50%',
+            transform: 'Translate(-50%)'
           }),
           menuList: (base) => ({ 
             ...base, 
@@ -282,7 +308,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           DVS: false,
           KPP: false,
           RK: false,
-          hydrorasp: false
+          hydrorasp: false,
+          AP:false,
+          BK:false
         });
         setFilterItems2({
           K7: false,
