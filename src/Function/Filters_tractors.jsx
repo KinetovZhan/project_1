@@ -34,8 +34,8 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen, setIsYearOpen] = useState(false);
+  const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false); 
-  const [activeDateField, setActiveDateField] = useState(null); // 'start' или 'end'
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
@@ -53,61 +53,81 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
 
   // Обработчик для начальной даты
   const handleStartDateChange = (date) => {
-    setStartDate(date);
-    if (onDateChange) {
-      const formatDate = (date) => {
-        if (!date) return null;
-        return format(date, 'yyyy-MM-dd');
-      };
-      
+  setStartDate(date);
+  if (onDateChange) {
+    const formatDate = (date) => {
+      if (!date) return null;
+      return format(date, 'yyyy-MM-dd');
+    };
+    
+    // Если конечная дата меньше начальной или равна null, устанавливаем конечную равной начальной
+    if (date && endDate && date > endDate) {
+      setEndDate(date);
+      onDateChange({
+        date_assemle: null,
+        date_start: formatDate(date),
+        date_end: formatDate(date)
+      });
+    } else {
       onDateChange({
         date_assemle: null,
         date_start: formatDate(date),
         date_end: endDate ? formatDate(endDate) : null
       });
     }
-  };
+  }
+};
 
-  // Обработчик для конечной даты
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-    if (onDateChange) {
-      const formatDate = (date) => {
-        if (!date) return null;
-        return format(date, 'yyyy-MM-dd');
-      };
-      
+// Обработчик для конечной даты
+const handleEndDateChange = (date) => {
+  setEndDate(date);
+  if (onDateChange) {
+    const formatDate = (date) => {
+      if (!date) return null;
+      return format(date, 'yyyy-MM-dd');
+    };
+    
+    // Если начальная дата больше конечной, обновляем начальную
+    if (date && startDate && date < startDate) {
+      setStartDate(date);
+      onDateChange({
+        date_assemle: null,
+        date_start: formatDate(date),
+        date_end: formatDate(date)
+      });
+    } else {
       onDateChange({
         date_assemle: null,
         date_start: startDate ? formatDate(startDate) : null,
         date_end: formatDate(date)
       });
     }
-  };
+  }
+};
 
-  // Очистка начальной даты
-  const handleClearStartDate = () => {
-    setStartDate(null);
-    if (onDateChange) {
-      onDateChange({
-        date_assemle: null,
-        date_start: null,
-        date_end: endDate ? format(endDate, 'yyyy-MM-dd') : null
-      });
-    }
-  };
+// Очистка начальной даты
+const handleClearStartDate = () => {
+  setStartDate(null);
+  if (onDateChange) {
+    onDateChange({
+      date_assemle: null,
+      date_start: null,
+      date_end: endDate ? format(endDate, 'yyyy-MM-dd') : null
+    });
+  }
+};
 
-  // Очистка конечной даты
-  const handleClearEndDate = () => {
-    setEndDate(null);
-    if (onDateChange) {
-      onDateChange({
-        date_assemle: null,
-        date_start: startDate ? format(startDate, 'yyyy-MM-dd') : null,
-        date_end: null
-      });
-    }
-  };
+// Очистка конечной даты
+const handleClearEndDate = () => {
+  setEndDate(null);
+  if (onDateChange) {
+    onDateChange({
+      date_assemle: null,
+      date_start: startDate ? format(startDate, 'yyyy-MM-dd') : null,
+      date_end: null
+    });
+  }
+};
 
   // Обработчик нажатия клавиш (Enter для поиска)
   const handleKeydown = (e) => {
@@ -160,9 +180,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
   ];
-  
-  const [isYearOpen, setIsYearOpen] = useState(false);
-  const [isMonthOpen, setIsMonthOpen] = useState(false);
 
     return (
       <div className="custom-datepicker-header">
@@ -201,10 +218,6 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
             </div>
           )}
         </div>
-
-          <span className="month-name">
-            {date.toLocaleDateString('ru-RU', { month: 'long' })}
-          </span>
           <div className="custom-year-select">
             <div 
               className="selected-year"

@@ -657,7 +657,7 @@
   min-width: 80px;
   text-align: center;
   font-weight: bold;
-  font-size:16=4px;
+  font-size:14px;
 }
 
 .year-dropdown {
@@ -708,7 +708,7 @@
 }
 
 .selected-month:hover {
-  background-color: #e9ecef;
+  background-color: none;
 }
 
 .month-dropdown {
@@ -716,7 +716,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  max-height: 250px;
+  max-height: 200px;
   overflow-y: auto;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -726,11 +726,10 @@
 }
 
 .month-option {
-  padding: 8px 12px;
+  padding: 8px 8px;
   cursor: pointer;
   text-align: center;
   font-size: 14px;
-  transition: background-color 0.2s;
 }
 
 .month-option:hover {
