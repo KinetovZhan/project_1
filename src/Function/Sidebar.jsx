@@ -83,7 +83,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         <div className='add-po-container2 '>
           <button className={activeButton === 'addAgg' ? 'active':''}
             onClick={() =>{
-            onAddAggClick 
+            onAddAggClick() 
             handleButtonClick('addAgg')
           }}> 
             Добавить агрегат
@@ -95,7 +95,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         <div className='add-po-container3'>
           <button className={activeButton === 'AddCompPart' ? 'active':''}
             onClick={() => {
-            onAddCompPartClick
+            onAddCompPartClick()
             handleButtonClick('AddCompPart')
           }}>
             Добавить часть агрегата
