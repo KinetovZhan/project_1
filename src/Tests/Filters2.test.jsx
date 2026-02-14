@@ -4,8 +4,8 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Filters2 } from '../Function/Filters_tractors';
 
-// Добавьте этот импорт для jest-dom matchers
-import '@testing-library/jest-dom';
+// ИСПРАВЛЕНО: добавляем /vitest для правильной работы с Vitest
+import '@testing-library/jest-dom/vitest';
 
 // Создаем моки с помощью vi.hoisted() чтобы избежать проблем с hoisting
 const mockFormat = vi.hoisted(() => 
@@ -19,13 +19,15 @@ const mockFormat = vi.hoisted(() =>
   })
 );
 
+// ИСПРАВЛЕНО: улучшенный мок для Select
 const MockSelect = vi.hoisted(() => 
-  vi.fn(({ placeholder, isMulti, onChange, options, value }) => (
+  vi.fn(({ placeholder, isMulti, onChange, options, value, styles }) => (
     <div data-testid="mock-select">
       <input 
         data-testid="select-input" 
         placeholder={placeholder} 
         readOnly 
+        value={value?.map(v => v.value).join(',') || ''}
       />
       <div data-testid="select-options">
         {options?.map(opt => (
@@ -51,27 +53,42 @@ const MockSelect = vi.hoisted(() =>
   ))
 );
 
+// ИСПРАВЛЕНО: улучшенный мок для DatePicker с поддержкой customInput
 const MockDatePicker = vi.hoisted(() => 
-  vi.fn(({ onChange, startDate, endDate, placeholderText }) => (
-    <div data-testid="mock-datepicker">
-      <input 
-        data-testid="datepicker-input" 
-        placeholder={placeholderText} 
-        readOnly 
-        value={startDate && endDate 
-          ? `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
-          : startDate 
-          ? startDate.toLocaleDateString()
-          : ''}
-      />
-      <button 
-        data-testid="datepicker-clear"
-        onClick={() => onChange && onChange([null, null])}
-      >
-        Clear
-      </button>
-    </div>
-  ))
+  vi.fn(({ selected, onChange, placeholderText, customInput }) => {
+    // Если есть customInput, рендерим его
+    if (customInput) {
+      return (
+        <div data-testid="mock-datepicker">
+          {customInput}
+          <button 
+            data-testid="datepicker-clear"
+            onClick={() => onChange && onChange(null)}
+          >
+            Clear
+          </button>
+        </div>
+      );
+    }
+    
+    // Иначе рендерим стандартный инпут
+    return (
+      <div data-testid="mock-datepicker">
+        <input 
+          data-testid="datepicker-input" 
+          placeholder={placeholderText} 
+          readOnly 
+          value={selected ? selected.toLocaleDateString() : ''}
+        />
+        <button 
+          data-testid="datepicker-clear"
+          onClick={() => onChange && onChange(null)}
+        >
+          Clear
+        </button>
+      </div>
+    );
+  })
 );
 
 // Мокируем модули
@@ -122,7 +139,9 @@ describe('Filters2 Component', () => {
     render(<Filters2 {...defaultProps} />);
     
     expect(screen.getByTestId('mock-select')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+    // ИСПРАВЛЕНО: используем getAllByTestId для DatePicker (их два)
+    const datePickers = screen.getAllByTestId('mock-datepicker');
+    expect(datePickers).toHaveLength(2);
     expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toBeInTheDocument();
     expect(screen.getByText('Серийное')).toBeInTheDocument();
     expect(screen.getByText('Опытное')).toBeInTheDocument();
@@ -290,14 +309,14 @@ describe('Filters2 Component', () => {
       render(<Filters2 {...defaultProps} activeMajMinButton="MAJ" />);
       
       const button = screen.getByText('Требуется MAJ');
-      expect(button.className).toBe('majmin_button_active');
+      expect(button).toHaveClass('majmin_button_active');
     });
 
     it('активный класс для MIN кнопки', () => {
       render(<Filters2 {...defaultProps} activeMajMinButton="MIN" />);
       
       const button = screen.getByText('Требуется MIN');
-      expect(button.className).toBe('majmin_button_active');
+      expect(button).toHaveClass('majmin_button_active');
     });
 
     it('неактивный класс когда кнопка не активна', () => {
@@ -306,8 +325,8 @@ describe('Filters2 Component', () => {
       const majButton = screen.getByText('Требуется MAJ');
       const minButton = screen.getByText('Требуется MIN');
       
-      expect(majButton.className).toBe('majmin_button');
-      expect(minButton.className).toBe('majmin_button');
+      expect(majButton).toHaveClass('majmin_button');
+      expect(minButton).toHaveClass('majmin_button');
     });
   });
 
@@ -315,8 +334,9 @@ describe('Filters2 Component', () => {
     it('очистка даты вызывает onDateChange', async () => {
       render(<Filters2 {...defaultProps} />);
       
-      const clearButton = screen.getByTestId('datepicker-clear');
-      await userEvent.click(clearButton);
+      // ИСПРАВЛЕНО: используем getAllByTestId и берем первую кнопку
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      await userEvent.click(clearButtons[0]);
       
       expect(mockOnDateChange).toHaveBeenCalledWith({
         date_assemle: null,
@@ -341,13 +361,13 @@ describe('Filters2 Component', () => {
       
       const input = screen.getByPlaceholderText(/поиск по дилеру/i);
       
-      expect(input.placeholder).toBe('Поиск по дилеру');
+      expect(input).toHaveAttribute('placeholder', 'Поиск по дилеру');
       
       await userEvent.click(input);
-      expect(input.placeholder).toBe('');
+      expect(input).toHaveAttribute('placeholder', '');
       
       await userEvent.tab();
-      expect(input.placeholder).toBe('Поиск по дилеру');
+      expect(input).toHaveAttribute('placeholder', 'Поиск по дилеру');
     });
 
     it('сохраняет текст при потере фокуса', async () => {
@@ -357,8 +377,8 @@ describe('Filters2 Component', () => {
       await userEvent.type(input, 'Мой дилер');
       await userEvent.tab();
       
-      expect(input.value).toBe('Мой дилер');
-      expect(input.placeholder).toBe('');
+      expect(input).toHaveValue('Мой дилер');
+      expect(input).toHaveAttribute('placeholder', '');
     });
 
     it('не меняет плейсхолдер если есть текст при потере фокуса', async () => {
@@ -369,8 +389,8 @@ describe('Filters2 Component', () => {
       await userEvent.click(input);
       await userEvent.tab();
       
-      expect(input.value).toBe('Текст');
-      expect(input.placeholder).toBe('');
+      expect(input).toHaveValue('Текст');
+      expect(input).toHaveAttribute('placeholder', '');
     });
   });
 
@@ -384,8 +404,8 @@ describe('Filters2 Component', () => {
       expect(() => {
         render(<Filters2 {...minimalProps} />);
         
-        expect(screen.getByText('Требуется MAJ')).toBeTruthy();
-        expect(screen.getByText('Требуется MIN')).toBeTruthy();
+        expect(screen.getByText('Требуется MAJ')).toBeInTheDocument();
+        expect(screen.getByText('Требуется MIN')).toBeInTheDocument();
       }).not.toThrow();
     });
 
@@ -464,7 +484,7 @@ describe('Filters2 Component', () => {
       const input = screen.getByPlaceholderText(/поиск по дилеру/i);
       await userEvent.type(input, 'Новый дилер');
       
-      expect(input.value).toBe('Новый дилер');
+      expect(input).toHaveValue('Новый дилер');
       expect(mockDealerChange).toHaveBeenCalled();
     });
 
@@ -478,8 +498,9 @@ describe('Filters2 Component', () => {
         />
       );
       
-      const clearButton = screen.getByTestId('datepicker-clear');
-      fireEvent.click(clearButton);
+      // ИСПРАВЛЕНО: используем getAllByTestId и берем первую кнопку
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      fireEvent.click(clearButtons[0]);
       
       expect(mockDateChange).toHaveBeenCalledWith({
         date_assemle: null,
@@ -498,7 +519,7 @@ describe('Filters2 Component', () => {
       expect(screen.getByLabelText('Актуальное').checked).toBe(false);
       expect(screen.getByLabelText('Критические').checked).toBe(false);
       
-      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toHaveValue('');
     });
 
     it('обновляет состояние Dealer при вводе', async () => {
@@ -507,7 +528,7 @@ describe('Filters2 Component', () => {
       const input = screen.getByPlaceholderText(/поиск по дилеру/i);
       await userEvent.type(input, 'Тестовый дилер');
       
-      expect(input.value).toBe('Тестовый дилер');
+      expect(input).toHaveValue('Тестовый дилер');
     });
 
     it('обновляет состояние FilterTractor_by_status при клике', async () => {
@@ -543,13 +564,16 @@ describe('Filters2 Component', () => {
     it('CustomInput рендерится', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      // ИСПРАВЛЕНО: используем getAllByTestId для DatePicker (их два)
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
 
     it('CustomHeader имеет базовую структуру', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
   });
 
@@ -585,7 +609,7 @@ describe('Filters2 Component', () => {
       });
     });
 
-    it('проверяет FilterStatus маппинг - исправленная версия', () => {
+    it('проверяет FilterStatus маппинг', () => {
       const statusTests = [
         { label: 'Серийное', expected: 's' },
         { label: 'Опытное', expected: 't' },
@@ -593,22 +617,24 @@ describe('Filters2 Component', () => {
         { label: 'Критические', expected: 'o' }
       ];
       
+      const mockStatusHandler = vi.fn();
+      const props = {
+        activeMajMinButton: null,
+        handleMajMinButtonClick: vi.fn(),
+        onFilterChangeByStatus: mockStatusHandler,
+      };
+      
+      render(<Filters2 {...props} />);
+      
       statusTests.forEach(({ label, expected }) => {
-        const mockStatusHandler = vi.fn();
-        const props = {
-          activeMajMinButton: null,
-          handleMajMinButtonClick: vi.fn(),
-          onFilterChangeByStatus: mockStatusHandler,
-        };
-        
-        const { unmount } = render(<Filters2 {...props} />);
+        mockStatusHandler.mockClear();
         
         const checkbox = screen.getByLabelText(label);
         fireEvent.click(checkbox);
         
         expect(mockStatusHandler).toHaveBeenCalledWith([expected]);
         
-        unmount();
+        fireEvent.click(checkbox);
       });
     });
 
@@ -655,22 +681,24 @@ describe('Filters2 Component', () => {
       const input = screen.getByPlaceholderText(/поиск по дилеру/i);
       
       await userEvent.click(input);
-      expect(input.placeholder).toBe('');
+      expect(input).toHaveAttribute('placeholder', '');
       
       await userEvent.tab();
-      expect(input.placeholder).toBe('Поиск по дилеру');
+      expect(input).toHaveAttribute('placeholder', 'Поиск по дилеру');
     });
 
     it('CustomInput компонент', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('datepicker-input')).toBeInTheDocument();
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
 
     it('CustomHeader компонент', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
 
     it('handleFilterByStatus переключает состояние', async () => {
@@ -703,7 +731,7 @@ describe('Filters2 Component', () => {
       });
       
       const dealerInput = screen.getByPlaceholderText(/поиск по дилеру/i);
-      expect(dealerInput.value).toBe('');
+      expect(dealerInput).toHaveValue('');
     });
     
     it('обрабатывает различные значения дилера', async () => {
@@ -782,7 +810,7 @@ describe('Filters2 Component', () => {
       await userEvent.type(input, 'Тест');
       await userEvent.tab();
       
-      expect(input.value).toBe('Тест');
+      expect(input).toHaveValue('Тест');
     });
     
     it('не вызывает handleSearch для не-Enter клавиш', async () => {
@@ -815,8 +843,8 @@ describe('Filters2 Component', () => {
       await userEvent.click(input);
       await userEvent.tab();
       
-      expect(input.value).toBe('Дилер');
-      expect(input.placeholder).toBe('');
+      expect(input).toHaveValue('Дилер');
+      expect(input).toHaveAttribute('placeholder', '');
     });
     
     it('инициализирует все состояния правильно', () => {
@@ -833,16 +861,17 @@ describe('Filters2 Component', () => {
         expect(screen.getByLabelText(label).checked).toBe(false);
       });
       
-      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toHaveValue('');
       
       const selectInput = screen.getByTestId('select-input');
-      expect(selectInput.value).toBe('');
+      expect(selectInput).toHaveValue('');
     });
     
     it('рендерится с правильной структурой CustomHeader', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
     
     it('обрабатывает логику years массива в CustomHeader', () => {
@@ -895,18 +924,23 @@ describe('Filters2 Component', () => {
       expect(endFormatted).toBe('2024-01-31');
     });
     
-    it('имеет правильный placeholder в DatePicker', () => {
+    // ИСПРАВЛЕНО: удаляем тест с datepicker-input, так как он не используется в компоненте
+    it('рендерит DatePicker с кастомными инпутами', () => {
       render(<Filters2 {...defaultProps} />);
       
-      const datepickerInput = screen.getByTestId('datepicker-input');
-      expect(datepickerInput.placeholder).toBe('Дата выпуска');
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
+      
+      // Проверяем что внутри есть кнопки очистки
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      expect(clearButtons).toHaveLength(2);
     });
     
     it('обрабатывает клик по иконке календаря', () => {
       render(<Filters2 {...defaultProps} />);
       
-      const clearButton = screen.getByTestId('datepicker-clear');
-      expect(clearButton).toBeInTheDocument();
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      expect(clearButtons).toHaveLength(2);
     });
     
     it('переключает статусы независимо', async () => {
@@ -962,7 +996,7 @@ describe('Filters2 Component', () => {
       expect(screen.getByLabelText('Актуальное').checked).toBe(false);
       expect(screen.getByLabelText('Критические').checked).toBe(false);
       
-      expect(screen.getByPlaceholderText(/поиск по дилеру/i).value).toBe('');
+      expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toHaveValue('');
     });
     
     it('обрабатывает клик по всем чекбоксам', async () => {
@@ -991,10 +1025,10 @@ describe('Filters2 Component', () => {
       const input = screen.getByPlaceholderText(/поиск по дилеру/i);
       
       await userEvent.type(input, 'Тестовый дилер');
-      expect(input.value).toBe('Тестовый дилер');
+      expect(input).toHaveValue('Тестовый дилер');
       
       await userEvent.clear(input);
-      expect(input.value).toBe('');
+      expect(input).toHaveValue('');
     });
     
     it('вызывает поиск по кнопке и по Enter', async () => {
@@ -1038,14 +1072,14 @@ describe('Filters2 Component', () => {
         const minButton = screen.getByText('Требуется MIN');
         
         if (activeMajMinButton === 'MAJ') {
-          expect(majButton.className).toBe('majmin_button_active');
-          expect(minButton.className).toBe('majmin_button');
+          expect(majButton).toHaveClass('majmin_button_active');
+          expect(minButton).toHaveClass('majmin_button');
         } else if (activeMajMinButton === 'MIN') {
-          expect(majButton.className).toBe('majmin_button');
-          expect(minButton.className).toBe('majmin_button_active');
+          expect(majButton).toHaveClass('majmin_button');
+          expect(minButton).toHaveClass('majmin_button_active');
         } else {
-          expect(majButton.className).toBe('majmin_button');
-          expect(minButton.className).toBe('majmin_button');
+          expect(majButton).toHaveClass('majmin_button');
+          expect(minButton).toHaveClass('majmin_button');
         }
         
         cleanup();
@@ -1065,7 +1099,10 @@ describe('Filters2 Component', () => {
       render(<Filters2 {...defaultProps} />);
       
       expect(screen.getByTestId('mock-select')).toBeInTheDocument();
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      
+      // ИСПРАВЛЕНО: используем getAllByTestId для DatePicker (их два)
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
       expect(screen.getByPlaceholderText(/поиск по дилеру/i)).toBeInTheDocument();
       expect(screen.getByTestId('search-button')).toBeInTheDocument();
       
@@ -1078,21 +1115,22 @@ describe('Filters2 Component', () => {
     });
   });
 
-  // НОВЫЕ ТЕСТЫ ДЛЯ НЕПОКРЫТЫХ СТРОК
-  describe('Тесты для непокрытых строк 62-63, 68, 75 (CustomHeader)', () => {
+  // Тесты для непокрытых строк
+  describe('Тесты для непокрытых строк', () => {
     it('рендерит кнопки навигации в CustomHeader', () => {
       render(<Filters2 {...defaultProps} />);
       
-      expect(screen.getByTestId('mock-datepicker')).toBeInTheDocument();
+      // ИСПРАВЛЕНО: используем getAllByTestId для DatePicker (их два)
+      const datePickers = screen.getAllByTestId('mock-datepicker');
+      expect(datePickers).toHaveLength(2);
     });
     
     it('обрабатывает changeYear в CustomHeader', () => {
-      const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - 10 + i);
+      const currentYear = new Date().getFullYear();
+      const years = Array.from({ length: 30 }, (_, i) => currentYear - 10 + i);
       expect(years.length).toBe(30);
     });
-  });
-  
-  describe('Тесты для непокрытых строк 93-96, 112 (форматирование дат)', () => {
+    
     it('форматирует даты в handleDateChange', () => {
       const date = new Date('2024-05-15');
       
@@ -1109,9 +1147,7 @@ describe('Filters2 Component', () => {
       
       expect(result).toBeNull();
     });
-  });
-  
-  describe('Тесты для непокрытых строк 147-179 (handleDateChange логика)', () => {
+    
     it('обрабатывает выбор одной даты через DatePicker', () => {
       const mockDateChange = vi.fn();
       const props = {
@@ -1122,8 +1158,9 @@ describe('Filters2 Component', () => {
       
       render(<Filters2 {...props} />);
       
-      const clearButton = screen.getByTestId('datepicker-clear');
-      fireEvent.click(clearButton);
+      // ИСПРАВЛЕНО: используем getAllByTestId и берем первую кнопку
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      fireEvent.click(clearButtons[0]);
       
       expect(mockDateChange).toHaveBeenCalledWith({
         date_assemle: null,
@@ -1131,9 +1168,7 @@ describe('Filters2 Component', () => {
         date_end: null
       });
     });
-  });
-  
-  describe('Тесты для непокрытых строк 240-250 (стили Select)', () => {
+    
     it('применяет стили к Select компоненту', () => {
       render(<Filters2 {...defaultProps} />);
       
@@ -1146,31 +1181,25 @@ describe('Filters2 Component', () => {
       expect(typeof props.styles.control).toBe('function');
       expect(typeof props.styles.menuList).toBe('function');
     });
-    
-   // НАЙДИТЕ тест "проверяет вызов Select с правильными параметрами" (примерно строка 1148)
-// и ЗАМЕНИТЕ его на:
 
-it('проверяет вызов Select с правильными параметрами', () => {
-  render(<Filters2 {...defaultProps} />);
-  
-  expect(MockSelect).toHaveBeenCalled();
-  
-  // Получаем первый вызов и проверяем основные параметры
-  const firstCall = MockSelect.mock.calls[0];
-  const props = firstCall[0]; // Первый аргумент
-  
-  expect(props.placeholder).toBe('Модель трактора');
-  expect(props.isMulti).toBe(true);
-  expect(props.options).toHaveLength(3);
-  expect(props.options[0].value).toBe('K-742МСТ');
-  expect(props.options[1].value).toBe('K-7');
-  expect(props.options[2].value).toBe('K-525');
-  expect(props.styles).toBeDefined();
-  expect(typeof props.styles.control).toBe('function');
-  expect(typeof props.styles.menuList).toBe('function');
-});
+    it('проверяет вызов Select с правильными параметрами', () => {
+      render(<Filters2 {...defaultProps} />);
+      
+      expect(MockSelect).toHaveBeenCalled();
+      
+      const firstCall = MockSelect.mock.calls[0];
+      const props = firstCall[0];
+      
+      expect(props.placeholder).toBe('Модель трактора');
+      expect(props.isMulti).toBe(true);
+      expect(props.options).toHaveLength(3);
+      expect(props.options[0].value).toBe('K-742МСТ');
+      expect(props.options[1].value).toBe('K-7');
+      expect(props.options[2].value).toBe('K-525');
+      expect(props.styles).toBeDefined();
+    });
   });
-  
+
   describe('Дополнительные интеграционные тесты', () => {
     it('работает со всеми фильтрами одновременно', async () => {
       render(<Filters2 {...defaultProps} />);
@@ -1202,9 +1231,10 @@ it('проверяет вызов Select с правильными параме�
       
       render(<Filters2 {...props} />);
       
-      const clearButton = screen.getByTestId('datepicker-clear');
-      fireEvent.click(clearButton);
-      fireEvent.click(clearButton); // Двойной клик
+      // ИСПРАВЛЕНО: используем getAllByTestId и берем первую кнопку
+      const clearButtons = screen.getAllByTestId('datepicker-clear');
+      fireEvent.click(clearButtons[0]);
+      fireEvent.click(clearButtons[0]); // Двойной клик
       
       expect(mockDateChange).toHaveBeenCalledTimes(2);
     });
@@ -1246,8 +1276,8 @@ it('проверяет вызов Select с правильными параме�
         />
       );
       
-      expect(majButton.className).toBe('majmin_button_active');
-      expect(minButton.className).toBe('majmin_button');
+      expect(majButton).toHaveClass('majmin_button_active');
+      expect(minButton).toHaveClass('majmin_button');
     });
   });
 });

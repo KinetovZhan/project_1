@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">95.23% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/32</span>
+                <span class='fraction'>40/42</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>11/12</span>
+                <span class='fraction'>10/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.54% </span>
+                <span class="strong">95.23% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>29/31</span>
+                <span class='fraction'>40/42</span>
             </div>
         
             
@@ -166,7 +166,20 @@
 <a name='L101'></a><a href='#L101'>101</a>
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,6 +209,8 @@
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -205,15 +220,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">6x</span>
@@ -222,6 +246,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,51 +310,64 @@ const LoginPage = () =&gt; {
   const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
 &nbsp;
   const handleSubmit = async (e) =&gt; {
-    e.preventDefault();
-    setAuthorizationError('');
+  e.preventDefault();
+  setAuthorizationError('');
 &nbsp;
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!login || !password) {
-<span class="cstat-no" title="statement not covered" >      setAuthorizationError('Введите логин и пароль');</span>
-<span class="cstat-no" title="statement not covered" >      return;</span>
-    }
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!login || !password) {
+<span class="cstat-no" title="statement not covered" >    setAuthorizationError('Введите логин и пароль');</span>
+<span class="cstat-no" title="statement not covered" >    return;</span>
+  }
 &nbsp;
-    const formData = new URLSearchParams();
-    formData.append('username', login);
-    formData.append('password', password);
+  const formData = new URLSearchParams();
+  formData.append('username', login);
+  formData.append('password', password);
 &nbsp;
-    try {
-      const response = await fetch(`http://${ip}/token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData.toString(),
-      });
+  console.log('Отправка запроса на:', `http://${ip}/token/`);
+  console.log('Данные:', formData.toString());
 &nbsp;
+  try {
+    const response = await fetch(`http://${ip}/token/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData.toString(),
+      mode: 'cors',  // Добавьте это
+    });
 &nbsp;
+    console.log('Статус ответа:', response.status);
+    console.log('Заголовки ответа:', [...response.headers.entries()]);
 &nbsp;
-      if (!response.ok) {
-        const errorData = await response.json().catch(() =&gt; ({}));
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Текст ошибки:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
         setAuthorizationError(
-          errorData.detail || 'Неверный логин или пароль'
+          errorData.detail || <span class="branch-1 cbranch-no" title="branch not covered" >'Неверный логин или пароль'</span>
         );
-        return;
+      } catch {
+        setAuthorizationError(`Ошибка сервера: ${errorText}`);
       }
-&nbsp;
-      const data = await response.json();
-&nbsp;
-      //  Используем login из контекста вместо ручного localStorage.setItem
-      if (data.access_token) {
-        loginContext(data.access_token); // ← сохраняет токен + обновляет состояние
-        navigate('/main', { replace: true }); // replace — чтобы нельзя было вернуться назад на /login по кнопке "Назад"
-      } else {
-        setAuthorizationError('Сервер не вернул токен');
-      }
-    } catch (error) {
-      console.error('Ошибка при авторизации:', error);
-      setAuthorizationError('Ошибка сети. Проверьте подключение.');
+      return;
     }
-  };
+&nbsp;
+    const data = await response.json();
+    console.log('Полученные данные:', data);
+&nbsp;
+    if (data.access_token) {
+      loginContext(data.access_token);
+      navigate('/main', { replace: true });
+    } else {
+      setAuthorizationError('Сервер не вернул токен');
+    }
+  } catch (error) {
+    console.error('Ошибка при авторизации:', error);
+    console.error('Тип ошибки:', error.name);
+    console.error('Сообщение ошибки:', error.message);
+    setAuthorizationError('Ошибка сети. Проверьте подключение.');
+  }
+};
 &nbsp;
   return (
     &lt;&gt;
@@ -379,7 +418,7 @@ export default LoginPage;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-13T10:43:12.843Z
+                at 2026-02-14T09:12:29.560Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
