@@ -4,10 +4,23 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MainPart } from '../Function/MainPart';
 
-// Моковые компоненты - УБРАНЫ TypeScript аннотации
+// ВАЖНО: Добавляем импорт для jest-dom matchers
+import '@testing-library/jest-dom';
+
+// Мок для AuthContext
+vi.mock('../auth/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { name: 'Test User' },
+    isAuthenticated: true
+  })),
+  AuthProvider: ({ children }) => <div>{children}</div>
+}));
+
+// Моковые компоненты
 vi.mock('../Function/SearchBar', () => ({
-  SearchBar: ({ onSearch }) => (
+  SearchBar: ({ onSearch, activeButton }) => (
     <div data-testid="search-bar">
+      <div data-testid="search-bar-active-button">{activeButton}</div>
       <input 
         data-testid="search-input" 
         placeholder="Search..." 
@@ -76,12 +89,45 @@ vi.mock('../Function/AddAgg', () => ({
   )
 }));
 
+// ИСПРАВЛЕНО: Мок для AddComponentPart с учетом AuthProvider
+vi.mock('./AddComponentPart', () => ({
+  AddComponentPart: ({ onBack, onSubmit }) => (
+    <div data-testid="add-component-part-form">
+      <h2>Add Component Part Form</h2>
+      <button data-testid="close-component-part-form" onClick={onBack}>
+        Close Component Part
+      </button>
+      <button data-testid="submit-component-part-form" onClick={() => onSubmit && onSubmit({ test: 'component-part' })}>
+        Submit Component Part
+      </button>
+    </div>
+  )
+}));
+
+// ИСПРАВЛЕНО: Убеждаемся что путь к AddComponentPart правильный
+// Если компонент находится в другой папке, измените путь
+vi.mock('../Function/AddComponentPart', () => ({
+  AddComponentPart: ({ onBack, onSubmit }) => (
+    <div data-testid="add-component-part-form">
+      <h2>Add Component Part Form</h2>
+      <button data-testid="close-component-part-form" onClick={onBack}>
+        Close Component Part
+      </button>
+      <button data-testid="submit-component-part-form" onClick={() => onSubmit && onSubmit({ test: 'component-part' })}>
+        Submit Component Part
+      </button>
+    </div>
+  )
+}));
+
 describe('MainPart Component', () => {
   const mockOnSearch = vi.fn();
   const mockOnCloseAddForm = vi.fn();
   const mockOnAddSubmit = vi.fn();
   const mockOnCloseAddAggForm = vi.fn();
   const mockOnAddAggSubmit = vi.fn();
+  const mockOnCloseAddCompPartForm = vi.fn();
+  const mockOnAddCompPartSubmit = vi.fn();
 
   const defaultProps = {
     activeButton: null,
@@ -100,7 +146,10 @@ describe('MainPart Component', () => {
     activeMajMinButton: 'all',
     showAddAggForm: false,
     onCloseAddAggForm: mockOnCloseAddAggForm,
-    onAddAggSubmit: mockOnAddAggSubmit
+    onAddAggSubmit: mockOnAddAggSubmit,
+    showAddCompPartForm: false,
+    onCloseAddCompPartForm: mockOnCloseAddCompPartForm,
+    onAddCompPartSubmit: mockOnAddCompPartSubmit
   };
 
   beforeEach(() => {
@@ -151,6 +200,14 @@ describe('MainPart Component', () => {
     expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
   });
 
+  it('5.1. Отображает форму компонентных частей когда showAddCompPartForm=true', () => {
+    render(<MainPart {...defaultProps} showAddCompPartForm={true} />);
+    
+    expect(screen.getByTestId('add-component-part-form')).toBeInTheDocument();
+    expect(screen.getByText('Add Component Part Form')).toBeInTheDocument();
+    expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
+  });
+
   it('6. Форма ПО имеет приоритет над другими компонентами', () => {
     render(
       <MainPart
@@ -158,25 +215,44 @@ describe('MainPart Component', () => {
         activeButton="aggregates"
         showAddForm={true}
         showAddAggForm={true}
+        showAddCompPartForm={true}
       />
     );
     
     expect(screen.getByTestId('add-po-form')).toBeInTheDocument();
     expect(screen.queryByTestId('add-agg-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('add-component-part-form')).not.toBeInTheDocument();
     expect(screen.queryByTestId('objects')).not.toBeInTheDocument();
   });
 
-  it('7. Форма агрегата отображается когда showAddForm=false и showAddAggForm=true', () => {
+  it('7. Форма агрегата имеет приоритет над компонентными частями', () => {
     render(
       <MainPart
         {...defaultProps}
         activeButton="tractor"
         showAddForm={false}
         showAddAggForm={true}
+        showAddCompPartForm={true}
       />
     );
     
     expect(screen.getByTestId('add-agg-form')).toBeInTheDocument();
+    expect(screen.queryByTestId('add-component-part-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('tractor-table')).not.toBeInTheDocument();
+  });
+
+  it('7.1. Форма компонентных частей отображается когда только она активна', () => {
+    render(
+      <MainPart
+        {...defaultProps}
+        activeButton="tractor"
+        showAddForm={false}
+        showAddAggForm={false}
+        showAddCompPartForm={true}
+      />
+    );
+    
+    expect(screen.getByTestId('add-component-part-form')).toBeInTheDocument();
     expect(screen.queryByTestId('tractor-table')).not.toBeInTheDocument();
   });
 
@@ -258,6 +334,25 @@ describe('MainPart Component', () => {
     expect(mockOnAddAggSubmit).toHaveBeenCalledWith({ test: 'agg' });
   });
 
+  it('13.1. Вызывает onCloseAddCompPartForm при нажатии кнопки закрытия формы компонентных частей', () => {
+    render(<MainPart {...defaultProps} showAddCompPartForm={true} />);
+    
+    const closeButton = screen.getByTestId('close-component-part-form');
+    fireEvent.click(closeButton);
+    
+    expect(mockOnCloseAddCompPartForm).toHaveBeenCalledTimes(1);
+  });
+
+  it('13.2. Вызывает onAddCompPartSubmit при отправке формы компонентных частей', () => {
+    render(<MainPart {...defaultProps} showAddCompPartForm={true} />);
+    
+    const submitButton = screen.getByTestId('submit-component-part-form');
+    fireEvent.click(submitButton);
+    
+    expect(mockOnAddCompPartSubmit).toHaveBeenCalledTimes(1);
+    expect(mockOnAddCompPartSubmit).toHaveBeenCalledWith({ test: 'component-part' });
+  });
+
   it('14. SearchBar вызывает onSearch при изменении ввода', () => {
     render(<MainPart {...defaultProps} activeButton="aggregates" />);
     
@@ -277,6 +372,10 @@ describe('MainPart Component', () => {
     rerender(<MainPart {...defaultProps} showAddAggForm={true} />);
     
     expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
+    
+    rerender(<MainPart {...defaultProps} showAddCompPartForm={true} />);
+    
+    expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
   });
 
   describe('useEffect тесты', () => {
@@ -287,7 +386,6 @@ describe('MainPart Component', () => {
       
       expect(mockOnCloseAddForm).not.toHaveBeenCalled();
       
-      // Меняем activeButton на другую вкладку
       rerender(
         <MainPart {...defaultProps} activeButton="aggregates" showAddForm={true} />
       );
@@ -302,7 +400,6 @@ describe('MainPart Component', () => {
         <MainPart {...defaultProps} activeButton="addPO" showAddForm={true} />
       );
       
-      // Меняем другие пропсы, но оставляем activeButton="addPO"
       rerender(
         <MainPart 
           {...defaultProps} 
@@ -324,7 +421,6 @@ describe('MainPart Component', () => {
       
       expect(mockOnCloseAddAggForm).not.toHaveBeenCalled();
       
-      // Меняем activeButton на другую вкладку
       rerender(
         <MainPart {...defaultProps} activeButton="tractor" showAddAggForm={true} />
       );
@@ -339,7 +435,6 @@ describe('MainPart Component', () => {
         <MainPart {...defaultProps} activeButton="addAgg" showAddAggForm={true} />
       );
       
-      // Меняем другие пропсы, но оставляем activeButton="addAgg"
       rerender(
         <MainPart 
           {...defaultProps} 
@@ -354,20 +449,100 @@ describe('MainPart Component', () => {
       });
     });
 
-    it('20. Закрывает форму ПО при изменении showAddForm на false', async () => {
+    it('19.1. Закрывает форму компонентных частей при смене activeButton на другую вкладку', async () => {
       const { rerender } = render(
-        <MainPart {...defaultProps} activeButton="addPO" showAddForm={true} />
+        <MainPart 
+          {...defaultProps} 
+          activeButton="AddCompPart" 
+          showAddCompPartForm={true} 
+        />
       );
       
-      // Меняем showAddForm на false
+      expect(mockOnCloseAddCompPartForm).not.toHaveBeenCalled();
+      
       rerender(
-        <MainPart {...defaultProps} activeButton="addPO" showAddForm={false} />
+        <MainPart 
+          {...defaultProps} 
+          activeButton="aggregates" 
+          showAddCompPartForm={true} 
+        />
       );
       
-      // useEffect сработает, но onCloseAddForm не должен вызываться,
-      // так как форма уже скрыта
+      await waitFor(() => {
+        expect(mockOnCloseAddCompPartForm).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('19.2. Не закрывает форму компонентных частей если активная кнопка остается "AddCompPart"', async () => {
+      const { rerender } = render(
+        <MainPart 
+          {...defaultProps} 
+          activeButton="AddCompPart" 
+          showAddCompPartForm={true} 
+        />
+      );
+      
+      rerender(
+        <MainPart 
+          {...defaultProps} 
+          activeButton="AddCompPart" 
+          showAddCompPartForm={true} 
+          searchQuery="new"
+        />
+      );
+      
+      await waitFor(() => {
+        expect(mockOnCloseAddCompPartForm).not.toHaveBeenCalled();
+      });
+    });
+
+    it('20. Не закрывает форму ПО при отсутствии activeButton', async () => {
+      const { rerender } = render(
+        <MainPart {...defaultProps} activeButton={null} showAddForm={true} />
+      );
+      
+      rerender(
+        <MainPart {...defaultProps} activeButton={null} showAddForm={true} />
+      );
+      
       await waitFor(() => {
         expect(mockOnCloseAddForm).not.toHaveBeenCalled();
+      });
+    });
+
+    it('20.1. Не закрывает форму агрегата при отсутствии activeButton', async () => {
+      const { rerender } = render(
+        <MainPart {...defaultProps} activeButton={null} showAddAggForm={true} />
+      );
+      
+      rerender(
+        <MainPart {...defaultProps} activeButton={null} showAddAggForm={true} />
+      );
+      
+      await waitFor(() => {
+        expect(mockOnCloseAddAggForm).not.toHaveBeenCalled();
+      });
+    });
+
+    it('20.2. Не закрывает форму компонентных частей при отсутствии activeButton', async () => {
+      const { rerender } = render(
+        <MainPart 
+          {...defaultProps} 
+          activeButton={null} 
+          showAddCompPartForm={true} 
+        />
+      );
+      
+      rerender(
+        <MainPart 
+          {...defaultProps} 
+          activeButton={null} 
+          showAddCompPartForm={true} 
+        />
+      );
+      
+      await waitFor(() => {
+        expect(mockOnCloseAddCompPartForm).not.toHaveBeenCalled();
       });
     });
   });
@@ -378,7 +553,9 @@ describe('MainPart Component', () => {
       onCloseAddForm: mockOnCloseAddForm,
       onAddSubmit: mockOnAddSubmit,
       onCloseAddAggForm: mockOnCloseAddAggForm,
-      onAddAggSubmit: mockOnAddAggSubmit
+      onAddAggSubmit: mockOnAddAggSubmit,
+      onCloseAddCompPartForm: mockOnCloseAddCompPartForm,
+      onAddCompPartSubmit: mockOnAddCompPartSubmit
     };
     
     expect(() => render(<MainPart {...minimalProps} />)).not.toThrow();
@@ -387,11 +564,10 @@ describe('MainPart Component', () => {
   it('22. Обрабатывает несуществующий activeButton корректно', () => {
     render(<MainPart {...defaultProps} activeButton="nonExistentButton" />);
     
-    // SearchBar НЕ должен отрендериться для несуществующего activeButton
     expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
     expect(screen.queryByTestId('objects')).not.toBeInTheDocument();
     expect(screen.queryByTestId('tractor-table')).not.toBeInTheDocument();
-    });
+  });
 
   it('23. Обрабатывает случай когда обе формы false', () => {
     render(
@@ -400,6 +576,7 @@ describe('MainPart Component', () => {
         activeButton="aggregates"
         showAddForm={false}
         showAddAggForm={false}
+        showAddCompPartForm={false}
       />
     );
     
@@ -410,10 +587,8 @@ describe('MainPart Component', () => {
   it('24. Корректно обрабатывает изменение activeButton с null на значение', () => {
     const { rerender } = render(<MainPart {...defaultProps} />);
     
-    // Первый рендер - пустой
     expect(screen.queryByTestId('search-bar')).not.toBeInTheDocument();
     
-    // Меняем activeButton
     rerender(<MainPart {...defaultProps} activeButton="aggregates" />);
     
     expect(screen.getByTestId('search-bar')).toBeInTheDocument();
@@ -430,5 +605,173 @@ describe('MainPart Component', () => {
     render(<MainPart {...customProps} />);
     
     expect(screen.getByText('Dealer: Test Dealer')).toBeInTheDocument();
+  });
+
+  it('26. Проверяет правильный порядок приоритета форм: ПО > Агрегат > Компонентные части', () => {
+    render(
+      <MainPart
+        {...defaultProps}
+        showAddForm={true}
+        showAddAggForm={true}
+        showAddCompPartForm={true}
+      />
+    );
+    
+    expect(screen.getByTestId('add-po-form')).toBeInTheDocument();
+    expect(screen.queryByTestId('add-agg-form')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('add-component-part-form')).not.toBeInTheDocument();
+  });
+
+  it('27. Передает activeButton в SearchBar', () => {
+    render(<MainPart {...defaultProps} activeButton="tractor" />);
+    
+    expect(screen.getByTestId('search-bar')).toBeInTheDocument();
+    expect(screen.getByTestId('search-bar-active-button')).toHaveTextContent('tractor');
+  });
+
+  // Замените тест 28 на этот:
+it('28. Objects компонент обрабатывает пустые фильтры', () => {
+  render(
+    <MainPart
+      {...defaultProps}
+      activeButton="aggregates"
+      activeFilters={[]}
+      activeFilters2={[]}
+      selectedModel=""
+      searchQuery=""
+    />
+  );
+  
+  expect(screen.getByText('Filters: []')).toBeInTheDocument();
+  expect(screen.getByText('Filters2: []')).toBeInTheDocument();
+  
+  // ИСПРАВЛЕНО: используем getByText с точным совпадением
+  expect(screen.getByText('Model:')).toBeInTheDocument();
+  expect(screen.getByText('Query:')).toBeInTheDocument();
+});
+
+// Замените тест 29 на этот:
+it('29. TractorTable компонент обрабатывает пустые пропсы', () => {
+  render(
+    <MainPart
+      {...defaultProps}
+      activeButton="tractor"
+      activeFiltersTrac={[]}
+      activeFiltersTrac2={[]}
+      searchQuery=""
+      searchDealer=""
+      dateFilter=""
+      activeMajMinButton=""
+    />
+  );
+  
+  expect(screen.getByText('Filters: []')).toBeInTheDocument();
+  expect(screen.getByText('Filters2: []')).toBeInTheDocument();
+  
+  // ИСПРАВЛЕНО: используем getByText с точным совпадением
+  expect(screen.getByText('Query:')).toBeInTheDocument();
+  expect(screen.getByText('Dealer:')).toBeInTheDocument();
+  expect(screen.getByText('Date:')).toBeInTheDocument();
+  expect(screen.getByText('Button:')).toBeInTheDocument();
+});
+
+  it('30. Форма ПО работает без onSubmit обработчика', () => {
+    const propsWithoutOnAddSubmit = {
+      ...defaultProps,
+      showAddForm: true,
+      onAddSubmit: undefined
+    };
+    
+    render(<MainPart {...propsWithoutOnAddSubmit} />);
+    
+    const submitButton = screen.getByTestId('submit-po-form');
+    
+    expect(() => {
+      fireEvent.click(submitButton);
+    }).not.toThrow();
+  });
+
+  it('31. Форма агрегата работает без onSubmit обработчика', () => {
+    const propsWithoutOnAddAggSubmit = {
+      ...defaultProps,
+      showAddAggForm: true,
+      onAddAggSubmit: undefined
+    };
+    
+    render(<MainPart {...propsWithoutOnAddAggSubmit} />);
+    
+    const submitButton = screen.getByTestId('submit-agg-form');
+    
+    expect(() => {
+      fireEvent.click(submitButton);
+    }).not.toThrow();
+  });
+
+  it('32. Форма компонентных частей работает без onSubmit обработчика', () => {
+    const propsWithoutOnAddCompPartSubmit = {
+      ...defaultProps,
+      showAddCompPartForm: true,
+      onAddCompPartSubmit: undefined
+    };
+    
+    render(<MainPart {...propsWithoutOnAddCompPartSubmit} />);
+    
+    const submitButton = screen.getByTestId('submit-component-part-form');
+    
+    expect(() => {
+      fireEvent.click(submitButton);
+    }).not.toThrow();
+  });
+
+  it('33. SearchBar работает без onSearch обработчика', () => {
+    const propsWithoutOnSearch = {
+      ...defaultProps,
+      activeButton: 'aggregates',
+      onSearch: undefined
+    };
+    
+    render(<MainPart {...propsWithoutOnSearch} />);
+    
+    const searchInput = screen.getByTestId('search-input');
+    
+    expect(() => {
+      fireEvent.change(searchInput, { target: { value: 'test' } });
+    }).not.toThrow();
+  });
+
+  it('34. Компонент корректно обновляется при изменении activeButton', () => {
+    const { rerender } = render(
+      <MainPart {...defaultProps} activeButton="aggregates" />
+    );
+    
+    expect(screen.getByTestId('objects')).toBeInTheDocument();
+    
+    rerender(<MainPart {...defaultProps} activeButton="tractor" />);
+    
+    expect(screen.getByTestId('tractor-table')).toBeInTheDocument();
+    expect(screen.queryByTestId('objects')).not.toBeInTheDocument();
+  });
+
+  it('35. useEffect правильно отслеживает зависимости', () => {
+    const { rerender } = render(
+      <MainPart
+        {...defaultProps}
+        activeButton="addPO"
+        showAddForm={true}
+        onCloseAddForm={mockOnCloseAddForm}
+      />
+    );
+    
+    rerender(
+      <MainPart
+        {...defaultProps}
+        activeButton="addPO"
+        showAddForm={true}
+        onCloseAddForm={mockOnCloseAddForm}
+        searchQuery="new query"
+      />
+    );
+    
+    expect(mockOnCloseAddForm).not.toHaveBeenCalled();
   });
 });
