@@ -6,7 +6,7 @@
   border-radius: 10px 5px 10px 5px;
   padding: 0;
   max-width: 120vh;
-  max-height: 80vh;
+  /* max-height: 80vh; */
   /* width:100%; */
   box-sizing: border-box;
   margin:100px;
@@ -14,7 +14,7 @@
 
 /* скролл для тела таблицы */
 .scroll-bar {
-  max-height: 600px;
+  max-height: 580px;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 10px;
@@ -131,26 +131,8 @@
     font-size: 12px;
   }
 
-  /* .scroll-bar {
-    max-height: 550px;
-  }
-
-  .tractor-table thead th {
-    padding: 10px 6px;
-    font-size: 13px;
-    min-width: 70px;
-  }
-
   .tractor-table td {
-    padding: 10px 6px;
-    font-size: 13px;
-    min-width: 70px;
-  }
-
-  .tractor-cell:hover::after {
-    max-width: 250px;
     font-size: 12px;
-    padding: 4px 8px;
-  } */
+  }
 
 }

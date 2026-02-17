@@ -3,6 +3,7 @@ import { useAuth } from '../auth/AuthContext';
 import { ip } from "../shrineofvsakoe/ip.jsx";
 import Select from 'react-select';
 import Creatable from 'react-select/creatable';
+import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     number_of_parts: '',
     producer_comp: ''
   });
+  const isMobile = useCheckMobile();
 
   const [tractors, setTractors] = useState([])
   const [loadingTractors, setLoadingTractors] = useState(false)
@@ -163,7 +165,7 @@ export function AddAggForm({ onBack, onSubmit }) {
       border: '1px solid',
       borderColor: state.isFocused ? '#13be00' : '#ccc',
       boxSizing: 'border-box',
-      fontSize:'16px',
+      fontSize:(isMobile?'12px':'16px'),
       cursor: 'pointer',
       transition: 'border-color 0.15s ease',
       outline: 'none',
@@ -224,15 +226,13 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   return (
     <div className="add-po-agg-container">
-      <button
-        onClick={onBack}
-        className="add-po-back-button"
-        disabled={loading}
-      >
-        <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
+      {!isMobile ? (
+        <button onClick={onBack} className="add-po-back-button">
+          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      ) : null}
 
       <h3 className="add-po-title">Добавление агрегата</h3>
 
@@ -329,7 +329,7 @@ export function AddAggForm({ onBack, onSubmit }) {
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
                 // padding: '0 12px',
-                fontSize: '16px', // Можно добавить проверку на isMobile если нужно
+                fontSize: (isMobile?'12px':'16px'), // Можно добавить проверку на isMobile если нужно
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',
                 outline: 'none',

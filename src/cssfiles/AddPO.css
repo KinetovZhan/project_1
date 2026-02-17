@@ -294,4 +294,19 @@
   .add-po-input {
     font-size: 12px;
   }
+
+  .add-po-agg-container {
+    position: static;
+    left: 0px;
+    margin-top: 2vh;
+    height: 72vh;
+  }
+
+  .add-po-comp-part-container {
+    left: 0px;
+    position: static;
+    margin-top: 2vh;
+    width: 100vh;
+    height: 40vh;
+  } 
 } 

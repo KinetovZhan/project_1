@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { ip } from "../shrineofvsakoe/ip.jsx";
 import Select from 'react-select';
+import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 export function AddComponentPart({ onBack, onSubmit }) {
     const [formData, setFormData] = useState({
         component_model: '',
         part_type: ''
     })
+    const isMobile = useCheckMobile();
 
     const [componentsModels, setComponentsModels] = useState([])
     const [loadingModels, setLoadingModels] = useState(false)
@@ -123,15 +125,13 @@ export function AddComponentPart({ onBack, onSubmit }) {
 
     return (
         <div className="add-po-comp-part-container">
-            <button
-                onClick={onBack}
-                className="add-po-back-button"
-                disabled={loading}
-            >
+            {!isMobile ? (
+                <button onClick={onBack} className="add-po-back-button">
                 <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-            </button>
+                </button>
+            ) : null}
 
             <h3 className="add-po-title">Добавление части агрегата</h3>
 
@@ -163,16 +163,16 @@ export function AddComponentPart({ onBack, onSubmit }) {
                                 minHeight: '40px',
                                 width: '100%',
                                 border: '1px solid',
-                                borderColor: state.isFocused ? '#13be00' : '#ccc',
+                                borderColor: state.isFocused ? '#454744' : '#ccc',
                                 boxSizing: 'border-box',
                                 // padding: '0 12px',
-                                fontSize: '16px',
+                                fontSize: (isMobile?'12px':'16px'),
                                 cursor: 'pointer',
                                 transition: 'border-color 0.15s ease',
                                 outline: 'none',
                                 boxShadow: 'none',
                                 '&:hover': {
-                                    borderColor: '#13be00'
+                                    borderColor: '#575a57'
                                 }
                             }),
                             menuList: (base) => ({

@@ -783,4 +783,10 @@ button.search_button {
     border-radius: 15px;
   }
 
+  .majmin_button_active {
+    width: 21vh;
+    height: 6vh;
+    border-radius: 15px;
+  }
+
 }
