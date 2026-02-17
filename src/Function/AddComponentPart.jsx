@@ -141,6 +141,8 @@ export function AddComponentPart({ onBack, onSubmit }) {
                 </div>
             )}
 
+            <div className='add-po-form-scroll-bar-comp-part'>
+
             <form className="add-po-form" onSubmit={handleSubmit}>
                 {/* 🔥 Выбор компонента через react-select */}
                 <div className="add-po-field">
@@ -225,6 +227,7 @@ export function AddComponentPart({ onBack, onSubmit }) {
                     {loading ? 'Добавление...' : 'Добавить'}
                 </button>
             </form>
+            </div>
         </div>
     );
 }

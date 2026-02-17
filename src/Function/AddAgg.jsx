@@ -241,6 +241,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           {error}
         </div>
       )}
+      <div className='add-po-form-scroll-bar'>
 
       <form className="add-po-form" onSubmit={handleSubmit}>
         <div className='add-po-field'>
@@ -433,6 +434,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           {loading ? 'Добавление...' : 'Добавить'}
         </button>
       </form>
+      </div>
     </div>
   );
 }

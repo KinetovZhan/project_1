@@ -5,7 +5,7 @@
   background: #ffffff;
   border-radius: 10px 5px 10px 5px;
   padding: 0;
-  max-width: 120vh;
+  max-width: 120%;
   /* max-height: 80vh; */
   /* width:100%; */
   box-sizing: border-box;
@@ -35,7 +35,7 @@
 }
 
 .tractor-table {
-  height: 60vh;
+  height: auto;
   border-collapse: collapse;
   background: white;
   table-layout: auto;
@@ -125,14 +125,25 @@
   .tractor-table-container {
     position: relative;
     max-width: 100vh;
-    max-height: 60vh;
+    /* height: auto; */
+    /* max-height: 60vh; */
     top: 15vh;
     margin: 0px;
     font-size: 12px;
+    height: fit-content;
   }
 
   .tractor-table td {
     font-size: 12px;
+  }
+
+  .scroll-bar {
+    max-height: 580px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 10px;
+    min-height: auto; 
+    height: fit-content;
   }
 
 }
