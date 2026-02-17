@@ -10,6 +10,37 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://172.20.46.61
 export const API_TIMEOUT = IS_PROD ? 10000 : 30000;
 export const RETRY_COUNT = IS_PROD ? 3 : 1;
 
+// Коды ошибок - добавлено!
+export const ERROR_CODES = {
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  SERVER_ERROR: 500,
+  TIMEOUT: 408,
+};
+
+// Логгер - добавлено!
+export const logger = {
+  log: (...args) => {
+    if (IS_DEV) {
+      console.log('[DEV]', ...args);
+    }
+  },
+  error: (...args) => {
+    console.error('[ERROR]', ...args);
+  },
+  warn: (...args) => {
+    if (IS_DEV) {
+      console.warn('[WARN]', ...args);
+    }
+  },
+  info: (...args) => {
+    if (IS_DEV) {
+      console.info('[INFO]', ...args);
+    }
+  },
+};
+
 // ИСПРАВЛЕНО: было builqApiUrl, стало buildApiUrl
 export const buildApiUrl = (endpoint) => {
   // Убираем ведущие и trailing слеши
@@ -123,6 +154,58 @@ class fetchAPI {
         throw new Error(data.message || `Ошибка ${response.status}`);
     }
   }
+
+
+  async download(endpoint, options = {}) {
+    const url = buildApiUrl(endpoint);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+    
+    try {
+        const token = localStorage.getItem('accessToken');
+        const headers = {
+            ...this.defaultHeaders,
+            ...options.headers,
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Важно: для скачивания не указываем Content-Type
+        delete headers['Content-Type'];
+
+        const fetchOptions = {
+            ...options,
+            headers,
+            signal: controller.signal,
+            method: options.method || 'GET',
+        };
+
+        logger.log(`Downloading: ${url}`);
+
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            // Пробуем получить текст ошибки
+            const errorText = await response.text();
+            throw new Error(`Ошибка скачивания: ${response.status} - ${errorText}`);
+        }
+
+        return response; // Возвращаем response для дальнейшей обработки blob
+
+    } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            throw new Error('Скачивание превысило время ожидания');
+        }
+        
+        logger.error('Download error:', error);
+        throw error;
+    }
+}
 
   /**
    * Обработка неавторизованного доступа

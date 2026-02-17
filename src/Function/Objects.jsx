@@ -11,6 +11,7 @@ import ContrImage from '../img/БК Контроллер.png';
 import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
+import { api } from '../fetchAPI.js';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
   const [softwareItems, setSoftwareItems] = useState([]);
@@ -48,32 +49,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           };
           
   
-          const response = await fetch(`http://${ip}/search/component-info`, {
-            method: 'POST',
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-          });
-  
-          if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-              const errorData = await response.json();
-              errorMessage += ` — ${JSON.stringify(errorData)}`;
-            } catch (e) {
-              // Если не JSON — попробуем текст
-              const errorText = await response.text();
-              errorMessage += ` — ${errorText}`;
-            }
-            throw new Error(errorMessage);
-          }
-  
-  
-  
-          const data = await response.json();
+          const data = await api.post('search/component-info',postData); 
+
           const items = Array.isArray(data) ? data : (data ? [data] : []);
           setSoftwareItems(items);
         } catch (err) {
@@ -117,7 +94,39 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
     }
     }
 
+   // Функция для получения имени файла из заголовков
+  const getFilenameFromResponse = (response, defaultName) => {
+    const contentDisposition = response.headers.get('content-disposition');
+    
+    if (contentDisposition) {
+      const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+      if (matches && matches[1]) {
+        return matches[1].replace(/['"]/g, '');
+      }
+    }
+    
+    return defaultName;
+  };
 
+  // Функция для определения расширения файла
+  const ensureFileExtension = (filename, contentType) => {
+    if (filename.match(/\.([a-zA-Z0-9]+)$/)) {
+      return filename;
+    }
+
+    const extensionMap = {
+      'application/octet-stream': '.bin',
+      'application/zip': '.zip',
+      'application/pdf': '.pdf',
+      'application/x-binary': '.bin',
+      'binary/octet-stream': '.bin',
+      'application/json': '.json',
+      'text/plain': '.txt'
+    };
+
+    const extension = extensionMap[contentType] || '.bin';
+    return filename + extension;
+  };
 
   const handleDownload = async (item) => {
   if (!item?.id_Firmwares) {
@@ -133,56 +142,15 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   try {
     setDownloading(item.id_Firmwares);
 
-    const response = await fetch(`http://${ip}/software/download/${item.id_Firmwares}`, {
-      method: 'GET',
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Текст ошибки:', errorText);
-      throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
-    }
-
-    // Получаем имя файла из заголовка или используем ID
-    let filename = `firmware_${item.id_Firmwares}`;
-    const contentDisposition = response.headers.get('content-disposition');
+    const response = await api.download(`software/download/${item.id_Firmwares}`)
     
-    if (contentDisposition) {
-      const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
-      if (matches && matches[1]) {
-        filename = matches[1].replace(/['"]/g, '');
-      }
-    }
+    // Получаем имя файла из заголовка или используем ID
+    let filename = getFilenameFromResponse(response,`firmware_${item.id_Firmwares}`);
 
-    // Улучшенное определение расширения
-    let extension = '';
     const contentType = response.headers.get('content-type') || '';
     
-    // Проверяем расширение в имени файла
-    const nameMatch = filename.match(/\.([a-zA-Z0-9]+)$/);
-    if (nameMatch) {
-      extension = `.${nameMatch[1]}`;
-    } else {
-      // Определяем по типу контента
-      const extensionMap = {
-        'application/octet-stream': '.bin',
-        'application/zip': '.zip',
-        'application/x-rar-compressed': '.rar',
-        'application/x-7z-compressed': '.7z',
-        'application/x-tar': '.tar',
-        'application/x-gzip': '.gz',
-        'application/pdf': '.pdf',
-        'application/x-binary': '.bin',
-        'binary/octet-stream': '.bin'
-      };
-      
-      extension = extensionMap[contentType] || '.bin';
-      filename += extension;
-    }
+    // Добавляем расширение, если нужно
+      filename = ensureFileExtension(filename, contentType);
 
     console.log('Скачиваем файл:', filename, 'Content-Type:', contentType);
 
