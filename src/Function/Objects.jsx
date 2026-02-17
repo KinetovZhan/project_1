@@ -6,8 +6,7 @@ import APImage from '../img/Автопилот.png';
 import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
-import DisplayImage from '../img/БК дисплей.png';
-import ContrImage from '../img/БК Контроллер.png';
+import BKImage from '../img/БК дисплей контроллер.png';
 import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
@@ -38,7 +37,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
       }
       if (userRole !== 'dealer') {
         try {
-          const FilterToTypeMap = { 'DVS': ['dvs', 'engine'], 'KPP': ['kpp', 'transmission'],'RK': ['suspension'], 'hydrorasp': ['hydraulics']};
+          const FilterToTypeMap = { 'DVS': ['dvs', 'engine'], 'KPP': ['kpp', 'transmission'],'RK': ['suspension','rk'], 'hydrorasp': ['hydraulics'],'AP': ['ap'], 'BK': ['bk']}
           const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
   
           const postData = {
@@ -91,30 +90,26 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
   }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
 
 
-    const ImageToComponent = (type_component,model_component,part_type) => {
-      if(type_component && type_component !== 'engine'&& type_component !== 'dvs' &&type_component !== 'bk'){
+    const ImageToComponent = (type_component,model_component) => {
+      if(type_component && type_component !== 'engine'&& type_component !== 'dvs'){
       const ImageByType = {
         'transmission': KPPImage,
         'suspension': RKImage,
         'hydraulics': HRImage,
         'ap':APImage,
+        'bk':BKImage
       };
       return ImageByType[type_component]|| DefaultImage;
     }
       if(model_component && (type_component == 'engine'|| type_component == 'dvs' )){
       const ImageByModel = {
         'Weichai': WeiImage,
+        'ТМЗ': TMZImage,
+        'ЯМЗ': JMZImage,
       };
       return ImageByModel[model_component]|| DefaultImage;
     }
 
-      if(type_component == 'bk'&&part_type){
-      const ImageByPart = {
-        'Дисплей': DisplayImage,
-        'Контроллер': ContrImage
-      };
-      return ImageByPart[part_type]|| DefaultImage;
-    }
     }
 
 
@@ -338,7 +333,7 @@ const handleMouseEnter = (id) => {
             .map((item) => (
               <li key={item.id_Firmwares}>
                 <div className='objectmenu' data-testid='objectmenu'>
-                  <img className='object' src={ImageToComponent(item.type_component,item.model_component || item.comp_model,item.part_type)} alt={item.type_component} />
+                  <img className='object' src={ImageToComponent(item.type_component,item.model_component )} alt={item.type_component} />
                   <div className='inform'>
                     <h4 className='poster'>
                       №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
