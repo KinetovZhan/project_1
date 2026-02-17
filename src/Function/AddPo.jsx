@@ -241,6 +241,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     
     // Отправляем актуальность
     formData.append('is_actual', selectedRelevance.value === 'actual');
+    console.log('is_actual:', selectedRelevance.value === 'actual');
     
     // Отправляем статус
     formData.append('status', selectedStatus.value);
@@ -259,12 +260,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       formData.append('part_type', opt.part_type);
     });
 
-    // Отправляем предыдущую версию ПО если выбрана
-    if (selectedPreviousVersion) {
-      formData.append('previous_sw_version_str', selectedPreviousVersion.value.toString());
-    }
-
-    // Добавляем производителя (пока заглушка)
     if (selectedProducer) {
       formData.append('producer', selectedProducer.value);
     }
@@ -272,9 +267,20 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     // Добавляем модель трактора - отправляем ID трактора
     if (selectedTractorModel) {
       formData.append('tractor_id', selectedTractorModel.value);
-      // Также можно отправить отдельно модель и VIN, если нужно
-      formData.append('tractor_model', selectedTractorModel.model);
-      formData.append('tractor_vin', selectedTractorModel.vin);
+    }
+
+    if (selectedPreviousVersion) {
+      formData.append('previous_sw_version', selectedPreviousVersion.value);
+    }
+
+    const releaseDate = form.elements.releaseDate.value;
+    if (releaseDate) {
+      formData.append('release_date', releaseDate);
+    }
+
+    const description = form.elements.description.value.trim();
+    if (description) {
+      formData.append('description', description);
     }
 
     // Для отладки
