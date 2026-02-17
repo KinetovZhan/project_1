@@ -98,7 +98,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
     // Обязательные поля
     const name = form.elements.poNumber.value.trim();
-    const is_major = form.elements.majorMinor.value === 'major';
+    const is_actual = form.elements.majorMinor.value === 'actual';
 
     // Необязательные
     const inner_name = form.elements.innerName?.value.trim() || undefined;
@@ -116,7 +116,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     formData.append('file', file);
     formData.append('name', name);
     formData.append('inner_name', inner_name);
-    formData.append('is_major', is_major.toString());
+    formData.append('is_actual', is_actual.toString());
     // Отправляем массив всех выбранных моделей
     selectedComponents.forEach(opt => {
       formData.append('component_models', opt.model);
@@ -320,7 +320,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           />
         </div>
 
-        {/* is_major */}
+        {/* is_actual */}
         <div className="add-po-field">
           <label className="add-po-label">Тип</label>
           <select name="majorMinor" required className="add-po-select" data-testid="type-select">

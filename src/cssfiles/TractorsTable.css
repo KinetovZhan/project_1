@@ -128,8 +128,6 @@
     max-height: 60vh;
     top: 15vh;
     margin: 0px;
-    left: 50%;
-    transform: translateX(-50%);
     font-size: 12px;
   }
 

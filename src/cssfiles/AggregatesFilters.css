@@ -5,7 +5,7 @@
   border-radius: 20px;
   background-color: rgba(217, 217, 217, 1);
   border-color: transparent;
-  margin: 4px auto;        /* ИЗМЕНЕНО: auto по бокам для центрирования */
+  margin: 4px;        /* ИЗМЕНЕНО: auto по бокам для центрирования */
   display: block;          /* Добавлено: для работы margin: auto */
   font-family: Arial;
   font-size: 16px;
