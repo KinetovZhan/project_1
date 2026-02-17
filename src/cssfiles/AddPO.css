@@ -8,7 +8,7 @@
 
   box-sizing: border-box;
   width: 963px;
-  height: 750px;
+  height: 732px;
   background-color: white;
   border-radius: 30px;
   color: black;
@@ -16,6 +16,29 @@
   position: absolute;
   left: 171px;
   top: 20px;
+}
+
+.add-po-form-scroll-bar {
+  /* max-height: 40vh; */
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 10px;
+  padding: 1px 10px 0 1px;
+}
+
+.add-po-form-scroll-bar::-webkit-scrollbar {
+  width: 10px; 
+}
+
+.add-po-form-scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #bebebe;
+}
+
+.add-po-form-scroll-bar::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* ← Цвет фона дорожки */
+  border-radius: 10px;
 }
 
 .add-po-agg-container {

@@ -373,6 +373,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       <h3 className="add-po-title">Добавление нового ПО</h3>
 
+      <div className='add-po-form-scroll-bar'>
+
       <form className="add-po-form" onSubmit={handleSubmit}>
 
         {/* Производитель */}
@@ -557,6 +559,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           Добавить ПО
         </button>
       </form>
+      </div>
     </div>
+
   );
 }
