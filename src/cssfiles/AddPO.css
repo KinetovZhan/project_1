@@ -49,7 +49,7 @@
   position: relative;
 
   box-sizing: border-box;
-  width: 963px;
+  width: 100vh;
   /* height: 630px; */
   max-height: 750px;
   background-color: white;
@@ -157,21 +157,6 @@
 }
 
 
-.add-po-textarea {
-  box-sizing: border-box;
-  /* width: 97.28%; */
-  width: 823px;
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  resize: none;
-  /* resize: vertical; */
-  /* min-height: 20px;
-  max-height: 140px; */
-  height: 107px;
-}
-
 .add-po-submit-button {
   width: 100%;
   padding: 10px;
@@ -267,7 +252,7 @@
 .add-po-textarea {
   box-sizing: border-box;
   /* width: 97.28%; */
-  width: 100%;
+  width: 100vh;
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
@@ -314,3 +299,37 @@
 }
 
 }
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .add-po-form-container {
+    position: static;
+    left: 0px;
+    width: 100vh;
+    margin-top: 2vh;
+  }
+  .add-po-title {
+    font-size: 18px;
+  }
+
+  .add-po-select {
+    font-size: 12px;
+  }
+  .add-po-input {
+    font-size: 12px;
+  }
+
+  .add-po-agg-container {
+    position: static;
+    left: 0px;
+    margin-top: 2vh;
+    height: 72vh;
+  }
+
+  .add-po-comp-part-container {
+    left: 0px;
+    position: static;
+    margin-top: 2vh;
+    width: 100vh;
+    height: 40vh;
+  } 
+} 

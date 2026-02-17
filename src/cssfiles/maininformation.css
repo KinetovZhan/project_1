@@ -59,7 +59,7 @@
   white-space: nowrap;       
   overflow: hidden;          
   text-overflow: ellipsis;   
-  max-width: 500px;  
+  max-width: 300px;  
   position: relative;
 }
 
@@ -224,8 +224,10 @@ background-color: transparent;
 
   .MainPart {
     width: 130vh; /* Чуть меньше для этого диапазона */
-    margin-left: -20px;
+    margin-left: 0px;
     font-size: 12px;
+    display: flex;
+    justify-content: center;
   }
 
   .maininfo {

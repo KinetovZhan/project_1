@@ -2,8 +2,8 @@
 
 /* Отступ для main, чтобы не залезать под fixed header */
 .login-main {
-  padding-top: 164px; /* Как у вас в App.css */
-  min-height: calc(100vh - 164px);
+  padding-top: 15vh; /* Как у вас в App.css */
+  min-height: calc(100vh - vh);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,7 +14,7 @@
   background-color: white;
   border-radius: 8px;
   padding: 30px;
-  width: 350px;
+  width: 40vh;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   /* Текст внутри формы - черный, как в макете */
   color: black;

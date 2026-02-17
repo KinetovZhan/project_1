@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
 import {ip} from "../shrineofvsakoe/ip.jsx";
+import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 // Трактор
 export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
@@ -14,6 +15,8 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
     { value: 'K-7', label: 'К-7' },
     { value: 'K-525', label: 'К-525' }
   ];
+
+  const isMobile = useCheckMobile()
 
   const [selectedModels, setSelectedModels] = useState([]);
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
@@ -294,6 +297,7 @@ const handleClearEndDate = () => {
           value={selectedModels}
           onChange={handleModelChange}
           placeholder="Модель трактора"
+          menuPortalTarget={document.body}
           styles={{ 
             control: (base) => ({ 
               ...base, 
@@ -308,6 +312,10 @@ const handleClearEndDate = () => {
               left: '50%',
               transform: 'Translate(-50%)', 
             }),
+            menuPortal: (base) => ({
+              ...base,  
+              zIndex: 9999
+            }),
             menuList: (base) => ({ 
               ...base, 
               maxHeight: 150, 
@@ -317,6 +325,9 @@ const handleClearEndDate = () => {
               color:'black', 
               border: '1px solid rgba(217, 217, 217, 1)',
               scrollbarWidth:'thin',
+              fontSize: (isMobile?'12px':'16px')
+
+
             })
           }}
         />
@@ -330,7 +341,7 @@ const handleClearEndDate = () => {
             onChange={handleStartDateChange}
             locale={ru}
             dateFormat="dd.MM.yyyy"
-            customInput={<CustomInput label="С:" />}
+            customInput={<CustomInput label="С:"/>}
             renderCustomHeader={CustomHeader}
             isClearable={true}
             onClear={handleClearStartDate}
@@ -355,7 +366,7 @@ const handleClearEndDate = () => {
       <div className='search_by_dealer'>
         <input
           type="text"
-          placeholder={isFocused || Dealer ? '' : "Поиск по дилеру"}
+          placeholder={isFocused || Dealer ? '' : "Поиск по дилеру" }
           className='searcher_dealer'
           value={Dealer}
           onChange={handleChange} 

@@ -12,7 +12,7 @@ export function HelpPage () {
           </svg>
         </button>
         <h3 className = "textHelp">Господи да поможи</h3>
-        <img src={HelpImage} />
+        <img src={HelpImage} style={{width:'5000px', height:'5000px'}}/>
       
       </div>; 
 }

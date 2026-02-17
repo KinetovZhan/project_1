@@ -733,7 +733,7 @@ button.search_button {
   white-space: nowrap;       
   overflow: hidden;          
   text-overflow: ellipsis;   
-  max-width: 500px;          
+  max-width: 200px;          
 }
 
 
@@ -778,6 +778,12 @@ button.search_button {
   
 
   .majmin_button {
+    width: 21vh;
+    height: 6vh;
+    border-radius: 15px;
+  }
+
+  .majmin_button_active {
     width: 21vh;
     height: 6vh;
     border-radius: 15px;
