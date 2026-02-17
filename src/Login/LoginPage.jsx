@@ -29,7 +29,7 @@ const LoginPage = () => {
   console.log('Данные:', formData.toString());
 
   try {
-    const response = await fetch(`http://${ip}/token/`, {
+    const response = await fetch(`http://${ip}/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

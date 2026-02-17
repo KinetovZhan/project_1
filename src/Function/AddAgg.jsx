@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { ip } from "../shrineofvsakoe/ip.jsx";
 import Select from 'react-select';
+import Creatable from 'react-select/creatable';
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
     type: '',
     model: '',
-    mounting_date: new Date().toISOString().split('T')[0],
     comp_ser_num: '',
     selected_tractor_id: '',
     number_of_parts: '',
@@ -23,6 +23,14 @@ export function AddAggForm({ onBack, onSubmit }) {
   // Для react-select нужен формат { value, label }
   const [tractorOptions, setTractorOptions] = useState([]);
   const [selectedTractor, setSelectedTractor] = useState(null);
+
+  const [selectedProducer, setSelectedProducer] = useState(null);
+    // Заглушка для производителей (пока нет на бэкенде)
+  const [producerOptions, setProducerOptions] = useState([
+    { value: 'producer1', label: 'Производитель 1' },
+    { value: 'producer2', label: 'Производитель 2' },
+    { value: 'producer3', label: 'Производитель 3' },
+  ]);
 
   useEffect(() => {
     const loadTractors = async () => {
@@ -144,6 +152,74 @@ export function AddAggForm({ onBack, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     submitDataToServer();
+  };
+
+  const selectStyles = {
+    control: (base, state) => ({
+      ...base,
+      color: '#333',
+      height: '40px',
+      width: '100%',
+      border: '1px solid',
+      borderColor: state.isFocused ? '#13be00' : '#ccc',
+      boxSizing: 'border-box',
+      fontSize:'16px',
+      cursor: 'pointer',
+      transition: 'border-color 0.15s ease',
+      outline: 'none',
+      boxShadow: 'none',
+      backgroundColor: 'white',
+    }),
+    menuList: (base) => ({
+      ...base,
+      maxHeight: 200,
+      padding: '4px 0',
+      backgroundColor: 'white'
+    }),
+    option: (base, state) => ({
+      ...base,
+      color: '#333',
+      backgroundColor: state.isFocused ? '#e6f7e4' : 'white',
+      '&:hover': {
+        backgroundColor: '#e6f7e4',
+      },
+    }),
+    singleValue: (base) => ({
+      ...base,
+      color: '#333',
+    }),
+    placeholder: (base) => ({
+      ...base,
+      color: '#999',
+    }),
+    multiValue: (base) => ({
+      ...base,
+      backgroundColor: '#e6f7e4',
+    }),
+    multiValueLabel: (base) => ({
+      ...base,
+      color: '#333',
+    }),
+  };
+
+     // Обработчик создания нового производителя
+  const handleProducerCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    setProducerOptions(prev => [...prev, newOption]);
+    setSelectedProducer(newOption);
+    setFormData(prev => ({
+      ...prev,
+      producer_comp: inputValue
+    }));
+  };
+
+  // Обработчик выбора производителя (существующего или нового)
+  const handleProducerChange = (selectedOption) => {
+    setSelectedProducer(selectedOption);
+    setFormData(prev => ({
+      ...prev,
+      producer_comp: selectedOption ? selectedOption.value : ''
+    }));
   };
 
   return (
@@ -321,7 +397,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        <div className='add-po-field'>
+        {/* <div className='add-po-field'>
           <label className='add-po-label'>Производитель</label>
           <input
             type="text"
@@ -331,6 +407,21 @@ export function AddAggForm({ onBack, onSubmit }) {
             onChange={handleChange}
             className='add-po-input'
             disabled={loading}
+          />
+        </div> */}
+        <div className="add-po-field">
+          <label className="add-po-label">Производитель</label>
+          <Creatable
+            options={producerOptions}
+            value={selectedProducer}
+            onChange={handleProducerChange}
+            onCreateOption={handleProducerCreate}
+            placeholder="Выберите производителя"
+            classNamePrefix="add-po-select"
+            isClearable={true}
+            isSearchable={true}
+            styles={selectStyles}
+            formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
           />
         </div>
 
