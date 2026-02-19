@@ -11,7 +11,8 @@ import { useState, useEffect, useMemo, useRef } from 'react'; // ← добав�
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery }) {
+
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,9 +44,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
           const postData = {
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
             type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-            model_comp: Array.isArray(selectedModel) ? selectedModel : []
+            model_comp: Array.isArray(selectedModel) ? selectedModel : [],
+            producers: Array.isArray(selectedProducers) ? selectedProducers : []
           };
-          
   
           const response = await fetch(`http://${ip}/search/component-info`, {
             method: 'POST',
@@ -87,7 +88,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
 
 
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery]); 
 
 
     const ImageToComponent = (type_component,model_component) => {

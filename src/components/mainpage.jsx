@@ -29,6 +29,7 @@ function MainPage() {
   const [activeMajMinButton, setActiveMajMinButton] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDealer, setSearchDealer] = useState('');
+  const [selectedProducers, setSelectedProducers] = useState([]);
   const [dateFilter, setDateFilter] = useState({
     date_assemle: null,  // Для обратной совместимости
     date_start: null,
@@ -50,6 +51,7 @@ function MainPage() {
     if (!shouldPreserveFilters) {
       setActiveFilters([]);
       setActiveFilters2([]);
+      setSelectedProducers([]);
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('model');
       setSearchParams(newParams, { replace: true });
@@ -78,6 +80,10 @@ function MainPage() {
       newParams.delete('model');
     }
     setSearchParams(newParams);
+  };
+
+  const handleProducerChange = (producers) => {
+    setSelectedProducers(producers);
   };
 
   // ===== Форма "ПО" =====
@@ -194,8 +200,10 @@ function MainPage() {
             onFilterChange={handleFilterChange}
             onFilterChange2={handleFilterChange2}
             onModelChange={handleModelChange}
+            onProducerChange={handleProducerChange} 
             onAddPoClick={handleAddForm}
             selectedModel={selectedModel}
+            selectedProducers={selectedProducers}
             onAddAggClick={handleAggForm}
             onAddCompPartClick={handleCompPartForm}
             onFilterChangeTracByModel={handleFilterByModelTractors}
@@ -212,6 +220,7 @@ function MainPage() {
             activeFilters={memoizedActiveFilters}
             activeFilters2={memoizedActiveFilters2}
             selectedModel={selectedModel}
+            selectedProducers={selectedProducers}
             activeFiltersTrac={memoizedActiveFiltersTrac}
             activeFiltersTrac2={memoizedActiveFiltersTrac2}
             activeMajMinButton={activeMajMinButton}
