@@ -235,9 +235,16 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       return;
     }
 
+    // Получаем имя файла без расширения
+    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name
+
     // Формируем FormData
     const formData = new FormData();
     formData.append('file', file);
+
+    // Отправляем имя файла как name
+    formData.append('name', fileNameWithoutExt);
+    formData.append('inner_name', fileNameWithoutExt);
     
     // Отправляем актуальность
     formData.append('is_actual', selectedRelevance.value === 'actual');
@@ -308,13 +315,30 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       if (!response.ok) {
         console.error('Ошибка:', data);
+
+        // Проверяем, является ли ошибка нарушением уникальности имени
+        const errorDetail = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+      
+        if (errorDetail.includes('UniqueViolation') && errorDetail.includes('Software_name_key')) {
+          // Пытаемся извлечь имя из ошибки
+          const nameMatch = errorDetail.match(/Key "\(name\)=\((.*?)\)"/);
+          const duplicateName = nameMatch ? nameMatch[1] : fileNameWithoutExt;
+        
+          // Показываем понятное сообщение пользователю
+          alert(`❌ Файл с именем "${duplicateName}" уже существует в системе.\n\nПожалуйста, переименуйте файл или выберите другой.`);
+          return; // Прерываем выполнение, не показывая общую ошибку
+        }
+
         const errMsg = data.detail 
           ? JSON.stringify(data.detail, null, 2)
           : data.message || 'Unknown error';
         throw new Error(`HTTP ${response.status}:\n${errMsg}`);
       }
 
+      // Успешная отправка
+      alert('✅ ПО успешно добавлено!');
       onSubmit?.(data);
+
     } catch (err) {
       console.error('❌ Ошибка:', err);
       alert(`Ошибка: ${err.message}`);
