@@ -3,74 +3,55 @@ import { Header } from '../Function/Header';
 import '../cssfiles/LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import {ip} from '../shrineofvsakoe/ip.jsx'
+import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 const LoginPage = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [authorizationError, setAuthorizationError] = useState('');
   const navigate = useNavigate();
-  const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
+  const { login: loginContext } = useAuth();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setAuthorizationError('');
+    e.preventDefault();
+    setAuthorizationError('');
 
-  if (!login || !password) {
-    setAuthorizationError('Введите логин и пароль');
-    return;
-  }
-
-  const formData = new URLSearchParams();
-  formData.append('username', login);
-  formData.append('password', password);
-
-  console.log('Отправка запроса на:', `http://${ip}/token/`);
-  console.log('Данные:', formData.toString());
-
-  try {
-    const response = await fetch(`http://${ip}/token/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: formData.toString(),
-      mode: 'cors',  // Добавьте это
-    });
-
-    console.log('Статус ответа:', response.status);
-    console.log('Заголовки ответа:', [...response.headers.entries()]);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Текст ошибки:', errorText);
-      try {
-        const errorData = JSON.parse(errorText);
-        setAuthorizationError(
-          errorData.detail || 'Неверный логин или пароль'
-        );
-      } catch {
-        setAuthorizationError(`Ошибка сервера: ${errorText}`);
-      }
+    if (!login || !password) {
+      setAuthorizationError('Введите логин и пароль');
       return;
     }
 
-    const data = await response.json();
-    console.log('Полученные данные:', data);
+    const formData = new URLSearchParams();
+    formData.append('username', login);
+    formData.append('password', password);
 
-    if (data.access_token) {
-      loginContext(data.access_token);
-      navigate('/main', { replace: true });
-    } else {
-      setAuthorizationError('Сервер не вернул токен');
+    console.log('Отправка запроса на /token/');
+    console.log('Данные:', formData.toString());
+
+    try {
+      // Используем api.request с переопределёнными заголовками и skipAuth
+      const data = await api.request('/token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+        skipAuth: true, // флаг, чтобы не добавлять токен (если он уже есть в localStorage)
+      });
+
+      console.log('Полученные данные:', data);
+
+      if (data.access_token) {
+        loginContext(data.access_token);
+        navigate('/main', { replace: true });
+      } else {
+        setAuthorizationError('Сервер не вернул токен');
+      }
+    } catch (error) {
+      console.error('Ошибка при авторизации:', error);
+      setAuthorizationError(error.message || 'Ошибка сети. Проверьте подключение.');
     }
-  } catch (error) {
-    console.error('Ошибка при авторизации:', error);
-    console.error('Тип ошибки:', error.name);
-    console.error('Сообщение ошибки:', error.message);
-    setAuthorizationError('Ошибка сети. Проверьте подключение.');
-  }
-};
+  };
 
   return (
     <>
