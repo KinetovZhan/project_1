@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import { ip } from "../shrineofvsakoe/ip.jsx";
 import Select from 'react-select';
+import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 import Creatable from 'react-select/creatable';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
@@ -16,8 +16,8 @@ export function AddAggForm({ onBack, onSubmit }) {
   });
   const isMobile = useCheckMobile();
 
-  const [tractors, setTractors] = useState([])
-  const [loadingTractors, setLoadingTractors] = useState(false)
+  const [tractors, setTractors] = useState([]);
+  const [loadingTractors, setLoadingTractors] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { token } = useAuth();
@@ -40,19 +40,8 @@ export function AddAggForm({ onBack, onSubmit }) {
       }
       try {
         setLoadingTractors(true);
-        const responseTractors = await fetch(`http://${ip}/tractors/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        if (!responseTractors.ok) {
-          const errorMessage = `Ошибка ${responseTractors.status}`;
-          throw new Error(errorMessage);
-        }
-        const responseTractorsData = await responseTractors.json();
+        // Используем api.get вместо fetch
+        const responseTractorsData = await api.get('/tractors/');
         
         // Сохраняем исходные данные
         setTractors(responseTractorsData);
@@ -66,6 +55,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         
         setTractorOptions(options);
         console.log('Трактора успешно загружены:', responseTractorsData);
+        setError(null);
       } catch (err) {
         console.error('Ошибка при загрузке тракторов:', err);
         setError('Не удалось загрузить список тракторов');
@@ -76,7 +66,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     loadTractors();
   }, [token]);
 
-  // Загружаем список производителей из компонентов
+  // Загружаем список производителей из компонентов через api
   useEffect(() => {
     const loadProducers = async () => {
       if (!token) {
@@ -87,20 +77,9 @@ export function AddAggForm({ onBack, onSubmit }) {
         setLoadingProducers(true);
         setProducerError(null);
         
-        const response = await fetch(`http://${ip}/components/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
+        // Используем api.get вместо fetch
+        const data = await api.get('/components/');
         
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить список компонентов');
-        }
-        
-        const data = await response.json();
         console.log('Полученные данные компонентов для производителей:', data);
         
         // Извлекаем уникальных производителей
@@ -128,7 +107,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     
     loadProducers();
   }, [token]);
-
+  
   // Обработчик выбора трактора из react-select
   const handleTractorSelectChange = (selectedOption) => {
     setSelectedTractor(selectedOption);
@@ -169,22 +148,8 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      const response = await fetch(`http://${ip}/components/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(submitData)
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        const errorMessage = responseData.detail || `Ошибка ${response.status}`;
-        throw new Error(errorMessage);
-      }
+      // Используем api.post вместо fetch
+      const responseData = await api.post('/components/', submitData);
 
       console.log('Агрегат успешно добавлен:', responseData);
 
@@ -199,7 +164,7 @@ export function AddAggForm({ onBack, onSubmit }) {
       alert(err.message);
     } finally {
       setLoading(false);
-    } 
+    }
   };
 
   const handleSubmit = (e) => {
@@ -355,7 +320,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* 🔥 Выбор трактора с использованием react-select */}
+        {/* Выбор трактора с использованием react-select */}
         <div className="add-po-field">
           <label className="add-po-label">Трактор</label>
           <Select
@@ -369,7 +334,6 @@ export function AddAggForm({ onBack, onSubmit }) {
             isLoading={loadingTractors}
             noOptionsMessage={() => "Нет доступных тракторов"}
             
-            // Кастомизация стилей как в примере
             styles={{
               control: (base, state) => ({
                 ...base,
@@ -380,8 +344,7 @@ export function AddAggForm({ onBack, onSubmit }) {
                 border: '1px solid',
                 borderColor: state.isFocused ? '#13be00' : '#ccc',
                 boxSizing: 'border-box',
-                // padding: '0 12px',
-                fontSize: (isMobile?'12px':'16px'), // Можно добавить проверку на isMobile если нужно
+                fontSize: '16px',
                 cursor: 'pointer',
                 transition: 'border-color 0.15s ease',
                 outline: 'none',

@@ -2,9 +2,7 @@ import React, { useState,useRef, useEffect } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
 import {TractorDetails} from "./TractorDetails.jsx";
 import { useAuth } from '../auth/AuthContext';
-
-
-import {ip} from "../shrineofvsakoe/ip.jsx";
+import { api } from '../fetchAPI.js';
 
 
 
@@ -84,7 +82,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       date_assemle: null,
       date_start: null,
       date_end: null,
-      is_actual: null,
+      is_major: null,
       query: searchQuery?.trim() || "",
       dealer: searchDealer?.trim() || ""
     };
@@ -105,14 +103,14 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     }
 
     if (activeMajMinButton === 'MAJ') {
-      postData.is_actual = true;
+      postData.is_major = true;
     } else if (activeMajMinButton === 'MIN') {
-      postData.is_actual = false;
+      postData.is_major = false;
     } 
 
     console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
-    console.log('postData.is_actual:', postData.is_actual);
+    console.log('postData.is_major:', postData.is_major);
 
     return postData;
   };
@@ -135,19 +133,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       setLoading(true);
 
       // 1. Получаем тракторы
-      const response = await fetch(`http://${ip}/search/tractor-info`, {
-        method: 'POST',
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postData)
-      });
-
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      let tractors = await response.json();
-
+      const tractors = await api.post('search/tractor-info',postData);
+        
       console.log(`dfsdfdasfdasvasdv ${userRole}`)
 
       if (userRole === 'dealer') {
@@ -167,18 +154,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       let enrichedTractors = tractors;
       if (tractors.length > 0) {
         const vins = tractors.map(t => t.vin);
-        const compResponse = await fetch(`http://${ip}/search/tractor-components`, {
-          method: 'POST',
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ vins })
-        });
-
-        if (compResponse.ok) {
-          const components = await compResponse.json();
+        const components = await api.post('search/tractor-components', {vins});
           const vinToComponents = {};
           components.forEach(c => {
             if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
@@ -199,7 +175,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
             });
             return enriched;
           });
-        }
       }
 
       setTractors(enrichedTractors);

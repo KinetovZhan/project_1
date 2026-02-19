@@ -4,7 +4,6 @@ import Select from 'react-select';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 // Трактор

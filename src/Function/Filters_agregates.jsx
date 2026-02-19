@@ -1,19 +1,17 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
-export function Filters( {onFilterChange, onFilterChange2, onModelChange}) { 
-
+export function Filters({ onFilterChange, onFilterChange2, onModelChange }) {
   const componentTypeMap = {
     'DVS': 'dvs',
     'KPP': 'kpp',
     'RK': 'rk',
-    'hydrorasp': 'hydro' ,
-    // 'hydrorasp': 'hydraulics'
-    'AP':'ap',
-    'BK':'bk',
+    'hydrorasp': 'hydro',
+    'AP': 'ap',
+    'BK': 'bk',
   };
 
   const tractorModelOptions = [
@@ -26,46 +24,44 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     KPP: false,
     RK: false,
     hydrorasp: false,
-    AP:false,
-    BK:false
+    AP: false,
+    BK: false
   });
 
   const [FilterItems2, setFilterItems2] = useState({
     K7: false,
     K5: false,
-  })
+  });
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   const isMobile = useCheckMobile();
-
-  
-  const options = [...componentModels.map(item => ({ value: item, label: item }))];
-
   const { token } = useAuth();
 
+  const options = [...componentModels.map(item => ({ value: item, label: item }))];
+
   const handleModelChange = (selectedOptions) => {
-    const values = selectedOptions 
-      ? selectedOptions.map(opt => opt.value) 
+    const values = selectedOptions
+      ? selectedOptions.map(opt => opt.value)
       : [];
-    
+
     setSelectedModel(values);
-    
+
     if (onModelChange) {
       onModelChange(values);
     }
   };
 
   const handleTractorModelChange = (selectedOptions) => {
-    const values = selectedOptions 
-      ? selectedOptions.map(opt => opt.value) 
+    const values = selectedOptions
+      ? selectedOptions.map(opt => opt.value)
       : [];
-    
+
     setSelectedTractorModels(values);
-    
+
     if (onFilterChange2) {
-      const activeTractorModels = values.map(key => 
+      const activeTractorModels = values.map(key =>
         key === 'K7' ? 'K-7' : 'K-5'
       );
       onFilterChange2(activeTractorModels);
@@ -73,7 +69,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
   };
 
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
-  const selectedTractorOptions = tractorModelOptions.filter(opt => 
+  const selectedTractorOptions = tractorModelOptions.filter(opt =>
     selectedTractorModels.includes(opt.value)
   );
 
@@ -89,69 +85,38 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
       onFilterChange(activeFilters);
     }
   };
-  // const handleFilterChange2 = (FilterType2) => {
-  //   const newFilter2 = {
-  //     ...FilterItems2,
-  //     [FilterType2]: !FilterItems2[FilterType2]
-  //   }
-  //   setFilterItems2(newFilter2);
-
-  //   if (onFilterChange2) {
-  //     const activeFilters2 = Object.keys(newFilter2).filter(key => newFilter2[key]);
-  //     onFilterChange2(activeFilters2);
-  //   }
-  // }
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
   const fetchModels = async () => {
-
     if (!token) {
       console.log('Нет токена, очищаем список моделей');
       setComponentModels([]);
-      return; 
+      return;
     }
-    
+
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
       .flatMap(key => componentTypeMap[key]);
-    
-    const activeTractorModels = selectedTractorModels.map(key => 
+
+    const activeTractorModels = selectedTractorModels.map(key =>
       key === 'K7' ? 'K-7' : 'K-5'
     );
 
-    
-    
     const postData = {
-      trac_model: activeTractorModels.length  > 0 ? activeTractorModels : [],
+      trac_model: activeTractorModels.length > 0 ? activeTractorModels : [],
       type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : []
     };
-    
+
     try {
       setLoading(true);
       setError(null);
-      
-      const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-         'Authorization': `Bearer ${token}`
-      };
 
-      
       console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
-      const response = await fetch(`http://${ip}/search/component-models`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(postData)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
+      // Используем api.post вместо fetch
+      const data = await api.post('/search/component-models', postData);
       setComponentModels(data.component_models || []);
     } catch (err) {
       console.error('Ошибка загрузки моделей компонентов:', err);
@@ -162,97 +127,98 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
     }
   };
 
-
-  useEffect(() => { 
-       
+  useEffect(() => {
     fetchModels();
-    
-  }, [FilterItems,selectedTractorModels, token]);
+  }, [FilterItems, selectedTractorModels, token]);
 
-  return(
-  <>
-    <div className='filters'>
-      <div className='filters-scroll-bar' style={{height: '100%', width:'100%'}}>
-        <div className='filter'>
-          <label> 
-            <span>ДВС</span>
-            <input 
-              type="checkbox"
-              checked={FilterItems.DVS}
-              onChange={() => handleFilterChange('DVS')}
-            />
-          </label>
-        </div>
-        {/* УДАЛЕНО: второй "ДВС" */}
-        <div className='filter'>
-          <label>
-            <span>КПП</span>
-            <input 
-              checked={FilterItems.KPP}
-              onChange={() => handleFilterChange('KPP')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label>
-            <span>РК</span>
-            <input 
-              checked={FilterItems.RK}
-              onChange={() => handleFilterChange('RK')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label> 
-            <span>Гидрораспределитель</span>
-            <input 
-              checked={FilterItems.hydrorasp}
-              onChange={() => handleFilterChange('hydrorasp')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label> 
-            <span>Автопилот</span>
-            <input 
-              checked={FilterItems.AP}
-              onChange={() => handleFilterChange('AP')}
-              type="checkbox"/>
-          </label>
-        </div>
-        <div className='filter'>
-          <label> 
-            <span>БК</span>
-            <input 
-              checked={FilterItems.BK}
-              onChange={() => handleFilterChange('BK')}
-              type="checkbox"/>
-          </label>
+  return (
+    <>
+      <div className='filters'>
+        <div className='filters-scroll-bar' style={{ height: '100%', width: '100%' }}>
+          <div className='filter'>
+            <label>
+              <span>ДВС</span>
+              <input
+                type="checkbox"
+                checked={FilterItems.DVS}
+                onChange={() => handleFilterChange('DVS')}
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>КПП</span>
+              <input
+                checked={FilterItems.KPP}
+                onChange={() => handleFilterChange('KPP')}
+                type="checkbox"
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>РК</span>
+              <input
+                checked={FilterItems.RK}
+                onChange={() => handleFilterChange('RK')}
+                type="checkbox"
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>Гидрораспределитель</span>
+              <input
+                checked={FilterItems.hydrorasp}
+                onChange={() => handleFilterChange('hydrorasp')}
+                type="checkbox"
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>Автопилот</span>
+              <input
+                checked={FilterItems.AP}
+                onChange={() => handleFilterChange('AP')}
+                type="checkbox"
+              />
+            </label>
+          </div>
+          <div className='filter'>
+            <label>
+              <span>БК</span>
+              <input
+                checked={FilterItems.BK}
+                onChange={() => handleFilterChange('BK')}
+                type="checkbox"
+              />
+            </label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div className='model' style={{top: '370px'}}>
-      <Select
-        className='modelSelect'
-        isMulti
-        options={tractorModelOptions}
-        value={selectedTractorOptions}
-        onChange={handleTractorModelChange}
+      <div className='model' style={{ top: '370px' }}>
+        <Select
+          className='modelSelect'
+          isMulti
+          options={tractorModelOptions}
+          value={selectedTractorOptions}
+          onChange={handleTractorModelChange}
         menuPortalTarget={document.body}
-        placeholder="Модель трактора"
-        styles={{ 
-          control: (base) => ({ 
-            ...base, 
-            maxHeight: 200, 
-            overflowY: 'auto', 
-            color: 'black', 
-            backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%' : '42vh', 
-            borderRadius: '15px', 
-            height:'53px',
-            left: '50%',
-            transform: 'Translate(-50%)',
+          placeholder="Модель трактора"
+          styles={{
+            control: (base) => ({
+              ...base,
+              maxHeight: 200,
+              overflowY: 'auto',
+              color: 'black',
+              backgroundColor: 'rgba(217, 217, 217, 1)',
+              width: isMobile ? '100%' : '42vh',
+              borderRadius: '15px',
+              height: '53px',
+              left: '50%',
+              transform: 'Translate(-50%)',
             position: 'relative',
             zIndex: 1
           }),
@@ -266,44 +232,44 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
             ...base,
             zIndex: 9999
-          }),
-          menuList: (base) => ({ 
-            ...base, 
-            maxHeight: 150, 
-            overflowY: 'auto', 
-            backgroundColor:'white',
-            color:'black', 
-            border: '1px solid rgba(217, 217, 217, 1)',
-            scrollbarWidth:'thin',
+            }),
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth: 'thin',
             zIndex: 9999
-          }),
-        }}
-      />
-    </div>
+            }),
+          }}
+        />
+      </div>
 
-    <div className='model' style={{top: '444px'}}>
-      <Select
-        className='modelSelect'
-        isMulti
-        options={options}
-        value={selectedOptions}
-        onChange={handleModelChange}
-        placeholder="Модель"
+      <div className='model' style={{ top: '444px' }}>
+        <Select
+          className='modelSelect'
+          isMulti
+          options={options}
+          value={selectedOptions}
+          onChange={handleModelChange}
+          placeholder="Модель"
         menuPortalTarget={document.body}
         menuPlacement="top" 
-        isDisabled={loading || componentModels.length === 0}
-        styles={{ 
-          control: (base) => ({ 
-            ...base, 
-            maxHeight: 200, 
-            overflowY: 'auto', 
-            color: 'black', 
-            backgroundColor:'rgba(217, 217, 217, 1)', 
-            width: isMobile ? '100%':'42vh', 
-            borderRadius: '15px', 
-            height:'53px',
-            left: '50%',
-            transform: 'Translate(-50%)',
+          isDisabled={loading || componentModels.length === 0}
+          styles={{
+            control: (base) => ({
+              ...base,
+              maxHeight: 200,
+              overflowY: 'auto',
+              color: 'black',
+              backgroundColor: 'rgba(217, 217, 217, 1)',
+              width: isMobile ? '100%' : '42vh',
+              borderRadius: '15px',
+              height: '53px',
+              left: '50%',
+              transform: 'Translate(-50%)',
             position: 'relative',
             zIndex: 1
           }),
@@ -317,44 +283,44 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange}) {
           menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
             ...base,
             zIndex: 9999
-          }),
-          menuList: (base) => ({ 
-            ...base, 
-            maxHeight: 150, 
-            overflowY: 'auto', 
-            backgroundColor:'white',
-            color:'black', 
-            border: '1px solid rgba(217, 217, 217, 1)',
-            scrollbarWidth:'thin'
-          }),
-        }}
-      />
-    </div>
-    <button 
-      className='clear'
-      data-testid="Clearbutton"
-      onClick={() => {
-        setFilterItems({
-          DVS: false,
-          KPP: false,
-          RK: false,
-          hydrorasp: false,
-          AP:false,
-          BK:false
-        });
-        setFilterItems2({
-          K7: false,
-          K5: false,
-        });
-        setSelectedModel([]);
+            }),
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth: 'thin'
+            }),
+          }}
+        />
+      </div>
+      <button
+        className='clear'
+        data-testid="Clearbutton"
+        onClick={() => {
+          setFilterItems({
+            DVS: false,
+            KPP: false,
+            RK: false,
+            hydrorasp: false,
+            AP: false,
+            BK: false
+          });
+          setFilterItems2({
+            K7: false,
+            K5: false,
+          });
+          setSelectedModel([]);
 
-        if (onFilterChange) onFilterChange([]);
-        if (onFilterChange2) onFilterChange2([]);
-        if (onModelChange) onModelChange([]);
-      }}
-    >
-      Сброс
-    </button>
-  </>
-);
+          if (onFilterChange) onFilterChange([]);
+          if (onFilterChange2) onFilterChange2([]);
+          if (onModelChange) onModelChange([]);
+        }}
+      >
+        Сброс
+      </button>
+    </>
+  );
 }
