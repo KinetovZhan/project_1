@@ -26,13 +26,11 @@ export function AddAggForm({ onBack, onSubmit }) {
   const [tractorOptions, setTractorOptions] = useState([]);
   const [selectedTractor, setSelectedTractor] = useState(null);
 
+  // Состояния для производителей
   const [selectedProducer, setSelectedProducer] = useState(null);
-    // Заглушка для производителей (пока нет на бэкенде)
-  const [producerOptions, setProducerOptions] = useState([
-    { value: 'producer1', label: 'Производитель 1' },
-    { value: 'producer2', label: 'Производитель 2' },
-    { value: 'producer3', label: 'Производитель 3' },
-  ]);
+  const [producerOptions, setProducerOptions] = useState([]);
+  const [loadingProducers, setLoadingProducers] = useState(false);
+  const [producerError, setProducerError] = useState(null);
 
   useEffect(() => {
     const loadTractors = async () => {
@@ -76,6 +74,59 @@ export function AddAggForm({ onBack, onSubmit }) {
       }
     };
     loadTractors();
+  }, [token]);
+
+  // Загружаем список производителей из компонентов
+  useEffect(() => {
+    const loadProducers = async () => {
+      if (!token) {
+        setLoadingProducers(false);
+        return;
+      }
+      try {
+        setLoadingProducers(true);
+        setProducerError(null);
+        
+        const response = await fetch(`http://${ip}/components/`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Не удалось загрузить список компонентов');
+        }
+        
+        const data = await response.json();
+        console.log('Полученные данные компонентов для производителей:', data);
+        
+        // Извлекаем уникальных производителей
+        const producers = data
+          .map(item => item.producer_comp)
+          .filter(producer => producer && producer.trim() !== '') // убираем пустые и null
+          .filter((value, index, self) => self.indexOf(value) === index); // уникальные значения
+        
+        console.log('Уникальные производители:', producers);
+        
+        // Формируем опции для react-select
+        const options = producers.map(producer => ({
+          value: producer,
+          label: producer
+        }));
+        
+        setProducerOptions(options);
+      } catch (err) {
+        console.error('Ошибка загрузки производителей:', err);
+        setProducerError(err.message);
+      } finally {
+        setLoadingProducers(false);
+      }
+    };
+    
+    loadProducers();
   }, [token]);
 
   // Обработчик выбора трактора из react-select
@@ -204,7 +255,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     }),
   };
 
-     // Обработчик создания нового производителя
+  // Обработчик создания нового производителя
   const handleProducerCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
     setProducerOptions(prev => [...prev, newOption]);
@@ -398,18 +449,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* <div className='add-po-field'>
-          <label className='add-po-label'>Производитель</label>
-          <input
-            type="text"
-            name="producer_comp"
-            placeholder="Введите производителя"
-            value={formData.producer_comp}
-            onChange={handleChange}
-            className='add-po-input'
-            disabled={loading}
-          />
-        </div> */}
+        {/* Производитель с загрузкой из бэкенда */}
         <div className="add-po-field">
           <label className="add-po-label">Производитель</label>
           <Creatable
@@ -417,13 +457,27 @@ export function AddAggForm({ onBack, onSubmit }) {
             value={selectedProducer}
             onChange={handleProducerChange}
             onCreateOption={handleProducerCreate}
-            placeholder="Выберите производителя"
+            placeholder="Выберите или создайте производителя"
             classNamePrefix="add-po-select"
             isClearable={true}
             isSearchable={true}
+            isLoading={loadingProducers}
+            isDisabled={!token || loadingProducers}
+            noOptionsMessage={() => {
+              if (!token) return "Требуется авторизация";
+              if (loadingProducers) return "Загрузка...";
+              if (producerError) return producerError;
+              if (producerOptions.length === 0) return "Нет доступных производителей";
+              return null;
+            }}
             styles={selectStyles}
             formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
           />
+          {producerError && token && (
+            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+              Ошибка загрузки: {producerError}
+            </div>
+          )}
         </div>
 
         <button
