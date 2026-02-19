@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import Creatable from 'react-select/creatable';
 import { useAuth } from '../auth/AuthContext';
 import {ip} from "../shrineofvsakoe/ip.jsx";
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
@@ -19,15 +20,14 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
+  
+  // Состояния для производителей
+  const [producerOptions, setProducerOptions] = useState([]);
+  const [loadingProducers, setLoadingProducers] = useState(false);
+  const [producerError, setProducerError] = useState(null);
+  
   const { token } = useAuth();
   const isMobile = useCheckMobile();
-
-  // Заглушка для производителей (пока нет на бэкенде)
-  const producerOptions = [
-    { value: 'producer1', label: 'Производитель 1' },
-    { value: 'producer2', label: 'Производитель 2' },
-    { value: 'producer3', label: 'Производитель 3' },
-  ];
 
   // Опции для актуальности
   const relevanceOptions = [
@@ -108,6 +108,52 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     } else {
       console.log('Токен отсутствует, пропускаем загрузку ПО');
       setSoftwareError('Для загрузки списка ПО требуется авторизация');
+    }
+  }, [token]);
+
+  // Загружаем список производителей из ПО
+  useEffect(() => {
+    if (token) {
+      setLoadingProducers(true);
+      setProducerError(null);
+
+      fetch(`http://${ip}/software/`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Не удалось загрузить список ПО');
+          return res.json();
+        })
+        .then(data => {
+          console.log('Полученные данные ПО для производителей:', data);
+          
+          // Извлекаем уникальных производителей
+          const producers = data
+            .map(item => item.producer)
+            .filter(producer => producer && producer.trim() !== '') // убираем пустые и null
+            .filter((value, index, self) => self.indexOf(value) === index); // уникальные значения
+          
+          console.log('Уникальные производители:', producers);
+          
+          // Формируем опции для react-select
+          const options = producers.map(producer => ({
+            value: producer,
+            label: producer
+          }));
+          
+          setProducerOptions(options);
+        })
+        .catch(err => {
+          console.error('Ошибка загрузки производителей:', err);
+          setProducerError(err.message);
+        })
+        .finally(() => {
+          setLoadingProducers(false);
+        });
     }
   }, [token]);
 
@@ -209,6 +255,18 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       setTractorError('Для загрузки списка тракторов требуется авторизация');
     }
   }, [token]);
+
+  // Обработчик создания нового производителя
+  const handleProducerCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    setProducerOptions(prev => [...prev, newOption]);
+    setSelectedProducer(newOption);
+  };
+
+  // Обработчик выбора производителя
+  const handleProducerChange = (selectedOption) => {
+    setSelectedProducer(selectedOption);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -410,19 +468,34 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       <form className="add-po-form" onSubmit={handleSubmit}>
 
-        {/* Производитель */}
+        {/* Производитель с возможностью создания нового */}
         <div className="add-po-field">
           <label className="add-po-label">Производитель</label>
-          <Select
+          <Creatable
             options={producerOptions}
             value={selectedProducer}
-            onChange={setSelectedProducer}
-            placeholder="Выберите производителя"
+            onChange={handleProducerChange}
+            onCreateOption={handleProducerCreate}
+            placeholder="Выберите или создайте производителя"
             classNamePrefix="add-po-select"
             isClearable={true}
             isSearchable={true}
+            isLoading={loadingProducers}
+            isDisabled={!token || loadingProducers}
+            noOptionsMessage={() => {
+              if (!token) return "Требуется авторизация";
+              if (loadingProducers) return "Загрузка...";
+              if (producerError) return producerError;
+              return "Нет доступных производителей";
+            }}
             styles={selectStyles}
+            formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
           />
+          {producerError && token && (
+            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+              Ошибка загрузки: {producerError}
+            </div>
+          )}
         </div>
 
         {/* Модель трактора с VIN */}
