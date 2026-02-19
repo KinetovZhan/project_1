@@ -327,7 +327,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       color: '#333',
       height: '40px',
       width: '100%',
-      border: '1px solid',
+      border: '1px solid #ccc',
       borderColor: state.isFocused ? '#13be00' : '#ccc',
       boxSizing: 'border-box',
       fontSize: isMobile ? '14px':'16px',
