@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
 import DefaultImage from '../img/default.jpg';
 import K5Image from '../img/К5.png';
 import K7Image from '../img/К7М.png';
+import {api} from '../fetchAPI.js';
 
 
 export function TractorDetails({ vin, onBack }) {
@@ -38,25 +38,49 @@ export function TractorDetails({ vin, onBack }) {
       setLoading(true);
       setError(null);
       try {
-        console.log('Запрос деталей для VIN:', vin);
+          // console.log('Запрос деталей для VIN:', vin);
+        // console.log('API URL:', `${API_BASE_URL}/search/search-tractor-vin`); 
         
-        const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-        });
+        // const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        //   method: 'GET',
+        //   headers: {
+        //     'Authorization': `Bearer ${token}`,
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json',
+        //   },
 
-        console.log('Статус ответа:', response.status);
+        ///////////////////////////////
+        // const response = await fetch(`${API_BASE_URL}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
+        //   method: 'GET',
+        //   headers: {
+        //     'Authorization': `Bearer ${token}`,
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
 
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
+        // console.log('Статус ответа:', response.status);
 
-        const data = await response.json();
-        console.log('Полученные данные трактора:', data);
+        // if (!response.ok) {
+        //   throw new Error(`Ошибка HTTP: ${response.status}`);
+        // }
+
+        // const data = await response.json();
+        // console.log('Полученные данные трактора:', data);
+        console.log('Запрос деталей для VIN:', vin);
+
+        // Используем нашу новую api утилиту
+        const data = await api.get(
+          `search/search-tractor-vin?request=${encodeURIComponent(vin)}`,
+          {
+            headers: {
+              // Можно добавить специфические заголовки
+              'X-Custom-Header': 'value',
+            },
+          }
+        );
+
+        console.log('Полученные данные:', data);
 
         if (!data || data.length === 0) {
           setError('Данные по трактору не найдены');

@@ -3,74 +3,75 @@ import { Header } from '../Function/Header';
 import '../cssfiles/LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import {ip} from '../shrineofvsakoe/ip.jsx'
+import { api, buildApiUrl, API_BASE_URL } from '../fetchAPI.js';
 
 const LoginPage = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [authorizationError, setAuthorizationError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login: loginContext } = useAuth(); // ← деструктуризация метода входа
+  const { login: loginContext } = useAuth();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setAuthorizationError('');
+    e.preventDefault();
+    setAuthorizationError('');
+    e.preventDefault();
+    setAuthorizationError('');
 
-  if (!login || !password) {
-    setAuthorizationError('Введите логин и пароль');
-    return;
-  }
-
-  const formData = new URLSearchParams();
-  formData.append('username', login);
-  formData.append('password', password);
-
-  console.log('Отправка запроса на:', `http://${ip}/token/`);
-  console.log('Данные:', formData.toString());
-
-  try {
-    const response = await fetch(`http://${ip}/token`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: formData.toString(),
-      mode: 'cors',  // Добавьте это
-    });
-
-    console.log('Статус ответа:', response.status);
-    console.log('Заголовки ответа:', [...response.headers.entries()]);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Текст ошибки:', errorText);
-      try {
-        const errorData = JSON.parse(errorText);
-        setAuthorizationError(
-          errorData.detail || 'Неверный логин или пароль'
-        );
-      } catch {
-        setAuthorizationError(`Ошибка сервера: ${errorText}`);
-      }
+    if (!login || !password) {
+      setAuthorizationError('Введите логин и пароль');
       return;
     }
 
-    const data = await response.json();
-    console.log('Полученные данные:', data);
+    setIsLoading(true);
 
-    if (data.access_token) {
-      loginContext(data.access_token);
-      navigate('/main', { replace: true });
-    } else {
-      setAuthorizationError('Сервер не вернул токен');
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'password');
+    formData.append('username', login);
+    formData.append('password', password);
+    formData.append('scope', '');
+    formData.append('client_id', '');
+    formData.append('client_secret', '');
+
+    // Подробное логирование
+    const fullUrl = buildApiUrl('/token/');
+    console.log('=== ДЕТАЛИ ЗАПРОСА ===');
+    console.log('API_BASE_URL:', API_BASE_URL);
+    console.log('Полный URL:', fullUrl);
+    console.log('Метод:', 'POST');
+    console.log('Данные:', formData.toString());
+    console.log('Content-Type:', 'application/x-www-form-urlencoded');
+    console.log('======================');
+
+    try {
+      const data = await api.request('/token/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData.toString(),
+        skipAuth: true,
+      });
+
+      console.log('Полученные данные:', data);
+
+      if (data.access_token) {
+        try {
+          loginContext(data.access_token);
+          navigate('/main', { replace: true });
+        } catch (err) {
+          console.error('Ошибка при сохранении токена:', err);
+          setAuthorizationError('Ошибка при входе: ' + err.message);
+        }
+      } else {
+        setAuthorizationError('Сервер не вернул токен');
+      }
+    } catch (error) {
+      console.error('Ошибка при авторизации:', error);
+      setAuthorizationError(error.message);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error('Ошибка при авторизации:', error);
-    console.error('Тип ошибки:', error.name);
-    console.error('Сообщение ошибки:', error.message);
-    setAuthorizationError('Ошибка сети. Проверьте подключение.');
-  }
-};
+  };
 
   return (
     <>
@@ -90,6 +91,7 @@ const LoginPage = () => {
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
                 placeholder="Введите логин"
+                disabled={isLoading}
                 required
               />
             </div>
@@ -101,11 +103,12 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Введите пароль"
+                disabled={isLoading}
                 required
               />
             </div>
-            <button type="submit" className="login-button">
-              Войти
+            <button type="submit" className="login-button" disabled={isLoading}>
+              {isLoading ? 'Вход...' : 'Войти'}
             </button>
           </form>
         </div>
