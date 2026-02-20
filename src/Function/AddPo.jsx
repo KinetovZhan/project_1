@@ -4,7 +4,6 @@ import Creatable from 'react-select/creatable';
 import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { api, buildApiUrl } from '../fetchAPI.js';
-import { api, buildApiUrl } from '../fetchAPI.js';
 
 export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   // Состояния
@@ -298,7 +297,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     }
 
     const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
-    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
 
     const formData = new FormData();
     formData.append('file', file);
@@ -348,9 +346,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     }
 
     try {
-      // Используем fetch с URL от buildApiUrl и токеном
-      const url = buildApiUrl('software/assign');
-      const response = await fetch(url, {
       // Используем fetch с URL от buildApiUrl и токеном
       const url = buildApiUrl('software/assign');
       const response = await fetch(url, {

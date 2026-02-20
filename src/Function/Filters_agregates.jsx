@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
-import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange}) { 
@@ -28,14 +26,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     hydrorasp: false,
     AP: false,
     BK: false
-    AP: false,
-    BK: false
   });
 
   const [FilterItems2, setFilterItems2] = useState({
     K7: false,
     K5: false,
-  });
   });
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
@@ -50,8 +45,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const { token } = useAuth();
 
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
-
-  const { token } = useAuth();
 
   // Загружаем список производителей
   useEffect(() => {
@@ -95,11 +88,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const handleModelChange = (selectedOptions) => {
     const values = selectedOptions
       ? selectedOptions.map(opt => opt.value)
-    const values = selectedOptions
-      ? selectedOptions.map(opt => opt.value)
       : [];
-
-
     setSelectedModel(values);
 
 
@@ -111,16 +100,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const handleTractorModelChange = (selectedOptions) => {
     const values = selectedOptions
       ? selectedOptions.map(opt => opt.value)
-    const values = selectedOptions
-      ? selectedOptions.map(opt => opt.value)
       : [];
-
-
     setSelectedTractorModels(values);
 
 
     if (onFilterChange2) {
-      const activeTractorModels = values.map(key =>
       const activeTractorModels = values.map(key =>
         key === 'K7' ? 'K-7' : 'K-5'
       );
@@ -140,7 +124,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   };
 
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
-  const selectedTractorOptions = tractorModelOptions.filter(opt =>
   const selectedTractorOptions = tractorModelOptions.filter(opt =>
     selectedTractorModels.includes(opt.value)
   );
@@ -169,15 +152,12 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       console.log('Нет токена, очищаем список моделей');
       setComponentModels([]);
       return;
-      return;
     }
 
 
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
       .flatMap(key => componentTypeMap[key]);
-
-    const activeTractorModels = selectedTractorModels.map(key =>
 
     const activeTractorModels = selectedTractorModels.map(key =>
       key === 'K7' ? 'K-7' : 'K-5'
@@ -197,8 +177,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       
       console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
-      // Используем api.post вместо fetch
-      const data = await api.post('/search/component-models', postData);
       // Используем api.post вместо fetch
       const data = await api.post('/search/component-models', postData);
       setComponentModels(data.component_models || []);

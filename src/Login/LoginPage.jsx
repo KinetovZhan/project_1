@@ -12,7 +12,6 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login: loginContext } = useAuth();
-  const { login: loginContext } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
