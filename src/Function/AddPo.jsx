@@ -4,6 +4,7 @@ import Creatable from 'react-select/creatable';
 import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { api, buildApiUrl } from '../fetchAPI.js';
+import { api, buildApiUrl } from '../fetchAPI.js';
 
 export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   // Состояния
@@ -43,7 +44,9 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   ];
 
    // Загрузка компонентов с частями
+   // Загрузка компонентов с частями
   useEffect(() => {
+    api.get('search/component-parts/')
     api.get('search/component-parts/')
       .then(data => {
         console.log('Полученные данные компонентов:', data);
@@ -56,7 +59,15 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   }, []);
 
   // Загрузка списка ПО (для предыдущих версий)
+  // Загрузка списка ПО (для предыдущих версий)
   useEffect(() => {
+    if (!token) {
+      setSoftwareError('Для загрузки списка ПО требуется авторизация');
+      return;
+    }
+
+    setLoadingSoftware(true);
+    setSoftwareError(null);
     if (!token) {
       setSoftwareError('Для загрузки списка ПО требуется авторизация');
       return;
@@ -85,10 +96,38 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         setSoftwareError(err.message);
       })
       .finally(() => setLoadingSoftware(false));
+    api.get('software/')
+      .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error('Данные не являются массивом');
+        }
+        const options = data.map(item => ({
+          value: item.id,
+          label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          id: item.id,
+          name: item.name,
+          inner_name: item.inner_name,
+          release_date: item.release_date
+        }));
+        setSoftwareOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки ПО:', err);
+        setSoftwareError(err.message);
+      })
+      .finally(() => setLoadingSoftware(false));
   }, [token]);
 
   // Загрузка производителей (из того же эндпоинта ПО)
+  // Загрузка производителей (из того же эндпоинта ПО)
   useEffect(() => {
+    if (!token) {
+      setProducerError('Для загрузки производителей требуется авторизация');
+      return;
+    }
+
+    setLoadingProducers(true);
+    setProducerError(null);
     if (!token) {
       setProducerError('Для загрузки производителей требуется авторизация');
       return;
@@ -112,10 +151,60 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         setProducerError(err.message);
       })
       .finally(() => setLoadingProducers(false));
+    api.get('software/')
+      .then(data => {
+        const producers = data
+          .map(item => item.producer)
+          .filter(producer => producer && producer.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index);
+        
+        const options = producers.map(producer => ({ value: producer, label: producer }));
+        setProducerOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки производителей:', err);
+        setProducerError(err.message);
+      })
+      .finally(() => setLoadingProducers(false));
   }, [token]);
 
   // Загрузка тракторов
+  // Загрузка тракторов
   useEffect(() => {
+    if (!token) {
+      setTractorError('Для загрузки тракторов требуется авторизация');
+      return;
+    }
+
+    setLoadingTractors(true);
+    setTractorError(null);
+
+    api.get('tractors/')
+      .then(data => {
+        let tractorsArray = [];
+        if (Array.isArray(data)) {
+          tractorsArray = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          tractorsArray = data.data;
+        } else if (data.items && Array.isArray(data.items)) {
+          tractorsArray = data.items;
+        } else if (data.results && Array.isArray(data.results)) {
+          tractorsArray = data.results;
+        }
+
+        const options = tractorsArray.map(item => ({
+          value: item.id,
+          label: item.model && item.vin 
+            ? `${item.model} (VIN: ${item.vin})`
+            : item.model || (item.vin ? `VIN: ${item.vin}` : `Трактор ${item.id}`),
+          model: item.model,
+          vin: item.vin,
+          oh_hour: item.oh_hour,
+          region: item.region,
+          consumer: item.consumer,
+          serv_center: item.serv_center,
+          original: item
+        }));
     if (!token) {
       setTractorError('Для загрузки тракторов требуется авторизация');
       return;
@@ -158,8 +247,16 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         setTractorError(err.message);
       })
       .finally(() => setLoadingTractors(false));
+        setTractorOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки тракторов:', err);
+        setTractorError(err.message);
+      })
+      .finally(() => setLoadingTractors(false));
   }, [token]);
 
+  // Обработчики для производителя
   // Обработчики для производителя
   const handleProducerCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
@@ -171,6 +268,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     setSelectedProducer(selectedOption);
   };
 
+  // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
   // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -184,10 +282,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
     if (!selectedRelevance) {
       alert('Пожалуйста, выберите актуальность');
+      alert('Пожалуйста, выберите актуальность');
       return;
     }
 
     if (!selectedStatus) {
+      alert('Пожалуйста, выберите статус');
       alert('Пожалуйста, выберите статус');
       return;
     }
@@ -197,6 +297,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       return;
     }
 
+    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
     const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
 
     const formData = new FormData();
@@ -250,9 +351,13 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       // Используем fetch с URL от buildApiUrl и токеном
       const url = buildApiUrl('software/assign');
       const response = await fetch(url, {
+      // Используем fetch с URL от buildApiUrl и токеном
+      const url = buildApiUrl('software/assign');
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
+          // Content-Type не указываем – браузер установит сам с boundary
           // Content-Type не указываем – браузер установит сам с boundary
         },
         body: formData
@@ -276,6 +381,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           const duplicateName = nameMatch ? nameMatch[1] : fileNameWithoutExt;
           alert(`❌ Файл с именем "${duplicateName}" уже существует в системе.\n\nПожалуйста, переименуйте файл или выберите другой.`);
           return;
+          return;
         }
 
         const errMsg = data.detail 
@@ -292,6 +398,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       alert(`Ошибка: ${err.message}`);
     }
   };
+
 
 
   const selectStyles = {
