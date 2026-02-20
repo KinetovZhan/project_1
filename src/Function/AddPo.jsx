@@ -284,7 +284,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         throw new Error(`HTTP ${response.status}:\n${errMsg}`);
       }
 
-      alert('✅ ПО успешно добавлено!');
+      // alert('✅ ПО успешно добавлено!');
       onSubmit?.(data);
 
     } catch (err) {

@@ -59,21 +59,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       try {
         setLoadingProducers(true);
         setProducerError(null);
-        
-        const response = await fetch(`http://${ip}/components/`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить список производителей');
-        }
-        
-        const data = await response.json();
+
+        const data = await api.get('/components/');
         
         // Извлекаем уникальных производителей
         const producers = data
@@ -187,13 +174,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     try {
       setLoading(true);
       setError(null);
-      
-      const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-         'Authorization': `Bearer ${token}`
-      };
-
       
       console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
