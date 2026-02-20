@@ -15,7 +15,7 @@
 
   position: absolute;
   left: 171px;
-  top: 20px;
+  top: 10px;
 }
 
 
@@ -130,8 +130,8 @@
 }
 
 .add-po-title {
-  margin-top: -30px; 
-  margin-bottom: 30px; 
+  margin-top: -35px; 
+  margin-bottom: 15px; 
   font-size: bold;
   font-size: 30px;
 }

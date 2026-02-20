@@ -51,14 +51,27 @@ export function AuthProvider({children}) {
 setLoading(false);
 }, []);
 
+// const login = (token) => {
+//   localStorage.setItem('accessToken', token);
+//   const decoded = jwtDecode(token);
+//   setUser(decoded);
+//   setToken(token);
+//   setIsAuthenticated(true);
+//   setUserRole(decoded.role || 'user');
+
+// };
 const login = (token) => {
-  localStorage.setItem('accessToken', token);
-  const decoded = jwtDecode(token);
-  setUser(decoded);
-  setToken(token);
-  setIsAuthenticated(true);
-  setUserRole(decoded.role || 'user');
-//   setUserRole('moderator'); // ⬅️ ВСЕГДА МОДЕРАТОР
+  try {
+    const decoded = jwtDecode(token);
+    localStorage.setItem('accessToken', token);
+    setUser(decoded);
+    setToken(token);
+    setIsAuthenticated(true);
+    setUserRole(decoded.role || 'user');
+  } catch (error) {
+    console.error('Ошибка декодирования токена при логине:', error);
+    // Можно также показать сообщение пользователю через состояние ошибки
+  }
 };
 
 const logout = () => {

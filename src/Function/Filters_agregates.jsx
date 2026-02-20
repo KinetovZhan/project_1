@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange}) { 
   const componentTypeMap = {
@@ -24,14 +24,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     KPP: false,
     RK: false,
     hydrorasp: false,
-    AP:false,
-    BK:false
+    AP: false,
+    BK: false
   });
 
   const [FilterItems2, setFilterItems2] = useState({
     K7: false,
     K5: false,
-  })
+  });
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
@@ -43,6 +43,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   
   const isMobile = useCheckMobile();
 
+  
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
 
   const { token } = useAuth();
@@ -100,26 +101,26 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   }, [token]);
 
   const handleModelChange = (selectedOptions) => {
-    const values = selectedOptions 
-      ? selectedOptions.map(opt => opt.value) 
+    const values = selectedOptions
+      ? selectedOptions.map(opt => opt.value)
       : [];
-    
+
     setSelectedModel(values);
-    
+
     if (onModelChange) {
       onModelChange(values);
     }
   };
 
   const handleTractorModelChange = (selectedOptions) => {
-    const values = selectedOptions 
-      ? selectedOptions.map(opt => opt.value) 
+    const values = selectedOptions
+      ? selectedOptions.map(opt => opt.value)
       : [];
-    
+
     setSelectedTractorModels(values);
-    
+
     if (onFilterChange2) {
-      const activeTractorModels = values.map(key => 
+      const activeTractorModels = values.map(key =>
         key === 'K7' ? 'K-7' : 'K-5'
       );
       onFilterChange2(activeTractorModels);
@@ -138,7 +139,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   };
 
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
-  const selectedTractorOptions = tractorModelOptions.filter(opt => 
+  const selectedTractorOptions = tractorModelOptions.filter(opt =>
     selectedTractorModels.includes(opt.value)
   );
   const selectedProducerOptions = producerOptions.filter(opt => 
@@ -165,14 +166,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     if (!token) {
       console.log('Нет токена, очищаем список моделей');
       setComponentModels([]);
-      return; 
+      return;
     }
-    
+
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
       .flatMap(key => componentTypeMap[key]);
-    
-    const activeTractorModels = selectedTractorModels.map(key => 
+
+    const activeTractorModels = selectedTractorModels.map(key =>
       key === 'K7' ? 'K-7' : 'K-5'
     );
     
@@ -182,7 +183,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : [],
       producers: selectedProducers.length > 0 ? selectedProducers : [] // ← добавили производителей
     };
-    
+
     try {
       setLoading(true);
       setError(null);
@@ -193,19 +194,11 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
          'Authorization': `Bearer ${token}`
       };
 
+      
       console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
 
-      const response = await fetch(`http://${ip}/search/component-models`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(postData)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('Полученные данные от сервера:', data); // для отладки
+      // Используем api.post вместо fetch
+      const data = await api.post('/search/component-models', postData);
       setComponentModels(data.component_models || []);
     } catch (err) {
       console.error('Ошибка загрузки моделей компонентов:', err);
@@ -216,8 +209,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     }
   };
 
-  // Добавляем selectedProducers в зависимости useEffect
+
   useEffect(() => { 
+       
     fetchModels();
   }, [FilterItems, selectedTractorModels, selectedProducers, token]); // ← добавили selectedProducers
 
@@ -283,54 +277,54 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
         </div>
       </div>
 
-      <div className='model' style={{top: '370px'}}>
-        <Select
-          className='modelSelect'
-          isMulti
-          options={tractorModelOptions}
-          value={selectedTractorOptions}
-          onChange={handleTractorModelChange}
-          menuPortalTarget={document.body}
-          placeholder="Модель трактора"
-          styles={{ 
-            control: (base) => ({ 
-              ...base, 
-              maxHeight: 200, 
-              overflowY: 'auto', 
-              color: 'black', 
-              backgroundColor:'rgba(217, 217, 217, 1)', 
-              width: isMobile ? '100%' : '42vh', 
-              borderRadius: '15px', 
-              height:'53px',
-              left: '50%',
-              transform: 'Translate(-50%)',
-              position: 'relative',
-              zIndex: 1
-            }),
-            menu: (base) => ({ 
-              ...base,
-              zIndex: 9999,
-              position: 'absolute',
-              backgroundColor: 'white',
-              marginBottom: '5px'
-            }),
-            menuPortal: (base) => ({
-              ...base,
-              zIndex: 9999
-            }),
-            menuList: (base) => ({ 
-              ...base, 
-              maxHeight: 150, 
-              overflowY: 'auto', 
-              backgroundColor:'white',
-              color:'black', 
-              border: '1px solid rgba(217, 217, 217, 1)',
-              scrollbarWidth:'thin',
-              zIndex: 9999
-            }),
-          }}
-        />
-      </div>
+    <div className='model' style={{top: '370px'}}>
+      <Select
+        className='modelSelect'
+        isMulti
+        options={tractorModelOptions}
+        value={selectedTractorOptions}
+        onChange={handleTractorModelChange}
+        menuPortalTarget={document.body}
+        placeholder="Модель трактора"
+        styles={{ 
+          control: (base) => ({ 
+            ...base, 
+            maxHeight: 200, 
+            overflowY: 'auto', 
+            color: 'black', 
+            backgroundColor:'rgba(217, 217, 217, 1)', 
+            width: isMobile ? '100%' : '42vh', 
+            borderRadius: '15px', 
+            height:'53px',
+            left: '50%',
+            transform: 'Translate(-50%)',
+            position: 'relative',
+            zIndex: 1
+          }),
+          menu: (base) => ({ 
+            ...base,
+            zIndex: 9999,
+            position: 'absolute',
+            backgroundColor: 'white',
+            marginBottom: '5px'
+          }),
+          menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
+            ...base,
+            zIndex: 9999
+          }),
+          menuList: (base) => ({ 
+            ...base, 
+            maxHeight: 150, 
+            overflowY: 'auto', 
+            backgroundColor:'white',
+            color:'black', 
+            border: '1px solid rgba(217, 217, 217, 1)',
+            scrollbarWidth:'thin',
+            zIndex: 9999
+          }),
+        }}
+      />
+    </div>
 
       {/* Фильтр по производителю */}
       <div className='model' style={{top: '444px'}}>
