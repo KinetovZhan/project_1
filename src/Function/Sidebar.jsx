@@ -5,7 +5,7 @@ import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { useAuth } from '../auth/AuthContext';
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
