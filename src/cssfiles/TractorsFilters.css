@@ -83,7 +83,7 @@
   /* Размеры и визуал блока */
   box-sizing: border-box;
   width: 40vh;
-  height: 135px;
+  /* min-height: 80px; */
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
   /* Внутренности */

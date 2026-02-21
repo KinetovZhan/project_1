@@ -19,17 +19,15 @@ export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, ac
 
   const [selectedModels, setSelectedModels] = useState([]);
   const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
-    Serial: false,
-    Experienced: false,
-    Actual: false,
-    Critical: false
+    serial: false,
+    experimental: false,
+    in_operation: false,
   });
 
   const FilterStatus = {
-    'Serial': 's',
-    'Experienced': 't',
-    'Actual': 'b',
-    'Critical': 'o'
+    'serial': 'serial',
+    'experimental': 'experimental',
+    'in_operation': 'in_operation',
   }
 
   const [Dealer, setDealer] = useState('')
@@ -397,40 +395,32 @@ const handleClearEndDate = () => {
       </div>
 
       {/* Фильтр по статусам */}
-      <div className='filterstrac2'>
+      {/* <div className='filterstrac2'>
         <label>
           <span>Серийное</span>
           <input 
             type="checkbox"
-            checked={FilterTractor_by_status.Serial} 
-            onChange={() => handleFilterByStatus('Serial')}
+            checked={FilterTractor_by_status.serial} 
+            onChange={() => handleFilterByStatus('serial')}
           />
         </label>
         <label>
           <span>Опытное</span>
           <input 
             type="checkbox"
-            checked={FilterTractor_by_status.Experienced} 
-            onChange={() => handleFilterByStatus('Experienced')}
+            checked={FilterTractor_by_status.experimental} 
+            onChange={() => handleFilterByStatus('experimental')}
           />
         </label>
         <label>
           <span>Актуальное</span>
           <input 
             type="checkbox"
-            checked={FilterTractor_by_status.Actual} 
-            onChange={() => handleFilterByStatus('Actual')}
+            checked={FilterTractor_by_status.in_operation} 
+            onChange={() => handleFilterByStatus('in_operation')}
           />
         </label>
-        <label>
-          <span>Критические</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.Critical} 
-            onChange={() => handleFilterByStatus('Critical')}
-          />
-        </label>
-      </div>
+      </div> */}
 
       <div className='Majmin'>
         <button 
