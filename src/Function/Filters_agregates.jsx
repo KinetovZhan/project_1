@@ -438,7 +438,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
         />
       </div>
 
-      <div>
+      {/* <div>
         <Select
           className='modelSelect'
           isMulti
@@ -486,7 +486,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
             }),
           }}
         />
-      </div>
+      </div> */}
 
       <button 
         className='clear'
