@@ -82,7 +82,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       date_assemle: null,
       date_start: null,
       date_end: null,
-      is_major: null,
+      is_actual: null,
       query: searchQuery?.trim() || "",
       dealer: searchDealer?.trim() || ""
     };
@@ -103,14 +103,14 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     }
 
     if (activeMajMinButton === 'MAJ') {
-      postData.is_major = true;
+      postData.is_actual = true;
     } else if (activeMajMinButton === 'MIN') {
-      postData.is_major = false;
+      postData.is_actual = false;
     } 
 
     console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
-    console.log('postData.is_major:', postData.is_major);
+    console.log('postData.is_actual:', postData.is_actual);
 
     return postData;
   };

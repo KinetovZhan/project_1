@@ -35,6 +35,9 @@ function MainPage() {
     date_start: null,
     date_end: null
   });
+  // Добавляем состояние для фильтра актуальности
+  const [actualFilter, setActualFilter] = useState(null); // null, true, false
+
   const { logout, user } = useAuth();
 
   const navigate = useNavigate();
@@ -52,6 +55,7 @@ function MainPage() {
       setActiveFilters([]);
       setActiveFilters2([]);
       setSelectedProducers([]);
+      setActualFilter(null); // Сбрасываем фильтр актуальности
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('model');
       setSearchParams(newParams, { replace: true });
@@ -168,6 +172,12 @@ function MainPage() {
     setDateFilter(date);
   }
 
+  // Добавляем обработчик для фильтра актуальности
+  const handleActualChange = (value) => {
+    console.log('📢 Фильтр актуальности изменился:', value);
+    setActualFilter(value);
+  };
+
 
   const handleMajMinButtonClick = (buttonName) => {
     setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
@@ -212,6 +222,7 @@ function MainPage() {
             activeMajMinButton={activeMajMinButton}
             onDateChange={handleDateChange}
             handleMajMinButtonClick={handleMajMinButtonClick}
+            onActualChange={handleActualChange}
           />
 
           {/* Основной контент — ТОЛЬКО таблицы и фильтры */}
@@ -239,6 +250,7 @@ function MainPage() {
             onAddAggSubmit={handleAddAggSubmit}
             onAddCompPartSubmit={handleAddCompPartSubmit}
             dateFilter={dateFilter}
+            actualFilter={actualFilter}
 
           />
 

@@ -7,7 +7,16 @@ import 'react-datepicker/dist/react-datepicker.css';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 // Трактор
-export function Filters2({ onFilterChangeTracByModel, onFilterChangeByStatus, activeMajMinButton, handleMajMinButtonClick, onDealerChange, onDateChange}) {
+export function Filters2({ 
+  onFilterChangeTracByModel, 
+  onFilterChangeByStatus, 
+  activeMajMinButton, 
+  handleMajMinButtonClick, 
+  onDealerChange, 
+  onDateChange,
+  // Добавляем новый проп для фильтра актуальности
+  onActualChange 
+}) {
   // Опции для Select с моделями тракторов
   const tractorOptions = [
     { value: 'K-742МСТ', label: 'К-742МСТ' },
@@ -282,6 +291,23 @@ const handleClearEndDate = () => {
       onFilterChangeByStatus(activeFiltersTrac2);
     }
   }
+
+  // Новый обработчик для кнопок актуальности
+  const handleActualClick = (value) => {
+    // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
+    handleMajMinButtonClick(value);
+    
+    // Вызываем onActualChange с булевым значением
+    if (onActualChange) {
+      // Если нажали на активную кнопку, сбрасываем фильтр
+      if (activeMajMinButton === value) {
+        onActualChange(null); // Показать все
+      } else {
+        // Иначе устанавливаем соответствующее значение
+        onActualChange(value === 'MAJ'); // true для актуальных, false для не актуальных
+      }
+    }
+  };
   
   return (
     <>
@@ -425,13 +451,13 @@ const handleClearEndDate = () => {
       <div className='Majmin'>
         <button 
           className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleMajMinButtonClick('MAJ')}
+          onClick={() => handleActualClick('MAJ')}
         >
           Актуальные
         </button>
         <button 
           className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleMajMinButtonClick('MIN')}
+          onClick={() => handleActualClick('MIN')}
         >
           Не актуальные
         </button>

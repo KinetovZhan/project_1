@@ -5,7 +5,7 @@ import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { useAuth } from '../auth/AuthContext';
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
@@ -37,6 +37,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       if (onDealerChange) onDealerChange('');
       if (onDateChange) onDateChange(null);
       if (handleMajMinButtonClick) handleMajMinButtonClick(null);
+      if (onActualChange) onActualChange(null);
     }
   },[activeButton]);
 
@@ -105,7 +106,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       
       
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange}/>}
-      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange}/>}
+      {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange} onActualChange={onActualChange}/>}
     </div>
   )
   return (
