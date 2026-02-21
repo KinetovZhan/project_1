@@ -225,11 +225,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           tractorsArray = data.results;
         }
 
-        const options = tractorsArray.filter(item => item.vin && item.vin.includes('undef')).map(item => ({
+        const options = tractorsArray.filter(item => item.vin && item.vin.includes('system')).map(item => ({
           value: item.id,
           label: item.model && item.vin 
-            ? `${item.model} (VIN: ${item.vin})`
-            : item.model || (item.vin ? `VIN: ${item.vin}` : `Трактор ${item.id}`),
+            ? `${item.model}`
+            : item.model,
           model: item.model,
           vin: item.vin,
           oh_hour: item.oh_hour,
@@ -493,7 +493,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
         {/* Модель трактора с VIN */}
         <div className="add-po-field">
-          <label className="add-po-label">Трактор (модель и VIN)</label>
+          <label className="add-po-label">Модель трактора</label>
           <Select
             options={tractorOptions}
             value={selectedTractorModel}

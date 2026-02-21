@@ -166,12 +166,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
             const enriched = { ...t };
             comps.forEach(c => {
               const type = c.component_type?.toLowerCase();
-              if (type === 'dvs' || type === 'engine') enriched.dvs = c.comp_model;
-              else if (type === 'kpp' || type === 'transmission') enriched.kpp = c.comp_model;
-              else if (type === 'rk' || type === 'suspension') enriched.rk = c.comp_model;
-              else if (type === 'bk') enriched.bk = c.comp_model;
-              else if (type === 'gr' || type === 'hydraulics') enriched.gr = c.comp_model;
-              else if (type === 'ap') enriched.ap = c.comp_model;
+              if (type === 'двс' || type === 'engine') enriched.dvs = c.comp_model;
+              else if (type === 'кпп' || type === 'transmission') enriched.kpp = c.comp_model;
+              else if (type === 'рулевая колонка' || type === 'suspension') enriched.rk = c.comp_model;
+              else if (type === 'бк') enriched.bk = c.comp_model;
+              else if (type === 'гидрораспределитель' || type === 'hydraulics') enriched.gr = c.comp_model;
             });
             return enriched;
           });
@@ -241,7 +240,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>РК</th>
                 <th>БК</th>
                 <th>ГР</th>
-                <th>Автопилот</th>
                 <th>Дилер</th>
               </tr> 
             </thead>
@@ -273,7 +271,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   className="tractor-cell">{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
-                  <td>{tractor.ap || tractor.AP || '-'}</td> 
                   <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
                 </tr>
               ))}
