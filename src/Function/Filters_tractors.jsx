@@ -4,7 +4,6 @@ import Select from 'react-select';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import 'react-datepicker/dist/react-datepicker.css';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 // Трактор
@@ -336,30 +335,36 @@ const handleClearEndDate = () => {
       {/* Два отдельных поля для дат */}
       <div className='release-date-container'>
         <div className='date-range'>
-          <DatePicker
-            selected={startDate}
-            onChange={handleStartDateChange}
-            locale={ru}
-            dateFormat="dd.MM.yyyy"
-            customInput={<CustomInput label="С:"/>}
-            renderCustomHeader={CustomHeader}
-            isClearable={true}
-            onClear={handleClearStartDate}
-            clearButtonTitle="Очистить"
-            placeholderText="Начальная дата"
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={handleEndDateChange}
-            locale={ru}
-            dateFormat="dd.MM.yyyy"
-            customInput={<CustomInput label="По:" />}
-            renderCustomHeader={CustomHeader}
-            isClearable={true}
-            onClear={handleClearEndDate}
-            clearButtonTitle="Очистить"
-            placeholderText="Конечная дата"
-          />
+          <div style={{ transform: 'scale(0.75)', position: 'relative', zIndex: 9999 }}>
+            <DatePicker
+              selected={startDate}
+              onChange={handleStartDateChange}
+              locale={ru}
+              dateFormat="dd.MM.yyyy"
+              customInput={<CustomInput label="С:"/>}
+              renderCustomHeader={CustomHeader}
+              isClearable={true}
+              onClear={handleClearStartDate}
+              clearButtonTitle="Очистить"
+              placeholderText="Начальная дата"
+              popperClassName="super-zindex"
+            />
+          </div>
+          <div style={{ transform: 'scale(0.75)', position: 'relative', zIndex: 9999}}>
+            <DatePicker
+              selected={endDate}
+              onChange={handleEndDateChange}
+              locale={ru}
+              dateFormat="dd.MM.yyyy"
+              customInput={<CustomInput label="По:" />}
+              renderCustomHeader={CustomHeader}
+              isClearable={true}
+              onClear={handleClearEndDate}
+              clearButtonTitle="Очистить"
+              placeholderText="Конечная дата"
+              popperClassName="super-zindex"
+            />
+          </div>
         </div>
       </div>
 

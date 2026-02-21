@@ -142,7 +142,7 @@
 
 .Majmin {
   box-sizing: border-box;
-  width: 349px;
+  width: 42vh;
   height: 68px;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 20px;
@@ -152,7 +152,7 @@
   /* Позиция */
   position: absolute;
   left: 50%;
-  transform: translateX(-50%); 
+  transform: translateX(-50%);
   top: 70vh;
   
 }
@@ -297,11 +297,13 @@
   overflow-y: auto;
 }
 
+
 .react-datepicker__year-option,
 .react-datepicker__month-option {
   padding: 8px 12px;
   cursor: pointer;
 }
+
 
 .react-datepicker__year-option:hover,
 .react-datepicker__month-option:hover {
@@ -313,7 +315,7 @@
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
-  width: 180px;
+  width: 120%;
   height: 56px;
   border-radius: 56px;
   /* position: absolute;
@@ -335,12 +337,12 @@
 .release-date-container {
   position: absolute;
   top: 255px;
-  left: 10px;
+  left: 13px;
   font-family: Arial;
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
-  width: 360px;
+  width: 90%;
   height: 56px;
   border-radius: 56px;
   padding: 0 10px;
@@ -651,8 +653,11 @@
 /* Добавленные стили для двух полей дат */
 .date-range {
   display: flex;
-  gap: 0px;
+  gap: -15px;              /* увеличьте отрицательный gap */
+  margin-left: -20px;       /* увеличьте отрицательный margin */
+  width: fit-content;
 }
+
 
 .date-range .react-datepicker-wrapper {
   flex: 1;
@@ -748,8 +753,10 @@ button.search_button {
   }
   .release-date-container {
     top: 230px;
-    width: 40vh;
+    width: 42vh;
     font-size: 12px;
+    left: 50%;
+    transform: translateX(-50%);
   }
   
   .search_by_dealer {

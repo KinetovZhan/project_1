@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import Creatable from 'react-select/creatable';
 import { useAuth } from '../auth/AuthContext';
-import {ip} from "../shrineofvsakoe/ip.jsx";
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { api, buildApiUrl } from '../fetchAPI.js';
 
 export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   // Состояния
@@ -19,15 +20,14 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
+  
+  // Состояния для производителей
+  const [producerOptions, setProducerOptions] = useState([]);
+  const [loadingProducers, setLoadingProducers] = useState(false);
+  const [producerError, setProducerError] = useState(null);
+  
   const { token } = useAuth();
   const isMobile = useCheckMobile();
-
-  // Заглушка для производителей (пока нет на бэкенде)
-  const producerOptions = [
-    { value: 'producer1', label: 'Производитель 1' },
-    { value: 'producer2', label: 'Производитель 2' },
-    { value: 'producer3', label: 'Производитель 3' },
-  ];
 
   // Опции для актуальности
   const relevanceOptions = [
@@ -42,15 +42,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     { value: 'in_operation', label: 'В эксплуатации' },
   ];
 
-  // Загружаем список компонентов с частями
+   // Загрузка компонентов с частями
+   // Загрузка компонентов с частями
   useEffect(() => {
-    console.log('Токен из useAuth:', token ? `Есть (${token.substring(0, 20)}...)` : 'Нет');
-
-    fetch(`http://${ip}/search/component-parts/`)
-      .then(res => {
-        if (!res.ok) throw new Error('Не удалось загрузить компоненты');
-        return res.json();
-      })
+    api.get('search/component-parts/')
+    api.get('search/component-parts/')
       .then(data => {
         console.log('Полученные данные компонентов:', data);
         setComponentOptions(data);
@@ -61,155 +57,218 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       });
   }, []);
 
-  // Загружаем список ПО для предыдущих версий
+  // Загрузка списка ПО (для предыдущих версий)
+  // Загрузка списка ПО (для предыдущих версий)
   useEffect(() => {
-    if (token) {
-      setLoadingSoftware(true);
-      setSoftwareError(null);
-
-      fetch(`http://${ip}/software/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(res => {
-          console.log('Статус ответа ПО:', res.status, res.statusText);
-          if (res.status === 401) {
-            throw new Error('Токен недействителен. Пожалуйста, войдите заново.');
-          }
-          if (!res.ok) throw new Error('Не удалось загрузить список ПО');
-          return res.json();
-        })
-        .then(data => {
-          console.log('Полученные данные ПО:', data);
-          if (!Array.isArray(data)) {
-            throw new Error('Данные не являются массивом');
-          }
-          const options = data.map(item => ({
-            value: item.id,
-            label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
-            id: item.id,
-            name: item.name,
-            inner_name: item.inner_name,
-            release_date: item.release_date
-          }));
-          console.log('Сформированные options ПО:', options);
-          setSoftwareOptions(options);
-        })
-        .catch(err => {
-          console.error('Ошибка загрузки ПО:', err);
-          setSoftwareError(err.message);
-        })
-        .finally(() => {
-          setLoadingSoftware(false);
-        });
-    } else {
-      console.log('Токен отсутствует, пропускаем загрузку ПО');
+    if (!token) {
       setSoftwareError('Для загрузки списка ПО требуется авторизация');
+      return;
     }
-  }, [token]);
 
-  // Загружаем модели тракторов
-  useEffect(() => {
-    if (token) {
-      setLoadingTractors(true);
-      setTractorError(null);
-      
-      fetch(`http://${ip}/tractors/`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+    setLoadingSoftware(true);
+    setSoftwareError(null);
+    if (!token) {
+      setSoftwareError('Для загрузки списка ПО требуется авторизация');
+      return;
+    }
+
+    setLoadingSoftware(true);
+    setSoftwareError(null);
+
+    api.get('software/')
+      .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error('Данные не являются массивом');
         }
+        const options = data.map(item => ({
+          value: item.id,
+          label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          id: item.id,
+          name: item.name,
+          inner_name: item.inner_name,
+          release_date: item.release_date
+        }));
+        setSoftwareOptions(options);
       })
-        .then(res => {
-          console.log('Статус ответа тракторов:', res.status, res.statusText);
-          if (res.status === 401) {
-            throw new Error('Токен недействителен. Пожалуйста, войдите заново.');
-          }
-          if (!res.ok) throw new Error('Не удалось загрузить модели тракторов');
-          return res.json();
-        })
-        .then(data => {
-          console.log('✅ Полученные данные тракторов:', data);
-          
-          if (!data) {
-            throw new Error('Получены пустые данные');
-          }
-
-          let tractorsArray = [];
-          
-          if (Array.isArray(data)) {
-            tractorsArray = data;
-          } else if (data.data && Array.isArray(data.data)) {
-            tractorsArray = data.data;
-          } else if (data.items && Array.isArray(data.items)) {
-            tractorsArray = data.items;
-          } else if (data.results && Array.isArray(data.results)) {
-            tractorsArray = data.results;
-          } else {
-            console.log('Неизвестная структура данных:', data);
-            tractorsArray = [];
-          }
-
-          console.log('Обработанный массив тракторов:', tractorsArray);
-
-          if (tractorsArray.length === 0) {
-            console.log('Массив тракторов пуст');
-            setTractorOptions([]);
-            return;
-          }
-
-          // Создаем опции для react-select с отображением модели и VIN
-          const options = tractorsArray.map(item => {
-            console.log('Обработка элемента трактора:', item);
-            
-            // Формируем метку с моделью и VIN
-            let label = '';
-            if (item.model && item.vin) {
-              label = `${item.model} (VIN: ${item.vin})`;
-            } else if (item.model) {
-              label = item.model;
-            } else if (item.vin) {
-              label = `VIN: ${item.vin}`;
-            } else {
-              label = `Трактор ${item.id || 'без названия'}`;
-            }
-
-            // Используем id как значение
-            const value = item.id;
-
-            return {
-              value: value,
-              label: label,
-              model: item.model,
-              vin: item.vin,
-              oh_hour: item.oh_hour,
-              region: item.region,
-              consumer: item.consumer,
-              serv_center: item.serv_center,
-              original: item
-            };
-          });
-
-          console.log('✅ Сформированные options тракторов:', options);
-          setTractorOptions(options);
-        })
-        .catch(err => {
-          console.error('❌ Ошибка загрузки моделей тракторов:', err);
-          setTractorError(err.message);
-        })
-        .finally(() => {
-          setLoadingTractors(false);
-        });
-    } else {
-      console.log('Токен отсутствует, пропускаем загрузку тракторов');
-      setTractorError('Для загрузки списка тракторов требуется авторизация');
-    }
+      .catch(err => {
+        console.error('Ошибка загрузки ПО:', err);
+        setSoftwareError(err.message);
+      })
+      .finally(() => setLoadingSoftware(false));
+    api.get('software/')
+      .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error('Данные не являются массивом');
+        }
+        const options = data.map(item => ({
+          value: item.id,
+          label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          id: item.id,
+          name: item.name,
+          inner_name: item.inner_name,
+          release_date: item.release_date
+        }));
+        setSoftwareOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки ПО:', err);
+        setSoftwareError(err.message);
+      })
+      .finally(() => setLoadingSoftware(false));
   }, [token]);
 
+  // Загрузка производителей (из того же эндпоинта ПО)
+  // Загрузка производителей (из того же эндпоинта ПО)
+  useEffect(() => {
+    if (!token) {
+      setProducerError('Для загрузки производителей требуется авторизация');
+      return;
+    }
+
+    setLoadingProducers(true);
+    setProducerError(null);
+    if (!token) {
+      setProducerError('Для загрузки производителей требуется авторизация');
+      return;
+    }
+
+    setLoadingProducers(true);
+    setProducerError(null);
+
+    api.get('software/')
+      .then(data => {
+        const producers = data
+          .map(item => item.producer)
+          .filter(producer => producer && producer.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index);
+        
+        const options = producers.map(producer => ({ value: producer, label: producer }));
+        setProducerOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки производителей:', err);
+        setProducerError(err.message);
+      })
+      .finally(() => setLoadingProducers(false));
+    api.get('software/')
+      .then(data => {
+        const producers = data
+          .map(item => item.producer)
+          .filter(producer => producer && producer.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index);
+        
+        const options = producers.map(producer => ({ value: producer, label: producer }));
+        setProducerOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки производителей:', err);
+        setProducerError(err.message);
+      })
+      .finally(() => setLoadingProducers(false));
+  }, [token]);
+
+  // Загрузка тракторов
+  // Загрузка тракторов
+  useEffect(() => {
+    if (!token) {
+      setTractorError('Для загрузки тракторов требуется авторизация');
+      return;
+    }
+
+    setLoadingTractors(true);
+    setTractorError(null);
+
+    api.get('tractors/')
+      .then(data => {
+        let tractorsArray = [];
+        if (Array.isArray(data)) {
+          tractorsArray = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          tractorsArray = data.data;
+        } else if (data.items && Array.isArray(data.items)) {
+          tractorsArray = data.items;
+        } else if (data.results && Array.isArray(data.results)) {
+          tractorsArray = data.results;
+        }
+
+        const options = tractorsArray.map(item => ({
+          value: item.id,
+          label: item.model && item.vin 
+            ? `${item.model} (VIN: ${item.vin})`
+            : item.model || (item.vin ? `VIN: ${item.vin}` : `Трактор ${item.id}`),
+          model: item.model,
+          vin: item.vin,
+          oh_hour: item.oh_hour,
+          region: item.region,
+          consumer: item.consumer,
+          serv_center: item.serv_center,
+          original: item
+        }));
+    if (!token) {
+      setTractorError('Для загрузки тракторов требуется авторизация');
+      return;
+    }
+
+    setLoadingTractors(true);
+    setTractorError(null);
+
+    api.get('tractors/')
+      .then(data => {
+        let tractorsArray = [];
+        if (Array.isArray(data)) {
+          tractorsArray = data;
+        } else if (data.data && Array.isArray(data.data)) {
+          tractorsArray = data.data;
+        } else if (data.items && Array.isArray(data.items)) {
+          tractorsArray = data.items;
+        } else if (data.results && Array.isArray(data.results)) {
+          tractorsArray = data.results;
+        }
+
+        const options = tractorsArray.map(item => ({
+          value: item.id,
+          label: item.model && item.vin 
+            ? `${item.model} (VIN: ${item.vin})`
+            : item.model || (item.vin ? `VIN: ${item.vin}` : `Трактор ${item.id}`),
+          model: item.model,
+          vin: item.vin,
+          oh_hour: item.oh_hour,
+          region: item.region,
+          consumer: item.consumer,
+          serv_center: item.serv_center,
+          original: item
+        }));
+
+        setTractorOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки тракторов:', err);
+        setTractorError(err.message);
+      })
+      .finally(() => setLoadingTractors(false));
+        setTractorOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки тракторов:', err);
+        setTractorError(err.message);
+      })
+      .finally(() => setLoadingTractors(false));
+  }, [token]);
+
+  // Обработчики для производителя
+  // Обработчики для производителя
+  const handleProducerCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    setProducerOptions(prev => [...prev, newOption]);
+    setSelectedProducer(newOption);
+  };
+
+  const handleProducerChange = (selectedOption) => {
+    setSelectedProducer(selectedOption);
+  };
+
+  // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
+  // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -221,12 +280,14 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     }
 
     if (!selectedRelevance) {
-      alert('Пожалуйста, выберите актуальность (Актуальное/Устаревшее)');
+      alert('Пожалуйста, выберите актуальность');
+      alert('Пожалуйста, выберите актуальность');
       return;
     }
 
     if (!selectedStatus) {
-      alert('Пожалуйста, выберите статус (Серийное/Опытное/В эксплуатации)');
+      alert('Пожалуйста, выберите статус');
+      alert('Пожалуйста, выберите статус');
       return;
     }
 
@@ -235,22 +296,19 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       return;
     }
 
-    // Формируем FormData
+    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
+
     const formData = new FormData();
     formData.append('file', file);
-    
-    // Отправляем актуальность
+    formData.append('name', fileNameWithoutExt);
+    formData.append('inner_name', fileNameWithoutExt);
     formData.append('is_actual', selectedRelevance.value === 'actual');
-    
-    // Отправляем статус
     formData.append('status', selectedStatus.value);
     
-    // Отправляем массив всех выбранных моделей
     selectedComponents.forEach(opt => {
       formData.append('component_models', opt.model);
     });
 
-    // Отправляем массив всех выбранных номеров частей
     selectedComponents.forEach(opt => {
       if (opt?.part_type == null) {
         alert(`Ошибка: у компонента "${opt?.model}" нет типа части`);
@@ -259,22 +317,26 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       formData.append('part_type', opt.part_type);
     });
 
-    // Отправляем предыдущую версию ПО если выбрана
-    if (selectedPreviousVersion) {
-      formData.append('previous_sw_version_str', selectedPreviousVersion.value.toString());
-    }
-
-    // Добавляем производителя (пока заглушка)
     if (selectedProducer) {
       formData.append('producer', selectedProducer.value);
     }
 
-    // Добавляем модель трактора - отправляем ID трактора
     if (selectedTractorModel) {
       formData.append('tractor_id', selectedTractorModel.value);
-      // Также можно отправить отдельно модель и VIN, если нужно
-      formData.append('tractor_model', selectedTractorModel.model);
-      formData.append('tractor_vin', selectedTractorModel.vin);
+    }
+
+    if (selectedPreviousVersion) {
+      formData.append('previous_sw_version', selectedPreviousVersion.value);
+    }
+
+    const releaseDate = form.elements.releaseDate.value;
+    if (releaseDate) {
+      formData.append('release_date', releaseDate);
+    }
+
+    const description = form.elements.description.value.trim();
+    if (description) {
+      formData.append('description', description);
     }
 
     // Для отладки
@@ -284,10 +346,14 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     }
 
     try {
-      const response = await fetch(`http://${ip}/software/assign`, {
+      // Используем fetch с URL от buildApiUrl и токеном
+      const url = buildApiUrl('software/assign');
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
+          // Content-Type не указываем – браузер установит сам с boundary
+          // Content-Type не указываем – браузер установит сам с boundary
         },
         body: formData
       });
@@ -302,18 +368,33 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       if (!response.ok) {
         console.error('Ошибка:', data);
+
+        const errorDetail = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+      
+        if (errorDetail.includes('UniqueViolation') && errorDetail.includes('Software_name_key')) {
+          const nameMatch = errorDetail.match(/Key "\(name\)=\((.*?)\)"/);
+          const duplicateName = nameMatch ? nameMatch[1] : fileNameWithoutExt;
+          alert(`❌ Файл с именем "${duplicateName}" уже существует в системе.\n\nПожалуйста, переименуйте файл или выберите другой.`);
+          return;
+          return;
+        }
+
         const errMsg = data.detail 
           ? JSON.stringify(data.detail, null, 2)
           : data.message || 'Unknown error';
         throw new Error(`HTTP ${response.status}:\n${errMsg}`);
       }
 
+      // alert('✅ ПО успешно добавлено!');
       onSubmit?.(data);
+
     } catch (err) {
       console.error('❌ Ошибка:', err);
       alert(`Ошибка: ${err.message}`);
     }
   };
+
+
 
   const selectStyles = {
     control: (base, state) => ({
@@ -321,7 +402,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       color: '#333',
       height: '40px',
       width: '100%',
-      border: '1px solid',
+      border: '1px solid #ccc',
       borderColor: state.isFocused ? '#13be00' : '#ccc',
       boxSizing: 'border-box',
       fontSize: isMobile ? '14px':'16px',
@@ -376,21 +457,38 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       <h3 className="add-po-title">Добавление нового ПО</h3>
 
+      <div className='add-po-form-scroll-bar'>
+
       <form className="add-po-form" onSubmit={handleSubmit}>
 
-        {/* Производитель */}
+        {/* Производитель с возможностью создания нового */}
         <div className="add-po-field">
           <label className="add-po-label">Производитель</label>
-          <Select
+          <Creatable
             options={producerOptions}
             value={selectedProducer}
-            onChange={setSelectedProducer}
-            placeholder="Выберите производителя"
+            onChange={handleProducerChange}
+            onCreateOption={handleProducerCreate}
+            placeholder="Выберите или создайте производителя"
             classNamePrefix="add-po-select"
             isClearable={true}
             isSearchable={true}
+            isLoading={loadingProducers}
+            isDisabled={!token || loadingProducers}
+            noOptionsMessage={() => {
+              if (!token) return "Требуется авторизация";
+              if (loadingProducers) return "Загрузка...";
+              if (producerError) return producerError;
+              return "Нет доступных производителей";
+            }}
             styles={selectStyles}
+            formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
           />
+          {producerError && token && (
+            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+              Ошибка загрузки: {producerError}
+            </div>
+          )}
         </div>
 
         {/* Модель трактора с VIN */}
@@ -560,6 +658,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           Добавить ПО
         </button>
       </form>
+      </div>
     </div>
+
   );
 }

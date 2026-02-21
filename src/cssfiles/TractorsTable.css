@@ -1,23 +1,25 @@
 
 .tractor-table-container {
-  display: flex;
+  display: inline-block;
   align-items: stretch;
   background: #ffffff;
   border-radius: 10px 5px 10px 5px;
   padding: 0;
-  max-width: 120vh;
+  width: auto ;
   /* max-height: 80vh; */
   /* width:100%; */
   box-sizing: border-box;
   margin:100px;
+  max-width: 80%;
 }
 
 /* скролл для тела таблицы */
 .scroll-bar {
-  max-height: 580px;
+  max-height: 60vh;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 10px;
+  max-width: 100%;
 }
 
 .scroll-bar::-webkit-scrollbar {
@@ -35,10 +37,11 @@
 }
 
 .tractor-table {
-  height: 60vh;
+  height: auto;
   border-collapse: collapse;
   background: white;
   table-layout: auto;
+  
 }
 
 .tractor-table thead {
@@ -58,6 +61,7 @@
   min-width: 80px;
   white-space: nowrap; 
   max-width:200px;
+  font-size: 18px;
 }
 
 .tractor-table thead th:last-child { 
@@ -125,14 +129,31 @@
   .tractor-table-container {
     position: relative;
     max-width: 100vh;
-    max-height: 60vh;
+    /* height: auto; */
+    /* max-height: 60vh; */
     top: 15vh;
     margin: 0px;
     font-size: 12px;
+    /* height: fit-content; */
+    max-height: 60vh;
   }
 
   .tractor-table td {
     font-size: 12px;
+    
+  }
+  
+  
+  .tractor-table {
+    height: auto;
+  }
+
+  .scroll-bar {
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 10px;
+    min-height: auto; 
+    height: auto;
   }
 
 }

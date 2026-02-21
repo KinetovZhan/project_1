@@ -11,6 +11,7 @@ export function MainPart({
   activeFilters,
   activeFilters2,
   selectedModel,
+  selectedProducers,
   activeFiltersTrac,
   activeFiltersTrac2,
   onSearch,
@@ -97,6 +98,7 @@ export function MainPart({
             activeFilters={activeFilters}
             activeFilters2={activeFilters2}
             selectedModel={selectedModel}
+            selectedProducers={selectedProducers}
             onSearch={onSearch}
             searchQuery={searchQuery}
           />

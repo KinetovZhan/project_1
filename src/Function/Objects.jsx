@@ -7,73 +7,55 @@ import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
-import { useState, useEffect, useMemo, useRef } from 'react'; // ← добавьте useMemo
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import {ip} from "../shrineofvsakoe/ip.jsx";
+import { api } from '../fetchAPI.js';
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, searchQuery }) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery }) {
+
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [downloading, setDownloading] = useState(null)
+  const [downloading, setDownloading] = useState(null);
   const { token, user } = useAuth();
-  const [isVisible, setIsVisible] = useState(null)
+  const [isVisible, setIsVisible] = useState(null);
 
-  const hoverTimers = useRef({})
+  const hoverTimers = useRef({});
 
-  
   const userRole = user?.role || 'user';
 
-  console.log(`dfadsjgosajif ${userRole}`)
+  console.log(`dfadsjgosajif ${userRole}`);
+
   useEffect(() => {
     const fetchFilteredData = async () => {
       setLoading(true);
       setError(null);
 
       if (!token) {
-        setError("Пользователь не авторизован");
+        setError('Пользователь не авторизован');
         setLoading(false);
         return;
       }
       if (userRole !== 'dealer') {
         try {
-          const FilterToTypeMap = { 'DVS': ['dvs', 'engine'], 'KPP': ['kpp', 'transmission'],'RK': ['suspension','rk'], 'hydrorasp': ['hydraulics'],'AP': ['ap'], 'BK': ['bk']}
-          const FilterToTractor = { 'K7': 'K-7', 'K5': 'K-5' };
-  
+          const FilterToTypeMap = {
+            DVS: ['dvs', 'engine'],
+            KPP: ['kpp', 'transmission'],
+            RK: ['suspension'],
+            hydrorasp: ['hydraulics'],
+          };
+          const FilterToTractor = { K7: 'K-7', K5: 'K-5' };
+
           const postData = {
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
             type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-            model_comp: Array.isArray(selectedModel) ? selectedModel : []
+            model_comp: Array.isArray(selectedModel) ? selectedModel : [],
+            producers: Array.isArray(selectedProducers) ? selectedProducers : []
           };
-          
-  
-          const response = await fetch(`http://${ip}/search/component-info`, {
-            method: 'POST',
-            headers: {
-              "Authorization": `Bearer ${token}`,
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData)
-          });
-  
-          if (!response.ok) {
-            let errorMessage = `HTTP error! status: ${response.status}`;
-            try {
-              const errorData = await response.json();
-              errorMessage += ` — ${JSON.stringify(errorData)}`;
-            } catch (e) {
-              // Если не JSON — попробуем текст
-              const errorText = await response.text();
-              errorMessage += ` — ${errorText}`;
-            }
-            throw new Error(errorMessage);
-          }
-  
-  
-  
-          const data = await response.json();
-          const items = Array.isArray(data) ? data : (data ? [data] : []);
+
+          const data = await api.post('search/component-info', postData);
+
+          const items = Array.isArray(data) ? data : data ? [data] : [];
           setSoftwareItems(items);
         } catch (err) {
           console.error('Ошибка:', err);
@@ -81,149 +63,136 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, searchQu
         } finally {
           setLoading(false);
         }
-      };
-      setLoading(false)
+      } else {
+        setLoading(false);
       }
-
+    };
 
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel, token, searchQuery]); 
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery]); 
 
-
-    const ImageToComponent = (type_component,model_component) => {
-      if(type_component && type_component !== 'engine'&& type_component !== 'dvs'){
+  const ImageToComponent = (type_component, model_component) => {
+    if (type_component && type_component !== 'engine' && type_component !== 'dvs') {
       const ImageByType = {
-        'transmission': KPPImage,
-        'suspension': RKImage,
-        'hydraulics': HRImage,
-        'ap':APImage,
-        'bk':BKImage
+        transmission: KPPImage,
+        suspension: RKImage,
+        hydraulics: HRImage,
+        ap: APImage,
+        bk: BKImage,
       };
-      return ImageByType[type_component]|| DefaultImage;
+      return ImageByType[type_component] || DefaultImage;
     }
-      if(model_component && (type_component == 'engine'|| type_component == 'dvs' )){
+    if (model_component && (type_component === 'engine' || type_component === 'dvs')) {
       const ImageByModel = {
-        'Weichai': WeiImage,
-        'ТМЗ': TMZImage,
-        'ЯМЗ': JMZImage,
+        Weichai: WeiImage,
+        ТМЗ: TMZImage,
+        ЯМЗ: JMZImage,
       };
-      return ImageByModel[model_component]|| DefaultImage;
+      return ImageByModel[model_component] || DefaultImage;
     }
+    return DefaultImage;
+  };
 
-    }
-
-
-
-  const handleDownload = async (item) => {
-  if (!item?.id_Firmwares) {
-    alert('ID файла не указан');
-    return;
-  }
-
-  if (!token) {
-    alert('Требуется авторизация');
-    return;
-  }
-
-  try {
-    setDownloading(item.id_Firmwares);
-
-    const response = await fetch(`http://${ip}/software/download/${item.id_Firmwares}`, {
-      method: 'GET',
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Текст ошибки:', errorText);
-      throw new Error(`Ошибка сервера: ${response.status} ${response.statusText}`);
-    }
-
-    // Получаем имя файла из заголовка или используем ID
-    let filename = `firmware_${item.id_Firmwares}`;
+  // Функция для получения имени файла из заголовков
+  const getFilenameFromResponse = (response, defaultName) => {
     const contentDisposition = response.headers.get('content-disposition');
-    
+
     if (contentDisposition) {
       const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
       if (matches && matches[1]) {
-        filename = matches[1].replace(/['"]/g, '');
+        return matches[1].replace(/['"]/g, '');
       }
     }
 
-    // Улучшенное определение расширения
-    let extension = '';
-    const contentType = response.headers.get('content-type') || '';
-    
-    // Проверяем расширение в имени файла
-    const nameMatch = filename.match(/\.([a-zA-Z0-9]+)$/);
-    if (nameMatch) {
-      extension = `.${nameMatch[1]}`;
-    } else {
-      // Определяем по типу контента
-      const extensionMap = {
-        'application/octet-stream': '.bin',
-        'application/zip': '.zip',
-        'application/x-rar-compressed': '.rar',
-        'application/x-7z-compressed': '.7z',
-        'application/x-tar': '.tar',
-        'application/x-gzip': '.gz',
-        'application/pdf': '.pdf',
-        'application/x-binary': '.bin',
-        'binary/octet-stream': '.bin'
-      };
-      
-      extension = extensionMap[contentType] || '.bin';
-      filename += extension;
+    return defaultName;
+  };
+
+  // Функция для определения расширения файла
+  const ensureFileExtension = (filename, contentType) => {
+    if (filename.match(/\.([a-zA-Z0-9]+)$/)) {
+      return filename;
     }
 
-    console.log('Скачиваем файл:', filename, 'Content-Type:', contentType);
+    const extensionMap = {
+      'application/octet-stream': '.bin',
+      'application/zip': '.zip',
+      'application/pdf': '.pdf',
+      'application/x-binary': '.bin',
+      'binary/octet-stream': '.bin',
+      'application/json': '.json',
+      'text/plain': '.txt',
+    };
 
-    const blob = await response.blob();
-    
-    if (blob.size === 0) {
-      throw new Error('Файл пустой');
+    const extension = extensionMap[contentType] || '.bin';
+    return filename + extension;
+  };
+
+  const handleDownload = async (item) => {
+    if (!item?.id_Firmwares) {
+      alert('ID файла не указан');
+      return;
     }
 
-    // Создаем ссылку для скачивания
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    
-    document.body.appendChild(a);
-    a.click();
-    
-    setTimeout(() => {
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    }, 100);
+    if (!token) {
+      alert('Требуется авторизация');
+      return;
+    }
 
-    console.log('Файл успешно скачан:', filename);
+    try {
+      setDownloading(item.id_Firmwares);
 
-  } catch (error) {
-    console.error('Ошибка при скачивании:', error);
-    alert(`Ошибка при скачивании: ${error.message}`);
-  } finally {
-    setDownloading(null);
-  }
-};
+      const contentType = response.headers.get('content-type') || '';
 
-const handleMouseEnter = (id) => {
+      // Добавляем расширение, если нужно
+      filename = ensureFileExtension(filename, contentType);
+      // Получаем имя файла из заголовка или используем ID
+      let filename = getFilenameFromResponse(response, `firmware_${item.id_Firmwares}`);
+
+      console.log('Скачиваем файл:', filename, 'Content-Type:', contentType);
+
+      const blob = await response.blob();
+
+      if (blob.size === 0) {
+        throw new Error('Файл пустой');
+      }
+
+      // Создаем ссылку для скачивания
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+
+      console.log('Файл успешно скачан:', filename);
+    } catch (error) {
+      console.error('Ошибка при скачивании:', error);
+      alert(`Ошибка при скачивании: ${error.message}`);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleMouseEnter = (id) => {
     // Очищаем предыдущий таймер для этого элемента
     if (hoverTimers.current[id]) {
       clearTimeout(hoverTimers.current[id]);
       delete hoverTimers.current[id];
     }
-    
+
+
     // Устанавливаем таймер на 3 секунды для показа popup
     hoverTimers.current[id] = setTimeout(() => {
       setIsVisible(id);
       delete hoverTimers.current[id];
-    }, 3000); // 3 секунды = 3000 миллисекунд
+    }, 3000);
   };
 
   // Функция для обработки ухода мыши
@@ -233,33 +202,39 @@ const handleMouseEnter = (id) => {
       clearTimeout(hoverTimers.current[id]);
       delete hoverTimers.current[id];
     }
-    
+
+
     // Скрываем popup сразу при уходе мыши
     setIsVisible(null);
   };
 
-
-  // --- 2. Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных ---
+  // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
   const filteredItems = useMemo(() => {
-      if (!searchQuery) return softwareItems;
+    if (!searchQuery) return softwareItems;
 
-      const query = searchQuery.trim().toLowerCase();
-      return softwareItems.filter(item =>
+    const query = searchQuery.trim().toLowerCase();
+    return softwareItems.filter(
+      (item) =>
         (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
         (item.type_component && item.type_component.toLowerCase().includes(query)) ||
         (item.model_component && item.model_component.toLowerCase().includes(query)) ||
         (item.comp_model && item.comp_model.toLowerCase().includes(query))
-      );
-    }, [softwareItems, searchQuery]);
+    );
+  }, [softwareItems, searchQuery]);
 
-  // --- Ваши функции (перенесены в начало!) ---
   const getAllActiveFilters = () => {
     const filterNames = {
-      'DVS': 'ДВС', 'KPP': 'КПП', 'RK': 'РК', 'hydrorasp': 'Гидрораспределитель', 'AP': 'Автопилот','BK':'БК',
-      'K7': 'К-7', 'K5': 'К-5'
+      DVS: 'ДВС',
+      KPP: 'КПП',
+      RK: 'РК',
+      hydrorasp: 'Гидрораспределитель',
+      AP: 'Автопилот',
+      BK: 'БК',
+      K7: 'К-7',
+      K5: 'К-5',
     };
     return [...activeFilters, ...activeFilters2]
-      .map(f => filterNames[f])
+      .map((f) => filterNames[f])
       .filter(Boolean)
       .join(', ');
   };
@@ -267,31 +242,31 @@ const handleMouseEnter = (id) => {
   const getComponentName = () => {
     const filterNames = {
       '': 'всех компонентов',
-      'DVS': 'ДВС',
-      'KPP': 'КПП',
-      'RK': 'РК',
-      'hydrorasp': 'Гидрораспределитель',
-      'AP': 'Автопилот',
-      'BK':'БК'
+      DVS: 'ДВС',
+      KPP: 'КПП',
+      RK: 'РК',
+      hydrorasp: 'Гидрораспределитель',
+      AP: 'Автопилот',
+      BK: 'БК',
     };
 
     if (activeFilters.length > 0) {
-      return activeFilters
-        .map(f => filterNames[f])
-        .filter(Boolean)
-        .join(', ') || 'компонентов';
+      return (
+        activeFilters
+          .map((f) => filterNames[f])
+          .filter(Boolean)
+          .join(', ') || 'компонентов'
+      );
     }
 
     // При отсутствии фильтров — показываем "Всех компонентов"
     return 'всех компонентов';
   };
 
-
-
   // --- Рендер ---
   if (loading) {
     return (
-      <div className='maininfo'>
+      <div className="maininfo">
         <h3>Последние версии ПО для {getComponentName()}</h3>
         <div>Загрузка...</div>
       </div>
@@ -300,7 +275,7 @@ const handleMouseEnter = (id) => {
 
   if (error) {
     return (
-      <div className='maininfo'>
+      <div className="maininfo">
         <h3>Ошибка</h3>
         <div style={{ color: 'red' }}>{error}</div>
       </div>
@@ -308,18 +283,18 @@ const handleMouseEnter = (id) => {
   }
 
   return (
-    <div className='maininfo'>
+    <div className="maininfo">
       <h3>Последние версии ПО для {getComponentName()}</h3>
       <div>
-        <h4>Компоненты ({filteredItems.filter(item => item.id_Firmwares).length})</h4>
+        <h4>Компоненты ({filteredItems.filter((item) => item.id_Firmwares).length})</h4>
         {activeFilters.length > 0 && (
           <div style={{ marginBottom: '10px', color: '#666' }}>
             Активные фильтры: {getAllActiveFilters()}
           </div>
         )}
       </div>
-      <div className = 'list-container'>
-        <ul className='List'>
+      <div className="list-container">
+        <ul className="List">
           {filteredItems.length === 0 ? (
             <li>
               <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
@@ -329,35 +304,45 @@ const handleMouseEnter = (id) => {
             </li>
           ) : (
             filteredItems
-            .filter(item => item.id_Firmwares)
-            .map((item) => (
-              <li key={item.id_Firmwares}>
-                <div className='objectmenu' data-testid='objectmenu'>
-                  <img className='object' src={ImageToComponent(item.type_component,item.model_component )} alt={item.type_component} />
-                  <div className='inform'>
-                    <h4 className='poster'>
-                      №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
-                    </h4>
-                    <div className='infodisc'>
-                      <h5 className='textunder' onMouseEnter={() => handleMouseEnter(item.id_Firmwares)}  onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
-                        Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
-                        {item.part_type ? ` (${item.part_type})` : ' (—)'}
-                      </h5>
-                      {isVisible === item.id_Firmwares && (
-                        <div className='popup-window'>{item.type_component || '—'}: {item.model_component || item.comp_model || '—'}</div>
-                    )}
+              .filter((item) => item.id_Firmwares)
+              .map((item) => (
+                <li key={item.id_Firmwares}>
+                  <div className="objectmenu" data-testid="objectmenu">
+                    <img
+                      className="object"
+                      src={ImageToComponent(item.type_component, item.model_component || item.comp_model)}
+                      alt={item.type_component}
+                    />
+                    <div className="inform">
+                      <h4 className="poster">
+                        №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
+                      </h4>
+                      <div className="infodisc">
+                        <h5
+                          className="textunder"
+                          onMouseEnter={() => handleMouseEnter(item.id_Firmwares)}
+                          onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
+                        >
+                          Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                          {item.part_type ? ` (${item.part_type})` : ' (—)'}
+                        </h5>
+                        {isVisible === item.id_Firmwares && (
+                          <div className="popup-window">
+                            {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        className="download"
+                        onClick={() => handleDownload(item)}
+                        disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
+                      >
+                        Скачать
+                      </button>
                     </div>
-                    <button 
-                      className='download'
-                      onClick={() => handleDownload(item)}
-                      disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
-                    >
-                      Скачать
-                    </button>
                   </div>
-                </div>
-              </li>
-            ))
+                </li>
+              ))
           )}
         </ul>
       </div>

@@ -1,66 +1,54 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
-import { ip } from "../shrineofvsakoe/ip.jsx";
 import Select from 'react-select';
+import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 
 export function AddComponentPart({ onBack, onSubmit }) {
     const [formData, setFormData] = useState({
         component_model: '',
         part_type: ''
-    })
+    });
     const isMobile = useCheckMobile();
 
-    const [componentsModels, setComponentsModels] = useState([])
-    const [loadingModels, setLoadingModels] = useState(false)
-    const [error, setError] = useState(null)
-    const {token} = useAuth();
-    const [loading, setLoading] = useState(false)
+    const [componentsModels, setComponentsModels] = useState([]);
+    const [loadingModels, setLoadingModels] = useState(false);
+    const [error, setError] = useState(null);
+    const { token } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     // Для react-select
-    const [componentOptions, setComponentOptions] = useState([])
-    const [selectedComponent, setSelectedComponent] = useState(null)
+    const [componentOptions, setComponentOptions] = useState([]);
+    const [selectedComponent, setSelectedComponent] = useState(null);
     
     useEffect(() => {
         const loadComponentsModels = async () => {
-            if(!token){
-                setLoadingModels(false)
+            if (!token) {
+                setLoadingModels(false);
                 return;
             }
             try {
-                setLoadingModels(true)
-                const responseModels = await fetch(`http://${ip}/components/`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-
-                    if (!responseModels.ok) {
-                    throw new Error(`Ошибка ${responseModels.status}`)
-                    }
-                const responseModelsData = await responseModels.json()
-                setComponentsModels(responseModelsData)
+                setLoadingModels(true);
+                // Используем api.get вместо fetch
+                const responseModelsData = await api.get('/components/');
+                setComponentsModels(responseModelsData);
                 
                 // Преобразуем данные для react-select
                 const options = responseModelsData.map(component => ({
                     value: component.id,
                     label: `${component.model} (${component.type})`
-                }))
-                setComponentOptions(options)
-                
-            }catch(err){
-                console.error('Ошибка загрузки данных о компонентах', err)
-                setError('Не удалось загрузить данные о компонентах')
-            }finally{
-                setLoadingModels(false)
+                }));
+                setComponentOptions(options);
+                setError(null);
+            } catch (err) {
+                console.error('Ошибка загрузки данных о компонентах', err);
+                setError('Не удалось загрузить данные о компонентах');
+            } finally {
+                setLoadingModels(false);
             }
-        }
-        loadComponentsModels()
+        };
+        loadComponentsModels();
     }, [token]);
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -86,37 +74,28 @@ export function AddComponentPart({ onBack, onSubmit }) {
         }
 
         try {
+            setLoading(true);
             const submitData = {
-                component: formData.component_model,
+                component: formData.component_model, // поле должно называться component (как ожидает бэкенд)
                 part_type: formData.part_type
-            }
+            };
 
-            const responseToMakeCompPart = await fetch(`http://${ip}/components/component-parts/`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(submitData)
-            });
-            if (!responseToMakeCompPart.ok) {
-                    throw new Error(`Ошибка ${responseToMakeCompPart.status}`)
-            }
+            // Используем api.post вместо fetch
+            const responseData = await api.post('/components/component-parts/', submitData);
 
-            const responseToMakeCompPartData = await responseToMakeCompPart.json();
             if (typeof onSubmit === 'function') {
-                onSubmit(responseToMakeCompPartData)
-            } else if(typeof onBack ==='function') {
-                onBack()
-            }  
+                onSubmit(responseData);
+            } else if (typeof onBack === 'function') {
+                onBack();
+            }
+            setError(null);
         } catch (err) {
             console.error('Ошибка при добавлении части агрегата:', err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -141,8 +120,10 @@ export function AddComponentPart({ onBack, onSubmit }) {
                 </div>
             )}
 
+            <div className='add-po-form-scroll-bar-comp-part'>
+
             <form className="add-po-form" onSubmit={handleSubmit}>
-                {/* 🔥 Выбор компонента через react-select */}
+                {/* Выбор компонента через react-select */}
                 <div className="add-po-field">
                     <label className="add-po-label">Компонент</label>
                     <Select
@@ -165,7 +146,6 @@ export function AddComponentPart({ onBack, onSubmit }) {
                                 border: '1px solid',
                                 borderColor: state.isFocused ? '#454744' : '#ccc',
                                 boxSizing: 'border-box',
-                                // padding: '0 12px',
                                 fontSize: (isMobile?'12px':'16px'),
                                 cursor: 'pointer',
                                 transition: 'border-color 0.15s ease',
@@ -225,6 +205,7 @@ export function AddComponentPart({ onBack, onSubmit }) {
                     {loading ? 'Добавление...' : 'Добавить'}
                 </button>
             </form>
+            </div>
         </div>
     );
 }
