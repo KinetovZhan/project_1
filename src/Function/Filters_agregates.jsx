@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthContext';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
-export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange}) { 
+export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange}) { 
   const componentTypeMap = {
     'DVS': 'dvs',
     'KPP': 'kpp',
@@ -33,6 +33,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     K5: false,
   });
 
+  const statusOptions = [
+    { value: 'serial', label: 'Серийное' },
+    { value: 'experimental', label: 'Опытное' },
+    { value: 'in_operation', label: 'В эксплуатации' },
+    { value: 'actual', label: 'Актуальное' },
+    { value: 'not_actual', label: 'Не актуальное' }
+  ];
+
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState([]);
   const [selectedProducers, setSelectedProducers] = useState([]);
@@ -40,11 +48,17 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [producerOptions, setProducerOptions] = useState([]);
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
-  
+  const [selectedStatus, setSelectedStatus] = useState([])
+
+
   const isMobile = useCheckMobile();
   const { token } = useAuth();
 
   const options = [...componentModels.map(item => ({ value: item, label: item }))];
+  const optionsStat = componentModels.map(item => ({ value: item, label: item }));
+  const selectedStatusOptions = statusOptions.filter(opt =>
+    selectedStatus.includes(opt.value)
+  );
 
   // Загружаем список производителей
   useEffect(() => {
@@ -123,6 +137,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     }
   };
 
+  const handleStatusChange = (selectedOptions) => {
+    const values = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+    setSelectedStatus(values);
+    if (onStatusChange) {
+      onStatusChange(values);
+    }
+  };
+
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
   const selectedTractorOptions = tractorModelOptions.filter(opt =>
     selectedTractorModels.includes(opt.value)
@@ -167,7 +189,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     const postData = {
       trac_model: activeTractorModels.length  > 0 ? activeTractorModels : [],
       type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : [],
-      producers: selectedProducers.length > 0 ? selectedProducers : [] // ← добавили производителей
+      producers: selectedProducers.length > 0 ? selectedProducers : [],
+      status: selectedStatus.length > 0 ? selectedStatus : []
     };
 
 
@@ -176,6 +199,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       setError(null);
       
       console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
+      console.log('Отправляемые данные:', postData);
 
       // Используем api.post вместо fetch
       const data = await api.post('/search/component-models', postData);
@@ -191,7 +215,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
 
   useEffect(() => {
     fetchModels();
-  }, [FilterItems, selectedTractorModels, selectedProducers, token]); // ← добавили selectedProducers
+  }, [FilterItems, selectedTractorModels, selectedProducers, selectedStatus, token]); 
 
   return (
     <>
@@ -382,6 +406,56 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           options={options}
           value={selectedOptions}
           onChange={handleModelChange}
+          placeholder="Модель"
+          menuPortalTarget={document.body}
+          menuPlacement="top" 
+          isDisabled={loading || componentModels.length === 0}
+          styles={{ 
+            control: (base) => ({ 
+              ...base, 
+              maxHeight: 200, 
+              overflowY: 'auto', 
+              color: 'black', 
+              backgroundColor:'rgba(217, 217, 217, 1)', 
+              width: isMobile ? '100%':'42vh', 
+              borderRadius: '15px', 
+              height:'53px',
+              left: '50%',
+              transform: 'Translate(-50%)',
+              position: 'relative',
+              zIndex: 1
+            }),
+            menu: (base) => ({ 
+              ...base,
+              zIndex: 9999,
+              position: 'absolute',
+              backgroundColor: 'white',
+              marginBottom: '5px'
+            }),
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999
+            }),
+            menuList: (base) => ({ 
+              ...base, 
+              maxHeight: 150, 
+              overflowY: 'auto', 
+              backgroundColor:'white',
+              color:'black', 
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth:'thin'
+            }),
+          }}
+        />
+      </div>
+
+      <div>
+        <Select
+          className='modelSelect'
+          isMulti
+          options={statusOptions}
+          value={selectedStatusOptions}
+          onChange={handleStatusChange}
           placeholder="Модель"
           menuPortalTarget={document.body}
           menuPlacement="top" 
