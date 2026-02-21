@@ -17,6 +17,7 @@ export function MainPart({
   onSearch,
   searchQuery,
   searchDealer,
+  selectedStatus,
 
   // --- Форма ПО ---
   showAddForm,
@@ -101,6 +102,7 @@ export function MainPart({
             selectedProducers={selectedProducers}
             onSearch={onSearch}
             searchQuery={searchQuery}
+            selectedStatus={selectedStatus}
           />
         </>
       )}

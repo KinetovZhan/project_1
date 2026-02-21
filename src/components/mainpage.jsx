@@ -30,6 +30,7 @@ function MainPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchDealer, setSearchDealer] = useState('');
   const [selectedProducers, setSelectedProducers] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState([]);
   const [dateFilter, setDateFilter] = useState({
     date_assemle: null,  // Для обратной совместимости
     date_start: null,
@@ -52,6 +53,7 @@ function MainPage() {
       setActiveFilters([]);
       setActiveFilters2([]);
       setSelectedProducers([]);
+      setSelectedStatus([]);
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('model');
       setSearchParams(newParams, { replace: true });
@@ -147,6 +149,11 @@ function MainPage() {
     setSearchParams(newParams)
   }
 
+  const handleStatusChange = (statuses) => {
+    console.log('Выбранные статусы:', statuses); 
+    setSelectedStatus(statuses);
+  };
+
   const closeAddCompPartForm = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('tab');
@@ -212,6 +219,7 @@ function MainPage() {
             activeMajMinButton={activeMajMinButton}
             onDateChange={handleDateChange}
             handleMajMinButtonClick={handleMajMinButtonClick}
+            onStatusChange={handleStatusChange} 
           />
 
           {/* Основной контент — ТОЛЬКО таблицы и фильтры */}
@@ -228,6 +236,7 @@ function MainPage() {
             searchQuery={searchQuery}
             searchDealer={searchDealer}
             onDealerSearch={handleDealer}
+            selectedStatus={selectedStatus}
 
             showAddForm={showAddForm}
             showAddAggForm={showAddAggForm}

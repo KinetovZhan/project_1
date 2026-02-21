@@ -32,11 +32,9 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   });
 
   const statusOptions = [
-    { value: 'serial', label: 'Серийное' },
-    { value: 'experimental', label: 'Опытное' },
-    { value: 'in_operation', label: 'В эксплуатации' },
-    { value: 'actual', label: 'Актуальное' },
-    { value: 'not_actual', label: 'Не актуальное' }
+    { value: "serial", label: "Серийное" },
+    { value: "experimental", label: 'Опытное' },
+    { value: "in_operation", label: 'В эксплуатации' }
   ];
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
@@ -299,7 +297,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
             backgroundColor: 'white',
             marginBottom: '5px'
           }),
-          menuPortal: (base) => ({  // ← ДОБАВЛЕНО!
+          menuPortal: (base) => ({  
             ...base,
             zIndex: 9999
             }),
@@ -438,14 +436,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
         />
       </div>
 
-      <div>
+      <div className='model' style ={{top: '600px'}}>
         <Select
-          className='modelSelect'
+          className='modelStatus'
           isMulti
           options={statusOptions}
           value={selectedStatusOptions}
           onChange={handleStatusChange}
-          placeholder="Модель"
+          placeholder="Статус"
           menuPortalTarget={document.body}
           menuPlacement="top" 
           isDisabled={loading || componentModels.length === 0}

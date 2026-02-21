@@ -5,7 +5,7 @@ import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { useAuth } from '../auth/AuthContext';
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange,onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange}) {
 
   const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
@@ -104,7 +104,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
       )}
       
       
-      {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange}/>}
+      {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange} onStatusChange={onStatusChange}/>}
       {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange}/>}
     </div>
   )

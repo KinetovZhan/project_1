@@ -11,7 +11,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery }) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus }) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,8 +57,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
             type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
             model_comp: Array.isArray(selectedModel) ? selectedModel : [],
-            producers: Array.isArray(selectedProducers) ? selectedProducers : []
+            producers: Array.isArray(selectedProducers) ? selectedProducers : [],
+            status: Array.isArray(selectedStatus) ? selectedStatus : []
           };
+
 
           const data = await api.post('search/component-info', postData);
 
@@ -76,7 +78,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     };
 
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery]); 
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery, selectedStatus]); 
 
   const ImageToComponent = (type_component, model_component) => {
   // Приводим типы к нижнему регистру для единообразия

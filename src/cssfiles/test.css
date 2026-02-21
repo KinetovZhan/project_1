@@ -274,6 +274,10 @@
     display: none;
   }
 
+  .modelStatus {
+    top: 30px
+  }
+
   /* Мобильная кнопка-гамбургер */
   .mobile-sidebar {
     display: flex;
@@ -547,7 +551,7 @@
 
 
   .mobile-sidebar-container .sidebar .clear {
-    top: 550px;
+    top: 700px;
     margin-bottom: 10px;
     width: 45vh;
   }
