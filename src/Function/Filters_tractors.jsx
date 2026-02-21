@@ -437,13 +437,13 @@ const handleClearEndDate = () => {
           className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
           onClick={() => handleMajMinButtonClick('MAJ')}
         >
-          Требуется MAJ
+          Актуальные
         </button>
         <button 
           className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
           onClick={() => handleMajMinButtonClick('MIN')}
         >
-          Требуется MIN
+          Не актуальные
         </button>
       </div>
     </>

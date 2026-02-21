@@ -225,7 +225,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           tractorsArray = data.results;
         }
 
-        const options = tractorsArray.map(item => ({
+        const options = tractorsArray.filter(item => item.vin && item.vin.includes('undef')).map(item => ({
           value: item.id,
           label: item.model && item.vin 
             ? `${item.model} (VIN: ${item.vin})`
