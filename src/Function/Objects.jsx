@@ -18,7 +18,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null);
   const { token, user } = useAuth();
-  const [isVisible, setIsVisible] = useState(null);
   // Состояние для тултипа
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -80,26 +79,48 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery]); 
 
   const ImageToComponent = (type_component, model_component) => {
-    if (type_component && type_component !== 'engine' && type_component !== 'dvs') {
-      const ImageByType = {
-        transmission: KPPImage,
-        suspension: RKImage,
-        hydraulics: HRImage,
-        ap: APImage,
-        bk: BKImage,
-      };
-      return ImageByType[type_component] || DefaultImage;
+  // Приводим типы к нижнему регистру для единообразия
+  const typeLower = type_component?.toLowerCase() || '';
+  const modelLower = model_component?.toLowerCase() || '';
+
+  // Обработка КПП в первую очередь (и по типу, и по модели)
+  if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
+      modelLower.includes('кпп') || modelLower.includes('kpp')) {
+    return KPPImage;
+  }
+
+  // Обработка остальных компонентов по типу
+  if (typeLower && typeLower !== 'двс') {
+    const ImageByType = {
+      'рулевая колонка': RKImage,
+      'гидрораспределитель': HRImage,
+      'бк': BKImage,
+      'автопилот': APImage,
+    };
+    
+    // Ищем соответствие по ключевым словам
+    for (const [key, image] of Object.entries(ImageByType)) {
+      if (typeLower.includes(key)) {
+        return image;
+      }
     }
-    if (model_component && (type_component === 'engine' || type_component === 'dvs')) {
-      const ImageByModel = {
-        Weichai: WeiImage,
-        ТМЗ: TMZImage,
-        ЯМЗ: JMZImage,
-      };
-      return ImageByModel[model_component] || DefaultImage;
+  }
+
+  // Обработка ДВС по модели
+  if (typeLower === 'двс' && modelLower) {
+    if (modelLower.includes('weichai')) {
+      return WeiImage;
     }
-    return DefaultImage;
-  };
+    if (modelLower.includes('тмз') || modelLower.includes('tmz')) {
+      return TMZImage;
+    }
+    if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
+      return JMZImage;
+    }
+  }
+
+  return DefaultImage;
+};
 
   // Функция для получения имени файла из заголовков
   const getFilenameFromResponse = (response, defaultName) => {
@@ -207,7 +228,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
         targetId: id
       });
       delete hoverTimers.current[id];
-    }, 3000);
+    }, 250);
   };
 
   const handleMouseMove = (event) => {
