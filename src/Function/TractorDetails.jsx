@@ -11,10 +11,17 @@ export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTooltip, setActiveTooltip] = useState(null);
+  // const [activeTooltip, setActiveTooltip] = useState(null);
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
   const { token } = useAuth();
+
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    text: '',
+    x: 0,
+    y: 0
+  });
 
   const ImageToModel = (model) => {
     const ImageJpg = {
@@ -115,16 +122,43 @@ export function TractorDetails({ vin, onBack }) {
     fetchTractorDetails();
   }, [vin]);
 
+// Обработчики для тултипа
+  const handleMouseEnter = (event, description) => {
+    setTooltip({
+      visible: true,
+      text: description || 'Нет описания',
+      x: event.clientX,
+      y: event.clientY
+    });
+  };
 
-
-
-  const handleItemClick = (index) => {
-    if (activeTooltip === index) {
-      setActiveTooltip(null);
-    } else {
-      setActiveTooltip(index);
+  const handleMouseMove = (event) => {
+    if (tooltip.visible) {
+      setTooltip(prev => ({
+        ...prev,
+        x: event.clientX,
+        y: event.clientY
+      }));
     }
   };
+
+  const handleMouseLeave = () => {
+    setTooltip({
+      visible: false,
+      text: '',
+      x: 0,
+      y: 0
+    });
+  };
+
+
+  // const handleItemClick = (index) => {
+  //   if (activeTooltip === index) {
+  //     setActiveTooltip(null);
+  //   } else {
+  //     setActiveTooltip(index);
+  //   }
+  // };
 
   // Закрыть подсказку при клике вне элемента
   useEffect(() => {
@@ -192,7 +226,7 @@ export function TractorDetails({ vin, onBack }) {
       </button>
       <div className="tractor-details-content">
         <div className="tractor-info">
-          <h2>{model}</h2>
+          <h2>{model} {VIN}</h2>
           <img src={ImageToModel(model)} alt={model} className="tractor-image" />
         </div>
 
@@ -219,8 +253,11 @@ export function TractorDetails({ vin, onBack }) {
                 {displayComponents.map((item, index) => (
                   <li
                     key={index}
-                    onClick={() => handleItemClick(index)}
+                    // onClick={() => handleItemClick(index)}
                     className="po-item"
+                    onMouseEnter={(e) => handleMouseEnter(e,item.description)}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
                   >
                     <div className="po-item-content">
                       <span className="po-item-name">{item.name}:</span>
@@ -229,11 +266,6 @@ export function TractorDetails({ vin, onBack }) {
                         <span className="po-item-model">({item.model})</span>
                       )}
                     </div>
-                    {activeTooltip === index && (
-                      <div className="tooltip">
-                        {/* {poDescriptions[item.name] || 'Нет описания'} */}{item.description}
-                      </div>
-                    )}
                   </li>
                 ))}
               </ul>
@@ -244,7 +276,32 @@ export function TractorDetails({ vin, onBack }) {
             </div>
           </div>
         </div>
-      </div>
-      </div>
+         </div>
+     {/* Кастомный тултип с вашими стилями */}
+      {tooltip.visible && (
+        <div 
+          className="tooltip"
+          style={{
+            position: 'fixed',
+            left: tooltip.x + 15,
+            top: tooltip.y + 15,
+            marginLeft: 0,
+            pointerEvents: 'none',
+            width: '200px',
+            background: '#333',
+            color: 'white',
+            padding: '12px',
+            borderRadius: '6px',
+            zIndex: 1000,
+            fontSize: '14px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            wordWrap: 'break-word',
+            height: 'auto'
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
+    </div>
   );
 }

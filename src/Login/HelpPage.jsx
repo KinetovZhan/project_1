@@ -11,8 +11,9 @@ export function HelpPage () {
             <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
-        <h3 className = "textHelp">Господи да поможи</h3>
-        <img src={HelpImage} style={{width:'5000px', height:'5000px'}}/>
+        <div className = "textHelp">
+          В разработке
+          </div>
       
       </div>; 
 }

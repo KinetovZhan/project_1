@@ -18,7 +18,14 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null);
   const { token, user } = useAuth();
-  const [isVisible, setIsVisible] = useState(null);
+  // Состояние для тултипа
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    text: '',
+    x: 0,
+    y: 0,
+    targetId:null
+  });
 
   const hoverTimers = useRef({});
 
@@ -72,26 +79,48 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery]); 
 
   const ImageToComponent = (type_component, model_component) => {
-    if (type_component && type_component !== 'engine' && type_component !== 'dvs') {
-      const ImageByType = {
-        transmission: KPPImage,
-        suspension: RKImage,
-        hydraulics: HRImage,
-        ap: APImage,
-        bk: BKImage,
-      };
-      return ImageByType[type_component] || DefaultImage;
+  // Приводим типы к нижнему регистру для единообразия
+  const typeLower = type_component?.toLowerCase() || '';
+  const modelLower = model_component?.toLowerCase() || '';
+
+  // Обработка КПП в первую очередь (и по типу, и по модели)
+  if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
+      modelLower.includes('кпп') || modelLower.includes('kpp')) {
+    return KPPImage;
+  }
+
+  // Обработка остальных компонентов по типу
+  if (typeLower && typeLower !== 'двс') {
+    const ImageByType = {
+      'рулевая колонка': RKImage,
+      'гидрораспределитель': HRImage,
+      'бк': BKImage,
+      'автопилот': APImage,
+    };
+    
+    // Ищем соответствие по ключевым словам
+    for (const [key, image] of Object.entries(ImageByType)) {
+      if (typeLower.includes(key)) {
+        return image;
+      }
     }
-    if (model_component && (type_component === 'engine' || type_component === 'dvs')) {
-      const ImageByModel = {
-        Weichai: WeiImage,
-        ТМЗ: TMZImage,
-        ЯМЗ: JMZImage,
-      };
-      return ImageByModel[model_component] || DefaultImage;
+  }
+
+  // Обработка ДВС по модели
+  if (typeLower === 'двс' && modelLower) {
+    if (modelLower.includes('weichai')) {
+      return WeiImage;
     }
-    return DefaultImage;
-  };
+    if (modelLower.includes('тмз') || modelLower.includes('tmz')) {
+      return TMZImage;
+    }
+    if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
+      return JMZImage;
+    }
+  }
+
+  return DefaultImage;
+};
 
   // Функция для получения имени файла из заголовков
   const getFilenameFromResponse = (response, defaultName) => {
@@ -155,6 +184,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       if (blob.size === 0) {
         throw new Error('Файл пустой');
       }
+      
 
       // Создаем ссылку для скачивания
       const url = window.URL.createObjectURL(blob);
@@ -180,22 +210,37 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     }
   };
 
-  const handleMouseEnter = (id) => {
+  // Обработчики для тултипа с задержкой 3 секунды
+  const handleMouseEnter = (event, text, id) => {
     // Очищаем предыдущий таймер для этого элемента
     if (hoverTimers.current[id]) {
       clearTimeout(hoverTimers.current[id]);
       delete hoverTimers.current[id];
     }
 
-
-    // Устанавливаем таймер на 3 секунды для показа popup
+    // Устанавливаем таймер на 3 секунды для показа тултипа
     hoverTimers.current[id] = setTimeout(() => {
-      setIsVisible(id);
+      setTooltip({
+        visible: true,
+        text: text,
+        x: event.clientX,
+        y: event.clientY,
+        targetId: id
+      });
       delete hoverTimers.current[id];
-    }, 3000);
+    }, 250);
   };
 
-  // Функция для обработки ухода мыши
+  const handleMouseMove = (event) => {
+    if (tooltip.visible && tooltip.targetId) {
+      setTooltip(prev => ({
+        ...prev,
+        x: event.clientX,
+        y: event.clientY
+      }));
+    }
+  };
+
   const handleMouseLeave = (id) => {
     // Очищаем таймер при уходе мыши
     if (hoverTimers.current[id]) {
@@ -203,9 +248,14 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       delete hoverTimers.current[id];
     }
 
-
-    // Скрываем popup сразу при уходе мыши
-    setIsVisible(null);
+    // Скрываем тултип сразу при уходе мыши
+    setTooltip({
+      visible: false,
+      text: '',
+      x: 0,
+      y: 0,
+      targetId: null
+    });
   };
 
   // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
@@ -305,7 +355,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           ) : (
             filteredItems
               .filter((item) => item.id_Firmwares)
-              .map((item) => (
+              .map((item) => {
+                // Формируем текст для тултипа
+                const tooltipText = `${item.type_component || '—'}: ${item.model_component || item.comp_model || '—'}`;
+               return (
                 <li key={item.id_Firmwares}>
                   <div className="objectmenu" data-testid="objectmenu">
                     <img
@@ -320,17 +373,13 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       <div className="infodisc">
                         <h5
                           className="textunder"
-                          onMouseEnter={() => handleMouseEnter(item.id_Firmwares)}
+                          onMouseEnter={(e) => handleMouseEnter(e, tooltipText, item.id_Firmwares)}
+                          onMouseMove={handleMouseMove}
                           onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
                         >
                           Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
                           {item.part_type ? ` (${item.part_type})` : ' (—)'}
                         </h5>
-                        {isVisible === item.id_Firmwares && (
-                          <div className="popup-window">
-                            {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
-                          </div>
-                        )}
                       </div>
                       <button
                         className="download"
@@ -342,10 +391,26 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                     </div>
                   </div>
                 </li>
-              ))
+              )
+            })
           )}
         </ul>
       </div>
+       {tooltip.visible && (
+        <div 
+          className="popup-window"
+          style={{
+            position: 'fixed',
+            left: tooltip.x + 15,
+            top: tooltip.y + 15,
+            pointerEvents: 'none',
+            zIndex: 1000,
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
     </div>
   );
 }
+    

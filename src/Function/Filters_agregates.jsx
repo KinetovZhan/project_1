@@ -5,13 +5,13 @@ import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange}) { 
+   // ИСПРАВЛЕНО: используем русские названия, которые приходят с бэкенда
   const componentTypeMap = {
-    'DVS': 'dvs',
-    'KPP': 'kpp',
-    'RK': 'rk',
-    'hydrorasp': 'hydro' ,
-    'AP':'ap',
-    'BK':'bk',
+    'DVS': 'ДВС',              // было: 'dvs'
+    'KPP': 'КПП',              // было: 'kpp'
+    'RK': 'Рулевая колонка',   // было: 'rk'
+    'hydrorasp': 'Гидрораспределитель', // было: 'hydro'
+    'BK': 'БК',                 // было: 'bk'
   };
 
   const tractorModelOptions = [
@@ -24,7 +24,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     KPP: false,
     RK: false,
     hydrorasp: false,
-    AP: false,
     BK: false
   });
 
@@ -139,7 +138,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     setFilterItems(newFilter);
 
     if (onFilterChange) {
-      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]);
+      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]).map(key => componentTypeMap[key]);
       onFilterChange(activeFilters);
     }
   };
@@ -157,7 +156,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
 
     const activeComponentTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
-      .flatMap(key => componentTypeMap[key]);
+      .map(key => componentTypeMap[key]);
 
     const activeTractorModels = selectedTractorModels.map(key =>
       key === 'K7' ? 'K-7' : 'K-5'
@@ -218,7 +217,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           </div>
           <div className='filter'>
             <label>
-              <span>РК</span>
+              <span>Рулевая колонка</span>
               <input 
                 checked={FilterItems.RK}
                 onChange={() => handleFilterChange('RK')}
@@ -231,15 +230,6 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
               <input 
                 checked={FilterItems.hydrorasp}
                 onChange={() => handleFilterChange('hydrorasp')}
-                type="checkbox"/>
-            </label>
-          </div>
-          <div className='filter'>
-            <label> 
-              <span>Автопилот</span>
-              <input 
-                checked={FilterItems.AP}
-                onChange={() => handleFilterChange('AP')}
                 type="checkbox"/>
             </label>
           </div>
