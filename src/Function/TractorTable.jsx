@@ -345,6 +345,9 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th onClick={() => handleSort('region')} style={{ cursor: 'pointer' }}>
                   Регион{getSortIcon('region')}
                 </th>
+                <th onClick={() => handleSort('consumer')} style={{ cursor: 'pointer' }}>
+                  Дилер{getSortIcon('consumer')}
+                </th>
                 <th onClick={() => handleSort('oh_hour')} style={{ cursor: 'pointer' }}>
                   Моточасы{getSortIcon('oh_hour')}
                 </th>
@@ -366,9 +369,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th onClick={() => handleSort('gr')} style={{ cursor: 'pointer' }}>
                   ГР{getSortIcon('gr')}
                 </th>
-                <th onClick={() => handleSort('consumer')} style={{ cursor: 'pointer' }}>
-                  Дилер{getSortIcon('consumer')}
-                </th>
               </tr> 
             </thead>
             <tbody>
@@ -385,6 +385,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
                   <td>{tractor.region || '-'}</td>
+                  <td>{tractor.consumer || tractor.dealer || '-'}</td> 
                   <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   <td>{tractor.dvs || tractor.DVS || '-'}</td>
@@ -393,8 +394,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                     {tractor.rk || tractor.RK || '-'}
                   </td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
-                  <td>{tractor.gr || tractor.GR || '-'}</td>
-                  <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
+                  <td>{tractor.gr || tractor.GR || '-'}</td>                
                 </tr>
               ))}
             </tbody>
