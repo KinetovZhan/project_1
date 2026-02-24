@@ -1,4 +1,4 @@
-import React, { useState,useRef, useEffect } from 'react';
+import React, { useState,useRef, useEffect, useMemo } from 'react';
 import {SearchBar} from "./SearchBar.jsx";
 import {TractorDetails} from "./TractorDetails.jsx";
 import { useAuth } from '../auth/AuthContext';
@@ -74,6 +74,12 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const userRole = user?.role || 'user';
 
 
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: null 
+  });
+
+
   const getPostData = () => {
 
     const postData = {
@@ -133,7 +139,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       setLoading(true);
 
       // 1. Получаем тракторы
-      const tractors = await api.post('search/tractor-info',postData);
+      let tractors = await api.post('search/tractor-info',postData);
         
       console.log(`dfsdfdasfdasvasdv ${userRole}`)
 
@@ -188,6 +194,104 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   fetchTractors();
 }, [activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, token, userRole, user]);
 
+
+
+  const handleSort = (key) => {
+    setSortConfig(prevConfig => {
+      // Если кликнули по тому же столбцу
+      if (prevConfig.key === key) {
+        // Цикл: asc -> desc -> null
+        if (prevConfig.direction === 'asc') {
+          return { key, direction: 'desc' };
+        } else if (prevConfig.direction === 'desc') {
+          return { key: null, direction: null }; // сброс сортировки
+        }
+      }
+      // Если кликнули по новому столбцу - сортируем по возрастанию
+      return { key, direction: 'asc' };
+    });
+  };
+
+
+  const getCellValue = (tractor, key) => {
+    let value = tractor[key];
+    
+    // Для моточасов - преобразуем в число для правильной сортировки
+    if (key === 'oh_hour' || key === 'motoHours') {
+      // Если значение отсутствует, возвращаем -1 для сортировки (пустые значения в конец)
+      if (value === undefined || value === null || value === '-') {
+        return -1;
+      }
+      // Пробуем преобразовать в число
+      const numValue = parseFloat(value);
+      return isNaN(numValue) ? -1 : numValue;
+    }
+    
+    // Для дат преобразуем в timestamp для правильной сортировки
+    if (key === 'assembly_date' || key === 'releaseDate' || key === 'last_activity' || key === 'lastActivity') {
+      if (value) {
+        const timestamp = new Date(value).getTime();
+        return isNaN(timestamp) ? value : timestamp;
+      }
+      return value || '-';
+    }
+    
+    // Для остальных полей возвращаем значение или '-'
+    return value || '-';
+  };
+
+  // Отсортированные тракторы с использованием useMemo
+  const sortedTractors = useMemo(() => {
+    let sortableTractors = [...tractors].filter(tractor => tractor.vin !== 'TEMPLATE_SOFTWARE_ASSIGNMENT');
+    
+    if (sortConfig.key && sortConfig.direction) {
+      sortableTractors.sort((a, b) => {
+        // Получаем значения для сравнения
+        let aValue = getCellValue(a, sortConfig.key);
+        let bValue = getCellValue(b, sortConfig.key);
+        
+        // Приводим к строке для сравнения, если это не число
+        if (typeof aValue !== 'number' || typeof bValue !== 'number') {
+          aValue = String(aValue).toLowerCase();
+          bValue = String(bValue).toLowerCase();
+        }
+        
+        // Сравниваем значения
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    } else {
+      // Если сортировка сброшена, сортируем по VIN (как было изначально)
+      sortableTractors.sort((a, b) => {
+        const vinA = (a.vin || a.VIN || '').toString();
+        const vinB = (b.vin || b.VIN || '').toString();
+        return vinA.localeCompare(vinB, undefined, { numeric: true, sensitivity: 'base' });
+      });
+    }
+    
+    return sortableTractors;
+  }, [tractors, sortConfig]);
+
+  // Функция для отображения иконки сортировки
+  const getSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return ' ↕'; // Иконка для несортированного столбца
+    }
+    if (sortConfig.direction === 'asc') {
+      return ' ↑'; // Иконка для сортировки по возрастанию
+    }
+    if (sortConfig.direction === 'desc') {
+      return ' ↓'; // Иконка для сортировки по убыванию
+    }
+    return ' ↕';
+  }
+
+
   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
     setSelectedTractor(tractor.vin);
@@ -229,37 +333,55 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
           <table className="tractor-table">
             <thead>
               <tr>
-                <th>VIN</th>
-                <th>Модель</th>
-                <th>Дата выпуска</th>
-                <th>Регион</th>
-                <th>Моточасы</th>
-                <th>Последняя активность</th>
-                <th>ДВС</th>
-                <th>КПП</th>
-                <th>РК</th>
-                <th>БК</th>
-                <th>ГР</th>
-                <th>Дилер</th>
+                <th onClick={() => handleSort('vin')} style={{ cursor: 'pointer' }}>
+                  VIN{getSortIcon('vin')}
+                </th>
+                <th onClick={() => handleSort('model')} style={{ cursor: 'pointer' }}>
+                  Модель{getSortIcon('model')}
+                </th>
+                <th onClick={() => handleSort('assembly_date')} style={{ cursor: 'pointer' }}>
+                  Дата выпуска{getSortIcon('assembly_date')}
+                </th>
+                <th onClick={() => handleSort('region')} style={{ cursor: 'pointer' }}>
+                  Регион{getSortIcon('region')}
+                </th>
+                <th onClick={() => handleSort('oh_hour')} style={{ cursor: 'pointer' }}>
+                  Моточасы{getSortIcon('oh_hour')}
+                </th>
+                <th onClick={() => handleSort('last_activity')} style={{ cursor: 'pointer' }}>
+                  Последняя активность{getSortIcon('last_activity')}
+                </th>
+                <th onClick={() => handleSort('dvs')} style={{ cursor: 'pointer' }}>
+                  ДВС{getSortIcon('dvs')}
+                </th>
+                <th onClick={() => handleSort('kpp')} style={{ cursor: 'pointer' }}>
+                  КПП{getSortIcon('kpp')}
+                </th>
+                <th onClick={() => handleSort('rk')} style={{ cursor: 'pointer' }}>
+                  РК{getSortIcon('rk')}
+                </th>
+                <th onClick={() => handleSort('bk')} style={{ cursor: 'pointer' }}>
+                  БК{getSortIcon('bk')}
+                </th>
+                <th onClick={() => handleSort('gr')} style={{ cursor: 'pointer' }}>
+                  ГР{getSortIcon('gr')}
+                </th>
+                <th onClick={() => handleSort('consumer')} style={{ cursor: 'pointer' }}>
+                  Дилер{getSortIcon('consumer')}
+                </th>
               </tr> 
             </thead>
             <tbody>
-              {[...tractors]
-                .sort((a, b) => {
-                  const vinA = (a.vin || a.VIN || '').toString();
-                  const vinB = (b.vin || b.VIN || '').toString();
-                  return vinA.localeCompare(vinB, undefined, { numeric: true, sensitivity: 'base' });
-                }).filter(tractor => tractor.vin !== 'TEMPLATE_SOFTWARE_ASSIGNMENT')
-                .map((tractor, index) => (
+              {sortedTractors.map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}
                   onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
                   className="clickable-row"
-                  
                 >
-                  <td   title={tractor.vin || tractor.VIN || '-'}
-  className="tractor-cell">{tractor.vin || tractor.VIN || '-'}</td>
+                  <td title={tractor.vin || tractor.VIN || '-'} className="tractor-cell">
+                    {tractor.vin || tractor.VIN || '-'}
+                  </td>
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
                   <td>{tractor.region || '-'}</td>
@@ -267,8 +389,9 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   <td>{tractor.dvs || tractor.DVS || '-'}</td>
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
-                  <td   title={tractor.rk || tractor.RK || '-'}
-  className="tractor-cell">{tractor.rk || tractor.RK || '-'}</td>
+                  <td title={tractor.rk || tractor.RK || '-'} className="tractor-cell">
+                    {tractor.rk || tractor.RK || '-'}
+                  </td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
                   <td>{tractor.gr || tractor.GR || '-'}</td>
                   <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
