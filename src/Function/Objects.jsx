@@ -362,6 +362,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               .map((item) => {
                 // Формируем текст для тултипа
                 const tooltipText = `${item.type_component || '—'}: ${item.model_component || item.comp_model || '—'}`;
+                const tooltipText2 = `${item.producer_version} от ${new Date(item.release_date).toLocaleDateString()}`;
                return (
                 <li key={item.id_Firmwares}>
                   <div className="objectmenu" data-testid="objectmenu">
@@ -371,7 +372,11 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       alt={item.type_component}
                     />
                     <div className="inform">
-                      <h4 className="poster">
+                      <h4 
+                      className="poster"
+                      onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
                         №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
                       </h4>
                       <div className="infodisc">
