@@ -250,7 +250,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         </button>
       ) : null}
 
-      <h3 className="add-po-title">Добавление агрегата</h3>
+      <h3 className="add-po-title">Добавление узла</h3>
 
       {error && (
         <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
@@ -271,7 +271,7 @@ export function AddAggForm({ onBack, onSubmit }) {
             className='add-po-select'
             disabled={loading}
           >
-            <option value="">Выберите агрегат</option>
+            <option value="">Выберите узел</option>
             <option value="dvs">ДВС</option>
             <option value="kpp">КПП</option>
             <option value="rk">РК</option>

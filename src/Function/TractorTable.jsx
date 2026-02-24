@@ -233,6 +233,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>Модель</th>
                 <th>Дата выпуска</th>
                 <th>Регион</th>
+                <th>Дилер</th>
                 <th>Моточасы</th>
                 <th>Последняя активность</th>
                 <th>ДВС</th>
@@ -240,7 +241,6 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                 <th>РК</th>
                 <th>БК</th>
                 <th>ГР</th>
-                <th>Дилер</th>
               </tr> 
             </thead>
             <tbody>
@@ -263,6 +263,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
                   <td>{tractor.region || '-'}</td>
+                  <td>{tractor.consumer || tractor.dealer || '-'}</td> 
                   <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   <td>{tractor.dvs || tractor.DVS || '-'}</td>
@@ -270,8 +271,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td   title={tractor.rk || tractor.RK || '-'}
   className="tractor-cell">{tractor.rk || tractor.RK || '-'}</td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
-                  <td>{tractor.gr || tractor.GR || '-'}</td>
-                  <td>{tractor.consumer || tractor.dealer || '-'}</td>                 
+                  <td>{tractor.gr || tractor.GR || '-'}</td>                
                 </tr>
               ))}
             </tbody>

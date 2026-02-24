@@ -538,7 +538,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
         {/* Мультивыбор компонентов и частей */}
         <div className="add-po-field">
-          <label className="add-po-label">Агрегат</label>
+          <label className="add-po-label">Узел</label>
           <Select
             isMulti
             options={componentOptions.map(item => ({
