@@ -76,7 +76,7 @@ main {
   }
   
   .popup-window {
-    position: fixed; /* или absolute с пересчетом позиции */
+    position: fixed; 
     max-width: 90%;
     margin-left: 0;
     left: 50%;

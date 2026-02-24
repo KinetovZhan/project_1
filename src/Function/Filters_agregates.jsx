@@ -13,10 +13,15 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     'BK': 'БК',                 // было: 'bk'
   };
 
-  const tractorModelOptions = [
-    { value: 'K7', label: 'К-7' },
-    { value: 'K5', label: 'К-5' }
-  ];
+
+
+
+
+
+  // const tractorModelOptions = [
+  //   { value: 'K7', label: 'К-7' },
+  //   { value: 'K5', label: 'К-5' }
+  // ];
 
   const [FilterItems, setFilterItems] = useState({
     DVS: false,
@@ -42,6 +47,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [selectedProducers, setSelectedProducers] = useState([]);
   const [componentModels, setComponentModels] = useState([]);
   const [producerOptions, setProducerOptions] = useState([]);
+  const [tractorOptions, setTractorOptions] = useState([])
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState([])
@@ -68,21 +74,39 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
         setLoadingProducers(true);
         setProducerError(null);
 
+        const data2 = await api.get('/tractors/')
+
         const data = await api.get('/components/');
         
+
+        let filteredData = data;
+        if (selectedModel.length > 0) {
+          filteredData = data.filter(item => 
+            item.model && selectedModel.includes(item.model)
+          );
+        }
         // Извлекаем уникальных производителей
-        const producers = data
+        const producers = filteredData
           .map(item => item.producer_comp)
           .filter(producer => producer && producer.trim() !== '')
           .filter((value, index, self) => self.indexOf(value) === index)
           .sort(); // сортируем по алфавиту
-        
+
+        const tractorModelOptions = data2.map(item =>
+          item.model
+        ).filter((value, index, self) => self.indexOf(value) === index).sort()
         // Формируем опции для react-select
         const options = producers.map(producer => ({
           value: producer,
           label: producer
         }));
-        
+
+        const options2 = tractorModelOptions.map(model => ({
+          value: model,
+          label: model
+        }));
+
+        setTractorOptions(options2)
         setProducerOptions(options);
       } catch (err) {
         console.error('Ошибка загрузки производителей:', err);
@@ -93,7 +117,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     };
     
     fetchProducers();
-  }, [token]);
+  }, [token, selectedModel]);
 
   const handleModelChange = (selectedOptions) => {
     const values = selectedOptions
@@ -115,10 +139,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
 
 
     if (onFilterChange2) {
-      const activeTractorModels = values.map(key =>
-        key === 'K7' ? 'K-7' : 'K-5'
-      );
-      onFilterChange2(activeTractorModels);
+      onFilterChange2(values);
     }
   };
 
@@ -142,7 +163,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   };
 
   const selectedOptions = options.filter(opt => selectedModel.includes(opt.value));
-  const selectedTractorOptions = tractorModelOptions.filter(opt =>
+  const selectedTractorOptions = tractorOptions.filter(opt =>
     selectedTractorModels.includes(opt.value)
   );
   const selectedProducerOptions = producerOptions.filter(opt => 
@@ -155,11 +176,12 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       [FilterType]: !FilterItems[FilterType]
     };
     setFilterItems(newFilter);
-
+    
     if (onFilterChange) {
       const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]).map(key => componentTypeMap[key]);
       onFilterChange(activeFilters);
     }
+    console.log(`evfsd ${FilterItems.DVS}`)
   };
 
   const [loading, setLoading] = useState(false);
@@ -177,9 +199,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       .filter(key => FilterItems[key])
       .map(key => componentTypeMap[key]);
 
-    const activeTractorModels = selectedTractorModels.map(key =>
-      key === 'K7' ? 'K-7' : 'K-5'
-    );
+    const activeTractorModels = selectedTractorModels; 
     
     // Добавляем производителей в запрос
     const postData = {
@@ -188,6 +208,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       producers: selectedProducers.length > 0 ? selectedProducers : [],
       status: selectedStatus.length > 0 ? selectedStatus : []
     };
+
 
 
     try {
@@ -265,12 +286,13 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           </div>
         </div>
       </div>
+      
 
       <div className='model' style={{ top: '370px' }}>
         <Select
           className='modelSelect'
           isMulti
-          options={tractorModelOptions}
+          options={tractorOptions}
           value={selectedTractorOptions}
           onChange={handleTractorModelChange}
         menuPortalTarget={document.body}
@@ -446,7 +468,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           placeholder="Статус"
           menuPortalTarget={document.body}
           menuPlacement="top" 
-          isDisabled={loading || componentModels.length === 0}
+          isDisabled={loading}
           styles={{ 
             control: (base) => ({ 
               ...base, 
@@ -484,7 +506,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
             }),
           }}
         />
-      </div> */}
+      </div>
 
       <button 
         className='clear'
@@ -505,11 +527,14 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           setSelectedModel([]);
           setSelectedProducers([]);
           setSelectedTractorModels([]);
+          setSelectedStatus([]);
 
           if (onFilterChange) onFilterChange([]);
           if (onFilterChange2) onFilterChange2([]);
           if (onModelChange) onModelChange([]);
           if (onProducerChange) onProducerChange([]);
+          if (onStatusChange) {onStatusChange([])}
+          
         }}
       >
         Сброс

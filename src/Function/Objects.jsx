@@ -28,6 +28,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   });
 
   const hoverTimers = useRef({});
+  const tooltipRef = useRef(null);
 
   const userRole = user?.role || 'user';
 
@@ -171,24 +172,24 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
     try {
       setDownloading(item.id_Firmwares);
+      
+      const response = await api.get(`firmware/download/${item.id_Firmwares}`, {
+        responseType: 'blob',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       const contentType = response.headers.get('content-type') || '';
-
-      // Добавляем расширение, если нужно
-      filename = ensureFileExtension(filename, contentType);
-      // Получаем имя файла из заголовка или используем ID
       let filename = getFilenameFromResponse(response, `firmware_${item.id_Firmwares}`);
-
-      console.log('Скачиваем файл:', filename, 'Content-Type:', contentType);
+      filename = ensureFileExtension(filename, contentType);
 
       const blob = await response.blob();
 
       if (blob.size === 0) {
         throw new Error('Файл пустой');
       }
-      
 
-      // Создаем ссылку для скачивания
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -202,8 +203,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       }, 100);
-
-      console.log('Файл успешно скачан:', filename);
     } catch (error) {
       console.error('Ошибка при скачивании:', error);
       alert(`Ошибка при скачивании: ${error.message}`);
@@ -290,6 +289,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       .filter(Boolean)
       .join(', ');
   };
+  
 
   const getComponentName = () => {
     const filterNames = {
@@ -333,6 +333,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       </div>
     );
   }
+
+  
 
   return (
     <div className="maininfo">
