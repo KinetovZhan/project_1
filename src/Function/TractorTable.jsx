@@ -133,7 +133,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       setLoading(true);
 
       // 1. Получаем тракторы
-      const tractors = await api.post('search/tractor-info',postData);
+      let tractors = await api.post('search/tractor-info',postData);
         
       console.log(`dfsdfdasfdasvasdv ${userRole}`)
 
