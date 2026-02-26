@@ -17,6 +17,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null);
+  const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
   // Состояние для тултипа
   const [tooltip, setTooltip] = useState({
@@ -273,6 +274,38 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     );
   }, [softwareItems, searchQuery]);
 
+  const toggleSortOrder = () => {
+    setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
+  };
+
+  // Фильтрация по поиску и сортировка по дате
+  const filteredAndSortedItems = useMemo(() => {
+    // Сначала фильтруем по поиску
+    let filtered = softwareItems;
+    if (searchQuery) {
+      const query = searchQuery.trim().toLowerCase();
+      filtered = softwareItems.filter(
+        (item) =>
+          (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
+          (item.type_component && item.type_component.toLowerCase().includes(query)) ||
+          (item.model_component && item.model_component.toLowerCase().includes(query)) ||
+          (item.comp_model && item.comp_model.toLowerCase().includes(query))
+      );
+    }
+
+    // Затем сортируем по дате
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.release_date).getTime();
+      const dateB = new Date(b.release_date).getTime();
+      
+      if (sortOrder === 'desc') {
+        return dateB - dateA; // Сначала новые
+      } else {
+        return dateA - dateB; // Сначала старые
+      }
+    });
+  }, [softwareItems, searchQuery, sortOrder]);
+
   const getAllActiveFilters = () => {
     const filterNames = {
       DVS: 'ДВС',
@@ -338,7 +371,29 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   return (
     <div className="maininfo">
-      <h3>Последние версии ПО для {getComponentName()}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+        <h3>Последние версии ПО для {getComponentName()}</h3>
+        <button 
+          onClick={toggleSortOrder}
+          style={{
+            padding: '8px 15px',
+            backgroundColor: 'rgba(217, 217, 217, 1)',
+            border: '1px solid #ddd',
+            borderRadius: '20px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '14px',
+            width:'30%'
+          }}
+        >
+          <span>Сортировка по дате</span>
+          <span style={{ marginLeft: '5px', color: '#666', fontSize: '12px' }}>
+            {sortOrder === 'desc' ? '(сначала новые)' : '(сначала старые)'}
+          </span>
+        </button>
+        </div>
       <div>
         <h4>Компоненты ({filteredItems.filter((item) => item.id_Firmwares).length})</h4>
         {activeFilters.length > 0 && (
