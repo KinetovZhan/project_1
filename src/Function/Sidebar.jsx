@@ -63,7 +63,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             // if (isMobile) setIsOpen(false);
           }}
         >
-          Агрегаты
+          ПО
         </button>
       </div>
 
@@ -87,7 +87,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             onAddAggClick() 
             handleButtonClick('addAgg')
           }}> 
-            Добавить агрегат
+            Добавить узел
           </button>
         </div>
       )}
@@ -99,7 +99,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             onAddCompPartClick()
             handleButtonClick('AddCompPart')
           }}>
-            Добавить часть агрегата
+            Добавить часть узла
           </button>
         </div>
       )}

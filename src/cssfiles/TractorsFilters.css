@@ -759,6 +759,10 @@ button.search_button {
     transform: translateX(-50%);
   }
   
+  .poster {
+    max-width: 350px;
+  }
+
   .search_by_dealer {
     top: 327px;
     left: 50%;

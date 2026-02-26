@@ -112,7 +112,7 @@ export function AddComponentPart({ onBack, onSubmit }) {
                 </button>
             ) : null}
 
-            <h3 className="add-po-title">Добавление части агрегата</h3>
+            <h3 className="add-po-title">Добавление части узла</h3>
 
             {error && (
                 <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
@@ -125,12 +125,12 @@ export function AddComponentPart({ onBack, onSubmit }) {
             <form className="add-po-form" onSubmit={handleSubmit}>
                 {/* Выбор компонента через react-select */}
                 <div className="add-po-field">
-                    <label className="add-po-label">Компонент</label>
+                    <label className="add-po-label">Узел</label>
                     <Select
                         options={componentOptions}
                         value={selectedComponent}
                         onChange={handleComponentSelectChange}
-                        placeholder={loadingModels ? "Загрузка компонентов..." : "Выберите компонент"}
+                        placeholder={loadingModels ? "Загрузка компонентов..." : "Выберите узел"}
                         classNamePrefix="add-po-select"
                         isClearable={true}
                         isSearchable={true}
@@ -188,7 +188,7 @@ export function AddComponentPart({ onBack, onSubmit }) {
                     <input
                         type="text"
                         name="part_type"
-                        placeholder="Введите тип части агрегата"
+                        placeholder="Введите тип части узла"
                         value={formData.part_type}
                         onChange={handleChange}
                         className='add-po-input'
