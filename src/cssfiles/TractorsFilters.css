@@ -738,9 +738,9 @@ button.search_button {
 
 .poster {
   white-space: nowrap;       
-  overflow: hidden;          
-  text-overflow: ellipsis;
-  max-width: 70%;          
+  overflow: hidden;
+  text-overflow: ellipsis;   
+  max-width: 600px;
 }
 
 
