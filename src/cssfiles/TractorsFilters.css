@@ -738,9 +738,9 @@ button.search_button {
 
 .poster {
   white-space: nowrap;       
-  overflow: hidden;          
+  overflow: hidden;
   text-overflow: ellipsis;   
-  max-width: 500px;          
+  max-width: 600px;
 }
 
 
@@ -758,11 +758,11 @@ button.search_button {
     left: 50%;
     transform: translateX(-50%);
   }
-
+  
   .poster {
     max-width: 350px;
   }
-  
+
   .search_by_dealer {
     top: 327px;
     left: 50%;
