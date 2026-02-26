@@ -116,7 +116,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   };
 
   useEffect(() => {
-  let fetchTractors = async () => {
+  const fetchTractors = async () => {
 
     console.log('DEBUG: userRole =', userRole);
     console.log('DEBUG: user =', user); 
