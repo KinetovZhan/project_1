@@ -1,5 +1,5 @@
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
-export function Header({ onLogout,onHelp }) {
+export function Header({ onLogout,onHelp, onKnowledgeBase }) {
   const isMobile = useCheckMobile();
   return(
     <header className = "header">
@@ -7,6 +7,7 @@ export function Header({ onLogout,onHelp }) {
         <h3>Сервис просмотра версий ПО</h3>
       </div>
       <div className='navigation'>
+        <h3 onClick={onKnowledgeBase} style={{cursor: 'pointer'}}>База знаний</h3>
         <h3 onClick={onHelp} style={{cursor: 'pointer'}}>Помощь</h3>
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>

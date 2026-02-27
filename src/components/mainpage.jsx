@@ -184,6 +184,10 @@ function MainPage() {
     setActualFilter(value);
   };
 
+   //ОБРАБОТЧИК для Базы знаний
+  const handleKnowledgeBase = () => {
+    navigate('/knowledge-base'); // или другой путь
+  };
 
   const handleMajMinButtonClick = (buttonName) => {
     setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
@@ -206,8 +210,11 @@ function MainPage() {
   return (
     <>
       <Header 
-      onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} 
-      onHelp={handleHelp}/>
+      onLogout={handleLogout} 
+      currentUser={user?.sub || 'Пользователь'} 
+      onHelp={handleHelp}
+      onKnowledgeBase={handleKnowledgeBase}
+      />
       <main>
         <div className="table">
           <Sidebar
