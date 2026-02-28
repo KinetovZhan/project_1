@@ -1,3 +1,4 @@
+import { PoDetails } from './PoDetails.jsx';
 import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
 import RKImage from '../img/РК.png';
@@ -19,6 +20,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [downloading, setDownloading] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
+  const [selectedPo,setSelectedPo]=useState(null);
   // Состояние для тултипа
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -367,6 +369,16 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     );
   }
 
+  const handlePoClick = (po) => {
+    console.log('Клик по по:', po);
+    const selectedItem = softwareItems.find(item => item.id_Firmwares === po);
+    setSelectedPo(selectedItem);
+  };
+
+  if (selectedPo) {
+      return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} />;
+    }
+
   
 
   return (
@@ -425,6 +437,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       className="object"
                       src={ImageToComponent(item.type_component, item.model_component || item.comp_model)}
                       alt={item.type_component}
+                      onClick={()=> handlePoClick(item.id_Firmwares)}
+                      style={{ cursor: 'pointer' }}
                     />
                     <div className="inform">
                       <h4 
