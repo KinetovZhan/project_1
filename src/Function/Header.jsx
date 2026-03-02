@@ -1,8 +1,21 @@
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { useState, useEffect } from 'react';
 export function Header({ onLogout,onHelp }) {
+  const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
   return(
     <header className = "header">
+      {isMobile && (
+      <button
+       className = {`mobile-sidebar ${isOpen ? 'active' : ''}`}
+       onClick = {()=>setIsOpen(!isOpen)}
+      >
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+          <span className="toggle-line"></span>
+          {/* <span className="toggle-text">Меню</span> */}
+      </button>
+     )}
       <div className='mainText'>
         <h3>Сервис просмотра версий ПО</h3>
       </div>

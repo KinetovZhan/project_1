@@ -10,7 +10,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     type: '',
     model: '',
     comp_ser_num: '',
-    selected_tractor_id: '',
+    tractor_models: [],
     number_of_parts: '',
     producer_comp: ''
   });
@@ -45,13 +45,18 @@ export function AddAggForm({ onBack, onSubmit }) {
         
         // Сохраняем исходные данные
         setTractors(responseTractorsData);
-        
-        // Преобразуем в формат для react-select
-        const options = responseTractorsData.map(tractor => ({
-          value: tractor.id,
-          label: tractor.vin,
-          data: tractor // сохраняем полные данные трактора
+
+           // Получаем уникальные модели
+        const uniqueModels = responseTractorsData
+          .map(t => t.model)
+          .filter(model => model && model.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index);
+            // Формируем опции для react-select
+        const options = uniqueModels.map(model => ({
+          value: model,
+          label: model
         }));
+      
         
         setTractorOptions(options);
         console.log('Трактора успешно загружены:', responseTractorsData);
@@ -322,12 +327,13 @@ export function AddAggForm({ onBack, onSubmit }) {
 
         {/* Выбор трактора с использованием react-select */}
         <div className="add-po-field">
-          <label className="add-po-label">Трактор</label>
+          <label className="add-po-label">Модели тракторов</label>
           <Select
+            isMulti
             options={tractorOptions}
             value={selectedTractor}
             onChange={handleTractorSelectChange}
-            placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите трактор"}
+            placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите модель"}
             classNamePrefix="add-po-select"
             isClearable={true}
             isSearchable={true}
@@ -350,7 +356,7 @@ export function AddAggForm({ onBack, onSubmit }) {
                 outline: 'none',
                 boxShadow: 'none',
                 '&:hover': {
-                  borderColor: '#13be00'
+                  borderColor: '#070707'
                 }
               }),
               menuList: (base) => ({
@@ -361,7 +367,7 @@ export function AddAggForm({ onBack, onSubmit }) {
               }),
               option: (base, state) => ({
                 ...base,
-                backgroundColor: state.isSelected ? '#13be00' : 
+                backgroundColor: state.isSelected ? '#0a0a0a' : 
                                 state.isFocused ? '#f0f9ff' : 'white',
                 color: state.isSelected ? 'white' : '#1E1E1E',
                 cursor: 'pointer',
@@ -379,24 +385,11 @@ export function AddAggForm({ onBack, onSubmit }) {
               }),
               loadingIndicator: (base) => ({
                 ...base,
-                color: '#13be00'
+                color: '#0c0c0c'
               })
             }}
           />
           
-          {/* Информация о выбранном тракторе */}
-          {selectedTractor && !loadingTractors && (
-            <div style={{ 
-              fontSize: '12px', 
-              color: '#666', 
-              marginTop: '5px',
-              padding: '6px 8px',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px'
-            }}>
-              Выбран: {selectedTractor.label}
-            </div>
-          )}
         </div>
 
         <div className='add-po-field'>

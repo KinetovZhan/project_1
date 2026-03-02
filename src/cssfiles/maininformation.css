@@ -25,6 +25,12 @@
   top: 80px;
   right: 235px;
 }
+.list-container {
+  list-style-type: none;
+  padding: 0;  
+  height: 70%;
+  box-sizing: border-box;
+}
 
 
 .object {
@@ -111,7 +117,7 @@ button:active {
   padding-left: 0;  
   overflow: auto;
   overflow-y: auto;
-  max-height: 40vh;
+  max-height: 100%;
   overflow-x: hidden;
 }
 

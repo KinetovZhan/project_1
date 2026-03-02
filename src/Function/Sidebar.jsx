@@ -3,6 +3,7 @@ import {Filters2} from '../Function/Filters_tractors.jsx'
 import { useState, useEffect } from 'react';
 import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
 import { useAuth } from '../auth/AuthContext';
+import {Header} from '../Function/Header.jsx'
 
 
 export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange}) {
@@ -111,17 +112,6 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
   )
   return (
     <>
-     {isMobile && (
-      <button
-       className = {`mobile-sidebar ${isOpen ? 'active' : ''}`}
-       onClick = {()=>setIsOpen(!isOpen)}
-      >
-          <span className="toggle-line"></span>
-          <span className="toggle-line"></span>
-          <span className="toggle-line"></span>
-          {/* <span className="toggle-text">Меню</span> */}
-      </button>
-     )}
 
      {isMobile && isOpen && (
       <div
