@@ -14,11 +14,13 @@ import './AddUzel/AddUzel.css'
 import './Login/LoginPage.css'
 import './Login/HelpPage.css'
 import './Sidebar/test.css'
+import './cssfiles/KnowledgeBase.css';
 import './PoDetails/PoDetails.css'
 import './MainPart/MainPart.css'
 import LoginPage from './Login/LoginPage'
 import {HelpPage} from './Login/HelpPage.jsx'
 import MainPage from './MainPage/mainpage'
+import { KnowledgeBase } from './Login/KnowledgeBase.jsx'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { AuthProvider } from './auth/AuthContext';
@@ -30,6 +32,9 @@ function App() {
     <Routes>
       {/* Публичный маршрут для входа */}
       <Route path="/login" element={<LoginPage />} />
+
+      {/*Публичный маршрут для Базы знаний (без авторизации) */}
+      <Route path="/knowledge-base" element={<KnowledgeBase />} />
       
       {/* Защищенный маршрут */}
       <Route 
