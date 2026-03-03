@@ -41,9 +41,9 @@ function App() {
         <Route 
         path="/help/*" 
         element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <HelpPage />
-          </ProtectedRoute>
+          // </ProtectedRoute>
         }
       />
       

@@ -13,6 +13,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login: loginContext } = useAuth();
 
+  const handleHelp = () => {
+    navigate('/help');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAuthorizationError('');
@@ -43,6 +47,9 @@ const LoginPage = () => {
     console.log('Данные:', formData.toString());
     console.log('Content-Type:', 'application/x-www-form-urlencoded');
     console.log('======================');
+
+    
+
 
     try {
       const data = await api.request('/token/', {
@@ -75,7 +82,7 @@ const LoginPage = () => {
 
   return (
     <>
-      <Header />
+      <Header onHelp={handleHelp}/>
       <main className="login-main">
         <div className="login-form-container">
           <form onSubmit={handleSubmit} className="login-form">

@@ -49,6 +49,10 @@ function MainPage() {
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
 
+  const handleMainPage = (poID) => {
+    navigate('/main')
+  }
+
   // Сброс фильтров при смене вкладки
   useEffect(() => {
     const shouldPreserveFilters = ['aggregates'].includes(activeButton);
@@ -99,7 +103,8 @@ function MainPage() {
   closeAddForm();
   };
 
-   const handleAddForm = () => {
+
+  const handleAddForm = () => {
     const newParams = new URLSearchParams(searchParams);
     if (activeButton === 'addPO') {
       newParams.delete('tab');
@@ -207,6 +212,7 @@ function MainPage() {
     <>
       <Header 
       onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} 
+      handleMainPage={handleMainPage}
       onHelp={handleHelp}/>
       <main>
         <div className="table">

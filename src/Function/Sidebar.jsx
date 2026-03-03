@@ -92,7 +92,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
 
-      {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
+      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
         <div className='add-po-container3'>
           <button className={activeButton === 'AddCompPart' ? 'active':''}
             onClick={() => {
@@ -102,7 +102,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
             Добавить часть узла
           </button>
         </div>
-      )}
+      )} */}
       
       
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange} onStatusChange={onStatusChange}/>}
