@@ -1,14 +1,14 @@
-import {Filters} from '../Function/Filters_agregates.jsx'
-import {Filters2} from '../Function/Filters_tractors.jsx'
+import {Filters} from '../FiltersPo/Filters_agregates.jsx'
+import {Filters2} from '../FiltersTractor/Filters_tractors.jsx'
 import { useState, useEffect } from 'react';
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
-import { useAuth } from '../auth/AuthContext';
-import {Header} from '../Function/Header.jsx'
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
+import {Header} from '../Header/Header.jsx'
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange}) {
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange, isMobileSidebarOpen,
+  toggleMobileSidebar}) {
 
-  const [isOpen,setIsOpen] = useState(false);
   const isMobile = useCheckMobile();
   const { user, isAuthenticated } = useAuth();
 
@@ -92,19 +92,6 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
           </button>
         </div>
       )}
-
-      {/* {activeButton !== 'aggregates' && activeButton !== 'tractor' && isAuthenticated && userRole === 'moderator' &&(
-        <div className='add-po-container3'>
-          <button className={activeButton === 'AddCompPart' ? 'active':''}
-            onClick={() => {
-            onAddCompPartClick()
-            handleButtonClick('AddCompPart')
-          }}>
-            Добавить часть узла
-          </button>
-        </div>
-      )} */}
-      
       
       {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange} onStatusChange={onStatusChange}/>}
       {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange} onActualChange={onActualChange}/>}
@@ -113,20 +100,20 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
   return (
     <>
 
-     {isMobile && isOpen && (
+     {isMobile && isMobileSidebarOpen && (
       <div
       className = "sidebar-overlay"
-      onClick ={() => setIsOpen(false)}
+      onClick ={toggleMobileSidebar}
        />
      )} 
      
      {isMobile ? (
-      <div className = {`mobile-sidebar-container ${isOpen ? 'open' : ''}`}>
+      <div className = {`mobile-sidebar-container ${isMobileSidebarOpen ? 'open' : ''}`}>
         <div className = "mobile-sidebar-header">
           <h3>Навигация</h3>
           <button
             className = "close-sidebar"
-            onClick = {() => setIsOpen(false)}
+            onClick = {toggleMobileSidebar}
           >
             ×
           </button>

@@ -1,4 +1,4 @@
-import { PoDetails } from './PoDetails.jsx';
+import { PoDetails } from '../PoDetails/PoDetails.jsx';
 import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
 import RKImage from '../img/РК.png';

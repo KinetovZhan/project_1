@@ -1,16 +1,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
 // import '../cssfiles/sidebar.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Header } from '../Function/Header.jsx';
-import { Sidebar } from '../Function/Sidebar.jsx';
-import { MainPart } from '../Function/MainPart.jsx';
-import { useAuth } from '../auth/AuthContext';
-// Убедитесь, что пути к формам правильные
-import { AddPoForm } from '../Function/AddPo.jsx';
-import { AddAggForm } from '../Function/AddAgg.jsx';
+import { Header } from '../Header/Header.jsx';
+import { Sidebar } from '../Sidebar/Sidebar.jsx';
+import { MainPart } from '../MainPart/MainPart.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 function MainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const toggleMobileSidebar = () => setIsMobileSidebarOpen(prev => !prev)
 
   const activeButton = searchParams.get('tab') || null;
   const selectedModel = useMemo(() => {
@@ -257,6 +256,8 @@ function MainPage() {
       currentUser={user?.sub || 'Пользователь'} 
       handleMainPage={handleMainPage}
       onHelp={handleHelp}
+      toggleMobileSidebar={toggleMobileSidebar} 
+      isMobileSidebarOpen={isMobileSidebarOpen}
       onKnowledgeBase={handleKnowledgeBase}
       />
       <main>
@@ -281,6 +282,8 @@ function MainPage() {
             handleMajMinButtonClick={handleMajMinButtonClick}
             onStatusChange={handleStatusChange} 
             onActualChange={handleActualChange}
+            isMobileSidebarOpen={isMobileSidebarOpen}
+            toggleMobileSidebar={toggleMobileSidebar}
           />
 
           {/* Основной контент — ТОЛЬКО таблицы и фильтры */}

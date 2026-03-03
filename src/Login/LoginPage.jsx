@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Header } from '../Function/Header';
-import '../cssfiles/LoginPage.css';
+import { Header } from '../Header/Header';
+import './LoginPage.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { api, buildApiUrl, API_BASE_URL } from '../fetchAPI.js';

@@ -1,7 +1,7 @@
 import React, { useState,useRef, useEffect, useMemo } from 'react';
-import {SearchBar} from "./SearchBar.jsx";
-import {TractorDetails} from "./TractorDetails.jsx";
-import { useAuth } from '../auth/AuthContext';
+import {SearchBar} from "../SearchBar/SearchBar.jsx";
+import {TractorDetails} from "../TractorDetails/TractorDetails.jsx";
+import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
 
 

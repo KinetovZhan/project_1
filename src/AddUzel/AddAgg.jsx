@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthContext.jsx';
 import Select from 'react-select';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 import Creatable from 'react-select/creatable';
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -256,7 +256,7 @@ export function AddAggForm({ onBack, onSubmit }) {
   };
 
   return (
-    <div className="add-po-agg-container">
+    <div className="add-po-form-container uzel">
       {/* {!isMobile ? (
         <button onClick={onBack} className="add-po-back-button">
           <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">

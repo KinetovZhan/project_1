@@ -1,0 +1,36 @@
+.add-po-form-container.uzel{
+  width: 100vh;
+  height: 75vh;
+  max-height: 750px;
+}
+
+
+@media (max-width: 767px) {
+  .add-po-form-container.uzel {
+  padding: 50px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  background-color: white;
+  border-radius: 30px;
+  color: black;
+
+  position: absolute;
+  left: 0px;
+  top: 4vh;
+ }
+}
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .add-po-form-container.uzel {
+    position: static;
+    left: 0px;
+    margin-top: 2vh;
+    height: 72vh;
+  }
+} 
