@@ -72,10 +72,10 @@ function App() {
         <AnimatePresence mode="wait">
           <motion.div
             key={getAnimationKey()}
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1}}
             exit={{ y: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
             style={{
               position: "relative",
               width: "100%",
