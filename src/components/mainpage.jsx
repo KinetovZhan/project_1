@@ -43,6 +43,44 @@ function MainPage() {
 
   const navigate = useNavigate();
 
+    //НОВЫЙ ОБРАБОТЧИК ДЛЯ ESCAPE тракторов и агрегатов
+  useEffect(() => {
+    const handleEscKey = (event) => {
+      if (event.key === 'Escape') {
+        console.log('Escape нажата, закрываем текущий вид');
+        
+        const newParams = new URLSearchParams(searchParams);
+        let paramsChanged = false;
+
+        // Проверяем, открыта ли форма добавления ПО
+        if (activeButton === 'addPO' || activeButton === 'addAgg' || activeButton === 'AddCompPart') {
+          newParams.delete('tab');
+          paramsChanged = true;
+          console.log('Закрываем форму добавления');
+        }
+        // Проверяем, открыта ли вкладка трактора или агрегатов
+        else if (activeButton === 'tractor' || activeButton === 'aggregates') {
+          // Сбрасываем на null (главное меню)
+          newParams.delete('tab');
+          paramsChanged = true;
+          console.log('Закрываем вкладку с таблицей');
+        }
+
+        if (paramsChanged) {
+          setSearchParams(newParams);
+        }
+      }
+    };
+
+    // Добавляем слушатель события
+    window.addEventListener('keydown', handleEscKey);
+
+    // Убираем слушатель при размонтировании
+    return () => {
+      window.removeEventListener('keydown', handleEscKey);
+    };
+  }, [activeButton, searchParams, setSearchParams]); // Зависимости
+
   // Memoized filters (опционально, можно убрать, если не используете)
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
@@ -189,6 +227,10 @@ function MainPage() {
     setActualFilter(value);
   };
 
+   //ОБРАБОТЧИК для Базы знаний
+  const handleKnowledgeBase = () => {
+    navigate('/knowledge-base'); // или другой путь
+  };
 
   const handleMajMinButtonClick = (buttonName) => {
     setActiveMajMinButton(activeMajMinButton === buttonName ? null : buttonName);
@@ -211,9 +253,12 @@ function MainPage() {
   return (
     <>
       <Header 
-      onLogout={handleLogout} currentUser={user?.sub || 'Пользователь'} 
+      onLogout={handleLogout} 
+      currentUser={user?.sub || 'Пользователь'} 
       handleMainPage={handleMainPage}
-      onHelp={handleHelp}/>
+      onHelp={handleHelp}
+      onKnowledgeBase={handleKnowledgeBase}
+      />
       <main>
         <div className="table">
           <Sidebar
