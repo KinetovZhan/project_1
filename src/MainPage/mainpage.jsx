@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 // import '../cssfiles/sidebar.css';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Header } from '../Header/Header.jsx';
+// import { Header } from '../Header/Header.jsx';  // УДАЛЯЕМ импорт Header
 import { Sidebar } from '../Sidebar/Sidebar.jsx';
 import { MainPart } from '../MainPart/MainPart.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
@@ -31,18 +31,17 @@ function MainPage() {
   const [selectedProducers, setSelectedProducers] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [dateFilter, setDateFilter] = useState({
-    date_assemle: null,  // Для обратной совместимости
+    date_assemle: null,
     date_start: null,
     date_end: null
   });
-  // Добавляем состояние для фильтра актуальности
-  const [actualFilter, setActualFilter] = useState(null); // null, true, false
+  const [actualFilter, setActualFilter] = useState(null);
 
-  const { logout, user } = useAuth();
-
+  const { user } = useAuth();  // Убрали logout, так как он теперь в App.js
   const navigate = useNavigate();
 
-    //НОВЫЙ ОБРАБОТЧИК ДЛЯ ESCAPE тракторов и агрегатов
+  // Убрали handleLogout, handleHelp, handleKnowledgeBase - они теперь в App.js
+
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.key === 'Escape') {
@@ -51,15 +50,12 @@ function MainPage() {
         const newParams = new URLSearchParams(searchParams);
         let paramsChanged = false;
 
-        // Проверяем, открыта ли форма добавления ПО
         if (activeButton === 'addPO' || activeButton === 'addAgg' || activeButton === 'AddCompPart') {
           newParams.delete('tab');
           paramsChanged = true;
           console.log('Закрываем форму добавления');
         }
-        // Проверяем, открыта ли вкладка трактора или агрегатов
         else if (activeButton === 'tractor' || activeButton === 'aggregates') {
-          // Сбрасываем на null (главное меню)
           newParams.delete('tab');
           paramsChanged = true;
           console.log('Закрываем вкладку с таблицей');
@@ -71,40 +67,34 @@ function MainPage() {
       }
     };
 
-    // Добавляем слушатель события
     window.addEventListener('keydown', handleEscKey);
-
-    // Убираем слушатель при размонтировании
     return () => {
       window.removeEventListener('keydown', handleEscKey);
     };
-  }, [activeButton, searchParams, setSearchParams]); // Зависимости
+  }, [activeButton, searchParams, setSearchParams]);
 
-  // Memoized filters (опционально, можно убрать, если не используете)
   const memoizedActiveFilters = useMemo(() => activeFilters, [activeFilters]);
   const memoizedActiveFilters2 = useMemo(() => activeFilters2, [activeFilters2]);
   const memoizedActiveFiltersTrac = useMemo(() => activeFiltersTrac, [activeFiltersTrac]);
   const memoizedActiveFiltersTrac2 = useMemo(() => activeFiltersTrac2, [activeFiltersTrac2]);
 
-  const handleMainPage = (poID) => {
-    navigate('/main')
+  const handleMainPage = () => {
+    navigate('/main');
   }
 
-  // Сброс фильтров при смене вкладки
   useEffect(() => {
     const shouldPreserveFilters = ['aggregates'].includes(activeButton);
     if (!shouldPreserveFilters) {
       setActiveFilters([]);
       setActiveFilters2([]);
       setSelectedProducers([]);
-      setActualFilter(null); // Сбрасываем фильтр актуальности
+      setActualFilter(null);
       const newParams = new URLSearchParams(searchParams);
       newParams.delete('model');
       setSearchParams(newParams, { replace: true });
     }
   }, [activeButton, searchParams, setSearchParams]);
 
-  // Общие обработчики
   const handleButtonClick = (buttonName) => {
     const newParams = new URLSearchParams(searchParams);
     if (activeButton === buttonName) {
@@ -132,14 +122,11 @@ function MainPage() {
     setSelectedProducers(producers);
   };
 
-  // ===== Форма "ПО" =====
   const handleAddSubmit = (responseData) => {
-  // Без preventDefault — это уже не событие, а ответ с бэка
-  const poNumber = responseData?.name || 'без номера';
-  alert(`✅ ПО «${poNumber}» успешно добавлено!`);
-  closeAddForm();
+    const poNumber = responseData?.name || 'без номера';
+    alert(`✅ ПО «${poNumber}» успешно добавлено!`);
+    closeAddForm();
   };
-
 
   const handleAddForm = () => {
     const newParams = new URLSearchParams(searchParams);
@@ -157,7 +144,6 @@ function MainPage() {
     setSearchParams(newParams);
   };
 
-  // ===== Форма "Агрегат" =====
   const handleAddAggSubmit = (responseData) => {
     console.log('Агрегат добавлен:', responseData);
     alert('Модель создана!');
@@ -174,25 +160,21 @@ function MainPage() {
     setSearchParams(newParams);
   };
 
-
   const closeAddAggForm = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('tab');
     setSearchParams(newParams);
   };
-  
-
-
 
   const handleCompPartForm = () => {
-    const newParams = new URLSearchParams(searchParams)
+    const newParams = new URLSearchParams(searchParams);
     if (activeButton === 'AddCompPart') {
-      newParams.delete('tab')
+      newParams.delete('tab');
     } else {
-      newParams.set('tab', 'AddCompPart')
+      newParams.set('tab', 'AddCompPart');
     }
-    setSearchParams(newParams)
-  }
+    setSearchParams(newParams);
+  };
 
   const handleStatusChange = (statuses) => {
     console.log('Выбранные статусы:', statuses); 
@@ -202,33 +184,25 @@ function MainPage() {
   const closeAddCompPartForm = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete('tab');
-    setSearchParams(newParams)
-  }
+    setSearchParams(newParams);
+  };
 
   const handleAddCompPartSubmit = (responseData) => {
     console.log('Часть агрегата добавлен:', responseData);
     alert('Часть агрегата создана!');
     closeAddCompPartForm();
-  }
+  };
 
-
-  // Остальные обработчики
   const handleSearch = (query) => setSearchQuery(query);
   const handleDealer = (query) => setSearchDealer(query);
   const handleDateChange = (date) => {
-    console.log('Дата получена в MainPage:', date); // <-- Добавьте этот лог
+    console.log('Дата получена в MainPage:', date);
     setDateFilter(date);
-  }
+  };
 
-  // Добавляем обработчик для фильтра актуальности
   const handleActualChange = (value) => {
     console.log('📢 Фильтр актуальности изменился:', value);
     setActualFilter(value);
-  };
-
-   //ОБРАБОТЧИК для Базы знаний
-  const handleKnowledgeBase = () => {
-    navigate('/knowledge-base'); // или другой путь
   };
 
   const handleMajMinButtonClick = (buttonName) => {
@@ -240,26 +214,9 @@ function MainPage() {
   const handleFilterByModelTractors = (model) => setActiveFiltersTrac(model);
   const handleFilterByStatus = (model) => setActiveFiltersTrac2(model);
 
-  const handleLogout = () => {
-    logout(); // ← Удаляет токен + сбрасывает состояние
-    navigate('/login', { replace: true }); // ← Перенаправляем на логин
-  };
-
-  const handleHelp = () => {
-    navigate('/help/');
-  }
-
   return (
     <>
-      <Header 
-      onLogout={handleLogout} 
-      currentUser={user?.sub || 'Пользователь'} 
-      handleMainPage={handleMainPage}
-      onHelp={handleHelp}
-      toggleMobileSidebar={toggleMobileSidebar} 
-      isMobileSidebarOpen={isMobileSidebarOpen}
-      onKnowledgeBase={handleKnowledgeBase}
-      />
+      {/* Удалили Header отсюда! */}
       <main>
         <div className="table">
           <Sidebar
@@ -286,7 +243,6 @@ function MainPage() {
             toggleMobileSidebar={toggleMobileSidebar}
           />
 
-          {/* Основной контент — ТОЛЬКО таблицы и фильтры */}
           <MainPart
             activeButton={activeButton}
             activeFilters={memoizedActiveFilters}
@@ -301,7 +257,6 @@ function MainPage() {
             searchDealer={searchDealer}
             onDealerSearch={handleDealer}
             selectedStatus={selectedStatus}
-
             showAddForm={showAddForm}
             showAddAggForm={showAddAggForm}
             showAddCompPartForm={showAddCompPartForm}
@@ -313,9 +268,7 @@ function MainPage() {
             onAddCompPartSubmit={handleAddCompPartSubmit}
             dateFilter={dateFilter}
             actualFilter={actualFilter}
-
           />
-
         </div>
       </main>
     </>

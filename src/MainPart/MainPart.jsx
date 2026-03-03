@@ -1,9 +1,33 @@
+import { motion, AnimatePresence } from 'framer-motion';
 import { SearchBar } from '../SearchBar/SearchBar';
 import { Objects } from '../Po/Objects';
 import { TractorTable } from '../TractorTable/TractorTable';
 import { AddPoForm } from '../AddPo/AddPo';
 import { AddAggForm } from '../AddUzel/AddAgg';
-import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
+import React, { useEffect } from 'react';
+
+// Одинаковая анимация для всех компонентов
+const contentVariants = {
+  initial: { 
+    opacity: 0,
+    y: 20 
+  },
+  animate: { 
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.2,
+      ease: "easeOut"
+    }
+  },
+  exit: { 
+    opacity: 0,
+    y: -20,
+    transition: {
+      duration: 0.15
+    }
+  }
+};
 
 export function MainPart({
   activeButton,
@@ -21,21 +45,18 @@ export function MainPart({
   // --- Форма ПО ---
   showAddForm,
   onCloseAddForm,
-  onAddSubmit, // ← для AddPoForm
+  onAddSubmit,
   dateFilter,
   activeMajMinButton,
 
   // --- Форма агрегата ---
   showAddAggForm,
   onCloseAddAggForm,
-  onAddAggSubmit, // ← ДОБАВЛЕНО: отдельный колбэк для агрегата
-
+  onAddAggSubmit,
 
   showAddCompPartForm,
   onCloseAddCompPartForm,
   onAddCompPartSubmit
-
-  // onBack — не нужен, используйте onClose...
 }) {
   // Закрываем форму ПО, если переключились на другую вкладку
   useEffect(() => {
@@ -51,68 +72,99 @@ export function MainPart({
     }
   }, [activeButton, showAddAggForm, onCloseAddAggForm]);
 
-
   useEffect(() => {
     if (activeButton && activeButton !== 'AddCompPart' && showAddCompPartForm) {
       onCloseAddCompPartForm();
     }
   }, [activeButton, showAddCompPartForm, onCloseAddCompPartForm]);
 
-  // Отображаем форму ПО
-  if (showAddForm) {
-    return (
-      <div className="MainPart">
-        <AddPoForm onBack={onCloseAddForm} onSubmit={onAddSubmit} />
-      </div>
-    );
-  }
-
-  // Отображаем форму агрегата
-  if (showAddAggForm) {
-    return (
-      <div className="MainPart">
-        <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} />
-      </div>
-    );
-  }
-
-  
-
-  // Основной контент
-  if (!activeButton) {
-    return <div className="MainPart"></div>;
-  }
-
   return (
-    <div className="MainPart">
-      {activeButton === 'aggregates' && (
-        <>
-          <SearchBar onSearch={onSearch} activeButton={activeButton} />
-          <Objects
-            activeFilters={activeFilters}
-            activeFilters2={activeFilters2}
-            selectedModel={selectedModel}
-            selectedProducers={selectedProducers}
-            onSearch={onSearch}
-            searchQuery={searchQuery}
-            selectedStatus={selectedStatus}
-          />
-        </>
-      )}
-      {activeButton === 'tractor' && (
-        <>
-          <SearchBar onSearch={onSearch} activeButton={activeButton}/>
-          <TractorTable
-            activeFiltersTrac={activeFiltersTrac}
-            activeFiltersTrac2={activeFiltersTrac2}
-            onSearch={onSearch}
-            searchQuery={searchQuery}
-            searchDealer={searchDealer}
-            dateFilter={dateFilter}
-            activeMajMinButton={activeMajMinButton}
-          />
-        </>
-      )}
+    <div className="MainPart"> {/* Фон остается здесь, не анимируется */}
+      <AnimatePresence mode="wait">
+        {/* Форма ПО */}
+        {showAddForm && (
+          <motion.div
+            key="addPoForm"
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ width: '100%' }}
+          >
+            <AddPoForm onBack={onCloseAddForm} onSubmit={onAddSubmit} />
+          </motion.div>
+        )}
+
+        {/* Форма агрегата */}
+        {showAddAggForm && (
+          <motion.div
+            key="addAggForm"
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            style={{ width: '100%' }}
+          >
+            <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} />
+          </motion.div>
+        )}
+
+        {/* Таблица агрегатов */}
+        {!showAddForm && !showAddAggForm && activeButton === 'aggregates' && (
+          <motion.div
+            key="aggregatesTable"
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <SearchBar onSearch={onSearch} activeButton={activeButton} />
+            <Objects
+              activeFilters={activeFilters}
+              activeFilters2={activeFilters2}
+              selectedModel={selectedModel}
+              selectedProducers={selectedProducers}
+              onSearch={onSearch}
+              searchQuery={searchQuery}
+              selectedStatus={selectedStatus}
+            />
+          </motion.div>
+        )}
+
+        {/* Таблица тракторов */}
+        {!showAddForm && !showAddAggForm && activeButton === 'tractor' && (
+          <motion.div
+            key="tractorTable"
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            <SearchBar onSearch={onSearch} activeButton={activeButton} />
+            <TractorTable
+              activeFiltersTrac={activeFiltersTrac}
+              activeFiltersTrac2={activeFiltersTrac2}
+              onSearch={onSearch}
+              searchQuery={searchQuery}
+              searchDealer={searchDealer}
+              dateFilter={dateFilter}
+              activeMajMinButton={activeMajMinButton}
+            />
+          </motion.div>
+        )}
+
+        {/* Пустой MainPart (когда нет активной кнопки) */}
+        {!activeButton && !showAddForm && !showAddAggForm && (
+          <motion.div
+            key="empty"
+            variants={contentVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

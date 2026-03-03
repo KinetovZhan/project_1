@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import './App.css'
 import './FiltersPo/AggregatesFilters.css'
 import './FiltersTractor/TractorsFilters.css'
@@ -24,42 +26,81 @@ import { KnowledgeBase } from './KnowledgeBase/KnowledgeBase.jsx'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { AuthProvider } from './auth/AuthContext';
-
+import { Header } from './Header/Header.jsx';
+import { useAuth } from './auth/AuthContext';
 
 function App() {
-  return (
-   <AuthProvider>
-    <Routes>
-      {/* Публичный маршрут для входа */}
-      <Route path="/login" element={<LoginPage />} />
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
-      {/*Публичный маршрут для Базы знаний (без авторизации) */}
-      <Route path="/knowledge-base" element={<KnowledgeBase />} />
-      
-      {/* Защищенный маршрут */}
-      <Route 
-        path="/main/*" 
-        element={
-          <ProtectedRoute>
-            <MainPage />
-          </ProtectedRoute>
-        }
+  // Функции для Header
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
+  const handleHelp = () => {
+    navigate('/help/');
+  };
+
+  const handleKnowledgeBase = () => {
+    navigate('/knowledge-base');
+  };
+
+  // Функция для определения ключа анимации
+  const getAnimationKey = () => {
+    if (location.pathname.startsWith('/main')) {
+      return '/main';
+    }
+    return location.pathname;
+  };
+
+  return (
+    <AuthProvider>
+      {/* Header всегда сверху */}
+      <Header 
+        onLogout={handleLogout}
+        onHelp={handleHelp}
+        onKnowledgeBase={handleKnowledgeBase}
+        isMobileSidebarOpen={false}
+        toggleMobileSidebar={() => {}}
       />
-        <Route 
-        path="/help/*" 
-        element={
-          // <ProtectedRoute>
-            <HelpPage />
-          // </ProtectedRoute>
-        }
-      />
-      
-      {/* Перенаправление с корневого пути */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      
-      {/* Обработка несуществующих маршрутов */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+
+      {/* Контент с отступом под Header */}
+      <div> 
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={getAnimationKey()}
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            style={{
+              position: "relative",
+              width: "100%",
+              minHeight: "calc(100vh - 60px)",
+              background: "transparent"
+            }}
+          >
+            <Routes location={location}>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/knowledge-base" element={<KnowledgeBase />} />
+              <Route 
+                path="/main/*" 
+                element={
+                  <ProtectedRoute>
+                    <MainPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/help/*" element={<HelpPage />} />
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </AuthProvider>
   );
 }
