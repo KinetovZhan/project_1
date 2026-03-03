@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/AuthContext.jsx';
 import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
 import RKImage from '../img/РК.png';

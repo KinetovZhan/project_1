@@ -1,10 +1,9 @@
-import { SearchBar } from '../Function/SearchBar';
-import { Objects } from '../Function/Objects';
-import { TractorTable } from '../Function/TractorTable';
-import { AddPoForm } from '../Function/AddPo';
-import { AddAggForm } from '../Function/AddAgg';
+import { SearchBar } from '../SearchBar/SearchBar';
+import { Objects } from '../Po/Objects';
+import { TractorTable } from '../TractorTable/TractorTable';
+import { AddPoForm } from '../AddPo/AddPo';
+import { AddAggForm } from '../AddUzel/AddAgg';
 import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
-import { AddComponentPart } from './AddComponentPart';
 
 export function MainPart({
   activeButton,
@@ -77,13 +76,7 @@ export function MainPart({
     );
   }
 
-  if (showAddCompPartForm) {
-    return (
-      <div className='MainPart'>
-        <AddComponentPart onBack={onCloseAddCompPartForm} onSubmit={onAddCompPartSubmit}/>
-      </div>
-    )
-  }
+  
 
   // Основной контент
   if (!activeButton) {

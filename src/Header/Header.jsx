@@ -1,9 +1,8 @@
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { useNavigate } from 'react-router-dom';
 
 import { useState, useEffect } from 'react';
-export function Header({ onLogout,onHelp }) {
-  const [isOpen,setIsOpen] = useState(false);
+export function Header({ onLogout,onHelp, isMobileSidebarOpen, toggleMobileSidebar }) {
   const isMobile = useCheckMobile();
   const navigate = useNavigate();
 
@@ -15,8 +14,8 @@ export function Header({ onLogout,onHelp }) {
     <header className = "header">
       {isMobile && (
       <button
-       className = {`mobile-sidebar ${isOpen ? 'active' : ''}`}
-       onClick = {()=>setIsOpen(!isOpen)}
+       className = {`mobile-sidebar ${isMobileSidebarOpen ? 'active' : ''}`}
+       onClick = {toggleMobileSidebar}
       >
           <span className="toggle-line"></span>
           <span className="toggle-line"></span>

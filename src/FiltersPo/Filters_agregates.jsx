@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import { useAuth } from '../auth/AuthContext';
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange}) { 

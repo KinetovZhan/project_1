@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
 import Creatable from 'react-select/creatable';
-import { useAuth } from '../auth/AuthContext';
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api, buildApiUrl } from '../fetchAPI.js';
 
 export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {

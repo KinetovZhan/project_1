@@ -49,26 +49,6 @@
 
 
 
-
-.add-po-agg-container {
-  padding: 50px 70px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-
-  box-sizing: border-box;
-  width: 100vh;
-  height: 75vh;
-  max-height: 750px;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
-  position: absolute;
-  left: 171px;
-  top: 20px;
-}
-
 .add-po-form-scroll-bar {
   /* max-height: 40vh; */
   flex: 1;                 /* занять всё свободное место */
@@ -89,57 +69,6 @@
   
 }
 
-
-.add-po-comp-part-container {
-  padding: 50px 70px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-
-  box-sizing: border-box;
-  width: 963px;
-  max-height: 500px;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
-
-  position: absolute;
-  left: 171px;
-  top: 20px;
-}
-
-@media (max-width:767px) {
-  .add-po-comp-part-container {
- padding: 50px 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  height: auto;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
-  position: absolute;
-  left: 0vw;
-  top: 20vh;
-}
-}
-
-.add-po-back-button {
-  position: absolute;
-  top: 0px;
-  left: -210px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  padding: 0 ;
-  box-shadow: none !important;
-  background-color: transparent !important;
-}
 
 .add-po-title {
   margin-top: -35px; 
@@ -214,18 +143,6 @@
   top: 4vh;
 }
 
-/* .add-po-back-button {
-  position: absolute;
-  top: 0px;
-  left: -210px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  padding: 0 ;
-  box-shadow: none !important;
-  background-color: transparent !important;
-} */
 
 .add-po-title {
   margin-top: -40px; 
@@ -260,30 +177,16 @@
   border: 1px solid #ccc;
 }
 
-/* .add-po-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  margin-bottom: 0px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  appearance: none;
-  background: url(arrow_custom.svg) no-repeat right;
-  background-position-x: calc(100% - 8px);
-} */
 
 .add-po-textarea {
   box-sizing: border-box;
-  /* width: 97.28%; */
   width: 100%;
   padding: 10px;
   font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
   resize: none;
-  /* resize: vertical; */
-  /* min-height: 20px;
-  max-height: 140px; */
+
   height: 107px;
 }
 
@@ -301,35 +204,14 @@
 }
 }
 
-@media (max-width: 767px) {
-  .add-po-agg-container {
-  padding: 50px 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-
-  box-sizing: border-box;
-  width: 100%;
-  height: auto;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
-
-  position: absolute;
-  left: 0px;
-  top: 4vh;
-}
-
-}
 
 @media (min-width: 1200px) and (max-width: 1600px) {
   .add-po-form-container {
-    position: static;
+     position: static;
     left: 0px;
-    width: 100vh;
     margin-top: 2vh;
-    height: 70vh;
+    height: 72vh;
+    width:80%;
   }
   .add-po-title {
     font-size: 18px;
@@ -342,41 +224,5 @@
     font-size: 12px;
   }
 
-  .add-po-agg-container {
-    position: static;
-    left: 0px;
-    margin-top: 2vh;
-    height: 72vh;
-  }
-
-  .add-po-comp-part-container {
-    left: 0px;
-    position: static;
-    margin-top: 2vh;
-    width: 100vh;
-    height: 40vh;
-  } 
 } 
 
-.add-po-form-scroll-bar-comp-part {
-  /* max-height: 40vh; */
-  height: 30vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-radius: 10px;
-  padding: 1px 10px 0 1px;
-}
-
-.add-po-form-scroll-bar-comp-part::-webkit-scrollbar {
-  width: 10px; 
-}
-
-.add-po-form-scroll-bar-comp-part::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #bebebe;
-}
-
-.add-po-form-scroll-bar-comp-part::-webkit-scrollbar-track {
-  background-color: #f0f0f0; /* ← Цвет фона дорожки */
-  border-radius: 10px;
-}
