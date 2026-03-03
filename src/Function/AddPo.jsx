@@ -421,26 +421,22 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     option: (base, state) => ({
       ...base,
       color: '#333',
-      backgroundColor: state.isFocused ? '#f0f9ff' : 'white',
-      '&:hover': {
-        backgroundColor: '#f0f9ff',
-      },
     }),
     singleValue: (base) => ({
       ...base,
-      color: '#333',
+      // color: '#333',
     }),
     placeholder: (base) => ({
       ...base,
-      color: '#999',
+      // color: '#999',
     }),
     multiValue: (base) => ({
       ...base,
-      backgroundColor: '#ccc',
+      // backgroundColor: '#ccc',
     }),
     multiValueLabel: (base) => ({
       ...base,
-      color: '#333',
+      // color: '#333',
     }),
   };
 

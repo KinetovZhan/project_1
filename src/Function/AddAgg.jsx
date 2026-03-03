@@ -484,12 +484,12 @@ export function AddAggForm({ onBack, onSubmit }) {
       }),
       option: (base, state) => ({
         ...base,
-        backgroundColor: state.isSelected ? '#f0f9ff' : 
-                        state.isFocused ? '#f0f9ff' : 'white',
-        color: state.isSelected ? '#333' : '#333',
+        // backgroundColor: state.isSelected ? '#f0f9ff' : 
+        //                 state.isFocused ? '#f0f9ff' : 'white',
+        // color: state.isSelected ? '#333' : '#333',
         cursor: 'pointer',
         '&:hover': {
-          backgroundColor: '#f0f9ff'
+          // backgroundColor: '#f0f9ff'
         }
       }),
       singleValue: (base) => ({

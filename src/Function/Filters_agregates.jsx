@@ -295,7 +295,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           options={tractorOptions}
           value={selectedTractorOptions}
           onChange={handleTractorModelChange}
-        menuPortalTarget={document.body}
+          menuPortalTarget={document.body}
           placeholder="Модель трактора"
           styles={{
             control: (base) => ({

@@ -25,7 +25,7 @@ export function Header({ onLogout,onHelp }) {
       </button>
      )}
       <div className='mainText'>
-        <h3 onDoubleClick={handleMainPage}>Сервис просмотра версий ПО</h3>
+        <h3 onClick={handleMainPage}>Сервис просмотра версий ПО</h3>
       </div>
       <div className='navigation'>
         <h3 onClick={onHelp} style={{cursor: 'pointer'}}>Помощь</h3>
