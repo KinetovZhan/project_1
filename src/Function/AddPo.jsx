@@ -421,9 +421,9 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     option: (base, state) => ({
       ...base,
       color: '#333',
-      backgroundColor: state.isFocused ? '#e6f7e4' : 'white',
+      backgroundColor: state.isFocused ? '#f0f9ff' : 'white',
       '&:hover': {
-        backgroundColor: '#e6f7e4',
+        backgroundColor: '#f0f9ff',
       },
     }),
     singleValue: (base) => ({
@@ -436,7 +436,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     }),
     multiValue: (base) => ({
       ...base,
-      backgroundColor: '#e6f7e4',
+      backgroundColor: '#ccc',
     }),
     multiValueLabel: (base) => ({
       ...base,

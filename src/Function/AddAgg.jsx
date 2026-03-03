@@ -14,6 +14,16 @@ export function AddAggForm({ onBack, onSubmit }) {
     number_of_parts: '',
     producer_comp: ''
   });
+
+  const options = [
+    { value: 'dvs', label: 'ДВС' },
+    { value: 'kpp', label: 'КПП' },
+    { value: 'rk', label: 'РК' },
+    { value: 'hydro', label: 'Гидрораспределитель' },
+    { value: 'ap', label: 'Автопилот' },
+    { value: 'bk', label: 'БК' }
+  ];
+
   const isMobile = useCheckMobile();
 
   const [tractors, setTractors] = useState([]);
@@ -267,24 +277,40 @@ export function AddAggForm({ onBack, onSubmit }) {
       <form className="add-po-form" onSubmit={handleSubmit}>
         <div className='add-po-field'>
           <label htmlFor="type-select" className='add-po-label'>Тип</label>
-          <select
+          <Select
             id="type-select"
             name="type"
-            required
-            value={formData.type}
-            onChange={handleChange}
-            className='add-po-select'
-            disabled={loading}
-            style={{color:'grey'}}
-          >
-            <option value="">Выберите узел</option>
-            <option value="dvs">ДВС</option>
-            <option value="kpp">КПП</option>
-            <option value="rk">РК</option>
-            <option value="hydro">Гидрораспределитель</option>
-            <option value="ap">Автопилот</option>
-            <option value="bk">БК</option>
-          </select>
+            value={options.find(opt => opt.value === formData.type)}
+            onChange={(selected) => handleChange({
+              target: { name: 'type', value: selected?.value }
+            })}
+            options={options}
+            placeholder="Выберите узел"
+            isDisabled={loading}
+            styles={{
+              menu: (base) => ({ 
+                ...base,
+                zIndex: 9999,
+                position: 'absolute',
+                backgroundColor: 'white',
+                marginBottom: '5px'
+              }),
+              menuPortal: (base) => ({  
+                ...base,
+                zIndex: 9999
+              }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 150,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                zIndex: 9999
+              })
+            }}
+          />
         </div>
 
         <div className='add-po-field'>
@@ -408,35 +434,95 @@ export function AddAggForm({ onBack, onSubmit }) {
         </div>
 
         {/* Производитель с загрузкой из бэкенда */}
-        <div className="add-po-field">
-          <label className="add-po-label">Производитель</label>
-          <Creatable
-            options={producerOptions}
-            value={selectedProducer}
-            onChange={handleProducerChange}
-            onCreateOption={handleProducerCreate}
-            placeholder="Выберите или создайте производителя"
-            classNamePrefix="add-po-select"
-            isClearable={true}
-            isSearchable={true}
-            isLoading={loadingProducers}
-            isDisabled={!token || loadingProducers}
-            noOptionsMessage={() => {
-              if (!token) return "Требуется авторизация";
-              if (loadingProducers) return "Загрузка...";
-              if (producerError) return producerError;
-              if (producerOptions.length === 0) return "Нет доступных производителей";
-              return null;
-            }}
-            styles={selectStyles}
-            formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
-          />
-          {producerError && token && (
-            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-              Ошибка загрузки: {producerError}
-            </div>
-          )}
-        </div>
+        {/* Производитель с загрузкой из бэкенда */}
+<div className="add-po-field">
+  <label className="add-po-label">Производитель</label>
+  <Creatable
+    options={producerOptions}
+    value={selectedProducer}
+    onChange={handleProducerChange}
+    onCreateOption={handleProducerCreate}
+    placeholder="Выберите или создайте производителя"
+    classNamePrefix="add-po-select"
+    isClearable={true}
+    isSearchable={true}
+    isLoading={loadingProducers}
+    menuPlacement="top" 
+    isDisabled={!token || loadingProducers}
+    noOptionsMessage={() => {
+      if (!token) return "Требуется авторизация";
+      if (loadingProducers) return "Загрузка...";
+      if (producerError) return producerError;
+      if (producerOptions.length === 0) return "Нет доступных производителей";
+      return null;
+    }}
+    formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
+    styles={{
+      control: (base, state) => ({
+        ...base,
+        color: '#333',
+        height: '40px',
+        width: '100%',
+        border: '1px solid',
+        borderColor: state.isFocused ? '#f0f9ff' : '#ccc',
+        boxSizing: 'border-box',
+        fontSize: isMobile ? '12px' : '16px',
+        cursor: 'pointer',
+        transition: 'border-color 0.15s ease',
+        outline: 'none',
+        boxShadow: 'none',
+        backgroundColor: 'white',
+        '&:hover': {
+          borderColor: '#070707'
+        }
+      }),
+      menuList: (base) => ({
+        ...base,
+        maxHeight: 200,
+        padding: '4px 0',
+        backgroundColor: 'white'
+      }),
+      option: (base, state) => ({
+        ...base,
+        backgroundColor: state.isSelected ? '#f0f9ff' : 
+                        state.isFocused ? '#f0f9ff' : 'white',
+        color: state.isSelected ? '#333' : '#333',
+        cursor: 'pointer',
+        '&:hover': {
+          backgroundColor: '#f0f9ff'
+        }
+      }),
+      singleValue: (base) => ({
+        ...base,
+        color: '#1E1E1E'
+      }),
+      placeholder: (base) => ({
+        ...base,
+        color: '#999'
+      }),
+      loadingIndicator: (base) => ({
+        ...base,
+        color: '#0c0c0c'
+      }),
+      menu: (base) => ({
+        ...base,
+        zIndex: 9999,
+        position: 'absolute',
+        backgroundColor: 'white',
+        marginBottom: '5px'
+      }),
+      menuPortal: (base) => ({
+        ...base,
+        zIndex: 9999
+      })
+    }}
+  />
+  {producerError && token && (
+    <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+      Ошибка загрузки: {producerError}
+    </div>
+  )}
+</div>
 
         <button
           type="submit"
