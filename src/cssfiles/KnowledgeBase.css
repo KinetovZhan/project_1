@@ -1,28 +1,29 @@
 /* src/cssfiles/KnowledgeBase.css */
 
 .knowledge-base-container {
-  position: relative;
-  width: 1800px;
-  height: 760px;
-  top: 189px;
-  left: 120px;
+  display: flex;
+  width: 90%;
+  height: 75vh;
+  margin-top: 20vh;
+  margin-left: 7%;
+  justify-content: center;
   border-radius: 20px;
   background: #55565A;
 }
 
 .close-button {
   position: absolute;
-  width: 62px;
-  height: 62px;
-  top: 20px;
-  left: -62px;
+  width: 3%;
+  height: 6vh;
+  margin-top: 2vh;
+  margin-left: 4%;
   border-top-left-radius: 10px;
   border-top-right-radius: 0;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 0;
   background: #D9D9D9;
   border: none;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: bold;
   color: #55565A;
   cursor: pointer;
@@ -31,17 +32,20 @@
   justify-content: center;
 }
 
+
+
 .close-button:hover {
   background: #c0c0c0;
 }
 
 .knowledge-base-title {
   color: white;
-  font-size: 40px;
-  margin: 0;
-  position: absolute;
-  top: 20px;        /* Привязано к верху */
-  left: 50%;         /* По центру горизонтально */
-  transform: translateX(-50%); /* Смещение для точного центрирования */
-  /* Убрали translateY, так как не нужно центрировать по вертикали */
+  font-size: 30px; 
+  margin-top:2vh;
+}
+
+@media (min-width:1200px) and (max-width:1600px) {
+  .knowledge-base-title {
+    font-size: 25px;
+  }
 }
