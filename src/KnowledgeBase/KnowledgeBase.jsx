@@ -1,8 +1,8 @@
 // src/Login/KnowledgeBase.jsx
 import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header } from '../Function/Header.jsx';
-import '../cssfiles/KnowledgeBase.css';
+import { Header } from '../Header/Header.jsx';
+import './KnowledgeBase.css';
 
 export function KnowledgeBase() {
   const navigate = useNavigate();
