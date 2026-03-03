@@ -9,13 +9,14 @@
   /* max-height: 80vh; */
   /* width:100%; */
   box-sizing: border-box;
-  margin:100px;
-  max-width: 80%;
+  margin:90px;
+  max-width: 90%;
+  max-height: 65vh;
 }
 
 /* скролл для тела таблицы */
 .scroll-bar {
-  max-height: 60vh;
+  max-height: 65vh;
   overflow-y: auto;
   overflow-x: auto;
   border-radius: 10px;
