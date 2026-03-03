@@ -275,6 +275,7 @@ export function AddAggForm({ onBack, onSubmit }) {
             onChange={handleChange}
             className='add-po-select'
             disabled={loading}
+            style={{color:'grey'}}
           >
             <option value="">Выберите узел</option>
             <option value="dvs">ДВС</option>
@@ -322,6 +323,7 @@ export function AddAggForm({ onBack, onSubmit }) {
             onChange={handleChange}
             className='add-po-input'
             disabled={loading}
+            style={{color:'grey'}}
           />
         </div>
 
