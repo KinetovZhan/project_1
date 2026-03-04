@@ -20,6 +20,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
+  const [isArchive, setIsArchive] = useState(false);
+  
   
   // Состояния для производителей
   const [producerOptions, setProducerOptions] = useState([]);
@@ -45,11 +47,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
    // Загрузка компонентов с частями
    // Загрузка компонентов с частями
   useEffect(() => {
-    api.get('search/component-parts/')
-    api.get('search/component-parts/')
+    api.get('components/')
       .then(data => {
         console.log('Полученные данные компонентов:', data);
         setComponentOptions(data);
+        console.log(`iaro;ijavjasvd${componentOptions}`)
       })
       .catch(err => {
         console.error('Ошибка загрузки компонентов:', err);
@@ -304,18 +306,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     formData.append('inner_name', fileNameWithoutExt);
     formData.append('is_actual', selectedRelevance.value === 'actual');
     formData.append('status', selectedStatus.value);
+    formData.append('is_archive', isArchive);
     
     selectedComponents.forEach(opt => {
       formData.append('component_models', opt.model);
     });
 
-    selectedComponents.forEach(opt => {
-      if (opt?.part_type == null) {
-        alert(`Ошибка: у компонента "${opt?.model}" нет типа части`);
-        return;
-      }
-      formData.append('part_type', opt.part_type);
-    });
 
     if (selectedProducer) {
       formData.append('producer', selectedProducer.value);
@@ -393,6 +389,15 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       alert(`Ошибка: ${err.message}`);
     }
   };
+
+  const changeArchive = () => {
+    if(isArchive === false) {
+      setIsArchive(true)
+    }
+    else{
+      setIsArchive(false)
+    }
+  }
 
 
 
@@ -538,10 +543,9 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           <Select
             isMulti
             options={componentOptions.map(item => ({
-              value: `${item.model}___${item.part_type}`,
-              label: item['model(part)'],
-              model: item.model,
-              part_type: item.part_type
+              value: `${item.name}`,
+              label: item['model'],
+              model: item.type,
             }))}
             value={selectedComponents}
             onChange={(selected) => {
@@ -612,6 +616,18 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
             isClearable={false}
             isSearchable={false}
             styles={selectStyles}
+          />
+        </div>
+        <div className='add-po-field archive'>
+          <label className="add-po-label">Архивная версия?</label>
+          <input
+            type="checkbox"
+            name="archive"
+            className="add-po-input checkbox"
+            onChange={changeArchive}
+            checked={isArchive}
+
+            defaultValue={new Date().toISOString().split('T')[0]}
           />
         </div>
 
