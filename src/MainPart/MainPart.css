@@ -1,4 +1,5 @@
 .MainPart {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   width:140vh;
   height: 80vh;
   background-color: rgba(217, 217, 217, 0.7);

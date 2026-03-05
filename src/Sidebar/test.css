@@ -1,6 +1,7 @@
 /* ========== БАЗОВЫЕ СТИЛИ - ДЛЯ ПК И НОУТБУКОВ (от 992px) ========== */
 @media (min-width: 1601px) {
   .sidebar {
+    animation: slideUpFadeIn 0.5s ease-out forwards;
     margin-left: 98px;
     height: 80vh;
     width: 45vh;
