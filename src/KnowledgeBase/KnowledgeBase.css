@@ -1,6 +1,7 @@
 /* src/cssfiles/KnowledgeBase.css */
 
 .knowledge-base-container {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   position: relative;
   width: 1800px;
   height: 760px;

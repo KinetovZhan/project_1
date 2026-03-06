@@ -42,13 +42,14 @@ export function KnowledgeBase() {
   };
 
   return (
-    <div className="knowledge-base-container">
+    <>
       <Header 
         onLogout={handleLogout}
         onHelp={handleHelp}
         onKnowledgeBase={handleKnowledgeBase}
       />
 
+      <div className="knowledge-base-container">
       <button onClick={handleBack} className="close-button"> 
         <svg width="34" height="35" viewBox="0 0 34 35" fill="none" xmlns="http://www.w3.org/2000/svg">
 <line x1="32.3787" y1="2.62132" x2="1.49998" y2="33.5" stroke="black" stroke-width="3" stroke-linecap="round"/>
@@ -61,5 +62,6 @@ export function KnowledgeBase() {
         База знаний
         </h1>
     </div>
+    </>
   );
 }
