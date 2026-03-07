@@ -8,19 +8,23 @@ import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus }) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
+  const [archiveItems, setArchiveItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloading, setDownloading] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
   const [selectedPo,setSelectedPo]=useState(null);
+  const [choosedObjects, setChoosedObjects] = useState('active')
+  const [changingArchive, setChangingArchive] = useState(null);
+
   // Состояние для тултипа
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -33,56 +37,70 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const hoverTimers = useRef({});
   const tooltipRef = useRef(null);
 
+
+
+
   const userRole = user?.role || 'user';
 
-  console.log(`dfadsjgosajif ${userRole}`);
+  const fetchFilteredData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    if (!token) {
+      setError('Пользователь не авторизован');
+      setLoading(false);
+      return;
+    }
+    
+    if (userRole !== 'dealer') {
+      try {
+        const FilterToTypeMap = {
+          DVS: ['dvs', 'engine'],
+          KPP: ['kpp', 'transmission'],
+          RK: ['suspension'],
+          hydrorasp: ['hydraulics'],
+          AP: ['autopilot'],
+          BK: ['bk', 'controller']
+        };
+        
+        const FilterToTractor = { 
+          K7: 'K-7', 
+          K5: 'K-5' 
+        };
+
+        const postData = {
+          trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
+          type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
+          name_component: Array.isArray(selectedModel) ? selectedModel : [],
+          producers: Array.isArray(selectedProducers) ? selectedProducers : [],
+          status: Array.isArray(selectedStatus) ? selectedStatus : []
+        };
+
+        const [activeResponse, archiveResponse] = await Promise.all([
+          api.post('search/component-info', postData),
+          api.post('search/archive-component-info', postData)
+        ]);
+
+        const SoftwareItems_data = Array.isArray(activeResponse) ? activeResponse : activeResponse ? [activeResponse] : [];
+        const archiveItems_data = Array.isArray(archiveResponse) ? archiveResponse : archiveResponse ? [archiveResponse] : [];
+
+        setSoftwareItems(SoftwareItems_data);
+        setArchiveItems(archiveItems_data);
+      } catch (err) {
+        console.error('Ошибка:', err);
+        setError(`Ошибка: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus, userRole]);
+
 
   useEffect(() => {
-    const fetchFilteredData = async () => {
-      setLoading(true);
-      setError(null);
-
-      if (!token) {
-        setError('Пользователь не авторизован');
-        setLoading(false);
-        return;
-      }
-      if (userRole !== 'dealer') {
-        try {
-          const FilterToTypeMap = {
-            DVS: ['dvs', 'engine'],
-            KPP: ['kpp', 'transmission'],
-            RK: ['suspension'],
-            hydrorasp: ['hydraulics'],
-          };
-          const FilterToTractor = { K7: 'K-7', K5: 'K-5' };
-
-          const postData = {
-            trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-            type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-            name_component: Array.isArray(selectedModel) ? selectedModel : [],
-            producers: Array.isArray(selectedProducers) ? selectedProducers : [],
-            status: Array.isArray(selectedStatus) ? selectedStatus : []
-          };
-
-
-          const data = await api.post('search/component-info', postData);
-
-          const items = Array.isArray(data) ? data : data ? [data] : [];
-          setSoftwareItems(items);
-        } catch (err) {
-          console.error('Ошибка:', err);
-          setError(`Ошибка: ${err.message}`);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setLoading(false);
-      }
-    };
-
     fetchFilteredData();
-  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery, selectedStatus]); 
+  }, [fetchFilteredData]);
 
   const ImageToComponent = (type_component, name_component) => {
   // Приводим типы к нижнему регистру для единообразия
@@ -263,8 +281,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   };
 
   // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
-  const filteredItems = useMemo(() => {
-    if (!searchQuery) return softwareItems;
+  // const filteredItems = useMemo(() => {
+  //   if (!searchQuery) return softwareItems;
 
     const query = searchQuery.trim().toLowerCase();
     return softwareItems.filter(
@@ -280,13 +298,18 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
   };
 
-  // Фильтрация по поиску и сортировка по дате
+  const currentItems = useMemo(() => {
+    return choosedObjects === 'active' ? softwareItems : archiveItems;
+  }, [choosedObjects, softwareItems, archiveItems]);
+
+  // Фильтрация и сортировка
   const filteredAndSortedItems = useMemo(() => {
-    // Сначала фильтруем по поиску
-    let filtered = softwareItems;
-    if (searchQuery) {
+    let filtered = [...currentItems];
+
+    // Фильтрация по поисковому запросу
+    if (searchQuery && searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
-      filtered = softwareItems.filter(
+      filtered = filtered.filter(
         (item) =>
           (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
           (item.type_component && item.type_component.toLowerCase().includes(query)) ||
@@ -295,18 +318,16 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       );
     }
 
-    // Затем сортируем по дате
-    return filtered.sort((a, b) => {
+    // Сортировка по дате
+    filtered.sort((a, b) => {
       const dateA = new Date(a.release_date).getTime();
       const dateB = new Date(b.release_date).getTime();
       
-      if (sortOrder === 'desc') {
-        return dateB - dateA; // Сначала новые
-      } else {
-        return dateA - dateB; // Сначала старые
-      }
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
     });
-  }, [softwareItems, searchQuery, sortOrder]);
+
+    return filtered;
+  }, [currentItems, searchQuery, sortOrder]);
 
   const getAllActiveFilters = () => {
     const filterNames = {
@@ -346,10 +367,18 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       );
     }
 
+    
     // При отсутствии фильтров — показываем "Всех компонентов"
     return 'всех компонентов';
   };
+  const getNewPO = () => {
+    setChoosedObjects('active')
+  }
 
+  const getArchivePO = () => {
+    setChoosedObjects('archive')
+  }
+  
   // --- Рендер ---
   if (loading) {
     return (
@@ -371,7 +400,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   const handlePoClick = (po) => {
     console.log('Клик по по:', po);
-    const selectedItem = softwareItems.find(item => item.id_Firmwares === po);
+    const selectedItem = currentItems.find(item => item.id_Firmwares === po);
     setSelectedPo(selectedItem);
   };
 
@@ -379,12 +408,69 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} />;
     }
 
+  const handleMoveToArchive = async (item, shouldArchive) => {
+    if (!item?.id_Firmwares) {
+      alert('ID файла не указан');
+      return;
+    }
+
+    if (!token) {
+      alert('Требуется авторизация');
+      return;
+    }
+
+    try {
+      setChangingArchive(item.id_Firmwares);
+      
+      await api.patch(`search/firmware/${item.id_Firmwares}/archive`, {
+        is_archive: shouldArchive
+      });
+
+      // После успешного изменения - перезагружаем данные
+      await fetchFilteredData();
+      
+      alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
+    } catch (error) {
+      console.error('Ошибка при изменении статуса архивации:', error);
+      alert(`Ошибка: ${error.message || 'Не удалось изменить статус архивации'}`);
+    } finally {
+      setChangingArchive(null);
+    }
+  };
+
   
 
   return (
     <div className="maininfo">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <h3>Последние версии ПО для {getComponentName()}</h3>
+        <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
+          <button 
+            onClick={getNewPO} 
+            style={{
+                padding: '8px 20px',
+                backgroundColor: choosedObjects === 'active' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
+                color: choosedObjects === 'active' ? 'white' : 'black',
+                border: choosedObjects === 'active' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
+              }}>
+            <span>Новейшие версии ({softwareItems.length})</span>
+          </button>
+          <button 
+            onClick={getArchivePO}
+            style={{
+              padding: '8px 20px',
+              backgroundColor: choosedObjects === 'archive' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
+              color: choosedObjects === 'archive' ? 'white' : 'black',
+              border: choosedObjects === 'archive' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              fontWeight: choosedObjects === 'archive' ? 'bold' : 'normal'
+            }}>
+            Архивные версии ({archiveItems.length})
+          </button>
+        </div>
         <button 
           onClick={toggleSortOrder}
           style={{
@@ -397,7 +483,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
             alignItems: 'center',
             gap: '5px',
             fontSize: '14px',
-            width:'30%'
+            width:'30%',
           }}
         >
           <span>Сортировка по дате</span>
@@ -407,7 +493,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
         </button>
         </div>
       <div>
-        <h4>Компоненты ({filteredItems.filter((item) => item.id_Firmwares).length})</h4>
         {activeFilters.length > 0 && (
           <div style={{ marginBottom: '10px', color: '#666' }}>
             Активные фильтры: {getAllActiveFilters()}
@@ -416,7 +501,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       </div>
       <div className="list-container">
         <ul className="List">
-          {filteredItems.length === 0 ? (
+          {filteredAndSortedItems.length === 0 ? (
             <li>
               <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
                 <h4>Ничего не найдено</h4>
@@ -424,13 +509,13 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               </div>
             </li>
           ) : (
-            filteredItems
+            filteredAndSortedItems
               .filter((item) => item.id_Firmwares)
               .map((item) => {
                 // Формируем текст для тултипа
                 const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
                 const tooltipText2 = `${item.producer_version} от ${new Date(item.release_date).toLocaleDateString()}`;
-               return (
+              return (
                 <li key={item.id_Firmwares}>
                   <div className="objectmenu" data-testid="objectmenu">
                     <img
@@ -440,7 +525,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       onClick={()=> handlePoClick(item.id_Firmwares)}
                       style={{ cursor: 'pointer' }}
                     />
-                    <div className="inform">
+                    <div className="inform" style ={{width:'70%'}}>
                       <h4 
                       className="poster"
                       onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
@@ -459,13 +544,18 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                           {item.part_type ? ` (${item.part_type})` : ' (—)'}
                         </h5>
                       </div>
-                      <button
-                        className="download"
-                        onClick={() => handleDownload(item)}
-                        disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
-                      >
-                        Скачать
-                      </button>
+                      <div style={{width:'100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <button
+                          className="download"
+                          onClick={() => handleDownload(item)}
+                          disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
+                        >
+                          Скачать
+                        </button>
+                        <button onClick={() => handleMoveToArchive(item, false)} style={{width:'100px', border: 'none', backgroundColor:'#d7dcf3'}}>
+                          <span>{(choosedObjects == 'active')?'В архив':'Из архива'}</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -474,7 +564,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           )}
         </ul>
       </div>
-       {tooltip.visible && (
+        {tooltip.visible && (
         <div 
           className="popup-window"
           style={{
