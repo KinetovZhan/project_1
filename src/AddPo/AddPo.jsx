@@ -13,45 +13,48 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(null);
   const [loadingSoftware, setLoadingSoftware] = useState(false);
   const [softwareError, setSoftwareError] = useState(null);
-  const [selectedRelevance, setSelectedRelevance] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedRelevance, setSelectedRelevance] = useState(null);   // Актуальность (actual/outdated)
+  const [selectedStatus, setSelectedStatus] = useState(null);         // Статус (serial/experienced/in operation)
   const [selectedProducer, setSelectedProducer] = useState(null);
-  const [selectedTractorModel, setSelectedTractorModel] = useState(null);
+  const [selectedTractorModels, setSelectedTractorModels] = useState([]); // массив выбранных моделей
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
   const [isArchive, setIsArchive] = useState(false);
-  
-  
+
   // Состояния для производителей
   const [producerOptions, setProducerOptions] = useState([]);
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
-  
+
   const { token } = useAuth();
   const isMobile = useCheckMobile();
 
-  // Опции для актуальности
+  // Опции для актуальности (software_is_actual)
   const relevanceOptions = [
     { value: 'actual', label: 'Актуальное' },
     { value: 'outdated', label: 'Устаревшее' },
   ];
 
-  // Опции для статуса
+  // Опции для статуса (software_status)
   const statusOptions = [
     { value: 'serial', label: 'Серийное' },
-    { value: 'experimental', label: 'Опытное' },
-    { value: 'in_operation', label: 'В эксплуатации' },
+    { value: 'experienced', label: 'Опытное' },
+    { value: 'in operation', label: 'В эксплуатации' },
   ];
 
-   // Загрузка компонентов с частями
-   // Загрузка компонентов с частями
+  // Загрузка компонентов
   useEffect(() => {
     api.get('components/')
       .then(data => {
-        console.log('Полученные данные компонентов:', data);
-        setComponentOptions(data);
-        console.log(`iaro;ijavjasvd${componentOptions}`)
+        const options = data.map(item => ({
+          value: item.id,
+          label: `${item.name} (${item.type})`,
+          name: item.name,
+          type: item.type,
+          producer: item.producer,
+        }));
+        setComponentOptions(options);
       })
       .catch(err => {
         console.error('Ошибка загрузки компонентов:', err);
@@ -60,55 +63,20 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   }, []);
 
   // Загрузка списка ПО (для предыдущих версий)
-  // Загрузка списка ПО (для предыдущих версий)
   useEffect(() => {
     if (!token) {
       setSoftwareError('Для загрузки списка ПО требуется авторизация');
       return;
     }
-
-    setLoadingSoftware(true);
-    setSoftwareError(null);
-    if (!token) {
-      setSoftwareError('Для загрузки списка ПО требуется авторизация');
-      return;
-    }
-
     setLoadingSoftware(true);
     setSoftwareError(null);
 
     api.get('software/')
       .then(data => {
-        if (!Array.isArray(data)) {
-          throw new Error('Данные не являются массивом');
-        }
+        if (!Array.isArray(data)) throw new Error('Данные не являются массивом');
         const options = data.map(item => ({
           value: item.id,
           label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
-          id: item.id,
-          name: item.name,
-          inner_name: item.inner_name,
-          release_date: item.release_date
-        }));
-        setSoftwareOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки ПО:', err);
-        setSoftwareError(err.message);
-      })
-      .finally(() => setLoadingSoftware(false));
-    api.get('software/')
-      .then(data => {
-        if (!Array.isArray(data)) {
-          throw new Error('Данные не являются массивом');
-        }
-        const options = data.map(item => ({
-          value: item.id,
-          label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
-          id: item.id,
-          name: item.name,
-          inner_name: item.inner_name,
-          release_date: item.release_date
         }));
         setSoftwareOptions(options);
       })
@@ -119,21 +87,34 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       .finally(() => setLoadingSoftware(false));
   }, [token]);
 
-  // Загрузка производителей (из того же эндпоинта ПО)
-  // Загрузка производителей (из того же эндпоинта ПО)
+  // Загрузка уникальных моделей тракторов
+  useEffect(() => {
+    if (!token) {
+      setTractorError('Для загрузки моделей тракторов требуется авторизация');
+      return;
+    }
+    setLoadingTractors(true);
+    setTractorError(null);
+
+    api.get('tractors/')
+      .then(data => {
+        const models = [...new Set(data.map(item => item.model).filter(Boolean))];
+        const options = models.map(model => ({ value: model, label: model }));
+        setTractorOptions(options);
+      })
+      .catch(err => {
+        console.error('Ошибка загрузки тракторов:', err);
+        setTractorError(err.message);
+      })
+      .finally(() => setLoadingTractors(false));
+  }, [token]);
+
+  // Загрузка производителей из ПО
   useEffect(() => {
     if (!token) {
       setProducerError('Для загрузки производителей требуется авторизация');
       return;
     }
-
-    setLoadingProducers(true);
-    setProducerError(null);
-    if (!token) {
-      setProducerError('Для загрузки производителей требуется авторизация');
-      return;
-    }
-
     setLoadingProducers(true);
     setProducerError(null);
 
@@ -143,22 +124,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           .map(item => item.producer)
           .filter(producer => producer && producer.trim() !== '')
           .filter((value, index, self) => self.indexOf(value) === index);
-        
-        const options = producers.map(producer => ({ value: producer, label: producer }));
-        setProducerOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки производителей:', err);
-        setProducerError(err.message);
-      })
-      .finally(() => setLoadingProducers(false));
-    api.get('software/')
-      .then(data => {
-        const producers = data
-          .map(item => item.producer)
-          .filter(producer => producer && producer.trim() !== '')
-          .filter((value, index, self) => self.indexOf(value) === index);
-        
         const options = producers.map(producer => ({ value: producer, label: producer }));
         setProducerOptions(options);
       })
@@ -169,95 +134,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       .finally(() => setLoadingProducers(false));
   }, [token]);
 
-  // Загрузка тракторов
-  // Загрузка тракторов
-  useEffect(() => {
-    if (!token) {
-      setTractorError('Для загрузки тракторов требуется авторизация');
-      return;
-    }
-
-    setLoadingTractors(true);
-    setTractorError(null);
-
-    api.get('tractors/')
-      .then(data => {
-        let tractorsArray = [];
-        if (Array.isArray(data)) {
-          tractorsArray = data;
-        } else if (data.data && Array.isArray(data.data)) {
-          tractorsArray = data.data;
-        } else if (data.items && Array.isArray(data.items)) {
-          tractorsArray = data.items;
-        } else if (data.results && Array.isArray(data.results)) {
-          tractorsArray = data.results;
-        }
-
-        const options = tractorsArray.map(item => ({
-          value: item.id,
-          label: item.model && item.vin 
-            ? `${item.model} (VIN: ${item.vin})`
-            : item.model || (item.vin ? `VIN: ${item.vin}` : `Трактор ${item.id}`),
-          model: item.model,
-          vin: item.vin,
-          oh_hour: item.oh_hour,
-          region: item.region,
-          consumer: item.consumer,
-          serv_center: item.serv_center,
-          original: item
-        }));
-    if (!token) {
-      setTractorError('Для загрузки тракторов требуется авторизация');
-      return;
-    }
-
-    setLoadingTractors(true);
-    setTractorError(null);
-
-    api.get('tractors/')
-      .then(data => {
-        let tractorsArray = [];
-        if (Array.isArray(data)) {
-          tractorsArray = data;
-        } else if (data.data && Array.isArray(data.data)) {
-          tractorsArray = data.data;
-        } else if (data.items && Array.isArray(data.items)) {
-          tractorsArray = data.items;
-        } else if (data.results && Array.isArray(data.results)) {
-          tractorsArray = data.results;
-        }
-
-        const options = tractorsArray.filter(item => item.vin && item.vin.includes('system')).map(item => ({
-          value: item.id,
-          label: item.model && item.vin 
-            ? `${item.model}`
-            : item.model,
-          model: item.model,
-          vin: item.vin,
-          oh_hour: item.oh_hour,
-          region: item.region,
-          consumer: item.consumer,
-          serv_center: item.serv_center,
-          original: item
-        }));
-
-        setTractorOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки тракторов:', err);
-        setTractorError(err.message);
-      })
-      .finally(() => setLoadingTractors(false));
-        setTractorOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки тракторов:', err);
-        setTractorError(err.message);
-      })
-      .finally(() => setLoadingTractors(false));
-  }, [token]);
-
-  // Обработчики для производителя
   // Обработчики для производителя
   const handleProducerCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
@@ -269,32 +145,41 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     setSelectedProducer(selectedOption);
   };
 
-  // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
-  // Отправка формы (оставляем fetch, но используем buildApiUrl для URL)
+  // Отправка формы
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     const form = event.target;
     const file = form.elements.file.files[0];
+    const instructionFile = form.elements.instructionFile.files[0];
+
+    // Валидация
     if (!file) {
       alert('Пожалуйста, выберите файл ПО');
       return;
     }
-
+    if (!instructionFile) {
+      alert('Пожалуйста, выберите файл инструкции');
+      return;
+    }
     if (!selectedRelevance) {
       alert('Пожалуйста, выберите актуальность');
-      alert('Пожалуйста, выберите актуальность');
       return;
     }
-
     if (!selectedStatus) {
       alert('Пожалуйста, выберите статус');
-      alert('Пожалуйста, выберите статус');
       return;
     }
-
+    if (!selectedProducer) {
+      alert('Пожалуйста, укажите производителя');
+      return;
+    }
+    if (selectedTractorModels.length === 0) {
+      alert('Пожалуйста, выберите хотя бы одну модель трактора');
+      return;
+    }
     if (!skipValidation && selectedComponents.length === 0) {
-      alert('Пожалуйста, выберите хотя бы один компонент и часть');
+      alert('Пожалуйста, выберите хотя бы один компонент');
       return;
     }
 
@@ -302,54 +187,59 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('name', fileNameWithoutExt);
-    formData.append('inner_name', fileNameWithoutExt);
-    formData.append('is_actual', selectedRelevance.value === 'actual');
-    formData.append('status', selectedStatus.value);
-    formData.append('is_archive', isArchive);
-    
-    selectedComponents.forEach(opt => {
-      formData.append('component_models', opt.model);
-    });
+    formData.append('instruction_file', instructionFile);
 
+    // Основные поля (имена должны совпадать с ожидаемыми на бэкенде)
+    formData.append('software_producer', selectedProducer.value);
+    formData.append('software_is_actual', selectedRelevance.value === 'actual');
+    formData.append('software_status', selectedStatus.value);
+    formData.append('software_is_archive', isArchive);
+    // Если нужно поле критичности – добавьте отдельно (software_is_critical)
 
-    if (selectedProducer) {
-      formData.append('producer', selectedProducer.value);
-    }
-
-    if (selectedTractorModel) {
-      formData.append('tractor_id', selectedTractorModel.value);
-    }
-
+    // Предыдущая версия (опционально)
     if (selectedPreviousVersion) {
-      formData.append('previous_sw_version', selectedPreviousVersion.value);
+      formData.append('previous_sw_version', String(selectedPreviousVersion.value));
     }
 
+    // Модели тракторов (JSON-строка)
+    formData.append(
+      'software_tractor_models',
+      JSON.stringify(selectedTractorModels.map(t => t.value))
+    );
+
+    // Данные компонентов (JSON-строки)
+    const componentModels = selectedComponents.map(c => c.name);
+    const componentTypes = selectedComponents.map(c => c.type);
+    const componentProducers = selectedComponents.map(c => c.producer);
+
+    formData.append('component_models', JSON.stringify(componentModels));
+    formData.append('component_types', JSON.stringify(componentTypes));
+    formData.append('component_producers', JSON.stringify(componentProducers));
+
+    // Дата релиза (опционально)
     const releaseDate = form.elements.releaseDate.value;
     if (releaseDate) {
-      formData.append('release_date', releaseDate);
+      formData.append('software_release_date', releaseDate);
     }
 
+    // Описание (опционально)
     const description = form.elements.description.value.trim();
     if (description) {
-      formData.append('description', description);
+      formData.append('software_description', description);
     }
 
-    // Для отладки
+    // Отладка
     console.log('Отправляемые данные:');
     for (let [key, value] of formData.entries()) {
       console.log(`${key}: ${value}`);
     }
 
     try {
-      // Используем fetch с URL от buildApiUrl и токеном
       const url = buildApiUrl('software/assign');
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
-          // Content-Type не указываем – браузер установит сам с boundary
-          // Content-Type не указываем – браузер установит сам с boundary
         },
         body: formData
       });
@@ -364,53 +254,36 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       if (!response.ok) {
         console.error('Ошибка:', data);
-
         const errorDetail = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
-      
         if (errorDetail.includes('UniqueViolation') && errorDetail.includes('Software_name_key')) {
-          const nameMatch = errorDetail.match(/Key "\(name\)=\((.*?)\)"/);
-          const duplicateName = nameMatch ? nameMatch[1] : fileNameWithoutExt;
-          alert(`❌ Файл с именем "${duplicateName}" уже существует в системе.\n\nПожалуйста, переименуйте файл или выберите другой.`);
-          return;
+          alert(`❌ Файл с таким именем уже существует. Переименуйте файл или выберите другой.`);
           return;
         }
-
         const errMsg = data.detail 
           ? JSON.stringify(data.detail, null, 2)
           : data.message || 'Unknown error';
         throw new Error(`HTTP ${response.status}:\n${errMsg}`);
       }
 
-      // alert('✅ ПО успешно добавлено!');
       onSubmit?.(data);
-
     } catch (err) {
       console.error('❌ Ошибка:', err);
       alert(`Ошибка: ${err.message}`);
     }
   };
 
-  const changeArchive = () => {
-    if(isArchive === false) {
-      setIsArchive(true)
-    }
-    else{
-      setIsArchive(false)
-    }
-  }
-
-
+  const changeArchive = () => setIsArchive(!isArchive);
 
   const selectStyles = {
     control: (base, state) => ({
       ...base,
       color: '#333',
-      height: '40px',
+      minHeight: '40px',
       width: '100%',
       border: '1px solid #ccc',
       borderColor: state.isFocused ? '#13be00' : '#ccc',
       boxSizing: 'border-box',
-      fontSize: isMobile ? '14px':'16px',
+      fontSize: isMobile ? '14px' : '16px',
       cursor: 'pointer',
       transition: 'border-color 0.15s ease',
       outline: 'none',
@@ -427,251 +300,218 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       ...base,
       color: '#333',
     }),
-    singleValue: (base) => ({
-      ...base,
-      // color: '#333',
-    }),
-    placeholder: (base) => ({
-      ...base,
-      // color: '#999',
-    }),
     multiValue: (base) => ({
       ...base,
-      // backgroundColor: '#ccc',
+      backgroundColor: '#e0e0e0',
     }),
     multiValueLabel: (base) => ({
       ...base,
-      // color: '#333',
+      color: '#333',
     }),
   };
 
   return (
     <div className="add-po-form-container">
-      {/* {!isMobile ? (
-        <button onClick={onBack} className="add-po-back-button">
-          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      ) : null} */}
-          
-
       <h3 className="add-po-title">Добавление нового ПО</h3>
 
-      <div className='add-po-form-scroll-bar'>
+      <div className="add-po-form-scroll-bar">
+        <form className="add-po-form" onSubmit={handleSubmit}>
 
-      <form className="add-po-form" onSubmit={handleSubmit}>
+          {/* Производитель */}
+          <div className="add-po-field">
+            <label className="add-po-label">Производитель *</label>
+            <Creatable
+              options={producerOptions}
+              value={selectedProducer}
+              onChange={handleProducerChange}
+              onCreateOption={handleProducerCreate}
+              placeholder="Выберите или создайте производителя"
+              classNamePrefix="add-po-select"
+              isClearable={true}
+              isSearchable={true}
+              isLoading={loadingProducers}
+              isDisabled={!token || loadingProducers}
+              noOptionsMessage={() => {
+                if (!token) return "Требуется авторизация";
+                if (loadingProducers) return "Загрузка...";
+                if (producerError) return producerError;
+                return "Нет доступных производителей";
+              }}
+              styles={selectStyles}
+              formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
+            />
+            {producerError && token && (
+              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                Ошибка загрузки: {producerError}
+              </div>
+            )}
+          </div>
 
-        {/* Производитель с возможностью создания нового */}
-        <div className="add-po-field">
-          <label className="add-po-label">Производитель</label>
-          <Creatable
-            options={producerOptions}
-            value={selectedProducer}
-            onChange={handleProducerChange}
-            onCreateOption={handleProducerCreate}
-            placeholder="Выберите или создайте производителя"
-            classNamePrefix="add-po-select"
-            isClearable={true}
-            isSearchable={true}
-            isLoading={loadingProducers}
-            isDisabled={!token || loadingProducers}
-            noOptionsMessage={() => {
-              if (!token) return "Требуется авторизация";
-              if (loadingProducers) return "Загрузка...";
-              if (producerError) return producerError;
-              return "Нет доступных производителей";
-            }}
-            styles={selectStyles}
-            formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
-          />
-          {producerError && token && (
-            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-              Ошибка загрузки: {producerError}
-            </div>
-          )}
-        </div>
+          {/* Модели тракторов (множественный выбор) */}
+          <div className="add-po-field">
+            <label className="add-po-label">Модели тракторов *</label>
+            <Select
+              isMulti
+              options={tractorOptions}
+              value={selectedTractorModels}
+              onChange={setSelectedTractorModels}
+              placeholder="Выберите модели тракторов"
+              classNamePrefix="add-po-select"
+              isClearable={false}
+              isSearchable={true}
+              isLoading={loadingTractors}
+              isDisabled={!token || loadingTractors}
+              noOptionsMessage={() => {
+                if (!token) return "Требуется авторизация";
+                if (loadingTractors) return "Загрузка...";
+                if (tractorError) return tractorError;
+                return "Нет доступных моделей";
+              }}
+              styles={selectStyles}
+            />
+            {tractorError && token && (
+              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                Ошибка загрузки: {tractorError}
+              </div>
+            )}
+          </div>
 
-        {/* Модель трактора с VIN */}
-        <div className="add-po-field">
-          <label className="add-po-label">Модель трактора</label>
-          <Select
-            options={tractorOptions}
-            value={selectedTractorModel}
-            onChange={setSelectedTractorModel}
-            placeholder="Выберите трактор по модели или VIN"
-            classNamePrefix="add-po-select"
-            isClearable={true}
-            isSearchable={true}
-            isLoading={loadingTractors}
-            isDisabled={!token || loadingTractors}
-            noOptionsMessage={() => {
-              if (!token) return "Требуется авторизация";
-              if (loadingTractors) return "Загрузка...";
-              if (tractorError) return tractorError;
-              if (tractorOptions.length === 0) return "Нет доступных тракторов";
-              return null;
-            }}
-            styles={selectStyles}
-            getOptionLabel={(option) => option.label}
-            getOptionValue={(option) => option.value}
-            filterOption={(option, searchText) => {
-              // Поиск по модели и VIN
-              const searchLower = searchText.toLowerCase();
-              return (
-                option.data.model?.toLowerCase().includes(searchLower) ||
-                option.data.vin?.toLowerCase().includes(searchLower) ||
-                option.label.toLowerCase().includes(searchLower)
-              );
-            }}
-          />
-          {tractorError && token && (
-            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-              Ошибка загрузки: {tractorError}
-            </div>
-          )}
-          {!loadingTractors && tractorOptions.length === 0 && token && !tractorError && (
-            <div style={{ color: '#666', fontSize: '12px', marginTop: '4px' }}>
-              Нет данных для отображения. Проверьте консоль браузера (F12)
-            </div>
-          )}
-        </div>
+          {/* Выбор компонентов */}
+          <div className="add-po-field">
+            <label className="add-po-label">Узлы *</label>
+            <Select
+              isMulti
+              options={componentOptions}
+              value={selectedComponents}
+              onChange={setSelectedComponents}
+              placeholder="Выберите узлы"
+              classNamePrefix="add-po-select"
+              isDisabled={componentOptions.length === 0}
+              noOptionsMessage={() => "Нет доступных узлов"}
+              styles={selectStyles}
+            />
+          </div>
 
-        {/* Мультивыбор компонентов и частей */}
-        <div className="add-po-field">
-          <label className="add-po-label">Узел</label>
-          <Select
-            isMulti
-            options={componentOptions.map(item => ({
-              value: `${item.name}`,
-              label: item['model'],
-              model: item.type,
-            }))}
-            value={selectedComponents}
-            onChange={(selected) => {
-              setSelectedComponents(selected || []);
-            }}
-            placeholder="Выберите компонент и часть"
-            classNamePrefix="add-po-select"
-            isDisabled={componentOptions.length === 0}
-            noOptionsMessage={() => "Нет доступных компонентов"}
-            data-testid="component-select"
-            styles={selectStyles}
-          />
-        </div>
+          {/* Предыдущая версия ПО */}
+          <div className="add-po-field">
+            <label className="add-po-label">Предыдущая версия ПО</label>
+            <Select
+              options={softwareOptions}
+              value={selectedPreviousVersion}
+              onChange={setSelectedPreviousVersion}
+              placeholder="Выберите предыдущую версию ПО (необязательно)"
+              classNamePrefix="add-po-select"
+              isClearable={true}
+              isSearchable={true}
+              isLoading={loadingSoftware}
+              isDisabled={!token || loadingSoftware}
+              noOptionsMessage={() => {
+                if (!token) return "Требуется авторизация";
+                if (loadingSoftware) return "Загрузка...";
+                if (softwareError) return softwareError;
+                return "Нет доступных версий ПО";
+              }}
+              styles={selectStyles}
+            />
+            {softwareError && token && (
+              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                Ошибка загрузки: {softwareError}
+              </div>
+            )}
+          </div>
 
-        {/* Предыдущая версия ПО */}
-        <div className="add-po-field">
-          <label className="add-po-label">Предыдущая версия ПО</label>
-          <Select
-            options={softwareOptions}
-            value={selectedPreviousVersion}
-            onChange={setSelectedPreviousVersion}
-            placeholder="Выберите предыдущую версию ПО (необязательно)"
-            classNamePrefix="add-po-select"
-            isClearable={true}
-            isSearchable={true}
-            isLoading={loadingSoftware}
-            isDisabled={!token || loadingSoftware}
-            noOptionsMessage={() => {
-              if (!token) return "Требуется авторизация";
-              if (loadingSoftware) return "Загрузка...";
-              if (softwareError) return softwareError;
-              if (softwareOptions.length === 0) return "Нет доступных версий ПО";
-              return null;
-            }}
-            styles={selectStyles}
-          />
-          {softwareError && token && (
-            <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-              Ошибка загрузки: {softwareError}
-            </div>
-          )}
-        </div>
+          {/* Актуальность */}
+          <div className="add-po-field">
+            <label className="add-po-label">Актуальность *</label>
+            <Select
+              options={relevanceOptions}
+              value={selectedRelevance}
+              onChange={setSelectedRelevance}
+              placeholder="Выберите актуальность"
+              classNamePrefix="add-po-select"
+              isClearable={false}
+              styles={selectStyles}
+            />
+          </div>
 
-        {/* Актуальность (Актуальное/Устаревшее) */}
-        <div className="add-po-field">
-          <label className="add-po-label">Актуальность</label>
-          <Select
-            options={relevanceOptions}
-            value={selectedRelevance}
-            onChange={setSelectedRelevance}
-            placeholder="Выберите актуальность"
-            classNamePrefix="add-po-select"
-            isClearable={false}
-            isSearchable={false}
-            styles={selectStyles}
-          />
-        </div>
+          {/* Статус */}
+          <div className="add-po-field">
+            <label className="add-po-label">Статус *</label>
+            <Select
+              options={statusOptions}
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              placeholder="Выберите статус"
+              classNamePrefix="add-po-select"
+              isClearable={false}
+              styles={selectStyles}
+            />
+          </div>
 
-        {/* Статус (Серийное/Опытное/В эксплуатации) */}
-        <div className="add-po-field">
-          <label className="add-po-label">Статус</label>
-          <Select
-            options={statusOptions}
-            value={selectedStatus}
-            onChange={setSelectedStatus}
-            placeholder="Выберите статус"
-            classNamePrefix="add-po-select"
-            isClearable={false}
-            isSearchable={false}
-            styles={selectStyles}
-          />
-        </div>
-        <div className='add-po-field archive'>
-          <label className="add-po-label">Архивная версия?</label>
-          <input
-            type="checkbox"
-            name="archive"
-            className="add-po-input checkbox"
-            onChange={changeArchive}
-            checked={isArchive}
+          {/* Архивная версия */}
+          <div className="add-po-field archive" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+            <label className="add-po-label" style={{ marginBottom: 0 }}>Архивная версия?</label>
+            <input
+              type="checkbox"
+              name="archive"
+              className="add-po-input checkbox"
+              checked={isArchive}
+              onChange={changeArchive}
+            />
+          </div>
 
-            defaultValue={new Date().toISOString().split('T')[0]}
-          />
-        </div>
+          {/* Дата релиза */}
+          <div className="add-po-field">
+            <label className="add-po-label">Дата релиза</label>
+            <input
+              type="date"
+              name="releaseDate"
+              className="add-po-input"
+              defaultValue={new Date().toISOString().split('T')[0]}
+            />
+          </div>
 
-        {/* Дата релиза */}
-        <div className="add-po-field">
-          <label className="add-po-label">Дата релиза</label>
-          <input
-            type="date"
-            name="releaseDate"
-            className="add-po-input"
-            defaultValue={new Date().toISOString().split('T')[0]}
-          />
-        </div>
+          {/* Файл ПО */}
+          <div className="add-po-field">
+            <label className="add-po-label">Файл ПО *</label>
+            <input
+              type="file"
+              name="file"
+              required
+              className="add-po-input"
+              data-testid="filePo"
+              accept=".bin,.hex,.zip,.elf,.doc,.docx"
+            />
+          </div>
 
-        {/* Файл */}
-        <div className="add-po-field">
-          <label className="add-po-label">Файл ПО *</label>
-          <input
-            type="file"
-            name="file"
-            required
-            className="add-po-input"
-            data-testid='filePo'
-            accept=".bin,.hex,.zip,.elf,.doc,.docx"
-          />
-        </div>
+          {/* Файл инструкции */}
+          <div className="add-po-field">
+            <label className="add-po-label">Файл инструкции *</label>
+            <input
+              type="file"
+              name="instructionFile"
+              required
+              className="add-po-input"
+              accept=".pdf,.doc,.docx,.txt"
+            />
+          </div>
 
-        {/* Описание */}
-        <div className="add-po-field">
-          <label className="add-po-label">Описание</label>
-          <textarea
-            name="description"
-            placeholder="Что изменено..."
-            rows="4"
-            className="add-po-textarea"
-          />
-        </div>
+          {/* Описание */}
+          <div className="add-po-field">
+            <label className="add-po-label">Описание</label>
+            <textarea
+              name="description"
+              placeholder="Что изменено..."
+              rows="4"
+              className="add-po-textarea"
+            />
+          </div>
 
-        <button type="submit" className="add-po-submit-button">
-          Добавить ПО
-        </button>
-      </form>
+          <button type="submit" className="add-po-submit-button">
+            Добавить ПО
+          </button>
+        </form>
       </div>
     </div>
-
   );
 }

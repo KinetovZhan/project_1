@@ -8,20 +8,19 @@ import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 export function AddAggForm({ onBack, onSubmit }) {
   const [formData, setFormData] = useState({
     type: '',
-    model: '',
-    comp_ser_num: '',
+    name: '',
     tractor_models: [],
-    number_of_parts: '',
-    producer_comp: ''
+    mounting_date: '',
+    comp_ser_num: '', 
+    producer: ''
   });
 
   const options = [
-    { value: 'dvs', label: 'ДВС' },
-    { value: 'kpp', label: 'КПП' },
-    { value: 'rk', label: 'РК' },
-    { value: 'hydro', label: 'Гидрораспределитель' },
-    { value: 'ap', label: 'Автопилот' },
-    { value: 'bk', label: 'БК' }
+    { value: 'DVS', label: 'ДВС' },
+    { value: 'KPP', label: 'КПП' },
+    { value: 'RK', label: 'РК' },
+    { value: 'HR', label: 'Гидрораспределитель' },
+    { value: 'BK', label: 'БК' }
   ];
 
   const isMobile = useCheckMobile();
@@ -99,7 +98,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         
         // Извлекаем уникальных производителей
         const producers = data
-          .map(item => item.producer_comp)
+          .map(item => item.producer)
           .filter(producer => producer && producer.trim() !== '') // убираем пустые и null
           .filter((value, index, self) => self.indexOf(value) === index); // уникальные значения
         
@@ -153,12 +152,11 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       const submitData = {
         type: formData.type,
-        model: formData.model,
+        name: formData.name,
         mounting_date: formData.mounting_date || null,
         comp_ser_num: formData.comp_ser_num || null,
         tractor_id: formData.selected_tractor_id ? parseInt(formData.selected_tractor_id, 10) : null,
-        number_of_parts: formData.number_of_parts ? parseInt(formData.number_of_parts, 10) : null,
-        producer_comp: formData.producer_comp || null
+        producer: formData.producer || null
       };
 
       console.log('Отправляемые данные:', submitData);
@@ -242,7 +240,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     setSelectedProducer(newOption);
     setFormData(prev => ({
       ...prev,
-      producer_comp: inputValue
+      producer: inputValue
     }));
   };
 
@@ -251,7 +249,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     setSelectedProducer(selectedOption);
     setFormData(prev => ({
       ...prev,
-      producer_comp: selectedOption ? selectedOption.value : ''
+      producer: selectedOption ? selectedOption.value : ''
     }));
   };
 
@@ -317,9 +315,9 @@ export function AddAggForm({ onBack, onSubmit }) {
           <label className='add-po-label'>Название</label>
           <input
             type="text"
-            name="model"
+            name="name"
             placeholder="Введите название"
-            value={formData.model}
+            value={formData.name}
             onChange={handleChange}
             required
             className='add-po-input'
@@ -420,7 +418,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           
         </div>
 
-        <div className='add-po-field'>
+        {/* <div className='add-po-field'>
           <label className='add-po-label'>Количество подчастей</label>
           <input
             type="number"
@@ -431,7 +429,7 @@ export function AddAggForm({ onBack, onSubmit }) {
             className='add-po-input'
             disabled={loading}
           />
-        </div>
+        </div> */}
 
         {/* Производитель с загрузкой из бэкенда */}
         {/* Производитель с загрузкой из бэкенда */}

@@ -281,8 +281,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   };
 
   // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
-  // const filteredItems = useMemo(() => {
-  //   if (!searchQuery) return softwareItems;
+  const filteredItems = useMemo(() => {
+    if (!searchQuery) return softwareItems;
 
     const query = searchQuery.trim().toLowerCase();
     return softwareItems.filter(
