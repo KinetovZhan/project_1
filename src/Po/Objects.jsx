@@ -147,91 +147,93 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 };
 
   // Функция для получения имени файла из заголовков
-  const getFilenameFromResponse = (response, defaultName) => {
-    const contentDisposition = response.headers.get('content-disposition');
-
+  const getFilenameFromResponse = (headers, defaultFilename) => {
+    const contentDisposition = headers['content-disposition'];
     if (contentDisposition) {
-      const matches = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
-      if (matches && matches[1]) {
-        return matches[1].replace(/['"]/g, '');
+      const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      if (filenameMatch && filenameMatch[1]) {
+        return filenameMatch[1].replace(/['"]/g, '');
       }
     }
-
-    return defaultName;
+    return defaultFilename;
   };
 
   // Функция для определения расширения файла
-  const ensureFileExtension = (filename, contentType) => {
-    if (filename.match(/\.([a-zA-Z0-9]+)$/)) {
-      return filename;
-    }
-
-    const extensionMap = {
-      'application/octet-stream': '.bin',
-      'application/zip': '.zip',
-      'application/pdf': '.pdf',
-      'application/x-binary': '.bin',
-      'binary/octet-stream': '.bin',
-      'application/json': '.json',
-      'text/plain': '.txt',
-    };
-
-    const extension = extensionMap[contentType] || '.bin';
-    return filename + extension;
-  };
-
+  // Функция для определения расширения файла
   const handleDownload = async (item) => {
-    if (!item?.id_Firmwares) {
-      alert('ID файла не указан');
-      return;
-    }
-
-    if (!token) {
-      alert('Требуется авторизация');
-      return;
-    }
-
-    try {
-      setDownloading(item.id_Firmwares);
-      
-      const response = await api.get(`firmware/download/${item.id_Firmwares}`, {
-        responseType: 'blob',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const contentType = response.headers.get('content-type') || '';
-      let filename = getFilenameFromResponse(response, `firmware_${item.id_Firmwares}`);
-      filename = ensureFileExtension(filename, contentType);
-
-      const blob = await response.blob();
-
-      if (blob.size === 0) {
-        throw new Error('Файл пустой');
+  try {
+    setDownloading(item.id_Firmwares);
+    
+    const response = await fetch(`http://172.20.46.66:8000/software/download/${item.id_Firmwares}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.style.display = 'none';
-
-      document.body.appendChild(a);
-      a.click();
-
-      setTimeout(() => {
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      }, 100);
-    } catch (error) {
-      console.error('Ошибка при скачивании:', error);
-      alert(`Ошибка при скачивании: ${error.message}`);
-    } finally {
-      setDownloading(null);
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+    
+    const blob = await response.blob();
+    
+    // Пробуем разные способы получить имя файла
+    let filename = `firmware_${item.id_Firmwares}`;
+    
+    // Способ 1: Из заголовка content-disposition
+    const contentDisposition = response.headers.get('content-disposition');
+    console.log('Content-Disposition header:', contentDisposition);
+    
+    if (contentDisposition && contentDisposition.includes('filename=')) {
+      const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+      if (matches && matches[1]) {
+        filename = matches[1].replace(/['"]/g, '');
+        console.log('Имя из content-disposition:', filename);
+      }
+    }
+    
+    // Способ 2: Из заголовка x-software-id (для отладки)
+    const softwareId = response.headers.get('x-software-id');
+    console.log('X-Software-ID header:', softwareId);
+    
+    // Способ 3: Используем download_link из item как запасной вариант
+    if (!filename.includes('.')) {
+      if (item.download_link && item.download_link.includes('.')) {
+        filename = item.download_link;
+        console.log('Имя из download_link:', filename);
+      } else {
+        // Если ничего не помогло, добавляем .pdf (так как мы знаем что это PDF)
+        filename += '.pdf';
+        console.log('Добавлено расширение .pdf по умолчанию');
+      }
+    }
 
+    console.log('ИТОГОВОЕ ИМЯ ФАЙЛА:', filename);
+
+    if (blob.size === 0) {
+      throw new Error('Файл пустой');
+    }
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }, 100);
+    
+  } catch (error) {
+    console.error('Ошибка при скачивании:', error);
+    alert(`Ошибка при скачивании: ${error.message}`);
+  } finally {
+    setDownloading(null);
+  }
+};
   // Обработчики для тултипа с задержкой 3 секунды
   const handleMouseEnter = (event, text, id) => {
     // Очищаем предыдущий таймер для этого элемента
@@ -429,7 +431,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       // После успешного изменения - перезагружаем данные
       await fetchFilteredData();
       
-      alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
+      // alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
     } catch (error) {
       console.error('Ошибка при изменении статуса архивации:', error);
       alert(`Ошибка: ${error.message || 'Не удалось изменить статус архивации'}`);
