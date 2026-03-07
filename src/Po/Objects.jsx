@@ -281,8 +281,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   };
 
   // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
-  // const filteredItems = useMemo(() => {
-  //   if (!searchQuery) return softwareItems;
+  const filteredItems = useMemo(() => {
+    if (!searchQuery) return softwareItems;
 
     const query = searchQuery.trim().toLowerCase();
     return softwareItems.filter(
@@ -429,7 +429,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       // После успешного изменения - перезагружаем данные
       await fetchFilteredData();
       
-      alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
+      // alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
     } catch (error) {
       console.error('Ошибка при изменении статуса архивации:', error);
       alert(`Ошибка: ${error.message || 'Не удалось изменить статус архивации'}`);
