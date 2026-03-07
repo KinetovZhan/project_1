@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import DefaultImage from '../img/default.jpg';
@@ -10,131 +9,234 @@ import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
-import {api} from '../fetchAPI.js';
-
+import  {api}  from '../fetchAPI.js';
+import { API_BASE_URL } from '../fetchAPI.js';
 
 export function PoDetails({ po, onBack }) {
+  const { token } = useAuth();
+  const [details, setDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [downloading, setDownloading] = useState(false); // состояние для кнопки
 
-//      useEffect(() => {
-//     const fetchFilteredData = async () => {
-//       setLoading(true);
-//       setError(null);
+  useEffect(() => {
+  const fetchDetails = async () => {
+    if (!po?.id_Firmwares || !po?.id_Component) {
+      setError('Недостаточно данных для загрузки');
+      setLoading(false);
+      return;
+    }
 
-//       if (!token) {
-//         setError('Пользователь не авторизован');
-//         setLoading(false);
-//         return;
-//       }
-//       if (userRole !== 'dealer') {
-//         try {
-//           const FilterToTypeMap = {
-//             DVS: ['dvs', 'engine'],
-//             KPP: ['kpp', 'transmission'],
-//             RK: ['suspension'],
-//             hydrorasp: ['hydraulics'],
-//           };
-//           const FilterToTractor = { K7: 'K-7', K5: 'K-5' };
-
-//           const postData = {
-//             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-//             type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-//             model_comp: Array.isArray(selectedModel) ? selectedModel : [],
-//             producers: Array.isArray(selectedProducers) ? selectedProducers : [],
-//             status: Array.isArray(selectedStatus) ? selectedStatus : [],
-
-//           };
-
-
-//           const data = await api.post('search/component-info', postData);
-
-//           const items = Array.isArray(data) ? data : data ? [data] : [];
-//           setSoftwareItems(items);
-//         } catch (err) {
-//           console.error('Ошибка:', err);
-//           setError(`Ошибка: ${err.message}`);
-//         } finally {
-//           setLoading(false);
-//         }
-//       } else {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchFilteredData();
-//   }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery, selectedStatus]); 
-
-
-    const ImageToComponent = (type_component, model_component) => {
-      // Приводим типы к нижнему регистру для единообразия
-      const typeLower = type_component?.toLowerCase() || '';
-      const modelLower = model_component?.toLowerCase() || '';
-    
-      // Обработка КПП в первую очередь (и по типу, и по модели)
-      if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
-          modelLower.includes('кпп') || modelLower.includes('kpp')) {
-        return KPPImage;
+    setLoading(true);
+    try {
+      // Явно формируем URL с параметрами
+      const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(po.id_Firmwares)}&id_component=${encodeURIComponent(po.id_Component)}`;
+      console.log('Fetching URL:', url); // для отладки
+      const data = await api.get(url);
+      
+      console.log('Received data:', data); // для отладки
+      const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
+      if (!item) throw new Error('Данные не найдены');
+      setDetails(item);
+    } catch (err) {
+      console.error('Ошибка загрузки деталей ПО:', err);
+      if (err.response) {
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
       }
-    
-      // Обработка остальных компонентов по типу
-      if (typeLower && typeLower !== 'двс') {
-        const ImageByType = {
-          'рулевая колонка': RKImage,
-          'гидрораспределитель': HRImage,
-          'бк': BKImage,
-          'автопилот': APImage,
-        };
-        
-        // Ищем соответствие по ключевым словам
-        for (const [key, image] of Object.entries(ImageByType)) {
-          if (typeLower.includes(key)) {
-            return image;
-          }
-        }
-      }
-    
-      // Обработка ДВС по модели
-      if (typeLower === 'двс' && modelLower) {
-        if (modelLower.includes('weichai')) {
-          return WeiImage;
-        }
-        if (modelLower.includes('тмз') || modelLower.includes('tmz')) {
-          return TMZImage;
-        }
-        if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
-          return JMZImage;
-        }
-      }
-    
-      return DefaultImage;
-    };
-    
+      setError(`Ошибка: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  fetchDetails();
+}, [po]);
+
+  if (loading) {
+    return (
+      <div className="po-details-container">
+        <button className="back-button" onClick={onBack}>← Назад</button>
+        <div className="po-details-content">Загрузка...</div>
+      </div>
+    );
+  }
+
+  if (error || !details) {
+    return (
+      <div className="po-details-container">
+        <button className="back-button" onClick={onBack}>← Назад</button>
+        <div className="po-details-content" style={{ color: 'red' }}>
+          {error || 'Данные не найдены'}
+        </div>
+      </div>
+    );
+  }
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('ru-RU');
+  };
+
+  const actualityPeriod = details.software_end_actuality
+    ? `${formatDate(details.software_release_date)} — ${formatDate(details.software_end_actuality)}`
+    : `с ${formatDate(details.software_release_date)} (бессрочно)`;
+
+  const ImageToComponent = (type_component, model_component) => {
+    const typeLower = type_component?.toLowerCase() || '';
+    const modelLower = model_component?.toLowerCase() || '';
+
+    if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
+        modelLower.includes('кпп') || modelLower.includes('kpp')) {
+      return KPPImage;
+    }
+
+    if (typeLower && typeLower !== 'двс') {
+      const ImageByType = {
+        'рулевая колонка': RKImage,
+        'гидрораспределитель': HRImage,
+        'бк': BKImage,
+        'автопилот': APImage,
+      };
+      for (const [key, image] of Object.entries(ImageByType)) {
+        if (typeLower.includes(key)) return image;
+      }
+    }
+
+    if (typeLower === 'двс' && modelLower) {
+      if (modelLower.includes('weichai')) return WeiImage;
+      if (modelLower.includes('тмз') || modelLower.includes('tmz')) return TMZImage;
+      if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) return JMZImage;
+    }
+
+    return DefaultImage;
+  };
+   const handleDownloadInstruction = async () => {
+    if (!details?.id_firmwares) return;
+    setDownloading(true);
+    try {
+      // Используем метод download из fetchAPI (он возвращает response)
+      const response = await api.download(`/firmware/download/${details.id_firmwares}?type=instruction`);
+      const blob = await response.blob();
+
+      // Пытаемся получить имя файла из заголовка Content-Disposition
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = details.software_path_instruction || `instruction_${details.id_firmwares}.pdf`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+        if (match && match[1]) filename = match[1].replace(/['"]/g, '');
+      }
+
+      // Создаём ссылку и скачиваем
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Ошибка скачивания:', error);
+      alert('Не удалось скачать файл');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="po-details-container">
-      <button onClick={onBack} className="add-po-back-button">
-        <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-       <div className="po-details-content">
+      <div className="po-details-content">
         <div className="left-column">
-            <div className="section">
-               <h2>№: {po.producer_version} от {new Date(po.release_date).toLocaleDateString()} </h2>
-               <img className="object"
-                      src={ImageToComponent(po.type_component, po.model_component || po.comp_model)}
-                      alt={po.type_component} />
-            </div>
-            <div className="section">
-               <h3>Дата выпуска</h3>
-              <p>{po.release_date ? new Date(po.release_date).toLocaleDateString('ru-RU') : '-'}</p>
-            </div>
+          <div className="section">
+            <h2>{details.software_path || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</h2>
+            <img
+              className="object"
+              src={ImageToComponent(details.component_type, details.component_name)}
+              alt={details.component_type}
+            />
+          </div>
+          <div className="section">
+            <h3>Дата выпуска</h3>
+            <p>{formatDate(details.software_release_date)}</p>
+          </div>
+          <div className="section">
+            <h3>Период актуальности</h3>
+            <p>{actualityPeriod}</p>
+          </div>
+          <div className="section">
+            <h3>Установщик</h3>
+              {details.software_path ? (
+              <button
+                className="download-button"
+                onClick={handleDownloadInstruction}
+                disabled={downloading}
+              >
+                {downloading ? 'Скачивание...' : 'Скачать '}
+              </button>
+            ) : (
+              <p>—</p>
+            )}
+          </div>
+          <div className="section">
+            <h3>Инструкция</h3>
+            {details.software_path_instruction ? (
+              <button
+                className="download-button"
+                onClick={handleDownloadInstruction}
+                disabled={downloading}
+              >
+                {downloading ? 'Скачивание...' : 'Скачать'}
+              </button>
+            ) : (
+              <p>—</p>
+            )}
+          </div>
         </div>
         <div className="right-column">
-            <h3>fdsdfxfxdfxfd</h3>
+          <div className="section">
+            <h3>Описание</h3>
+            <div className="description">
+              {details.software_description || 'Описание отсутствует'}
+            </div>
+          </div>
+          <div className="section">
+            <h3>Предыдущие версии</h3>
+            <p>
+              {details.software_previous_sw_version ? (
+                <a href={`#/software/${details.software_previous_sw_version}`}>
+                  Версия {details.software_previous_sw_version}
+                </a>
+              ) : '—'}
+            </p>
+          </div>
+          {/* <div className="section">
+            <h3>Статус</h3>
+            <p>
+              {details.software_status === 'serial' && 'Серийное'}
+              {details.software_status === 'experienced' && 'Опытное'}
+              {details.software_status === 'in operation' && 'В эксплуатации'}
+              {!details.software_status && '—'}
+            </p>
+          </div>
+          <div className="section">
+            <h3>Актуальность</h3>
+            <p>
+              {details.software_is_actual ? 'Актуально' : 'Не актуально'}
+              {details.software_is_archive && ' (в архиве)'}
+              {details.software_is_critical && ' (критическое)'}
+            </p>
+          </div>
+          <div className="section">
+            <h3>Модели тракторов</h3>
+            <p>
+              {details.software_tractor_models?.length
+                ? details.software_tractor_models.join(', ')
+                : '—'}
+            </p>
+          </div> */}
         </div>
-    </div>
-      
+      </div>
     </div>
   );
 }
