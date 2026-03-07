@@ -54,6 +54,7 @@
   overflow-y: auto;
   border-radius: 10px;
   padding:10px;
+   overflow-wrap: break-word;
 }
 
 .download-button {

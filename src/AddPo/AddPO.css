@@ -232,6 +232,17 @@
   justify-content: space-between;
 }
 
+.actual {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+.critical {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+
 .checkbox {
   width: 50px;
 
