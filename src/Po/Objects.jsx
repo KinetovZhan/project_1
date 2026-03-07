@@ -60,7 +60,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           const postData = {
             trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
             type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-            model_comp: Array.isArray(selectedModel) ? selectedModel : [],
+            name_component: Array.isArray(selectedModel) ? selectedModel : [],
             producers: Array.isArray(selectedProducers) ? selectedProducers : [],
             status: Array.isArray(selectedStatus) ? selectedStatus : []
           };
@@ -84,10 +84,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     fetchFilteredData();
   }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, searchQuery, selectedStatus]); 
 
-  const ImageToComponent = (type_component, model_component) => {
+  const ImageToComponent = (type_component, name_component) => {
   // Приводим типы к нижнему регистру для единообразия
   const typeLower = type_component?.toLowerCase() || '';
-  const modelLower = model_component?.toLowerCase() || '';
+  const modelLower =  name_component?.toLowerCase() || '';
 
   // Обработка КПП в первую очередь (и по типу, и по модели)
   if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
@@ -271,7 +271,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       (item) =>
         (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
         (item.type_component && item.type_component.toLowerCase().includes(query)) ||
-        (item.model_component && item.model_component.toLowerCase().includes(query)) ||
+        (item. name_component && item. name_component.toLowerCase().includes(query)) ||
         (item.comp_model && item.comp_model.toLowerCase().includes(query))
     );
   }, [softwareItems, searchQuery]);
@@ -290,7 +290,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
         (item) =>
           (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
           (item.type_component && item.type_component.toLowerCase().includes(query)) ||
-          (item.model_component && item.model_component.toLowerCase().includes(query)) ||
+          (item. name_component &&  name_component.toLowerCase().includes(query)) ||
           (item.comp_model && item.comp_model.toLowerCase().includes(query))
       );
     }
@@ -428,7 +428,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               .filter((item) => item.id_Firmwares)
               .map((item) => {
                 // Формируем текст для тултипа
-                const tooltipText = `${item.type_component || '—'}: ${item.model_component || item.comp_model || '—'}`;
+                const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
                 const tooltipText2 = `${item.producer_version} от ${new Date(item.release_date).toLocaleDateString()}`;
                return (
                 <li key={item.id_Firmwares}>
@@ -446,7 +446,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
                       onMouseMove={handleMouseMove}
                       onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
-                        №: {item.producer_version} от {new Date(item.release_date).toLocaleDateString()}
+                        {item.download_link} от {new Date(item.release_date).toLocaleDateString()}
                       </h4>
                       <div className="infodisc">
                         <h5
@@ -455,7 +455,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                           onMouseMove={handleMouseMove}
                           onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
                         >
-                          Для компонента {item.type_component || '—'}: {item.model_component || item.comp_model || '—'}
+                          Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
                           {item.part_type ? ` (${item.part_type})` : ' (—)'}
                         </h5>
                       </div>

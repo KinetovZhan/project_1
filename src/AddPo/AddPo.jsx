@@ -44,18 +44,18 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
    // Загрузка компонентов с частями
    // Загрузка компонентов с частями
-  useEffect(() => {
-    api.get('search/component-parts/')
-    api.get('search/component-parts/')
-      .then(data => {
-        console.log('Полученные данные компонентов:', data);
-        setComponentOptions(data);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки компонентов:', err);
-        alert('Не удалось загрузить список компонентов');
-      });
-  }, []);
+  // useEffect(() => {
+  //   api.get('search/component-parts/')
+  //   api.get('search/component-parts/')
+  //     .then(data => {
+  //       console.log('Полученные данные компонентов:', data);
+  //       setComponentOptions(data);
+  //     })
+  //     .catch(err => {
+  //       console.error('Ошибка загрузки компонентов:', err);
+  //       alert('Не удалось загрузить список компонентов');
+  //     });
+  // }, []);
 
   // Загрузка списка ПО (для предыдущих версий)
   // Загрузка списка ПО (для предыдущих версий)

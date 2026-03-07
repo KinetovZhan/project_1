@@ -187,53 +187,44 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchModels = async () => {
-    if (!token) {
-      console.log('Нет токена, очищаем список моделей');
-      setComponentModels([]);
-      return;
-    }
+ const fetchModels = async () => {
+  if (!token) {
+    setComponentModels([]);
+    return;
+  }
 
-
-    const activeComponentTypes = Object.keys(FilterItems)
-      .filter(key => FilterItems[key])
-      .map(key => componentTypeMap[key]);
-
-    const activeTractorModels = selectedTractorModels; 
-    
-    // Добавляем производителей в запрос
-    const postData = {
-      trac_model: activeTractorModels.length  > 0 ? activeTractorModels : [],
-      type_comp: activeComponentTypes.length > 0 ? activeComponentTypes : [],
-      producers: selectedProducers.length > 0 ? selectedProducers : [],
-      status: selectedStatus.length > 0 ? selectedStatus : []
-    };
-
-
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('Токен в Filters компоненте:', token ? 'Есть' : 'Нет');
-      console.log('Отправляемые данные:', postData);
-
-      // Используем api.post вместо fetch
-      const data = await api.post('/search/component-models', postData);
-      setComponentModels(data.component_models || []);
-    } catch (err) {
-      console.error('Ошибка загрузки моделей компонентов:', err);
-      setError('Не удалось загрузить модели компонентов');
-      setComponentModels([]);
-    } finally {
-      setLoading(false);
-    }
+  // Сопоставление ключей чекбоксов с кодами в БД
+  const typeCodeMap = {
+    DVS: 'DVS',
+    KPP: 'KPP',
+    RK: 'RK',
+    hydrorasp: 'HR',   // важно: hydrorasp -> HR
+    BK: 'BK'
   };
 
-  useEffect(() => {
-    fetchModels();
-  }, [FilterItems, selectedTractorModels, selectedProducers, selectedStatus, token]); 
+  const activeTypes = Object.keys(FilterItems)
+    .filter(key => FilterItems[key])
+    .map(key => typeCodeMap[key]);
 
+  const postData = {
+    trac_model: selectedTractorModels.length > 0 ? selectedTractorModels : [],
+    type_comp: activeTypes,
+    producers: selectedProducers,
+    status: selectedStatus
+  };
+
+  try {
+    setLoading(true);
+    const data = await api.post('/search/component-info', postData);
+    const uniqueNames = [...new Set(data.map(item => item.name_component).filter(Boolean))];
+    setComponentModels(uniqueNames);
+  } catch (err) {
+    console.error(err);
+    setComponentModels([]);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       <div className='filters'>
