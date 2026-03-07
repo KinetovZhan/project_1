@@ -24,21 +24,15 @@ export function Filters2({
     { value: 'K-525', label: 'К-525' }
   ];
 
+  const actualityOptions = [
+    {value:'critical', label: 'Критическое'},
+    {value:'actual', label: 'Актуальное'},
+    {value:'oldy', label: 'Устаревшее'}
+  ];
+
   const isMobile = useCheckMobile()
-
+  const [selectedActuality, setSelectedActuality] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
-  const [FilterTractor_by_status, setFilterTractor_by_status] = useState({
-    serial: false,
-    experimental: false,
-    in_operation: false,
-  });
-
-  const FilterStatus = {
-    'serial': 'serial',
-    'experimental': 'experimental',
-    'in_operation': 'in_operation',
-  }
-
   const [Dealer, setDealer] = useState('')
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -293,20 +287,14 @@ const handleClearEndDate = () => {
   }
 
   // Новый обработчик для кнопок актуальности
-  const handleActualClick = (value) => {
+  const handleActualChange = (selectedOption) => {
     // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
-    handleMajMinButtonClick(value);
+    setSelectedActuality(selectedOption);
     
     // Вызываем onActualChange с булевым значением
     if (onActualChange) {
-      // Если нажали на активную кнопку, сбрасываем фильтр
-      if (activeMajMinButton === value) {
-        onActualChange(null); // Показать все
-      } else {
-        // Иначе устанавливаем соответствующее значение
-        onActualChange(value === 'MAJ'); // true для актуальных, false для не актуальных
-      }
-    }
+        onActualChange(selectedOption ? selectedOption.value : null); // Показать все
+      } 
   };
   
   return (
@@ -448,7 +436,7 @@ const handleClearEndDate = () => {
         </label>
       </div> */}
 
-      <div className='Majmin'>
+      {/* <div className='Majmin'>
         <button 
           className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
           onClick={() => handleActualClick('MAJ')}
@@ -461,7 +449,42 @@ const handleClearEndDate = () => {
         >
           Не актуальные
         </button>
-      </div>
+      </div> */}
+
+      <div className="actuality-filter">
+  <Select
+    className="actuality-select"
+    options={actualityOptions}
+    value={selectedActuality}
+    onChange={handleActualChange}
+    placeholder="Все статусы"
+    isClearable={true}
+    menuPortalTarget={document.body}
+    styles={{
+      control: (base) => ({
+        ...base,
+        width: '100%',
+        borderRadius: '15px',
+        height: '53px',
+        backgroundColor: 'rgba(217, 217, 217, 1)',
+        color: 'black',
+        left: '90%',
+        transform: 'Translate(-50%)',
+      }),
+      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+      menuList: (base) => ({
+        ...base,
+        maxHeight: 150,
+        overflowY: 'auto',
+        backgroundColor: 'white',
+        color: 'black',
+        border: '1px solid rgba(217, 217, 217, 1)',
+        scrollbarWidth: 'thin',
+        fontSize: '16px'
+      })
+    }}
+  />
+</div>
     </>
   );
 }

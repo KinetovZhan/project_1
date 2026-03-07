@@ -226,3 +226,13 @@
 
 } 
 
+.archive {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+
+.checkbox {
+  width: 50px;
+
+}
