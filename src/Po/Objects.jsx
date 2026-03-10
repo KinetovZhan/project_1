@@ -54,14 +54,13 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     
     if (userRole !== 'dealer') {
       try {
-        const FilterToTypeMap = {
-          DVS: ['dvs', 'engine'],
-          KPP: ['kpp', 'transmission'],
-          RK: ['suspension'],
-          hydrorasp: ['hydraulics'],
-          AP: ['autopilot'],
-          BK: ['bk', 'controller']
-        };
+        // const FilterToTypeMap = {
+        //   DVS: ['dvs', 'engine'],
+        //   KPP: ['kpp', 'transmission','кпп'],
+        //   RK: ['suspension','Рулевая колонка'],
+        //   HR: ['hydraulics'],
+        //   BK: ['bk', 'controller']
+        // };
         
         const FilterToTractor = { 
           K7: 'K-7', 
@@ -70,8 +69,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
         const postData = {
           trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-          type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
-          name_component: Array.isArray(selectedModel) ? selectedModel : [],
+          // type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
+          type_comp: activeFilters,
+          name_comp: Array.isArray(selectedModel) ? selectedModel : [],
           producers: Array.isArray(selectedProducers) ? selectedProducers : [],
           status: Array.isArray(selectedStatus) ? selectedStatus : []
         };
@@ -337,7 +337,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       DVS: 'ДВС',
       KPP: 'КПП',
       RK: 'РК',
-      hydrorasp: 'Гидрораспределитель',
+      HR: 'Гидрораспределитель',
       AP: 'Автопилот',
       BK: 'БК',
       K7: 'К-7',
@@ -555,7 +555,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                         >
                           Скачать
                         </button>
-                        <button onClick={() => handleMoveToArchive(item, false)} style={{width:'100px', border: 'none', backgroundColor:'#d7dcf3'}}>
+                        <button onClick={() => handleMoveToArchive(item, choosedObjects === 'active')} style={{width:'100px', border: 'none', backgroundColor:'#d7dcf3'}}>
                           <span>{(choosedObjects == 'active')?'В архив':'Из архива'}</span>
                         </button>
                       </div>
