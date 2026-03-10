@@ -37,6 +37,7 @@ function MainPage() {
   });
   // Добавляем состояние для фильтра актуальности
   const [actualFilter, setActualFilter] = useState(null); // null, true, false
+  const [aggFilter, setAggFilter] = useState(null);
 
   const { logout, user } = useAuth();
 
@@ -226,6 +227,10 @@ function MainPage() {
     setActualFilter(value);
   };
 
+  const handleAggChange = (value) => {
+    setAggFilter(value)
+  }
+
    //ОБРАБОТЧИК для Базы знаний
   const handleKnowledgeBase = () => {
     navigate('/knowledge-base'); // или другой путь
@@ -282,6 +287,7 @@ function MainPage() {
             handleMajMinButtonClick={handleMajMinButtonClick}
             onStatusChange={handleStatusChange} 
             onActualChange={handleActualChange}
+            onAggChange={handleAggChange}
             isMobileSidebarOpen={isMobileSidebarOpen}
             toggleMobileSidebar={toggleMobileSidebar}
           />

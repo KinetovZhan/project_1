@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { format } from 'date-fns';
@@ -15,7 +15,8 @@ export function Filters2({
   onDealerChange, 
   onDateChange,
   // Добавляем новый проп для фильтра актуальности
-  onActualChange 
+  onActualChange,
+  onAggChange
 }) {
   // Опции для Select с моделями тракторов
   const tractorOptions = [
@@ -30,6 +31,12 @@ export function Filters2({
     {value:'oldy', label: 'Устаревшее'}
   ];
 
+  const actualityOptions1 = [
+    {value:'dvs', label: 'ДВС'},
+    {value:'KPP', label: 'КПП'},
+    {value:'RK', label: 'РК'}
+  ];
+
   const isMobile = useCheckMobile()
   const [selectedActuality, setSelectedActuality] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
@@ -38,12 +45,44 @@ export function Filters2({
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); 
+  const [isFocused, setIsFocused] = useState(false);
+  const [agg, setAgg] = useState(null);
+  const [isCritical, setIsCritical] = useState(null);
+  const [isActual, setIsActual] = useState(null);
+  const [isOldy, setIsOldy] = useState(null);
+
+
+  useEffect(() => {
+    const checkStatus =() => {
+      if(optioins.value === 'critical') {
+        setIsCritical(true)
+      } else {setIsCritical(false)}
+
+      if(actualityOptions.value === 'actual') {
+        setIsActual(true)
+      } else {setIsActual(false)}
+
+      if(actualityOptions.value === 'oldy') {
+        setIsOldy(true)
+      } else {setIsOldy(false)}
+    }
+    checkStatus()
+  },[])
+
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
       onDealerChange(Dealer);
     }
+  };
+
+  const handleAgg = (selectedOption) => {
+    // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
+    setAgg(selectedOption);
+    
+    if (onAggChange) {
+        onAggChange(selectedOption ? selectedOption.value : null);
+      } 
   };
 
   const handleChange = (e) => {
@@ -80,6 +119,7 @@ export function Filters2({
     }
   }
 };
+
 
 // Обработчик для конечной даты
 const handleEndDateChange = (date) => {
@@ -408,83 +448,78 @@ const handleClearEndDate = () => {
         </button>  
       </div>
 
-      {/* Фильтр по статусам */}
-      {/* <div className='filterstrac2'>
-        <label>
-          <span>Серийное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.serial} 
-            onChange={() => handleFilterByStatus('serial')}
-          />
-        </label>
-        <label>
-          <span>Опытное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.experimental} 
-            onChange={() => handleFilterByStatus('experimental')}
-          />
-        </label>
-        <label>
-          <span>Актуальное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.in_operation} 
-            onChange={() => handleFilterByStatus('in_operation')}
-          />
-        </label>
-      </div> */}
+      <div className="actuality-filter" style={{display:'flex',flexDirection:'row', width:'100%',gap:'15%',justifyContent:'center'}}>
 
-      {/* <div className='Majmin'>
-        <button 
-          className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleActualClick('MAJ')}
-        >
-          Актуальные
-        </button>
-        <button 
-          className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleActualClick('MIN')}
-        >
-          Не актуальные
-        </button>
-      </div> */}
+        <Select
+          className="actuality-select"
+          options={actualityOptions1}
+          value={agg}
+          onChange={handleAgg}
+          placeholder="Узел"
+          isClearable={true}
+          menuPortalTarget={document.body}
+          styles={{
+            control: (base) => ({
+              ...base,
+              width: '100%',
+              borderRadius: '15px',
+              height: '53px',
+              backgroundColor: 'rgba(217, 217, 217, 1)',
+              color: 'black'
+            }),
+            container: (base) => ({
+              width:'40%'
+            }),
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth: 'thin',
+              fontSize: '16px'
+            })
+          }}
+        />
 
-      <div className="actuality-filter">
-  <Select
-    className="actuality-select"
-    options={actualityOptions}
-    value={selectedActuality}
-    onChange={handleActualChange}
-    placeholder="Все статусы"
-    isClearable={true}
-    menuPortalTarget={document.body}
-    styles={{
-      control: (base) => ({
-        ...base,
-        width: '100%',
-        borderRadius: '15px',
-        height: '53px',
-        backgroundColor: 'rgba(217, 217, 217, 1)',
-        color: 'black',
-        left: '90%',
-        transform: 'Translate(-50%)',
-      }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      menuList: (base) => ({
-        ...base,
-        maxHeight: 150,
-        overflowY: 'auto',
-        backgroundColor: 'white',
-        color: 'black',
-        border: '1px solid rgba(217, 217, 217, 1)',
-        scrollbarWidth: 'thin',
-        fontSize: '16px'
-      })
-    }}
-  />
-</div>
+        <Select
+          className="actuality-select"
+          options={actualityOptions}
+          value={selectedActuality}
+          onChange={handleActualChange}
+          placeholder="Все статусы"
+          isClearable={true}
+          menuPortalTarget={document.body}
+          styles={{
+            control: (base) => ({
+              ...base,
+              width: '100%',
+              borderRadius: '15px',
+              height: '53px',
+              backgroundColor: 'rgba(217, 217, 217, 1)',
+              color: 'black',
+            }),
+            container: (base) => ({
+              width:'40%'
+            }),
+            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+              backgroundColor: (isCritical?'red':(isActual?'green':'yellow')),
+              backgroundColor: (isActual?'green':'white'),
+              backgroundColor: (isOldy?'yellow':'white'),
+              color: 'black',
+              border: '1px solid rgba(217, 217, 217, 1)',
+              scrollbarWidth: 'thin',
+              fontSize: '16px'
+            })
+          }}
+        />
+      </div>
     </>
   );
 }

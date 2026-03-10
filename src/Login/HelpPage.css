@@ -14,3 +14,90 @@
   height: 100%;  
   font-size:25px;
 }
+
+
+
+.help-page{
+  display: flex;
+  justify-content: center;
+}
+
+.help-container{
+  background-color: grey;
+  border-radius: 25px;
+  height: 90vh;
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5vh;
+  
+}
+.sendform{
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.message-form{
+  display: flex;
+  flex-direction: column;
+}
+
+.user-messages{
+  max-height:78vh;
+  background-color: white;
+  color: black;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  border-radius: 10px;
+  margin-right: 5%;
+  margin-top: 2vh;
+  overflow-y: auto;
+  padding: 2%;
+  width: 30%;
+  gap: 10px;
+}
+
+.user-messages::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.user-messages::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color:#bebebe;
+}
+
+.user-messages::-webkit-scrollbar-corner {
+  border-radius: 10px;
+}
+
+.message-replies {
+  background-color: rgb(177, 171, 171);
+  border-radius: 5px;
+  display:flex;
+  flex-direction:column ;
+  padding: 10px;
+}
+
+.message-card{
+  background-color: antiquewhite;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hzclass {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.add-po-back-button {
+  width: 20%;
+  background-color: rgb(158, 151, 151);
+}
+.message-body {
+  background-color: rgb(235, 193, 129);
+}
