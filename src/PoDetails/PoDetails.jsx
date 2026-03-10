@@ -4,7 +4,6 @@ import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
 import RKImage from '../img/РК.png';
 import HRImage from '../img/Гидрораспределитель.png';
-import APImage from '../img/Автопилот.png';
 import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
@@ -99,33 +98,48 @@ useEffect(() => {
     ? `${formatDate(details.software_release_date)} — ${formatDate(details.software_end_actuality)}`
     : `с ${formatDate(details.software_release_date)} (бессрочно)`;
 
-  const ImageToComponent = (type_component, model_component) => {
+  const ImageToComponent = (type_component, name_component) => {
+    // Приводим типы к нижнему регистру для единообразия
     const typeLower = type_component?.toLowerCase() || '';
-    const modelLower = model_component?.toLowerCase() || '';
-
-    if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
-        modelLower.includes('кпп') || modelLower.includes('kpp')) {
+    const modelLower =  name_component?.toLowerCase() || '';
+  
+    // Обработка КПП в первую очередь (и по типу, и по модели)
+    if (typeLower.includes('кпп') || typeLower.includes('kpp') ) {
       return KPPImage;
     }
-
-    if (typeLower && typeLower !== 'двс') {
+  
+    // Обработка остальных компонентов по типу
+    if (typeLower && typeLower !== 'dvs') {
       const ImageByType = {
         'рулевая колонка': RKImage,
         'гидрораспределитель': HRImage,
         'бк': BKImage,
-        'автопилот': APImage,
+        'rk': RKImage,
+        'hr': HRImage,
+        'bk': BKImage,
       };
+      
+      // Ищем соответствие по ключевым словам
       for (const [key, image] of Object.entries(ImageByType)) {
-        if (typeLower.includes(key)) return image;
+        if (typeLower.includes(key)) {
+          return image;
+        }
       }
     }
-
-    if (typeLower === 'двс' && modelLower) {
-      if (modelLower.includes('weichai')) return WeiImage;
-      if (modelLower.includes('тмз') || modelLower.includes('tmz')) return TMZImage;
-      if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) return JMZImage;
+         // Обработка ДВС по модели
+    if ((typeLower === 'двс'||typeLower === 'dvs') && modelLower) {
+      if (modelLower.includes('weichai')) {
+        return WeiImage;
+      }
+      if (modelLower.includes('тмз') || modelLower.includes('tmz')) {
+        return TMZImage;
+      }
+      if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
+        return JMZImage;
+      }
+  
     }
-
+  
     return DefaultImage;
   };
   const handleDownloadSoftware = async () => {
@@ -234,7 +248,7 @@ useEffect(() => {
       <div className="po-details-content">
         <div className="left-column">
           <div className="section">
-            <h2>{details.filename || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</h2>
+            <h2>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</h2>
             <img
               className="object"
               src={ImageToComponent(details.component_type, details.component_name)}
@@ -286,28 +300,30 @@ useEffect(() => {
             </div>
           </div>
           <div className="section">
-  <h3>Предыдущие версии</h3>
-  <p>
-    {details.software_previous_sw_version ? (
-      prevVersionData ? (
-        <a
-          href="#"
-          onClick={handlePreviousVersionClick}
-          style={{ cursor: 'pointer', textDecoration: 'underline' }}
-        >
-          {prevVersionData.name} ({formatDate(prevVersionData.release_date)})
-        </a>
-      ) : (
-        <a
-          href="#"
-          onClick={handlePreviousVersionClick}
-          style={{ cursor: 'pointer', textDecoration: 'underline' }}
-        >
-          Версия {details.software_previous_sw_version}
-        </a>
-      )
-    ) : '—'}
-  </p>
+            <h3>Предыдущие версии</h3>
+            <div className = 'prev-version'>
+              <div className = 'version'>
+              {details.software_previous_sw_version ? (
+                prevVersionData ? (
+                  <a
+                    href="#"
+                    onClick={handlePreviousVersionClick}
+                    className="prev-version-link"
+                  >
+                    {prevVersionData.filename_for_download} от ({new Date(prevVersionData.release_date).toLocaleDateString()})
+                  </a>
+                ) : (
+                  <a
+                    href="#"
+                    onClick={handlePreviousVersionClick}
+                    className ="prev-version-link"
+                  >
+                    Версия {details.software_previous_sw_version}
+                  </a>
+                )
+              ) : '—'}
+              </div>
+            </div>
 </div>
           {/* <div className="section">
             <h3>Статус</h3>

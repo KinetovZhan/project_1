@@ -108,18 +108,19 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const modelLower =  name_component?.toLowerCase() || '';
 
   // Обработка КПП в первую очередь (и по типу, и по модели)
-  if (typeLower.includes('кпп') || typeLower.includes('kpp') || 
-      modelLower.includes('кпп') || modelLower.includes('kpp')) {
+  if (typeLower.includes('кпп') || typeLower.includes('kpp') ) {
     return KPPImage;
   }
 
   // Обработка остальных компонентов по типу
-  if (typeLower && typeLower !== 'двс') {
+  if (typeLower && typeLower !== 'dvs') {
     const ImageByType = {
       'рулевая колонка': RKImage,
       'гидрораспределитель': HRImage,
       'бк': BKImage,
-      'автопилот': APImage,
+      'rk': RKImage,
+      'hr': HRImage,
+      'bk': BKImage,
     };
     
     // Ищем соответствие по ключевым словам
@@ -129,9 +130,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       }
     }
   }
-
-  // Обработка ДВС по модели
-  if (typeLower === 'двс' && modelLower) {
+       // Обработка ДВС по модели
+  if ((typeLower === 'двс'||typeLower === 'dvs') && modelLower) {
     if (modelLower.includes('weichai')) {
       return WeiImage;
     }
@@ -141,6 +141,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
       return JMZImage;
     }
+
   }
 
   return DefaultImage;
@@ -516,13 +517,13 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               .map((item) => {
                 // Формируем текст для тултипа
                 const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
-                const tooltipText2 = `${item.producer_version} от ${new Date(item.release_date).toLocaleDateString()}`;
+                const tooltipText2 = `${item.download_link} от ${new Date(item.release_date).toLocaleDateString()}`;
               return (
                 <li key={item.id_Firmwares}>
                   <div className="objectmenu" data-testid="objectmenu">
                     <img
                       className="object"
-                      src={ImageToComponent(item.type_component, item.model_component || item.comp_model)}
+                      src={ImageToComponent(item.type_component, item.model_component || item.name_component)}
                       alt={item.type_component}
                       onClick={()=> handlePoClick(item.id_Firmwares)}
                       style={{ cursor: 'pointer' }}
@@ -543,7 +544,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                           onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
                         >
                           Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
-                          {item.part_type ? ` (${item.part_type})` : ' (—)'}
+                      
                         </h5>
                       </div>
                       <div style={{width:'100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
