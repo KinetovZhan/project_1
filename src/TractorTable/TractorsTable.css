@@ -158,3 +158,15 @@
   }
 
 }
+
+.cell-critical {
+  background-color: #ffcccc !important; /* красный */
+}
+
+.cell-actual {
+  background-color: #ccffcc !important; /* зелёный */
+}
+
+.cell-oldy {
+  background-color: #ffffcc !important; /* жёлтый */
+}

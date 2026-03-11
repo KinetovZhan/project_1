@@ -708,7 +708,15 @@ button.search_button {
 
 .actuality-filter {
   position: absolute;
-  top: 505px;
+  top: 500px;
+  width: 200px;
+;
+}
+
+.uzel-filter {
+  position: absolute;
+  top: 500px;
+  width: 150px;
 ;
 }
 

@@ -17,6 +17,8 @@ export function MainPart({
   searchQuery,
   searchDealer,
   selectedStatus,
+  actualFilter,   
+  uzelFilter,
 
   // --- Форма ПО ---
   showAddForm,
@@ -110,6 +112,8 @@ export function MainPart({
             searchDealer={searchDealer}
             dateFilter={dateFilter}
             activeMajMinButton={activeMajMinButton}
+            actualFilter = {actualFilter}    
+            uzelFilter = {uzelFilter}
           />
         </>
       )}
