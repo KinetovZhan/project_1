@@ -165,7 +165,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   try {
     setDownloading(item.id_Firmwares);
     
-    const response = await fetch(`http://172.20.46.61:8000/software/download/${item.id_Firmwares}`, {
+    const response = await fetch(`api/software/download/${item.id_Firmwares}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
