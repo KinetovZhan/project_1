@@ -56,9 +56,9 @@ export const buildApiUrl = (endpoint) => {
   }
   
   // Добавляем протокол если его нет
-  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-    baseUrl = 'http://' + baseUrl;
-  }
+//  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+//    baseUrl = 'http://' + baseUrl;
+//  }
   
   // Убираем trailing слеш у базового URL
   const cleanBaseUrl = baseUrl.replace(/\/+$/, '');
