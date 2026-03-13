@@ -1,6 +1,7 @@
 /* src/cssfiles/KnowledgeBase.css */
 
 .knowledge-base-container {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   display: flex;
   width: 90%;
   height: 75vh;
@@ -12,6 +13,7 @@
 }
 
 .close-button {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   position: absolute;
   width: 3%;
   height: 6vh;
