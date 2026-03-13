@@ -8,11 +8,16 @@
     border-radius: 30px;
     flex-shrink: 1;
     z-index: 2;
-    position: relative;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
-  
+
+  .sidebar > div{
+    margin-top: 10%;
+  }
+
   .choose {
     display: flex;
     text-align: center;
@@ -23,7 +28,6 @@
     line-height: 0;
     width: 30vh;  
     height: 120px;
-    margin-top: 40px;
   }
   
   .choose button {

@@ -501,86 +501,91 @@ const formatActualityOptionLabel = ({ value, label }) => {
         </button>
       </div> */}
 
-      <div className="actuality-filter">
-  <Select
-    isMulti
-    className="actuality-select"
-    options={actualityOptions}
-    value={selectedActuality}
-    onChange={handleActualChange}
-    placeholder="Все статусы"
-    isClearable={true}
-    menuPortalTarget={document.body}
-    formatOptionLabel={formatActualityOptionLabel}   // <-- добавлено
-    styles={{
-      control: (base) => ({
-        ...base,
-        width: '100%',
-        borderRadius: '15px',
-        height: '53px',
-        backgroundColor: 'rgba(217, 217, 217, 1)',
-        color: 'black',
-        left: '100%',
-        transform: 'Translate(-50%)',
-        overflowY: 'auto',
-        overflowX: 'auto',
-      }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      menuList: (base) => ({
-        ...base,
-        maxHeight: 150,
-        overflowY: 'auto',
-        backgroundColor: 'white',
-        color: 'black',
-        border: '1px solid rgba(217, 217, 217, 1)',
-        scrollbarWidth: 'thin',
-        fontSize: '16px'
-      }),
-      option: (base, state) => ({
-        ...base,
-        display: 'flex',
-        alignItems: 'center',
-      }),
-    }}
-  />
-</div>
+      <div className='tractors-status'>
+        <span>Статус:</span>
+        <div className="actuality-filter">
+          <Select
+            isMulti
+            className="actuality-select"
+            options={actualityOptions}
+            value={selectedActuality}
+            onChange={handleActualChange}
+            placeholder="Все статусы"
+            isClearable={true}
+            menuPortalTarget={document.body}
+            formatOptionLabel={formatActualityOptionLabel}   // <-- добавлено
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                borderRadius: '15px',
+                borderColor: 'black',
+                height: '53px',
+                backgroundColor: 'rgba(217, 217, 217, 1)',
+                color: 'black',
+                overflowY: 'auto',
+                overflowX: 'auto',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                fontSize: '11px'
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 150,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                fontSize: '11px'
+              }),
+              option: (base, state) => ({
+                ...base,
+                display: 'flex',
+                alignItems: 'center',
+              }),
+            }}
+          />
+        </div>
 
-
-      <div className="uzel-filter">
-  <Select
-  isMulti
-    className="uzel-select"
-    options={uzelOptions}
-    value={selectedUzel}
-    onChange={handleUzelChange}
-    placeholder="Узлы"
-    isClearable={true}
-    menuPortalTarget={document.body}
-    styles={{
-      control: (base) => ({
-        ...base,
-        width: '100%',
-        borderRadius: '15px',
-        height: '53px',
-        backgroundColor: 'rgba(217, 217, 217, 1)',
-        color: 'black',
-        left: '-10%',
-        transform: 'Translate(-50%)',
-      }),
-      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-      menuList: (base) => ({
-        ...base,
-        maxHeight: 100,
-        overflowY: 'auto',
-        backgroundColor: 'white',
-        color: 'black',
-        border: '1px solid rgba(217, 217, 217, 1)',
-        scrollbarWidth: 'thin',
-        fontSize: '16px'
-      })
-    }}
-  />
-</div>
+        <span>У узлов:</span>
+        <div className="uzel-filter">
+          <Select
+            isMulti
+            className="uzel-select"
+            options={uzelOptions}
+            value={selectedUzel}
+            onChange={handleUzelChange}
+            placeholder="Узлы"
+            isClearable={true}
+            menuPortalTarget={document.body}
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                borderRadius: '15px',
+                height: '53px',
+                borderColor: 'black',
+                backgroundColor: 'rgba(217, 217, 217, 1)',
+                color: 'black',
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 100,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                fontSize: '11px'
+              })
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 }
