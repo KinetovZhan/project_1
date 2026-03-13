@@ -1,4 +1,5 @@
 .add-po-form-container.uzel{
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   width: 100vh;
   height: 75vh;
   max-height: 750px;

@@ -27,6 +27,7 @@
 }
 
 .tractorModel {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   display: inline-block;
 }
 
@@ -305,6 +306,7 @@
 
 
 .release-date-container {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   font-family: Arial;
   display: flex;
   align-items: center;
@@ -639,6 +641,7 @@
 /* Поиск диллера */
 
 .search_by_dealer {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
@@ -716,6 +719,7 @@ button.search_button {
 }
 
 .actuality-filter {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   display: inline-block;
   width: 90%;
 }

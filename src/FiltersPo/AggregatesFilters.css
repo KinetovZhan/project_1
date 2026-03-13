@@ -1,8 +1,9 @@
 
 
 .model {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   position: absolute;
-  left: 50%;                    
+  /* left: 50%;                     */
   transform: translateX(-50%);  
   bottom: 120px;               
   width: 360px;
@@ -21,8 +22,9 @@
 }
 
 .clear {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   position: absolute;
-  left: 50%;                    /* Центрирование */
+  /*left: 50%;*/                    /* Центрирование */
   transform: translateX(-50%);  
   bottom: 20px;               
   width: 42vh;
