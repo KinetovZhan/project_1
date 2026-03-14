@@ -161,18 +161,18 @@ export function TractorDetails({ vin, onBack }) {
   // };
 
   // Закрыть подсказку при клике вне элемента
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.po-item')) {
-        setActiveTooltip(null);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (!event.target.closest('.po-item')) {
+  //       setActiveTooltip(null);
+  //     }
+  //   };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+  //   document.addEventListener('click', handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener('click', handleClickOutside);
+  //   };
+  // }, []);
 
   if (loading) return (
     <div className="loading">

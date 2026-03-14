@@ -20,6 +20,7 @@ import './MainPart/MainPart.css'
 import LoginPage from './Login/LoginPage'
 import {HelpPage} from './Login/HelpPage.jsx'
 import MainPage from './MainPage/mainpage'
+import {PoDetails} from './PoDetails/PoDetails.jsx'
 import { KnowledgeBase } from './KnowledgeBase/KnowledgeBase.jsx'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
@@ -56,6 +57,7 @@ function App() {
       
       {/* Перенаправление с корневого пути */}
       <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/software/:id" element={<PoDetails />} />
       
       {/* Обработка несуществующих маршрутов */}
       <Route path="*" element={<Navigate to="/login" replace />} />

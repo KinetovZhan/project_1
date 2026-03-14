@@ -4,7 +4,7 @@ export const IS_PROD = import.meta.env.PROD;
 export const MODE = import.meta.env.MODE;
 
 // API конфигурация - ИСПРАВЛЕНО: добавлен http://
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://172.20.46.71:8000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://26.77.162.134:8000';
 console.log('API_BASE_URL =', API_BASE_URL);
 
 // Таймауты и настройки запросов
@@ -56,9 +56,9 @@ export const buildApiUrl = (endpoint) => {
   }
   
   // Добавляем протокол если его нет
-  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
-    baseUrl = 'http://' + baseUrl;
-  }
+//  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+//    baseUrl = 'http://' + baseUrl;
+//  }
   
   // Убираем trailing слеш у базового URL
   const cleanBaseUrl = baseUrl.replace(/\/+$/, '');

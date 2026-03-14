@@ -62,7 +62,8 @@ const groupTractors = (data) => {
   console.log(grouped)
   return Object.values(grouped);
 };
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton}) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],      
+  uzelFilter=[] }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -89,6 +90,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       date_start: null,
       date_end: null,
       is_actual: null,
+      is_critical:null,
+      is_archive:null,
       query: searchQuery?.trim() || "",
       dealer: searchDealer?.trim() || ""
     };
@@ -120,6 +123,10 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
 
     return postData;
   };
+
+  console.log('actualFilter:', actualFilter);
+console.log('uzelFilter:', uzelFilter);
+console.log('Первый трактор:', tractors[0]);
 
   useEffect(() => {
   const fetchTractors = async () => {
@@ -163,23 +170,56 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
         const components = await api.post('search/tractor-components', {vins});
           const vinToComponents = {};
           components.forEach(c => {
-            if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
-            vinToComponents[c.vin].push(c);
-          });
+  if (!c.vin) {
+    console.warn('Компонент без VIN:', c);
+    return;
+  }
+  if (!c.component_type) {
+    console.warn(`Компонент для VIN ${c.vin} не имеет типа:`, c);
+  }
+  if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
+  vinToComponents[c.vin].push({
+    type: c.component_type || 'unknown',
+    model: c.comp_model || '-',
+    status: c.status || 'unknown'
+  });
+});
+console.log('vinToComponents:', vinToComponents); // отладка
 
+// Маппинг типов компонентов на поля в таблице
+const typeToField = {
+  // Русские названия
+  'dvs': 'dvs',
+  'kpp': 'kpp',
+  'bk': 'bk',
+
+  'rk': 'rk',
+  'hr': 'gr',
+  // Добавьте другие варианты по необходимости
+};
           enrichedTractors = tractors.map(t => {
-            const comps = vinToComponents[t.vin] || [];
-            const enriched = { ...t };
-            comps.forEach(c => {
-              const type = c.component_type?.toLowerCase();
-              if (type === 'двс' || type === 'engine') enriched.dvs = c.comp_model;
-              else if (type === 'кпп' || type === 'transmission') enriched.kpp = c.comp_model;
-              else if (type === 'рулевая колонка' || type === 'suspension') enriched.rk = c.comp_model;
-              else if (type === 'бк') enriched.bk = c.comp_model;
-              else if (type === 'гидрораспределитель' || type === 'hydraulics') enriched.gr = c.comp_model;
-            });
-            return enriched;
-          });
+  if (!t.vin) {
+    console.warn('Трактор без VIN:', t);
+    return t;
+  }
+  const comps = vinToComponents[t.vin] || [];
+  const enriched = { ...t };
+  comps.forEach(c => {
+    if (!c.type || c.type === 'unknown') {
+      console.warn(`Пропуск компонента с неизвестным типом для VIN ${t.vin}:`, c);
+      return;
+    }
+    const type = c.type.toLowerCase();
+    const field = typeToField[type];
+    if (field) {
+      enriched[field] = c.model;
+      enriched[`${field}_status`] = c.status;
+    } else {
+      console.warn(`Неизвестный тип компонента: ${c.type} для VIN ${t.vin}`);
+    }
+  });
+  return enriched;
+});
       }
 
       setTractors(enrichedTractors);
@@ -324,6 +364,28 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     );
   }
 
+
+  const shouldHighlight = (componentStatus, componentType) => {
+  // Если фильтр по актуальности не выбран — не подсвечиваем
+  if (!actualFilter || actualFilter.length === 0) return false;
+  // Если статус компонента не входит в выбранные — не подсвечиваем
+  if (!actualFilter.includes(componentStatus)) return false;
+  // Если фильтр по узлам выбран и тип компонента не входит в выбранные — не подсвечиваем
+  if (uzelFilter.length > 0 && !uzelFilter.includes(componentType)) return false;
+  return true;
+};
+
+// Функция для получения класса цвета в зависимости от статуса
+const getStatusColorClass = (status) => {
+  switch (status) {
+    case 'critical': return 'cell-critical';
+    case 'actual': return 'cell-actual';
+    case 'oldy': return 'cell-oldy';
+    default: return '';
+  }
+};
+
+
   return (
     <div className="tractor-table-container" >
         <div 
@@ -378,6 +440,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   onClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
                   className="clickable-row"
+
                 >
                   <td title={tractor.vin || tractor.VIN || '-'} className="tractor-cell">
                     {tractor.vin || tractor.VIN || '-'}
@@ -388,13 +451,42 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
                   <td>{tractor.consumer || tractor.dealer || '-'}</td> 
                   <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
-                  <td>{tractor.dvs || tractor.DVS || '-'}</td>
+                  {/* <td>{tractor.dvs || tractor.DVS || '-'}</td>
                   <td>{tractor.kpp || tractor.KPP || '-'}</td>
                   <td title={tractor.rk || tractor.RK || '-'} className="tractor-cell">
                     {tractor.rk || tractor.RK || '-'}
                   </td>
                   <td>{tractor.bk || tractor.BK || '-'}</td>
-                  <td>{tractor.gr || tractor.GR || '-'}</td>                
+                  <td>{tractor.gr || tractor.GR || '-'}</td>                 */}
+                  <td
+  className={shouldHighlight(tractor.dvs_status, 'dvs') ? getStatusColorClass(tractor.dvs_status) : ''}
+>
+  {tractor.dvs || '-'}
+</td>
+
+<td
+  className={shouldHighlight(tractor.kpp_status, 'kpp') ? getStatusColorClass(tractor.kpp_status) : ''}
+>
+  {tractor.kpp || '-'}
+</td>
+
+<td
+  className={shouldHighlight(tractor.rk_status, 'rk') ? getStatusColorClass(tractor.rk_status) : ''}
+>
+  {tractor.rk || '-'}
+</td>
+
+<td
+  className={shouldHighlight(tractor.bk_status, 'bk') ? getStatusColorClass(tractor.bk_status) : ''}
+>
+  {tractor.bk || '-'}
+</td>
+
+<td
+  className={shouldHighlight(tractor.gr_status, 'gr') ? getStatusColorClass(tractor.gr_status) : ''}
+>
+  {tractor.gr || '-'}
+</td>
                 </tr>
               ))}
             </tbody>

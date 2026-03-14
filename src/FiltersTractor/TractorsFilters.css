@@ -27,9 +27,8 @@
 }
 
 .tractorModel {
-  position: absolute;
-  top: 185px;
-  width: 42vh;
+  animation: slideRightFadeIn 0.5s ease-out forwards;
+  display: inline-block;
 }
 
 
@@ -307,9 +306,7 @@
 
 
 .release-date-container {
-  position: absolute;
-  top: 255px;
-  left: 13px;
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   font-family: Arial;
   display: flex;
   align-items: center;
@@ -644,15 +641,13 @@
 /* Поиск диллера */
 
 .search_by_dealer {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   display: flex;
   align-items: center;
   background-color: rgba(217, 217, 217, 1);
   width: 242px;
   height: 56px;
   border-radius: 56px;
-  position: absolute;
-  top: 327px;
-  left: 13px;
   padding: 0 20px;
   box-sizing: border-box;
 }
@@ -703,13 +698,35 @@ button.search_button {
 .searcher_dealer::placeholder {
   color: #000000;
   text-align: left;
+}
 
+.tractors-status{
+  background-color: rgba(217, 217, 217, 1);
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  align-items: center;
+  padding-bottom: 5%;
+}
+
+.tractors-status > span{
+  color: #000000;
+}
+
+.tractors-status > * {
+  margin-top: 1%;
 }
 
 .actuality-filter {
-  position: absolute;
-  top: 505px;
-;
+  animation: slideRightFadeIn 0.5s ease-out forwards;
+  display: inline-block;
+  width: 90%;
+}
+
+.uzel-filter {
+  display: inline-block;
+  width: 90%;
 }
 
 /* ========== ДЕСКТОПЫ (1200px - 1600px) ========== */

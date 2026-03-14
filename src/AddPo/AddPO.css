@@ -1,5 +1,6 @@
 /*Для добавления по*/
 .add-po-form-container {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   padding: 50px 70px;
   display: flex;
   flex-direction: column;
@@ -227,6 +228,17 @@
 } 
 
 .archive {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+
+.actual {
+  display: flex;
+  flex-direction:row;
+  justify-content: space-between;
+}
+.critical {
   display: flex;
   flex-direction:row;
   justify-content: space-between;

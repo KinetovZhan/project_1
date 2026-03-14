@@ -13,7 +13,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(null);
   const [loadingSoftware, setLoadingSoftware] = useState(false);
   const [softwareError, setSoftwareError] = useState(null);
-  const [selectedRelevance, setSelectedRelevance] = useState(null);   // Актуальность (actual/outdated)
   const [selectedStatus, setSelectedStatus] = useState(null);         // Статус (serial/experienced/in operation)
   const [selectedProducer, setSelectedProducer] = useState(null);
   const [selectedTractorModels, setSelectedTractorModels] = useState([]); // массив выбранных моделей
@@ -21,6 +20,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
   const [isArchive, setIsArchive] = useState(false);
+  const [isCritical, setIsCritical] = useState(false);
+  const [isActual, setIsActual] = useState(false);
 
   // Состояния для производителей
   const [producerOptions, setProducerOptions] = useState([]);
@@ -29,12 +30,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
   const { token } = useAuth();
   const isMobile = useCheckMobile();
-
-  // Опции для актуальности (software_is_actual)
-  const relevanceOptions = [
-    { value: 'actual', label: 'Актуальное' },
-    { value: 'outdated', label: 'Устаревшее' },
-  ];
 
   // Опции для статуса (software_status)
   const statusOptions = [
@@ -76,7 +71,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         if (!Array.isArray(data)) throw new Error('Данные не являются массивом');
         const options = data.map(item => ({
           value: item.id,
-          label: `${item.name}${item.inner_name ? ` (${item.inner_name})` : ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          label: `${item.filename}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
         }));
         setSoftwareOptions(options);
       })
@@ -162,10 +157,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       alert('Пожалуйста, выберите файл инструкции');
       return;
     }
-    if (!selectedRelevance) {
-      alert('Пожалуйста, выберите актуальность');
-      return;
-    }
+    
     if (!selectedStatus) {
       alert('Пожалуйста, выберите статус');
       return;
@@ -191,9 +183,10 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
     // Основные поля (имена должны совпадать с ожидаемыми на бэкенде)
     formData.append('software_producer', selectedProducer.value);
-    formData.append('software_is_actual', selectedRelevance.value === 'actual');
+    formData.append('software_is_actual', isActual);
     formData.append('software_status', selectedStatus.value);
     formData.append('software_is_archive', isArchive);
+    formData.append('software_is_critical', isCritical);
     // Если нужно поле критичности – добавьте отдельно (software_is_critical)
 
     // Предыдущая версия (опционально)
@@ -273,6 +266,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   };
 
   const changeArchive = () => setIsArchive(!isArchive);
+  const changeActual = () => setIsActual(!isActual);
+  const changeCritical = () => setIsCritical(!isCritical);
 
   const selectStyles = {
     control: (base, state) => ({
@@ -421,7 +416,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           </div>
 
           {/* Актуальность */}
-          <div className="add-po-field">
+          {/* <div className="add-po-field">
             <label className="add-po-label">Актуальность *</label>
             <Select
               options={relevanceOptions}
@@ -432,7 +427,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
               isClearable={false}
               styles={selectStyles}
             />
-          </div>
+          </div> */}
 
           {/* Статус */}
           <div className="add-po-field">
@@ -445,6 +440,28 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
               classNamePrefix="add-po-select"
               isClearable={false}
               styles={selectStyles}
+            />
+          </div>
+
+          <div className="add-po-field actual" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+            <label className="add-po-label">Актуальная версия </label>
+            <input
+              type="checkbox"
+              name="actual"
+              className="add-po-input checkbox"
+              checked={isActual}
+              onChange={changeActual}
+            />
+          </div>
+
+          <div className="add-po-field critical" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
+            <label className="add-po-label">Критическая версия </label>
+            <input
+              type="checkbox"
+              name="critical"
+              className="add-po-input checkbox"
+              checked={isCritical}
+              onChange={changeCritical}
             />
           </div>
 

@@ -16,7 +16,7 @@ export function Filters2({
   onDateChange,
   // Добавляем новый проп для фильтра актуальности
   onActualChange,
-  onAggChange
+  onUzelChange 
 }) {
   // Опции для Select с моделями тракторов
   const tractorOptions = [
@@ -31,15 +31,26 @@ export function Filters2({
     {value:'oldy', label: 'Устаревшее'}
   ];
 
-  const actualityOptions1 = [
-    {value:'dvs', label: 'ДВС'},
-    {value:'KPP', label: 'КПП'},
-    {value:'RK', label: 'РК'}
-  ];
+  // const uzelOptions = [
+  //   {value:'DVS', label: 'ДВС'},
+  //   {value:'HR', label: 'ГР'},
+  //   {value:'RK', label: 'РК'},
+  //   {value:'BK', label: 'БК'},
+  //   {value:'KPP', label: 'КПП'},
+  // ];
+
+  const uzelOptions = [
+  {value:'dvs', label: 'ДВС'},
+  {value:'gr', label: 'ГР'},
+  {value:'rk', label: 'РК'},
+  {value:'bk', label: 'БК'},
+  {value:'kpp', label: 'КПП'},
+];
 
   const isMobile = useCheckMobile()
   const [selectedActuality, setSelectedActuality] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
+  const [selectedUzel, setSelectedUzel] = useState(null);
   const [Dealer, setDealer] = useState('')
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -326,17 +337,49 @@ const handleClearEndDate = () => {
     }
   }
 
-  // Новый обработчик для кнопок актуальности
-  const handleActualChange = (selectedOption) => {
-    // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
-    setSelectedActuality(selectedOption);
-    
-    // Вызываем onActualChange с булевым значением
-    if (onActualChange) {
-        onActualChange(selectedOption ? selectedOption.value : null); // Показать все
-      } 
-  };
-  
+const handleActualChange = (selectedOptions) => {
+  const values = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+  setSelectedActuality(selectedOptions);
+  if (onActualChange) {
+    onActualChange(values); // передаём массив строк
+  }
+};
+
+const handleUzelChange = (selectedOptions) => {
+  const values = selectedOptions ? selectedOptions.map(opt => opt.value.toLowerCase()) : [];
+  setSelectedUzel(selectedOptions);
+  if (onUzelChange) {
+    onUzelChange(values);
+  }
+};
+
+
+  // Форматирование опций с цветным кружком для фильтра актуальности
+const formatActualityOptionLabel = ({ value, label }) => {
+  let color;
+  switch (value) {
+    case 'critical': color = '#ff4444'; break; // красный
+    case 'actual': color = '#44ff44'; break;   // зелёный
+    case 'oldy': color = '#ffff44'; break;     // жёлтый
+    default: color = '#ccc';
+  }
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span
+        style={{
+          display: 'inline-block',
+          width: '12px',
+          height: '12px',
+          borderRadius: '50%',
+          backgroundColor: color,
+          marginRight: '8px',
+        }}
+      />
+      {label}
+    </div>
+  );
+};
+
   return (
     <>
       {/* Фильтр по моделям тракторов */}
@@ -448,77 +491,133 @@ const handleClearEndDate = () => {
         </button>  
       </div>
 
-      <div className="actuality-filter" style={{display:'flex',flexDirection:'row', width:'100%',gap:'15%',justifyContent:'center'}}>
+      {/* Фильтр по статусам */}
+      {/* <div className='filterstrac2'>
+        <label>
+          <span>Серийное</span>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.serial} 
+            onChange={() => handleFilterByStatus('serial')}
+          />
+        </label>
+        <label>
+          <span>Опытное</span>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.experimental} 
+            onChange={() => handleFilterByStatus('experimental')}
+          />
+        </label>
+        <label>
+          <span>Актуальное</span>
+          <input 
+            type="checkbox"
+            checked={FilterTractor_by_status.in_operation} 
+            onChange={() => handleFilterByStatus('in_operation')}
+          />
+        </label>
+      </div> */}
 
-        <Select
-          className="actuality-select"
-          options={actualityOptions1}
-          value={agg}
-          onChange={handleAgg}
-          placeholder="Узел"
-          isClearable={true}
-          menuPortalTarget={document.body}
-          styles={{
-            control: (base) => ({
-              ...base,
-              width: '100%',
-              borderRadius: '15px',
-              height: '53px',
-              backgroundColor: 'rgba(217, 217, 217, 1)',
-              color: 'black'
-            }),
-            container: (base) => ({
-              width:'40%'
-            }),
-            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-            menuList: (base) => ({
-              ...base,
-              maxHeight: 150,
-              overflowY: 'auto',
-              backgroundColor: 'white',
-              color: 'black',
-              border: '1px solid rgba(217, 217, 217, 1)',
-              scrollbarWidth: 'thin',
-              fontSize: '16px'
-            })
-          }}
-        />
+      {/* <div className='Majmin'>
+        <button 
+          className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
+          onClick={() => handleActualClick('MAJ')}
+        >
+          Актуальные
+        </button>
+        <button 
+          className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
+          onClick={() => handleActualClick('MIN')}
+        >
+          Не актуальные
+        </button>
+      </div> */}
 
-        <Select
-          className="actuality-select"
-          options={actualityOptions}
-          value={selectedActuality}
-          onChange={handleActualChange}
-          placeholder="Все статусы"
-          isClearable={true}
-          menuPortalTarget={document.body}
-          styles={{
-            control: (base) => ({
-              ...base,
-              width: '100%',
-              borderRadius: '15px',
-              height: '53px',
-              backgroundColor: 'rgba(217, 217, 217, 1)',
-              color: 'black',
-            }),
-            container: (base) => ({
-              width:'40%'
-            }),
-            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-            menuList: (base) => ({
-              ...base,
-              maxHeight: 150,
-              overflowY: 'auto',
-              backgroundColor: (isCritical?'red':(isActual?'green':'yellow')),
-              backgroundColor: (isActual?'green':'white'),
-              backgroundColor: (isOldy?'yellow':'white'),
-              color: 'black',
-              border: '1px solid rgba(217, 217, 217, 1)',
-              scrollbarWidth: 'thin',
-              fontSize: '16px'
-            })
-          }}
-        />
+      <div className='tractors-status'>
+        <span>Статус:</span>
+        <div className="actuality-filter">
+          <Select
+            isMulti
+            className="actuality-select"
+            options={actualityOptions}
+            value={selectedActuality}
+            onChange={handleActualChange}
+            placeholder="Все статусы"
+            isClearable={true}
+            menuPortalTarget={document.body}
+            formatOptionLabel={formatActualityOptionLabel}   // <-- добавлено
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                borderRadius: '15px',
+                borderColor: 'black',
+                height: '53px',
+                backgroundColor: 'rgba(217, 217, 217, 1)',
+                color: 'black',
+                overflowY: 'auto',
+                overflowX: 'auto',
+              }),
+              multiValue: (base) => ({
+                ...base,
+                fontSize: '11px'
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 150,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                fontSize: '11px'
+              }),
+              option: (base, state) => ({
+                ...base,
+                display: 'flex',
+                alignItems: 'center',
+              }),
+            }}
+          />
+        </div>
+
+        <span>У узлов:</span>
+        <div className="uzel-filter">
+          <Select
+            isMulti
+            className="uzel-select"
+            options={uzelOptions}
+            value={selectedUzel}
+            onChange={handleUzelChange}
+            placeholder="Узлы"
+            isClearable={true}
+            menuPortalTarget={document.body}
+            styles={{
+              control: (base) => ({
+                ...base,
+                width: '100%',
+                borderRadius: '15px',
+                height: '53px',
+                borderColor: 'black',
+                backgroundColor: 'rgba(217, 217, 217, 1)',
+                color: 'black',
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 100,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                fontSize: '11px'
+              })
+            }}
+          />
+        </div>
       </div>
     </>
   );

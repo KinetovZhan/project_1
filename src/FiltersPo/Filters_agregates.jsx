@@ -5,17 +5,6 @@ import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
 export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange}) { 
-  const componentTypeMap = {
-    'DVS': 'ДВС',              // было: 'dvs'
-    'KPP': 'КПП',              // было: 'kpp'
-    'RK': 'Рулевая колонка',   // было: 'rk'
-    'hydrorasp': 'Гидрораспределитель', // было: 'hydro'
-    'BK': 'БК',                 // было: 'bk'
-  };
-
-
-
-
 
 
   // const tractorModelOptions = [
@@ -27,7 +16,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     DVS: false,
     KPP: false,
     RK: false,
-    hydrorasp: false,
+    HR: false,
     BK: false
   });
 
@@ -50,63 +39,65 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [tractorOptions, setTractorOptions] = useState([])
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
+  const [loadingTractorModels, setLoadingTractorModels] = useState(false);
+  const [tractorError, setTractorError] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState([])
 
 
   const isMobile = useCheckMobile();
   const { token } = useAuth();
 
-  const options = [...componentModels.map(item => ({ value: item, label: item }))];
-  const optionsStat = componentModels.map(item => ({ value: item, label: item }));
+  const options = componentModels;
+ 
   const selectedStatusOptions = statusOptions.filter(opt =>
     selectedStatus.includes(opt.value)
   );
-
-  // Загружаем список производителей
-  useEffect(() => {
+  useEffect (() => {
     const fetchProducers = async () => {
       if (!token) {
         setProducerOptions([]);
         return;
       }
-      
-      try {
+
+      const typeCodeMap = {
+      DVS: 'DVS',
+      KPP: 'KPP', 
+      RK: 'RK',
+      hydrorasp: 'HR',   
+      BK: 'BK'
+    };
+
+    const activeTypes = Object.keys(FilterItems)
+      .filter(key => FilterItems[key])
+      .map(key => typeCodeMap[key]);
+
+    // Формируем тело запроса с правильными полями
+    const requestBody = {
+      trac_model: selectedTractorModels.length > 0 ? selectedTractorModels : [],
+      type_comp: activeTypes,
+      component_models: selectedModel,  //  name_comp → component_models
+      software_status: selectedStatus   // status → software_status
+    };
+
+     
+  try {
         setLoadingProducers(true);
         setProducerError(null);
 
-        const data2 = await api.get('/tractors/')
-
-        const data = await api.get('/components/');
-        
-
-        let filteredData = data;
-        if (selectedModel.length > 0) {
-          filteredData = data.filter(item => 
-            item.model && selectedModel.includes(item.model)
-          );
-        }
+        const producerData = await api.post('search/component-producers',requestBody)
+        let filteredData = producerData;
         // Извлекаем уникальных производителей
         const producers = filteredData
-          .map(item => item.producer_comp)
+          .map(item => item.producer)
           .filter(producer => producer && producer.trim() !== '')
           .filter((value, index, self) => self.indexOf(value) === index)
           .sort(); // сортируем по алфавиту
-
-        const tractorModelOptions = data2.map(item =>
-          item.model
-        ).filter((value, index, self) => self.indexOf(value) === index).sort()
-        // Формируем опции для react-select
+        
+           // Формируем опции для react-select
         const options = producers.map(producer => ({
           value: producer,
           label: producer
         }));
-
-        const options2 = tractorModelOptions.map(model => ({
-          value: model,
-          label: model
-        }));
-
-        setTractorOptions(options2)
         setProducerOptions(options);
       } catch (err) {
         console.error('Ошибка загрузки производителей:', err);
@@ -118,6 +109,129 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     
     fetchProducers();
   }, [token, selectedModel]);
+
+  useEffect (() => {
+    const fetchTractorModel = async () => {
+      if (!token) {
+        setSelectedTractorModels([]);
+        return;
+      }
+
+      const typeCodeMap = {
+      DVS: 'DVS',
+      KPP: 'KPP', 
+      RK: 'RK',
+      hydrorasp: 'HR',   
+      BK: 'BK'
+    };
+
+    const activeTypes = Object.keys(FilterItems)
+      .filter(key => FilterItems[key])
+      // .map(key => typeCodeMap[key]);
+
+    // Формируем тело запроса с правильными полями
+    const requestBody = {
+      component_producers: selectedProducers,
+      component_types: activeTypes,
+      component_models: selectedModel,  //  name_comp → component_models
+      software_status: selectedStatus   // status → software_status
+    };
+
+     
+  try {
+        setLoadingTractorModels(true);
+        setTractorError(null);
+
+        const tractorData = await api.post('search/tractor-models',requestBody)
+        let filteredData = tractorData;
+        // Извлекаем уникальных производителей
+        const tractors = filteredData
+          .map(item => item.model)
+          .filter(model => model && model.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .sort(); // сортируем по алфавиту
+        
+           // Формируем опции для react-select
+        const options = tractors.map(model => ({
+          value: model,
+          label: model
+        }));
+        setTractorOptions(options);
+      } catch (err) {
+        console.error('Ошибка загрузки производителей:', err);
+        setTractorError(err.message);
+      } finally {
+        setLoadingTractorModels(false);
+      }
+    };
+    
+    fetchTractorModel();
+  }, [token, selectedModel,selectedStatus,selectedProducers]);
+  
+
+
+  useEffect(() => {
+  const fetchModels = async () => {
+  if (!token) {
+    setComponentModels([]);
+    return;
+  }
+
+  // Сопоставление ключей чекбоксов с кодами в БД
+  const typeCodeMap = {
+    DVS: 'DVS',
+    KPP: 'KPP',
+    RK: 'RK',
+    HR: 'HR',   // важно: hydrorasp -> HR
+    BK: 'BK'
+  };
+
+  const activeTypes = Object.keys(FilterItems)
+    .filter(key => FilterItems[key])
+    .map(key => typeCodeMap[key]);
+
+  const postData = {
+    trac_model: selectedTractorModels.length > 0 ? selectedTractorModels : [],
+    type_comp: activeTypes,
+    producers: selectedProducers,
+    status: selectedStatus
+  };
+  ;
+        
+
+  try {
+    setLoading(true);
+    const response = await api.post('search/component-models', postData);
+
+        let modelsArray = [];
+        if (Array.isArray(response)) {
+          modelsArray = response;
+        } else if (response && Array.isArray(response.component_models)) {
+          modelsArray = response.component_models;
+        } else {
+          console.warn('Неожиданный формат ответа:', response);
+          modelsArray = [];
+        }
+
+        const modelNames = modelsArray
+          .map(item => item && item.name)
+          .filter(name => typeof name === 'string' && name.trim() !== '')
+          .map(name => name.trim());
+
+        const uniqueNames = [...new Set(modelNames)].sort();
+
+        // Формируем массив объектов для react-select
+        const options = uniqueNames.map(name => ({ value: name, label: name }));
+        setComponentModels(options);
+      } catch (err) {
+        console.error(err);
+        setComponentModels([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+fetchModels();
+}, [FilterItems, selectedTractorModels, selectedProducers, selectedStatus]);
 
   const handleModelChange = (selectedOptions) => {
     const values = selectedOptions
@@ -178,7 +292,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     setFilterItems(newFilter);
     
     if (onFilterChange) {
-      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]).map(key => componentTypeMap[key]);
+      const activeFilters = Object.keys(newFilter).filter(key => newFilter[key]);
       onFilterChange(activeFilters);
     }
     console.log(`evfsd ${FilterItems.DVS}`)
@@ -187,44 +301,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
- const fetchModels = async () => {
-  if (!token) {
-    setComponentModels([]);
-    return;
-  }
-
-  // Сопоставление ключей чекбоксов с кодами в БД
-  const typeCodeMap = {
-    DVS: 'DVS',
-    KPP: 'KPP',
-    RK: 'RK',
-    hydrorasp: 'HR',   // важно: hydrorasp -> HR
-    BK: 'BK'
-  };
-
-  const activeTypes = Object.keys(FilterItems)
-    .filter(key => FilterItems[key])
-    .map(key => typeCodeMap[key]);
-
-  const postData = {
-    trac_model: selectedTractorModels.length > 0 ? selectedTractorModels : [],
-    type_comp: activeTypes,
-    producers: selectedProducers,
-    status: selectedStatus
-  };
-
-  try {
-    setLoading(true);
-    const data = await api.post('/search/component-info', postData);
-    const uniqueNames = [...new Set(data.map(item => item.name_component).filter(Boolean))];
-    setComponentModels(uniqueNames);
-  } catch (err) {
-    console.error(err);
-    setComponentModels([]);
-  } finally {
-    setLoading(false);
-  }
-};
+ 
   return (
     <>
       <div className='filters'>
@@ -261,8 +338,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
             <label> 
               <span>Гидрораспределитель</span>
               <input 
-                checked={FilterItems.hydrorasp}
-                onChange={() => handleFilterChange('hydrorasp')}
+                checked={FilterItems.HR}
+                onChange={() => handleFilterChange('HR')}
                 type="checkbox"/>
             </label>
           </div>
@@ -406,7 +483,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
           options={options}
           value={selectedOptions}
           onChange={handleModelChange}
-          placeholder="Модель"
+          placeholder="Название узла"
           menuPortalTarget={document.body}
           menuPlacement="top" 
           isDisabled={loading || componentModels.length === 0}

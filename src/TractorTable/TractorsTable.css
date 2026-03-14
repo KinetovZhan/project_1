@@ -1,5 +1,6 @@
 
 .tractor-table-container {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   display: inline-block;
   align-items: stretch;
   background: #ffffff;
@@ -54,7 +55,7 @@
 .tractor-table thead th {
   background: #d7dadc;
   color: #080808;
-  padding: 12px 8px;
+  padding: 12px 28px 12px 8px;
   text-align: left;
   font-weight: 600;
   border-bottom: 1px solid #454343;
@@ -157,4 +158,16 @@
     height: auto;
   }
 
+}
+
+.cell-critical {
+  background-color: #ffcccc !important; /* красный */
+}
+
+.cell-actual {
+  background-color: #ccffcc !important; /* зелёный */
+}
+
+.cell-oldy {
+  background-color: #ffffcc !important; /* жёлтый */
 }

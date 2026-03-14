@@ -1,5 +1,6 @@
 
 .maininfo {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   /* Общий вид */
   box-sizing: border-box;
   width: 110vh;
@@ -18,7 +19,7 @@
 .list-container {
   list-style-type: none;
   padding: 0;  
-  height: 70%;
+  height: 65%;
   box-sizing: border-box;
 }
 

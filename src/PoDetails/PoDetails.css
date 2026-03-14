@@ -54,24 +54,56 @@
   overflow-y: auto;
   border-radius: 10px;
   padding:10px;
+   overflow-wrap: break-word;
 }
 
 .download-button {
     display: flex;
     text-align: center;
-    background-color: rgba(217, 217, 217, 1);
+    background-color:  #b3b4b6;
     border-radius: 20px;
     height: 50px;
     margin-top: 0px;
     font-family: Arial;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 300;
     width: 120px;
-    border-color:black;
     align-items: center;
     justify-content: center;
+    box-shadow: none!important;
   }
+  
+ 
 .section h3 {
   display:flex;
   justify-content: flex-start;
+}
+
+.prev-version {
+  background-color: #b3b4b6;
+  display: flex;
+  justify-content: center;
+  width:300px;
+  height:120px;
+  overflow-y: auto;
+  border-radius: 10px;
+  padding:15px ;
+  text-overflow: ellipsis;   
+}
+.version {
+  display: flex;
+  align-items: center;
+  background-color: #d9dbdf;
+  border-radius: 10px;
+  padding:10px;
+  width:250px;
+  height:30px;
+}
+
+.prev-version-link {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  color: black; /* или другой */
 }
