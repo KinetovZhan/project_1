@@ -65,7 +65,7 @@ export function Filters2({
 
   useEffect(() => {
     const checkStatus =() => {
-      if(optioins.value === 'critical') {
+      if (actualityOptions.value === 'critical') {
         setIsCritical(true)
       } else {setIsCritical(false)}
 

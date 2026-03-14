@@ -248,7 +248,10 @@ useEffect(() => {
       <div className="po-details-content">
         <div className="left-column">
           <div className="section">
-            <h2>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</h2>
+            <h2>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}
+              <br />
+              {details.component_name} ({po.tractor_model})
+            </h2>
             <img
               className="object"
               src={ImageToComponent(details.component_type, details.component_name)}

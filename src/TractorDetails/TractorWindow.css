@@ -79,8 +79,8 @@
 
 
 .tooltip {
-  position: absolute;
-  left: 100%;
+  display:flex;
+  left: 0;
   top: 0;
   display: inline-block;
   width: 200px;
