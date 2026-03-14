@@ -27,7 +27,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
 
   const statusOptions = [
     { value: "serial", label: "Серийное" },
-    { value: "experimental", label: 'Опытное' },
+    { value: "experienced", label: 'Опытное' },
     { value: "in_operation", label: 'В эксплуатации' }
   ];
 
