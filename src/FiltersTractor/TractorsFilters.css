@@ -650,6 +650,7 @@
   border-radius: 56px;
   padding: 0 20px;
   box-sizing: border-box;
+  z-index: -1;
 }
 
 
@@ -708,6 +709,7 @@ button.search_button {
   width: 90%;
   align-items: center;
   padding-bottom: 5%;
+  z-index: -1;
 }
 
 .tractors-status > span{
@@ -754,6 +756,7 @@ button.search_button {
     transform: translateX(-50%);
     width: 42vh;
     font-size: 12px;
+    z-index: -1;
   }
 
 
