@@ -16,7 +16,7 @@
   }
 
   .sidebar > div{
-    margin-top: 10%;
+    margin-top: 5%;
   }
 
   .choose {
@@ -92,12 +92,9 @@
     border-radius: 20px;
     padding: 12px 10px;
     gap: 20px;
-    position: absolute;
-    top: 187px;
     background-color: rgba(217, 217, 217, 1);
-    /* left: 50%; */
-    transform: translateX(-50%);
     color: black;
+    margin-top: 5%;
   }
   
   .choose button.active {
