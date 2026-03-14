@@ -243,6 +243,13 @@ useEffect(() => {
   }
 };
 
+  const getStatusText = () => {
+    if (details.software_status === 'serial') return 'Серийное';
+    if (details.software_status === 'experienced' || details.software_status === 'experimental') return 'Опытное';
+    if (details.software_status === 'in operation' || details.software_status === 'in_operation') return 'В эксплуатации';
+    return '—';
+  };
+
   return (
     <div className="po-details-container">
       <div className="po-details-content">
@@ -266,6 +273,11 @@ useEffect(() => {
             <h3>Период актуальности</h3>
             <p>{actualityPeriod}</p>
           </div>
+          <div>
+            <h3>Статус</h3>
+            <p>{getStatusText()}</p>
+          </div>
+          <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
           <div className="section">
             <h3>Установщик</h3>
               {details.software_path ? (
@@ -293,6 +305,7 @@ useEffect(() => {
             ) : (
               <p>—</p>
             )}
+          </div>
           </div>
         </div>
         <div className="right-column">
