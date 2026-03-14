@@ -10,8 +10,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     type: '',
     name: '',
     tractor_models: [],
-    mounting_date: '',
-    comp_ser_num: '', 
+    mounting_date: '', 
     producer: ''
   });
 
@@ -154,7 +153,6 @@ export function AddAggForm({ onBack, onSubmit }) {
         type: formData.type,
         name: formData.name,
         mounting_date: formData.mounting_date || null,
-        comp_ser_num: formData.comp_ser_num || null,
         tractor_id: formData.selected_tractor_id ? parseInt(formData.selected_tractor_id, 10) : null,
         producer: formData.producer || null
       };
@@ -320,19 +318,6 @@ export function AddAggForm({ onBack, onSubmit }) {
             value={formData.name}
             onChange={handleChange}
             required
-            className='add-po-input'
-            disabled={loading}
-          />
-        </div>
-
-        <div className='add-po-field'>
-          <label className='add-po-label'>Серийный номер</label>
-          <input
-            type="text"
-            name="comp_ser_num"
-            placeholder="Введите серийный номер"
-            value={formData.comp_ser_num}
-            onChange={handleChange}
             className='add-po-input'
             disabled={loading}
           />
