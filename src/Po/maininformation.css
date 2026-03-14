@@ -1,5 +1,6 @@
 
 .maininfo {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   /* Общий вид */
   box-sizing: border-box;
   width: 110vh;

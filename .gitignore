@@ -34,3 +34,5 @@ dist-ssr
 # Исключаем все локальные настройки
 .env.local
 src/shrineofvsakoe/ip.jsx
+# Видимо линуксовая тема
+*.save

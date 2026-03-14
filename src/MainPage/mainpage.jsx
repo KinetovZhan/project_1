@@ -36,7 +36,8 @@ function MainPage() {
     date_end: null
   });
   // Добавляем состояние для фильтра актуальности
-  const [actualFilter, setActualFilter] = useState(null); // null, true, false
+  const [uzelFilter, setUzelFilter] = useState([]);
+  const [actualFilter, setActualFilter] = useState([]);
 
   const { logout, user } = useAuth();
 
@@ -225,6 +226,10 @@ function MainPage() {
     console.log('📢 Фильтр актуальности изменился:', value);
     setActualFilter(value);
   };
+const handleUzelChange = (uzels) => {
+  setUzelFilter(uzels);
+};
+
 
    //ОБРАБОТЧИК для Базы знаний
   const handleKnowledgeBase = () => {
@@ -282,6 +287,7 @@ function MainPage() {
             handleMajMinButtonClick={handleMajMinButtonClick}
             onStatusChange={handleStatusChange} 
             onActualChange={handleActualChange}
+            onUzelChange={handleUzelChange}
             isMobileSidebarOpen={isMobileSidebarOpen}
             toggleMobileSidebar={toggleMobileSidebar}
           />
@@ -313,7 +319,7 @@ function MainPage() {
             onAddCompPartSubmit={handleAddCompPartSubmit}
             dateFilter={dateFilter}
             actualFilter={actualFilter}
-
+            uzelFilter={uzelFilter}
           />
 
         </div>
