@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import DefaultImage from '../img/default.jpg';
 import K5Image from '../img/К5.png';
 import K7Image from '../img/К7М.png';
 import {api} from '../fetchAPI.js';
 import { PoDetails } from '../PoDetails/PoDetails.jsx';
+import ReactDOM from 'react-dom';
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -23,6 +25,7 @@ export function TractorDetails({ vin, onBack }) {
     x: 0,
     y: 0
   });
+  const navigate = useNavigate ();
 
   const ImageToModel = (model) => {
     const ImageJpg = {
@@ -34,6 +37,10 @@ export function TractorDetails({ vin, onBack }) {
 
     return ImageJpg[model]|| DefaultImage;
   }
+
+   const handleBack = () => {
+    navigate(-1);
+  };
 
   useEffect(() => {
     const fetchTractorDetails = async () => {
@@ -188,11 +195,11 @@ export function TractorDetails({ vin, onBack }) {
 
   return (
     <div className="tractor-details-container add-po-form-scroll-bar">
-      {/* <button onClick={onBack} className="add-po-back-button">
+      <button onClick={handleBack} className="add-po-back-button">
         <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-      </button> */}
+      </button>
       <div className="tractor-details-content">
         <div className="tractor-info">
           <h2>{model} {VIN}</h2>
@@ -249,30 +256,32 @@ export function TractorDetails({ vin, onBack }) {
         </div>
          </div>
      {/* Кастомный тултип с вашими стилями */}
-      {tooltip.visible && (
-        <div 
-          className="tooltip"
-          style={{
-            position: 'fixed',
-            left: tooltip.x + 15,
-            top: tooltip.y + 15,
-            marginLeft: 0,
-            pointerEvents: 'none',
-            width: '200px',
-            background: '#333',
-            color: 'white',
-            padding: '12px',
-            borderRadius: '6px',
-            zIndex: 1000,
-            fontSize: '14px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-            wordWrap: 'break-word',
-            height: 'auto'
-          }}
-        >
-          {tooltip.text}
-        </div>
-      )}
+      {/* Кастомный тултип с порталом */}
+{tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal(
+  <div 
+    className="tooltip"
+    style={{
+      position: 'fixed',
+      left: tooltip.x + 15,
+      top: tooltip.y + 15,
+      marginLeft: 0,
+      pointerEvents: 'none',
+      width: '200px',
+      background: '#333',
+      color: 'white',
+      padding: '12px',
+      borderRadius: '6px',
+      zIndex: 1000,
+      fontSize: '14px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+      wordWrap: 'break-word',
+      height: 'auto'
+    }}
+  >
+    {tooltip.text}
+  </div>,
+  document.body
+)}
     </div>
   );
 }
