@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import HelpImage from '../img/помощь.jpg';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
 
@@ -12,7 +11,6 @@ export function HelpPage() {
   const [replyContent, setReplyContent] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [filter, setFilter] = useState('all');
-  const [expandedMessages, setExpandedMessages] = useState({});
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -23,110 +21,117 @@ export function HelpPage() {
     navigate(-1);
   };
 
-  // Загрузка сообщений при монтировании
   useEffect(() => {
     if (!token) {
-      console.log("Вы не авторизированы");
       alert("У вас нет прав");
       navigate("/main");
       return;
     }
-
     fetchMessages();
   }, [token, navigate]);
 
-  // Загрузка сообщений с сервера
+  // Функция для нормализации данных
+  const normalizeMessages = (data) => {
+    if (!Array.isArray(data)) return [];
+    
+    // Если это массив сообщений (как у обычного пользователя)
+    if (data.length > 0 && data[0].hasOwnProperty('id') && !data[0].hasOwnProperty('user_id')) {
+      return data.map(msg => ({
+        ...msg,
+        sender_name: 'Вы',
+        sender_role: userRole
+      }));
+    }
+    
+    // Если это массив пользователей с сообщениями (как у модератора)
+    const flatMessages = [];
+    data.forEach(userData => {
+      if (userData.messages && Array.isArray(userData.messages)) {
+        userData.messages.forEach(msg => {
+          flatMessages.push({
+            ...msg,
+            sender_name: userData.username,
+            sender_role: userData.role,
+            sender_id: userData.user_id
+          });
+        });
+      }
+    });
+    
+    // Сортируем по дате (новые сверху)
+    return flatMessages.sort((a, b) => 
+      new Date(b.created_at) - new Date(a.created_at)
+    );
+  };
+
   const fetchMessages = async () => {
     try {
       setLoading(true);
       const response = await api.get('/support/messages');
-      setMessages(Array.isArray(response) ? response : []);
+      console.log('Полученные данные:', response);
+      
+      const normalizedMessages = normalizeMessages(response);
+      console.log('Нормализованные сообщения:', normalizedMessages);
+      
+      setMessages(normalizedMessages);
       setError('');
     } catch (err) {
       setError('Ошибка загрузки сообщений');
-      console.error(err);
       setMessages([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Отправка нового сообщения (для dealer/engineer)
   const handleSendMessage = async () => {
     if (!newMessage.trim()) return;
-
     try {
       setLoading(true);
-      const messageRequest = {
-        content: newMessage,
-      };
-      
-      await api.post("/support/messages", messageRequest);
+      await api.post("/support/messages", { content: newMessage });
       setNewMessage('');
       fetchMessages();
     } catch (err) {
       setError('Ошибка отправки сообщения');
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Отправка ответа (для moderator)
   const handleSendReply = async (messageId) => {
     if (!replyContent.trim()) return;
-
     try {
       setLoading(true);
-      const replyRequest = {
+      await api.post("/support/messages/reply", {
         content: replyContent,
-        parentMessageId: messageId
-      };
-      
-      await api.post("/support/messages/reply", replyRequest);
+        message_id: messageId
+      });
+      console.log(` письмо ${replyContent} айдишник${messageId}`)
       setReplyContent('');
       setSelectedMessageId(null);
       fetchMessages();
     } catch (err) {
       setError('Ошибка отправки ответа');
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Отметить сообщение как прочитанное
-  const handleMarkAsRead = async (messageId) => {
-    try {
-      await api.patch(`/support/messages/${messageId}/read`);
-      fetchMessages();
-    } catch (err) {
-      console.error('Ошибка при отметке о прочтении:', err);
+  // Автоматически отмечаем как прочитанное при клике на сообщение
+  const handleMessageClick = async (message) => {
+    if (isModerator && !message.is_read) {
+      try {
+        await api.patch(`/support/messages/${message.id}/read`);
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === message.id ? { ...msg, is_read: true } : msg
+          )
+        );
+      } catch (err) {
+        console.error('Ошибка при отметке о прочтении:', err);
+      }
     }
   };
 
-  // Удалить сообщение (только для модератора)
-  const handleDeleteMessage = async (messageId) => {
-    if (!confirm('Вы уверены, что хотите удалить это сообщение?')) return;
-    
-    try {
-      await api.delete(`/support/messages/${messageId}`);
-      fetchMessages();
-    } catch (err) {
-      setError('Ошибка при удалении сообщения');
-      console.error(err);
-    }
-  };
-
-  // Переключить расширение сообщения
-  const toggleMessageExpanded = (messageId) => {
-    setExpandedMessages(prev => ({
-      ...prev,
-      [messageId]: !prev[messageId]
-    }));
-  };
-
-  // Фильтрация сообщений для модератора
   const getFilteredMessages = () => {
     if (!isModerator) return messages;
     
@@ -142,101 +147,79 @@ export function HelpPage() {
 
   const filteredMessages = getFilteredMessages();
 
-  // Обработчик Escape
   useEffect(() => {
     const handleEscKey = (event) => {
-      if (event.key === 'Escape') {
-        handleBack();
-      }
+      if (event.key === 'Escape') handleBack();
     };
-
     window.addEventListener('keydown', handleEscKey);
-    return () => {
-      window.removeEventListener('keydown', handleEscKey);
-    };
+    return () => window.removeEventListener('keydown', handleEscKey);
   }, [handleBack]);
 
   return (
-    <div className="formHelp">
-      <button onClick={handleBack} className="add-po-back-button">
-        <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </button>
-
+    <div className="help-page-container">
       {loading && <div className="loading">Загрузка...</div>}
       {error && <div className="error">{error}</div>}
 
-      <div className="help-content">
-        {/* Заголовок в зависимости от роли */}
-        <h1 className="help-title">
-          {isModerator ? '📬 Панель модератора' : '📨 Служба поддержки'}
-        </h1>
+      <div className="help-content-wrapper">
+        {/* Левая колонка */}
+        <div className="help-left-column" style={{display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
+          <div>
 
-        {/* Фильтры для модератора */}
-        {isModerator && (
-          <div className="moderator-filters">
-            <button 
-              className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-              onClick={() => setFilter('all')}
-            >
-              Все сообщения
-            </button>
-            <button 
-              className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
-              onClick={() => setFilter('unread')}
-            >
-              Непрочитанные
-            </button>
-            <button 
-              className={`filter-btn ${filter === 'answered' ? 'active' : ''}`}
-              onClick={() => setFilter('answered')}
-            >
-              С ответами
-            </button>
+            <h1 className="help-title">
+              {isModerator ? 'Панель модератора' : 'Служба поддержки'}
+            </h1>
+
+            {isModerator && (
+              <div className="moderator-filters">
+                <button 
+                  className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilter('all')}
+                >
+                  Все сообщения
+                </button>
+                <button 
+                  className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
+                  onClick={() => setFilter('unread')}
+                >
+                  Непрочитанные
+                </button>
+                <button 
+                  className={`filter-btn ${filter === 'answered' ? 'active' : ''}`}
+                  onClick={() => setFilter('answered')}
+                >
+                  С ответами
+                </button>
+              </div>
+            )}
+
+            {!isModerator && (
+              <div className="new-message-form">
+                <h3>Создать обращение</h3>
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Опишите вашу проблему..."
+                  rows="4"
+                />
+                <button 
+                  onClick={handleSendMessage}
+                  disabled={loading || !newMessage.trim()}
+                  className="send-btn"
+                >
+                  Отправить
+                </button>
+              </div>
+            )}
           </div>
-        )}
+          <button onClick={handleBack} className="add-po-back-button">
+            <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
 
-        {/* Форма для создания сообщения (для dealer/engineer) */}
-        {!isModerator && (
-          <div className="new-message-form">
-            <h3>Создать обращение</h3>
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Опишите вашу проблему..."
-              rows="4"
-            />
-            <button 
-              onClick={handleSendMessage}
-              disabled={loading || !newMessage.trim()}
-              className="send-btn"
-            >
-              Отправить
-            </button>
-          </div>
-        )}
-
-        {/* Статистика для модератора */}
-        {isModerator && (
-          <div className="moderator-stats">
-            <div className="stat-item">
-              <span className="stat-label">Всего:</span>
-              <span className="stat-value">{messages.length}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">Непрочитанных:</span>
-              <span className="stat-value">{messages.filter(m => !m.is_read).length}</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-label">С ответами:</span>
-              <span className="stat-value">{messages.filter(m => m.replies?.length > 0).length}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Список сообщений */}
-        <div className="messages-list">
+        {/* Правая колонка - список сообщений */}
+        <div className="help-right-column">
           <h3>
             {isModerator ? 'Обращения пользователей' : 'Ваши обращения'}
             {filteredMessages.length > 0 && (
@@ -244,137 +227,104 @@ export function HelpPage() {
             )}
           </h3>
           
-          {filteredMessages.length === 0 ? (
-            <p className="no-messages">
-              {isModerator 
-                ? 'Нет сообщений, соответствующих фильтру' 
-                : 'У вас пока нет обращений'}
-            </p>
-          ) : (
-            filteredMessages.map((message) => (
-              <div 
-                key={message.id} 
-                className={`message-item ${!message.is_read && isModerator ? 'unread' : ''}`}
-              >
-                <div className="message-header">
-                  <div className="message-header-left">
-                    <strong className="message-sender">
-                      {message.sender?.username || 'Пользователь'}
-                    </strong>
-                    {!message.is_read && isModerator && (
-                      <span className="unread-badge">Новое</span>
-                    )}
-                  </div>
-                  <div className="message-header-right">
-                    <span className="message-date">
-                      {new Date(message.created_at).toLocaleString()}
-                    </span>
-                    {isModerator && (
-                      <div className="message-actions">
-                        {!message.is_read && (
-                          <button 
-                            className="action-btn mark-read"
-                            onClick={() => handleMarkAsRead(message.id)}
-                            title="Отметить как прочитанное"
-                          >
-                            ✓
-                          </button>
-                        )}
+          <div className="messages-scroll-container">
+            {filteredMessages.length === 0 ? (
+              <p className="no-messages">
+                {isModerator 
+                  ? 'Нет сообщений, соответствующих фильтру' 
+                  : 'У вас пока нет обращений'}
+              </p>
+            ) : (
+              filteredMessages.map((message) => (
+                <div 
+                  key={message.id} 
+                  className={`message-item ${!message.is_read && isModerator ? 'unread' : ''}`}
+                  onClick={() => handleMessageClick(message)}
+                >
+                  <div className="message-header">
+                    <div className="message-header-left">
+                      <strong className="message-sender">
+                        {message.sender_name || 'Вы'}
+                      </strong>
+                      {message.sender_role && isModerator && (
+                        <span className="user-role-badge">
+                          {message.sender_role}
+                        </span>
+                      )}
+                      {!message.is_read && isModerator && (
+                        <span className="unread-badge">Новое</span>
+                      )}
+                    </div>
+                    <div className="message-header-right">
+                      <span className="message-date">
+                        {new Date(message.created_at).toLocaleString()}
+                      </span>
+                      {isModerator && (
                         <button 
-                          className="action-btn delete"
-                          onClick={() => handleDeleteMessage(message.id)}
-                          title="Удалить"
+                          className="reply-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMessageId(
+                              selectedMessageId === message.id ? null : message.id
+                            );
+                            setReplyContent('');
+                          }}
                         >
-                          ×
+                          {selectedMessageId === message.id ? 'Отмена' : 'Ответить'}
                         </button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="message-content">
+                    {message.content}
+                  </div>
+
+                  {/* Ответы на сообщение */}
+                  {message.replies && message.replies.length > 0 && (
+                    <div className="message-replies">
+                      <h4 className="replies-title">Ответы:</h4>
+                      {message.replies.map((reply) => (
+                        <div key={reply.id} className="reply-item">
+                          <div className="reply-header">
+                            <strong className="reply-sender">
+                              {reply.moderator_name || 'Модератор'}
+                            </strong>
+                            <span className="reply-date">
+                              {new Date(reply.created_at).toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="reply-content">{reply.content}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Форма ответа для модератора */}
+                  {isModerator && selectedMessageId === message.id && (
+                    <div className="reply-form">
+                      <textarea
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        placeholder="Введите ваш ответ..."
+                        rows="3"
+                        autoFocus
+                      />
+                      <div className="reply-form-actions">
                         <button 
-                          className="action-btn expand"
-                          onClick={() => toggleMessageExpanded(message.id)}
-                          title={expandedMessages[message.id] ? 'Свернуть' : 'Развернуть'}
+                          onClick={() => handleSendReply(message.id)}
+                          disabled={loading || !replyContent.trim()}
+                          className="send-reply-btn"
                         >
-                          {expandedMessages[message.id] ? '▼' : '▶'}
+                          Отправить
                         </button>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="message-content">
-                  {message.content}
-                </div>
-
-                {/* Ответы на сообщение (показываем всегда для модератора, для других - если есть ответы) */}
-                {(isModerator || (message.replies && message.replies.length > 0)) && (
-                  <div className={`message-replies ${!expandedMessages[message.id] && isModerator ? 'collapsed' : ''}`}>
-                    {message.replies && message.replies.length > 0 ? (
-                      <>
-                        <h4 className="replies-title">Ответы:</h4>
-                        {message.replies.map((reply) => (
-                          <div key={reply.id} className="reply-item">
-                            <div className="reply-header">
-                              <strong className="reply-sender">
-                                {reply.sender?.username || 'Модератор'}
-                              </strong>
-                              <span className="reply-date">
-                                {new Date(reply.created_at).toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="reply-content">{reply.content}</div>
-                          </div>
-                        ))}
-                      </>
-                    ) : (
-                      isModerator && (
-                        <p className="no-replies">Нет ответов</p>
-                      )
-                    )}
-
-                    {/* Форма ответа для модератора */}
-                    {isModerator && (
-                      <div className="reply-form">
-                        {selectedMessageId === message.id ? (
-                          <div className="reply-form-active">
-                            <textarea
-                              value={replyContent}
-                              onChange={(e) => setReplyContent(e.target.value)}
-                              placeholder="Введите ваш ответ..."
-                              rows="3"
-                              autoFocus
-                            />
-                            <div className="reply-form-actions">
-                              <button 
-                                onClick={() => handleSendReply(message.id)}
-                                disabled={loading || !replyContent.trim()}
-                                className="send-reply-btn"
-                              >
-                                Отправить
-                              </button>
-                              <button 
-                                onClick={() => {
-                                  setSelectedMessageId(null);
-                                  setReplyContent('');
-                                }}
-                                className="cancel-reply-btn"
-                              >
-                                Отмена
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <button 
-                            onClick={() => setSelectedMessageId(message.id)}
-                            className="reply-btn"
-                          >
-                            Ответить
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
       </div>
     </div>
