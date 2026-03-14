@@ -153,10 +153,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       alert('Пожалуйста, выберите файл ПО');
       return;
     }
-    if (!instructionFile) {
-      alert('Пожалуйста, выберите файл инструкции');
-      return;
-    }
     
     if (!selectedStatus) {
       alert('Пожалуйста, выберите статус');
@@ -503,11 +499,10 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
           {/* Файл инструкции */}
           <div className="add-po-field">
-            <label className="add-po-label">Файл инструкции *</label>
+            <label className="add-po-label">Файл инструкции</label>
             <input
               type="file"
               name="instructionFile"
-              required
               className="add-po-input"
               accept=".pdf,.doc,.docx,.txt"
             />
