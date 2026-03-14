@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState, useEffect } from 'react'; 
 import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { format } from 'date-fns';
@@ -56,12 +56,44 @@ export function Filters2({
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); 
+  const [isFocused, setIsFocused] = useState(false);
+  const [agg, setAgg] = useState(null);
+  const [isCritical, setIsCritical] = useState(null);
+  const [isActual, setIsActual] = useState(null);
+  const [isOldy, setIsOldy] = useState(null);
+
+
+  useEffect(() => {
+    const checkStatus =() => {
+      if(optioins.value === 'critical') {
+        setIsCritical(true)
+      } else {setIsCritical(false)}
+
+      if(actualityOptions.value === 'actual') {
+        setIsActual(true)
+      } else {setIsActual(false)}
+
+      if(actualityOptions.value === 'oldy') {
+        setIsOldy(true)
+      } else {setIsOldy(false)}
+    }
+    checkStatus()
+  },[])
+
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
       onDealerChange(Dealer);
     }
+  };
+
+  const handleAgg = (selectedOption) => {
+    // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
+    setAgg(selectedOption);
+    
+    if (onAggChange) {
+        onAggChange(selectedOption ? selectedOption.value : null);
+      } 
   };
 
   const handleChange = (e) => {
@@ -98,6 +130,7 @@ export function Filters2({
     }
   }
 };
+
 
 // Обработчик для конечной даты
 const handleEndDateChange = (date) => {
