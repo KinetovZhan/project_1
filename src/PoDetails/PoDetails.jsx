@@ -243,14 +243,29 @@ useEffect(() => {
   }
 };
 
+  const getStatusText = () => {
+    if (details.software_status === 'serial') return 'Серийное';
+    if (details.software_status === 'experienced' || details.software_status === 'experimental') return 'Опытное';
+    if (details.software_status === 'in operation' || details.software_status === 'in_operation') return 'В эксплуатации';
+    return '—';
+  };
+
   return (
-    <div className="po-details-container">
-      <div className="po-details-content">
+    <div className="po-details-container ">
+      <div className="po-details-content ">
         <div className="left-column">
           <div className="section">
-            <h2>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}
+            <h2>
+              <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
               <br />
-              {details.component_name} ({po.tractor_model})
+              <span className='text-names'>{details.component_name}</span>
+              <br />
+              {po.tractor_model && po.tractor_model.length > 0 && (
+                <span className='text-names'>
+                  <span>Модели тракторов: </span>
+                  <span>{po.tractor_model.join(', ')}</span>
+                </span>
+              )}
             </h2>
             <img
               className="object"
@@ -266,6 +281,11 @@ useEffect(() => {
             <h3>Период актуальности</h3>
             <p>{actualityPeriod}</p>
           </div>
+          <div>
+            <h3>Статус</h3>
+            <p>{getStatusText()}</p>
+          </div>
+          <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
           <div className="section">
             <h3>Установщик</h3>
               {details.software_path ? (
@@ -293,6 +313,7 @@ useEffect(() => {
             ) : (
               <p>—</p>
             )}
+          </div>
           </div>
         </div>
         <div className="right-column">

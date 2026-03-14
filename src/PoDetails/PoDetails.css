@@ -5,11 +5,30 @@
   background-color: rgb(219, 219, 219);
   border-radius: 30px;
   color: black;
-  padding: 0px 70px;
+  padding: 20px 70px;
   position: absolute;
   left: 171px;
   top: 80px;
   right: 235px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+}
+
+.po-details-container::-webkit-scrollbar {
+  width: 10px; 
+}
+
+.po-details-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #bebebe;
+}
+
+.po-details-container::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* ← Цвет фона дорожки */
+  border-radius: 10px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .po-details-content {
@@ -106,4 +125,10 @@
   font-weight: bold;
   text-decoration: none;
   color: black; /* или другой */
+}
+
+.text-names {
+  font-size: 18px;
+  font-style: italic;
+  /* color: rgba(0, 0, 0, 0.8); */
 }

@@ -14,6 +14,21 @@
   overflow: auto;
 }
  
+.tractor-details-container::-webkit-scrollbar {
+  width: 10px; 
+}
+
+.tractor-details-container::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #bebebe;
+}
+
+.tractor-details-container::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* ← Цвет фона дорожки */
+  border-radius: 10px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
 
 .tractor-details-content {
   display: flex;

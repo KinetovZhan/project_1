@@ -532,7 +532,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
               required
               className="add-po-input"
               data-testid="filePo"
-              accept=".bin,.hex,.zip,.elf,.doc,.docx"
             />
           </div>
 
@@ -543,7 +542,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
               type="file"
               name="instructionFile"
               className="add-po-input"
-              accept=".pdf,.doc,.docx,.txt"
             />
           </div>
 
