@@ -24,6 +24,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [selectedPo,setSelectedPo]=useState(null);
   const [choosedObjects, setChoosedObjects] = useState('active')
   const [changingArchive, setChangingArchive] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Состояние для тултипа
   const [tooltip, setTooltip] = useState({
@@ -54,13 +55,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     
     if (userRole !== 'dealer') {
       try {
-        // const FilterToTypeMap = {
-        //   DVS: ['dvs', 'engine'],
-        //   KPP: ['kpp', 'transmission','кпп'],
-        //   RK: ['suspension','Рулевая колонка'],
-        //   HR: ['hydraulics'],
-        //   BK: ['bk', 'controller']
-        // };
         
         const FilterToTractor = { 
           K7: 'K-7', 
@@ -68,8 +62,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
         };
 
         const postData = {
+          search: searchQuery || '',
           trac_model: activeFilters2.map(f => FilterToTractor[f] || f),
-          // type_comp: activeFilters.flatMap(f => FilterToTypeMap[f] || f),
           type_comp: activeFilters,
           name_comp: Array.isArray(selectedModel) ? selectedModel : [],
           producers: Array.isArray(selectedProducers) ? selectedProducers : [],
@@ -95,12 +89,13 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     } else {
       setLoading(false);
     }
-  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus, userRole, choosedObjects, sortOrder]);
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus, userRole, choosedObjects, sortOrder, searchQuery]);
 
 
   useEffect(() => {
     fetchFilteredData();
-  }, [fetchFilteredData]);
+  }, [fetchFilteredData, searchQuery]);
+  
 
   const ImageToComponent = (type_component, name_component) => {
   // Приводим типы к нижнему регистру для единообразия
@@ -283,19 +278,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     });
   };
 
-  // Фильтрация по поиску СРЕДИ УЖЕ ЗАГРУЖЕННЫХ данных
-  const filteredItems = useMemo(() => {
-    if (!searchQuery) return softwareItems;
-
-    const query = searchQuery.trim().toLowerCase();
-    return softwareItems.filter(
-      (item) =>
-        (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
-        (item.type_component && item.type_component.toLowerCase().includes(query)) ||
-        (item. name_component && item. name_component.toLowerCase().includes(query)) ||
-        (item.comp_model && item.comp_model.toLowerCase().includes(query))
-    );
-  }, [softwareItems, searchQuery]);
 
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'desc' ? 'asc' : 'desc');
@@ -309,17 +291,6 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const filteredAndSortedItems = useMemo(() => {
     let filtered = [...currentItems];
 
-    // Фильтрация по поисковому запросу
-    if (searchQuery && searchQuery.trim()) {
-      const query = searchQuery.trim().toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          (item.producer_version && item.producer_version.toLowerCase().includes(query)) ||
-          (item.type_component && item.type_component.toLowerCase().includes(query)) ||
-          (item. name_component &&  name_component.toLowerCase().includes(query)) ||
-          (item.comp_model && item.comp_model.toLowerCase().includes(query))
-      );
-    }
 
     // Сортировка по дате
     filtered.sort((a, b) => {
@@ -439,7 +410,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     } finally {
       setChangingArchive(null);
     }
-  };
+  }
 
   
 
