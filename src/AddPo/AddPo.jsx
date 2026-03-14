@@ -83,26 +83,71 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   }, [token]);
 
   // Загрузка уникальных моделей тракторов
-  useEffect(() => {
-    if (!token) {
-      setTractorError('Для загрузки моделей тракторов требуется авторизация');
-      return;
-    }
-    setLoadingTractors(true);
-    setTractorError(null);
+  // useEffect(() => {
+  //   if (!token) {
+  //     setTractorError('Для загрузки моделей тракторов требуется авторизация');
+  //     return;
+  //   }
+  //   setLoadingTractors(true);
+  //   setTractorError(null);
 
-    api.get('tractors/')
-      .then(data => {
-        const models = [...new Set(data.map(item => item.model).filter(Boolean))];
-        const options = models.map(model => ({ value: model, label: model }));
-        setTractorOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки тракторов:', err);
-        setTractorError(err.message);
-      })
-      .finally(() => setLoadingTractors(false));
-  }, [token]);
+  //   api.get('tractors/')
+  //     .then(data => {
+  //       const models = [...new Set(data.map(item => item.model).filter(Boolean))];
+  //       const options = models.map(model => ({ value: model, label: model }));
+  //       setTractorOptions(options);
+  //     })
+  //     .catch(err => {
+  //       console.error('Ошибка загрузки тракторов:', err);
+  //       setTractorError(err.message);
+  //     })
+  //     .finally(() => setLoadingTractors(false));
+  // }, [token]);
+
+  useEffect(() => {
+  if (!token) {
+    setTractorError('Для загрузки моделей тракторов требуется авторизация');
+    return;
+  }
+  setLoadingTractors(true);
+  setTractorError(null);
+
+  // Тело запроса без фильтров
+  const requestBody = {
+    search: '',
+    trac_model: [],
+    type_comp: [],
+    name_comp: [],
+    producers: [],
+    status: []
+  };
+
+  Promise.all([
+    api.post('search/component-info', requestBody),
+    api.post('search/archive-component-info', requestBody)
+  ])
+    .then(([activeData, archiveData]) => {
+      const combined = [...activeData, ...archiveData];
+      const tractorModels = new Set();
+      combined.forEach(item => {
+        if (item.tractor_model && Array.isArray(item.tractor_model)) {
+          item.tractor_model.forEach(model => {
+            if (model && model.trim() !== '') {
+              tractorModels.add(model.trim());
+            }
+          });
+        }
+      });
+      const sortedModels = Array.from(tractorModels).sort();
+      const options = sortedModels.map(model => ({ value: model, label: model }));
+      setTractorOptions(options);
+    })
+    .catch(err => {
+      console.error('Ошибка загрузки моделей тракторов:', err);
+      setTractorError(err.message);
+    })
+    .finally(() => setLoadingTractors(false));
+}, [token]);
 
   // Загрузка производителей из ПО
   useEffect(() => {
@@ -139,7 +184,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
    const handleModelCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
     setTractorOptions(prev => [...prev, newOption]);
-    setSelectedTractorModels(newOption);
+    setSelectedTractorModels(prev => [...prev, newOption]);
   };
   const handleProducerChange = (selectedOption) => {
     setSelectedProducer(selectedOption);
