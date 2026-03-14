@@ -445,7 +445,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   return (
     <div className="maininfo">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
         <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
           <button 
             onClick={getNewPO} 
