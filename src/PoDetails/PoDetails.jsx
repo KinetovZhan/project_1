@@ -8,66 +8,108 @@ import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
-import  {api}  from '../fetchAPI.js';
-import { API_BASE_URL } from '../fetchAPI.js';
+import { api } from '../fetchAPI.js';
 
 export function PoDetails({ po, onBack }) {
   const { token } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [downloading, setDownloading] = useState(false); // состояние для кнопки
-  const [prevVersionData, setPrevVersionData] = useState(null);
+  const [downloading, setDownloading] = useState(false);
+  const [allPreviousVersions, setAllPreviousVersions] = useState([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
 
+  // Загрузка основных деталей ПО
   useEffect(() => {
-  const fetchDetails = async () => {
-    if (!po?.id_Firmwares || !po?.id_Component) {
-      setError('Недостаточно данных для загрузки');
-      setLoading(false);
-      return;
-    }
+    const fetchDetails = async () => {
+      if (!po?.id_Firmwares || !po?.id_Component) {
+        setError('Недостаточно данных для загрузки');
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(po.id_Firmwares)}&id_component=${encodeURIComponent(po.id_Component)}`;
+        console.log('Fetching URL:', url);
+        const data = await api.get(url);
+        
+        console.log('Received data:', data);
+        const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
+        if (!item) throw new Error('Данные не найдены');
+        setDetails(item);
+      } catch (err) {
+        console.error('Ошибка загрузки деталей ПО:', err);
+        setError(`Ошибка: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDetails();
+  }, [po]);
+
+  // Загрузка всех предыдущих версий
+  useEffect(() => {
+    const fetchAllPreviousVersions = async () => {
+      if (!details?.software_previous_sw_version) {
+        setAllPreviousVersions([]);
+        return;
+      }
+
+      setLoadingVersions(true);
+      const versions = [];
+      let currentVersionId = details.software_previous_sw_version;
+      let currentComponentId = po.id_Component;
+
+      while (currentVersionId) {
+        try {
+          // Загружаем детали текущей предыдущей версии
+          const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(currentVersionId)}&id_component=${encodeURIComponent(currentComponentId)}`;
+          console.log('Fetching previous version:', url);
+          
+          const data = await api.get(url);
+          const versionData = Array.isArray(data) && data.length > 0 ? data[0] : null;
+          
+          if (versionData) {
+            versions.push(versionData);
+            // Переходим к следующей предыдущей версии
+            currentVersionId = versionData.software_previous_sw_version;
+          } else {
+            break;
+          }
+        } catch (err) {
+          console.error('Ошибка загрузки предыдущей версии:', err);
+          break;
+        }
+      }
+
+      setAllPreviousVersions(versions);
+      setLoadingVersions(false);
+    };
+
+    fetchAllPreviousVersions();
+  }, [details?.software_previous_sw_version, po.id_Component]);
+
+  const handleVersionClick = async (e, versionId) => {
+    e.preventDefault();
+    if (!versionId) return;
 
     setLoading(true);
     try {
-      // Явно формируем URL с параметрами
-      const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(po.id_Firmwares)}&id_component=${encodeURIComponent(po.id_Component)}`;
-      console.log('Fetching URL:', url); // для отладки
+      const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(versionId)}&id_component=${encodeURIComponent(po.id_Component)}`;
       const data = await api.get(url);
-      
-      console.log('Received data:', data); // для отладки
       const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
       if (!item) throw new Error('Данные не найдены');
+
       setDetails(item);
     } catch (err) {
-      console.error('Ошибка загрузки деталей ПО:', err);
-      if (err.response) {
-        console.error('Response data:', err.response.data);
-        console.error('Response status:', err.response.status);
-      }
-      setError(`Ошибка: ${err.message}`);
+      console.error('Ошибка загрузки версии:', err);
+      setError(`Ошибка загрузки версии: ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
-
-  fetchDetails();
-}, [po]);
-
-useEffect(() => {
-  if (details?.software_previous_sw_version) {
-    api.get(`software/${details.software_previous_sw_version}/metadata`)
-      .then(data => {
-        console.log('Prev version metadata:', data);
-        setPrevVersionData(data);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки предыдущей версии:', err);
-        setPrevVersionData(null);
-      });
-  } else {
-    setPrevVersionData(null);
-  }
-}, [details?.software_previous_sw_version]);
 
   if (loading) {
     return (
@@ -99,16 +141,13 @@ useEffect(() => {
     : `с ${formatDate(details.software_release_date)} (бессрочно)`;
 
   const ImageToComponent = (type_component, name_component) => {
-    // Приводим типы к нижнему регистру для единообразия
     const typeLower = type_component?.toLowerCase() || '';
-    const modelLower =  name_component?.toLowerCase() || '';
-  
-    // Обработка КПП в первую очередь (и по типу, и по модели)
-    if (typeLower.includes('кпп') || typeLower.includes('kpp') ) {
+    const modelLower = name_component?.toLowerCase() || '';
+
+    if (typeLower.includes('кпп') || typeLower.includes('kpp')) {
       return KPPImage;
     }
-  
-    // Обработка остальных компонентов по типу
+
     if (typeLower && typeLower !== 'dvs') {
       const ImageByType = {
         'рулевая колонка': RKImage,
@@ -118,76 +157,67 @@ useEffect(() => {
         'hr': HRImage,
         'bk': BKImage,
       };
-      
-      // Ищем соответствие по ключевым словам
+
       for (const [key, image] of Object.entries(ImageByType)) {
         if (typeLower.includes(key)) {
           return image;
         }
       }
     }
-         // Обработка ДВС по модели
-    if ((typeLower === 'двс'||typeLower === 'dvs') && modelLower) {
-      if (modelLower.includes('weichai')) {
-        return WeiImage;
-      }
-      if (modelLower.includes('тмз') || modelLower.includes('tmz')) {
-        return TMZImage;
-      }
-      if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
-        return JMZImage;
-      }
-  
+
+    if ((typeLower === 'двс' || typeLower === 'dvs') && modelLower) {
+      if (modelLower.includes('weichai')) return WeiImage;
+      if (modelLower.includes('тмз') || modelLower.includes('tmz')) return TMZImage;
+      if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) return JMZImage;
     }
-  
+
     return DefaultImage;
   };
-  const handleDownloadSoftware = async () => {
-  if (!details?.id_firmwares) return;
-  setDownloading(true);
-  try {
-    const response = await api.download(`/software/download/${details.id_firmwares}`);
-    const blob = await response.blob();
-    // получить имя файла из Content-Disposition или использовать details.software_path
-    const contentDisposition = response.headers.get('content-disposition');
-    let filename = details.software_path || `software_${details.id_firmwares}.bin`;
-    if (contentDisposition) {
-      const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
-      if (match && match[1]) filename = match[1].replace(/['"]/g, '');
-    }
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-  } catch (error) {
-    console.error('Ошибка скачивания ПО:', error);
-    alert('Не удалось скачать файл ПО');
-  } finally {
-    setDownloading(false);
-  }
-};
 
-   const handleDownloadInstruction = async () => {
-    if (!details?.id_firmwares) return;
+  const handleDownloadSoftware = async () => {
+    const fileId = details.id_firmwares || details.id_Firmwares;
+    if (!fileId) return;
+    
     setDownloading(true);
     try {
-      // Используем метод download из fetchAPI (он возвращает response)
-      const response = await api.download(`/software/download/${details.id_firmwares}/instruction`);
+      const response = await api.download(`/software/download/${fileId}`);
       const blob = await response.blob();
-
-      // Пытаемся получить имя файла из заголовка Content-Disposition
       const contentDisposition = response.headers.get('content-disposition');
-      let filename = details.software_path_instruction || `instruction_${details.id_firmwares}.pdf`;
+      let filename = details.software_path || `software_${fileId}.bin`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Ошибка скачивания ПО:', error);
+      alert('Не удалось скачать файл ПО');
+    } finally {
+      setDownloading(false);
+    }
+  };
 
-      // Создаём ссылку и скачиваем
+  const handleDownloadInstruction = async () => {
+    const fileId = details.id_firmwares || details.id_Firmwares;
+    if (!fileId) return;
+    
+    setDownloading(true);
+    try {
+      const response = await api.download(`/software/download/${fileId}/instruction`);
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get('content-disposition');
+      let filename = details.software_path_instruction || `instruction_${fileId}.pdf`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
+        if (match && match[1]) filename = match[1].replace(/['"]/g, '');
+      }
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -204,45 +234,6 @@ useEffect(() => {
     }
   };
 
- const handlePreviousVersionClick = async (e) => {
-  e.preventDefault();
-  const prevVersionId = details?.software_previous_sw_version;
-  if (!prevVersionId) return;
-
-  setLoading(true);
-  try {
-    // Получаем метаданные (если ещё не загружены)
-    let meta = prevVersionData;
-    if (!meta) {
-      meta = await api.get(`software/${prevVersionId}/metadata`);
-    }
-    
-    // Получаем список компонентов для этой версии ПО
-    const components = await api.get(`software/${prevVersionId}/components`);
-    if (!components || components.length === 0) {
-      throw new Error('Для предыдущей версии не найдены компоненты');
-    }
-    
-    // Берём ID первого компонента (предполагаем, что ПО связано с одним компонентом)
-    const componentId = components[0].id;
-
-    // Формируем запрос для получения деталей ПО и компонента
-    const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(prevVersionId)}&id_component=${encodeURIComponent(componentId)}`;
-    console.log('Fetching previous version details:', url);
-    const data = await api.get(url);
-    const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
-    if (!item) throw new Error('Данные не найдены');
-
-    setDetails(item);
-    // Второй useEffect автоматически подгрузит метаданные для следующей предыдущей версии
-  } catch (err) {
-    console.error('Ошибка загрузки предыдущей версии:', err);
-    setError(`Ошибка загрузки версии: ${err.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
-
   const getStatusText = () => {
     if (details.software_status === 'serial') return 'Серийное';
     if (details.software_status === 'experienced' || details.software_status === 'experimental') return 'Опытное';
@@ -252,7 +243,7 @@ useEffect(() => {
 
   return (
     <div className="po-details-container add-po-form-scroll-bar">
-      <div className="po-details-content ">
+      <div className="po-details-content">
         <div className="left-column">
           <div className="section">
             <h2>
@@ -285,35 +276,35 @@ useEffect(() => {
             <h3>Статус</h3>
             <p>{getStatusText()}</p>
           </div>
-          <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
-          <div className="section">
-            <h3>Установщик</h3>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>
+            <div className="section">
+              <h3>Установщик</h3>
               {details.software_path ? (
-              <button
-                className="download-button"
-                onClick={handleDownloadSoftware}
-                disabled={downloading}
-              >
-                {downloading ? 'Скачивание...' : 'Скачать '}
-              </button>
-            ) : (
-              <p>—</p>
-            )}
-          </div>
-          <div className="section">
-            <h3>Инструкция</h3>
-            {details.software_path_instruction ? (
-              <button
-                className="download-button"
-                onClick={handleDownloadInstruction}
-                disabled={downloading}
-              >
-                {downloading ? 'Скачивание...' : 'Скачать'}
-              </button>
-            ) : (
-              <p>—</p>
-            )}
-          </div>
+                <button
+                  className="download-button"
+                  onClick={handleDownloadSoftware}
+                  disabled={downloading}
+                >
+                  {downloading ? 'Скачивание...' : 'Скачать'}
+                </button>
+              ) : (
+                <p>—</p>
+              )}
+            </div>
+            <div className="section">
+              <h3>Инструкция</h3>
+              {details.software_path_instruction ? (
+                <button
+                  className="download-button"
+                  onClick={handleDownloadInstruction}
+                  disabled={downloading}
+                >
+                  {downloading ? 'Скачивание...' : 'Скачать'}
+                </button>
+              ) : (
+                <p>—</p>
+              )}
+            </div>
           </div>
         </div>
         <div className="right-column">
@@ -325,55 +316,26 @@ useEffect(() => {
           </div>
           <div className="section">
             <h3>Предыдущие версии</h3>
-            <div className = 'prev-version'>
-              <div className = 'version'>
-              {details.software_previous_sw_version ? (
-                prevVersionData ? (
-                  <a
-                    href="#"
-                    onClick={handlePreviousVersionClick}
-                    className="prev-version-link"
-                  >
-                    {prevVersionData.filename_for_download} от ({new Date(prevVersionData.release_date).toLocaleDateString()})
-                  </a>
-                ) : (
-                  <a
-                    href="#"
-                    onClick={handlePreviousVersionClick}
-                    className ="prev-version-link"
-                  >
-                    Версия {details.software_previous_sw_version}
-                  </a>
-                )
-              ) : '—'}
-              </div>
+            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+              {loadingVersions ? (
+                <p>Загрузка версий...</p>
+              ) : allPreviousVersions.length > 0 ? (
+                allPreviousVersions.map((version, index) => (
+                  <div key={index} className='version'>
+                    <a
+                      href="#"
+                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                      className="prev-version-link"
+                    >
+                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <p>—</p>
+              )}
             </div>
-</div>
-          {/* <div className="section">
-            <h3>Статус</h3>
-            <p>
-              {details.software_status === 'serial' && 'Серийное'}
-              {details.software_status === 'experienced' && 'Опытное'}
-              {details.software_status === 'in operation' && 'В эксплуатации'}
-              {!details.software_status && '—'}
-            </p>
           </div>
-          <div className="section">
-            <h3>Актуальность</h3>
-            <p>
-              {details.software_is_actual ? 'Актуально' : 'Не актуально'}
-              {details.software_is_archive && ' (в архиве)'}
-              {details.software_is_critical && ' (критическое)'}
-            </p>
-          </div>
-          <div className="section">
-            <h3>Модели тракторов</h3>
-            <p>
-              {details.software_tractor_models?.length
-                ? details.software_tractor_models.join(', ')
-                : '—'}
-            </p>
-          </div> */}
         </div>
       </div>
     </div>
