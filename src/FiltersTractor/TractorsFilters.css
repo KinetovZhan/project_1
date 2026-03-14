@@ -725,6 +725,7 @@ button.search_button {
 }
 
 .uzel-filter {
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   display: inline-block;
   width: 90%;
 }

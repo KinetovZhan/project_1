@@ -39,11 +39,8 @@
   }
 
 
-    .add-po-container {
-    position: absolute;
-    top: 182px; 
+  .add-po-container {
     padding: 0 63px; 
-    
   }
 
   .add-po-container button {
@@ -62,8 +59,6 @@
 
 
   .add-po-container2 {
-    position: absolute;
-    top: 260px; 
     padding: 0 63px; 
   }
 
