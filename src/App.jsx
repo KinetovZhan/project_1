@@ -25,6 +25,7 @@ import { KnowledgeBase } from './KnowledgeBase/KnowledgeBase.jsx'
 import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { AuthProvider } from './auth/AuthContext';
+import { TractorDetails } from './TractorDetails/TractorDetails.jsx'
 
 
 function App() {
@@ -58,6 +59,8 @@ function App() {
       {/* Перенаправление с корневого пути */}
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/software/:id" element={<PoDetails />} />
+
+      <Route path="/tractors/details" element={<TractorDetails />} />
       
       {/* Обработка несуществующих маршрутов */}
       <Route path="*" element={<Navigate to="/login" replace />} />

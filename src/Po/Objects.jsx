@@ -11,8 +11,9 @@ import BKImage from '../img/БК дисплей контроллер.png';
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
+import { useNavigate } from 'react-router-dom';
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus }) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -38,8 +39,11 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const hoverTimers = useRef({});
   const tooltipRef = useRef(null);
 
+  const navigate = useNavigate();
 
-
+  // const handleAggregateDetails = () => {
+  //   navigate('/main/AggregateDetails');
+  // }
 
   const userRole = user?.role || 'user';
 
@@ -496,7 +500,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                       className="object"
                       src={ImageToComponent(item.type_component, item.model_component || item.name_component)}
                       alt={item.type_component}
-                      onClick={()=> handlePoClick(item.id_Firmwares)}
+                      onClick={()=> {handlePoClick(item.id_Firmwares) 
+                                    handleAggregateDetails()}}
                       style={{ cursor: 'pointer' }}
                     />
                     <div className="inform" style ={{width:'70%'}}>

@@ -71,7 +71,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         if (!Array.isArray(data)) throw new Error('Данные не являются массивом');
         const options = data.map(item => ({
           value: item.id,
-          label: `${item.filename}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          label: `${item.filename.slice(33) || ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
         }));
         setSoftwareOptions(options);
       })
@@ -83,26 +83,71 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   }, [token]);
 
   // Загрузка уникальных моделей тракторов
-  useEffect(() => {
-    if (!token) {
-      setTractorError('Для загрузки моделей тракторов требуется авторизация');
-      return;
-    }
-    setLoadingTractors(true);
-    setTractorError(null);
+  // useEffect(() => {
+  //   if (!token) {
+  //     setTractorError('Для загрузки моделей тракторов требуется авторизация');
+  //     return;
+  //   }
+  //   setLoadingTractors(true);
+  //   setTractorError(null);
 
-    api.get('tractors/')
-      .then(data => {
-        const models = [...new Set(data.map(item => item.model).filter(Boolean))];
-        const options = models.map(model => ({ value: model, label: model }));
-        setTractorOptions(options);
-      })
-      .catch(err => {
-        console.error('Ошибка загрузки тракторов:', err);
-        setTractorError(err.message);
-      })
-      .finally(() => setLoadingTractors(false));
-  }, [token]);
+  //   api.get('tractors/')
+  //     .then(data => {
+  //       const models = [...new Set(data.map(item => item.model).filter(Boolean))];
+  //       const options = models.map(model => ({ value: model, label: model }));
+  //       setTractorOptions(options);
+  //     })
+  //     .catch(err => {
+  //       console.error('Ошибка загрузки тракторов:', err);
+  //       setTractorError(err.message);
+  //     })
+  //     .finally(() => setLoadingTractors(false));
+  // }, [token]);
+
+  useEffect(() => {
+  if (!token) {
+    setTractorError('Для загрузки моделей тракторов требуется авторизация');
+    return;
+  }
+  setLoadingTractors(true);
+  setTractorError(null);
+
+  // Тело запроса без фильтров
+  const requestBody = {
+    search: '',
+    trac_model: [],
+    type_comp: [],
+    name_comp: [],
+    producers: [],
+    status: []
+  };
+
+  Promise.all([
+    api.post('search/component-info', requestBody),
+    api.post('search/archive-component-info', requestBody)
+  ])
+    .then(([activeData, archiveData]) => {
+      const combined = [...activeData, ...archiveData];
+      const tractorModels = new Set();
+      combined.forEach(item => {
+        if (item.tractor_model && Array.isArray(item.tractor_model)) {
+          item.tractor_model.forEach(model => {
+            if (model && model.trim() !== '') {
+              tractorModels.add(model.trim());
+            }
+          });
+        }
+      });
+      const sortedModels = Array.from(tractorModels).sort();
+      const options = sortedModels.map(model => ({ value: model, label: model }));
+      setTractorOptions(options);
+    })
+    .catch(err => {
+      console.error('Ошибка загрузки моделей тракторов:', err);
+      setTractorError(err.message);
+    })
+    .finally(() => setLoadingTractors(false));
+}, [token]);
 
   // Загрузка производителей из ПО
   useEffect(() => {
@@ -139,7 +184,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
    const handleModelCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
     setTractorOptions(prev => [...prev, newOption]);
-    setSelectedTractorModels(newOption);
+    setSelectedTractorModels(prev => [...prev, newOption]);
   };
   const handleProducerChange = (selectedOption) => {
     setSelectedProducer(selectedOption);
@@ -418,19 +463,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
             )}
           </div>
 
-          {/* Актуальность */}
-          {/* <div className="add-po-field">
-            <label className="add-po-label">Актуальность *</label>
-            <Select
-              options={relevanceOptions}
-              value={selectedRelevance}
-              onChange={setSelectedRelevance}
-              placeholder="Выберите актуальность"
-              classNamePrefix="add-po-select"
-              isClearable={false}
-              styles={selectStyles}
-            />
-          </div> */}
 
           {/* Статус */}
           <div className="add-po-field">
@@ -447,7 +479,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           </div>
 
           <div className="add-po-field actual" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label">Актуальная версия </label>
+            <label className="add-po-label" onClick={changeActual} style={{userSelect: 'none'}}>Актуальная версия </label>
             <input
               type="checkbox"
               name="actual"
@@ -458,7 +490,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           </div>
 
           <div className="add-po-field critical" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label">Критическая версия </label>
+            <label className="add-po-label" style={{userSelect: 'none'}} onClick={changeCritical}>Критическая версия </label>
             <input
               type="checkbox"
               name="critical"
@@ -470,7 +502,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
           {/* Архивная версия */}
           <div className="add-po-field archive" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label" style={{ marginBottom: 0 }}>Архивная версия</label>
+            <label className="add-po-label" style={{ marginBottom: 0, userSelect: 'none' }} onClick={changeArchive}>Архивная версия</label>
             <input
               type="checkbox"
               name="archive"

@@ -253,6 +253,12 @@ const handleUzelChange = (uzels) => {
   const handleHelp = () => {
     navigate('/help/');
   }
+  const handleTractorDetails = () => {
+    navigate('/main/tractor-details'); // или другой путь
+  };
+  const handleAggregateDetails = () => {
+    navigate('/main/aggregate-details'); // или другой путь
+  };
 
   return (
     <>
@@ -307,6 +313,8 @@ const handleUzelChange = (uzels) => {
             searchDealer={searchDealer}
             onDealerSearch={handleDealer}
             selectedStatus={selectedStatus}
+            handleTractorDetails={handleTractorDetails}
+            handleAggregateDetails={handleAggregateDetails}
 
             showAddForm={showAddForm}
             showAddAggForm={showAddAggForm}

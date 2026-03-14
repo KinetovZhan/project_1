@@ -110,64 +110,81 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     fetchProducers();
   }, [token, selectedModel]);
 
-  useEffect (() => {
-    const fetchTractorModel = async () => {
-      if (!token) {
-        setSelectedTractorModels([]);
-        return;
-      }
+  useEffect(() => {
+  const fetchTractorModel = async () => {
+    if (!token) {
+      setTractorOptions([]);
+      return;
+    }
 
-      const typeCodeMap = {
+    const typeCodeMap = {
       DVS: 'DVS',
-      KPP: 'KPP', 
+      KPP: 'KPP',
       RK: 'RK',
-      hydrorasp: 'HR',   
+      HR: 'HR',
       BK: 'BK'
     };
 
     const activeTypes = Object.keys(FilterItems)
       .filter(key => FilterItems[key])
-      // .map(key => typeCodeMap[key]);
+      .map(key => typeCodeMap[key]);
 
-    // Формируем тело запроса с правильными полями
+    // Используем ту же структуру, что и в Objects
     const requestBody = {
-      component_producers: selectedProducers,
-      component_types: activeTypes,
-      component_models: selectedModel,  //  name_comp → component_models
-      software_status: selectedStatus   // status → software_status
+      search: '', // Пустой поиск
+      trac_model: [], // Не фильтруем по тракторам, чтобы получить все доступные
+      type_comp: activeTypes,
+      name_comp: selectedModel,
+      producers: selectedProducers,
+      status: selectedStatus
     };
 
-     
-  try {
-        setLoadingTractorModels(true);
-        setTractorError(null);
+    try {
+      setLoadingTractorModels(true);
+      setTractorError(null);
 
-        const tractorData = await api.post('search/tractor-models',requestBody)
-        let filteredData = tractorData;
-        // Извлекаем уникальных производителей
-        const tractors = filteredData
-          .map(item => item.model)
-          .filter(model => model && model.trim() !== '')
-          .filter((value, index, self) => self.indexOf(value) === index)
-          .sort(); // сортируем по алфавиту
-        
-           // Формируем опции для react-select
-        const options = tractors.map(model => ({
-          value: model,
-          label: model
-        }));
-        setTractorOptions(options);
-      } catch (err) {
-        console.error('Ошибка загрузки производителей:', err);
-        setTractorError(err.message);
-      } finally {
-        setLoadingTractorModels(false);
-      }
-    };
-    
-    fetchTractorModel();
-  }, [token, selectedModel,selectedStatus,selectedProducers]);
-  
+      // Используем тот же эндпоинт, что и в Objects
+      
+      const response = await api.post('search/component-info', requestBody);
+      const response2 = await api.post('search/archive-component-info', requestBody);
+
+      const combinedResponse = [...response, ...response2];
+      
+      // Извлекаем уникальные модели тракторов из поля tractor_model (которое является массивом)
+      const tractorModels = [];
+      
+      combinedResponse.forEach(item => {
+        if (item.tractor_model && Array.isArray(item.tractor_model)) {
+          item.tractor_model.forEach(model => {
+            if (model && model.trim() !== '' && !tractorModels.includes(model)) {
+              tractorModels.push(model);
+            }
+          });
+        }
+      });
+      
+      // Сортируем по алфавиту
+      tractorModels.sort();
+
+      // Формируем опции для react-select
+      const options = tractorModels.map(model => ({
+        value: model,
+        label: model
+      }));
+
+      console.log('Найденные модели тракторов:', tractorModels); // Для отладки
+      setTractorOptions(options);
+      
+    } catch (err) {
+      console.error('Ошибка загрузки моделей тракторов:', err);
+      setTractorError(err.message);
+    } finally {
+      setLoadingTractorModels(false);
+    }
+  };
+
+  fetchTractorModel();
+}, [token, FilterItems, selectedModel, selectedProducers, selectedStatus]);
 
 
   useEffect(() => {
