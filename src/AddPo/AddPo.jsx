@@ -71,7 +71,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         if (!Array.isArray(data)) throw new Error('Данные не являются массивом');
         const options = data.map(item => ({
           value: item.id,
-          label: `${item.filename}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
+          label: `${item.filename.slice(33) || ''}${item.release_date ? ` - ${new Date(item.release_date).toLocaleDateString()}` : ''}`,
         }));
         setSoftwareOptions(options);
       })
@@ -418,19 +418,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
             )}
           </div>
 
-          {/* Актуальность */}
-          {/* <div className="add-po-field">
-            <label className="add-po-label">Актуальность *</label>
-            <Select
-              options={relevanceOptions}
-              value={selectedRelevance}
-              onChange={setSelectedRelevance}
-              placeholder="Выберите актуальность"
-              classNamePrefix="add-po-select"
-              isClearable={false}
-              styles={selectStyles}
-            />
-          </div> */}
 
           {/* Статус */}
           <div className="add-po-field">
@@ -447,7 +434,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           </div>
 
           <div className="add-po-field actual" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label">Актуальная версия </label>
+            <label className="add-po-label" onClick={changeActual} style={{userSelect: 'none'}}>Актуальная версия </label>
             <input
               type="checkbox"
               name="actual"
@@ -458,7 +445,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           </div>
 
           <div className="add-po-field critical" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label">Критическая версия </label>
+            <label className="add-po-label" style={{userSelect: 'none'}} onClick={changeCritical}>Критическая версия </label>
             <input
               type="checkbox"
               name="critical"
@@ -470,7 +457,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
           {/* Архивная версия */}
           <div className="add-po-field archive" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label" style={{ marginBottom: 0 }}>Архивная версия</label>
+            <label className="add-po-label" style={{ marginBottom: 0, userSelect: 'none' }} onClick={changeArchive}>Архивная версия</label>
             <input
               type="checkbox"
               name="archive"

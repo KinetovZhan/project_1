@@ -4,6 +4,7 @@ import { TractorTable } from '../TractorTable/TractorTable';
 import { AddPoForm } from '../AddPo/AddPo';
 import { AddAggForm } from '../AddUzel/AddAgg';
 import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
+import { useNavigate } from 'react-router-dom';
 
 export function MainPart({
   activeButton,
@@ -35,10 +36,21 @@ export function MainPart({
 
   showAddCompPartForm,
   onCloseAddCompPartForm,
-  onAddCompPartSubmit
+  onAddCompPartSubmit,
+
+  handleTractorDetails,
+  handleAggregateDetails
 
   // onBack — не нужен, используйте onClose...
 }) {
+  const navigate = useNavigate();
+
+  
+
+  const handleGoBack = () => {
+    navigate(-1); // Возврат на предыдущую страницу в истории
+  };
+
   // Закрываем форму ПО, если переключились на другую вкладку
   useEffect(() => {
     if (activeButton && activeButton !== 'addPO' && showAddForm) {
@@ -87,6 +99,7 @@ export function MainPart({
 
   return (
     <div className="MainPart">
+      
       {activeButton === 'aggregates' && (
         <>
           <SearchBar onSearch={onSearch} activeButton={activeButton} />
@@ -98,6 +111,7 @@ export function MainPart({
             onSearch={onSearch}
             searchQuery={searchQuery}
             selectedStatus={selectedStatus}
+
           />
         </>
       )}
