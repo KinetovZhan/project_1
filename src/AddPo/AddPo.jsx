@@ -135,7 +135,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     setProducerOptions(prev => [...prev, newOption]);
     setSelectedProducer(newOption);
   };
-
+  
+   const handleModelCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    setTractorOptions(prev => [...prev, newOption]);
+    setSelectedTractorModels(newOption);
+  };
   const handleProducerChange = (selectedOption) => {
     setSelectedProducer(selectedOption);
   };
@@ -320,7 +325,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
               value={selectedProducer}
               onChange={handleProducerChange}
               onCreateOption={handleProducerCreate}
-              placeholder="Выберите или создайте производителя"
+              placeholder="Выберите производителя"
               classNamePrefix="add-po-select"
               isClearable={true}
               isSearchable={true}
@@ -333,7 +338,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 return "Нет доступных производителей";
               }}
               styles={selectStyles}
-              formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
+              formatCreateLabel={(inputValue) => `Добавить: ${inputValue}`}
             />
             {producerError && token && (
               <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
@@ -345,11 +350,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
           {/* Модели тракторов (множественный выбор) */}
           <div className="add-po-field">
             <label className="add-po-label">Модели тракторов *</label>
-            <Select
+            <Creatable
               isMulti
               options={tractorOptions}
               value={selectedTractorModels}
               onChange={setSelectedTractorModels}
+              onCreateOption={handleModelCreate}
               placeholder="Выберите модели тракторов"
               classNamePrefix="add-po-select"
               isClearable={false}
@@ -363,6 +369,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
                 return "Нет доступных моделей";
               }}
               styles={selectStyles}
+              formatCreateLabel={(inputValue) => `Добавить: ${inputValue}`}
             />
             {tractorError && token && (
               <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
@@ -467,7 +474,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
           {/* Архивная версия */}
           <div className="add-po-field archive" style={{ flexDirection: 'row', alignItems: 'center', gap: '20px' }}>
-            <label className="add-po-label" style={{ marginBottom: 0 }}>Архивная версия?</label>
+            <label className="add-po-label" style={{ marginBottom: 0 }}>Архивная версия</label>
             <input
               type="checkbox"
               name="archive"

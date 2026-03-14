@@ -5,7 +5,7 @@ import DefaultImage from '../img/default.jpg';
 import K5Image from '../img/К5.png';
 import K7Image from '../img/К7М.png';
 import {api} from '../fetchAPI.js';
-
+import { PoDetails } from '../PoDetails/PoDetails.jsx';
 
 export function TractorDetails({ vin, onBack }) {
   const [tractor, setTractor] = useState(null);
@@ -14,6 +14,7 @@ export function TractorDetails({ vin, onBack }) {
   // const [activeTooltip, setActiveTooltip] = useState(null);
   const [components, setComponents] = useState([]);
   const [poDescriptions, setPoDescriptions] = useState({});
+  const [selectedPo,setSelectedPo]=useState(null);
   const { token } = useAuth();
 
   const [tooltip, setTooltip] = useState({
@@ -45,35 +46,7 @@ export function TractorDetails({ vin, onBack }) {
       setLoading(true);
       setError(null);
       try {
-          // console.log('Запрос деталей для VIN:', vin);
-        // console.log('API URL:', `${API_BASE_URL}/search/search-tractor-vin`); 
-        
-        // const response = await fetch(`http://${ip}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
-        //   method: 'GET',
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`,
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json',
-        //   },
-
-        ///////////////////////////////
-        // const response = await fetch(`${API_BASE_URL}/search/search-tractor-vin?request=${encodeURIComponent(vin)}`, {
-        //   method: 'GET',
-        //   headers: {
-        //     'Authorization': `Bearer ${token}`,
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/json',
-        //   },
-        // });
-
-        // console.log('Статус ответа:', response.status);
-
-        // if (!response.ok) {
-        //   throw new Error(`Ошибка HTTP: ${response.status}`);
-        // }
-
-        // const data = await response.json();
-        // console.log('Полученные данные трактора:', data);
+         
         console.log('Запрос деталей для VIN:', vin);
 
         // Используем нашу новую api утилиту
@@ -152,28 +125,6 @@ export function TractorDetails({ vin, onBack }) {
   };
 
 
-  // const handleItemClick = (index) => {
-  //   if (activeTooltip === index) {
-  //     setActiveTooltip(null);
-  //   } else {
-  //     setActiveTooltip(index);
-  //   }
-  // };
-
-  // Закрыть подсказку при клике вне элемента
-  // useEffect(() => {
-  //   const handleClickOutside = (event) => {
-  //     if (!event.target.closest('.po-item')) {
-  //       setActiveTooltip(null);
-  //     }
-  //   };
-
-  //   document.addEventListener('click', handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener('click', handleClickOutside);
-  //   };
-  // }, []);
-
   if (loading) return (
     <div className="loading">
       <div>Загрузка деталей трактора...</div>
@@ -202,7 +153,10 @@ export function TractorDetails({ vin, onBack }) {
     name: component.component_type,
     version: component.recommend_sw_version || component.sw_name || '-',
     model: component.comp_model,
-    description: component.description || 'Нет описания' 
+    description: component.description || 'Нет описания' ,
+    component_id: component.component_id,
+  firmware_id: component.current_sw_version,
+    
   }));
 
   // Если компонентов нет, показываем заглушку
@@ -215,15 +169,30 @@ export function TractorDetails({ vin, onBack }) {
     { name: 'Автопилот', version: '-', model: '-' }
   ];
 
+   const handlePoClick = (component) => {
+       if (component.firmware_id && component.component_id) {
+    setSelectedPo({
+      id_Firmwares: component.firmware_id,
+      id_Component: component.component_id,
+    });
+  } else {
+    console.warn('Недостаточно данных для отображения ПО', component);
+  }
+};
+  
+    if (selectedPo) {
+        return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} />;
+      }
+  
   
 
   return (
     <div className="tractor-details-container">
-      <button onClick={onBack} className="add-po-back-button">
+      {/* <button onClick={onBack} className="add-po-back-button">
         <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-      </button>
+      </button> */}
       <div className="tractor-details-content">
         <div className="tractor-info">
           <h2>{model} {VIN}</h2>
@@ -258,6 +227,8 @@ export function TractorDetails({ vin, onBack }) {
                     onMouseEnter={(e) => handleMouseEnter(e,item.description)}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
+                    onClick={()=> handlePoClick(item)}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="po-item-content">
                       <span className="po-item-name">{item.name}:</span>

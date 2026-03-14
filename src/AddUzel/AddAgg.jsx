@@ -253,6 +253,12 @@ export function AddAggForm({ onBack, onSubmit }) {
     }));
   };
 
+  const handleModelCreate = (inputValue) => {
+    const newOption = { value: inputValue, label: inputValue };
+    setTractorOptions(prev => [...prev, newOption]);
+    setSelectedTractors(newOption);
+  };
+
   return (
     <div className="add-po-form-container uzel">
       {/* {!isMobile ? (
@@ -354,11 +360,12 @@ export function AddAggForm({ onBack, onSubmit }) {
         {/* Выбор трактора с использованием react-select */}
         <div className="add-po-field">
           <label className="add-po-label">Модели тракторов</label>
-          <Select
+          <Creatable
             isMulti
             options={tractorOptions}
             value={selectedTractor}
             onChange={handleTractorSelectChange}
+            onCreateOption={handleModelCreate}
             placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите модель"}
             classNamePrefix="add-po-select"
             isClearable={true}
@@ -414,6 +421,7 @@ export function AddAggForm({ onBack, onSubmit }) {
                 color: '#0c0c0c'
               })
             }}
+              formatCreateLabel={(inputValue) => `Добавить: ${inputValue}`}
           />
           
         </div>
@@ -440,7 +448,7 @@ export function AddAggForm({ onBack, onSubmit }) {
     value={selectedProducer}
     onChange={handleProducerChange}
     onCreateOption={handleProducerCreate}
-    placeholder="Выберите или создайте производителя"
+    placeholder="Выберите производителя"
     classNamePrefix="add-po-select"
     isClearable={true}
     isSearchable={true}

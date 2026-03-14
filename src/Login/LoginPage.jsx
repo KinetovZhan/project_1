@@ -52,7 +52,7 @@ const LoginPage = () => {
 
 
     try {
-      const data = await api.request('/token/', {
+      const data = await api.request('/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData.toString(),
