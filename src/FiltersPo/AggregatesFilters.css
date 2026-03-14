@@ -1,11 +1,7 @@
 
 
 .model {
-  animation: slideRightFadeIn 0.5s ease-out forwards;
-  position: absolute;
-  /* left: 50%;                     */
-  transform: translateX(-50%);  
-  bottom: 120px;               
+  animation: slideRightFadeIn 0.5s ease-out forwards;    
   width: 360px;
   max-width: 90%;            
 }
