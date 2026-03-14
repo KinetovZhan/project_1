@@ -244,13 +244,21 @@ useEffect(() => {
 };
 
   return (
-    <div className="po-details-container">
-      <div className="po-details-content">
+    <div className="po-details-container add-po-form-scroll-bar">
+      <div className="po-details-content ">
         <div className="left-column">
           <div className="section">
-            <h2>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}
+            <h2>
+              <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
               <br />
-              {details.component_name} ({po.tractor_model})
+              <span className='text-names'>{details.component_name}</span>
+              <br />
+              {po.tractor_model && po.tractor_model.length > 0 && (
+                <span className='text-names'>
+                  <span>Модели тракторов: </span>
+                  <span>{po.tractor_model.join(', ')}</span>
+                </span>
+              )}
             </h2>
             <img
               className="object"
