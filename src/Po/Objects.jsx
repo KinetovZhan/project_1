@@ -142,6 +142,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
       return JMZImage;
     }
+    else {
+      return WeiImage;
+    }
 
   }
 

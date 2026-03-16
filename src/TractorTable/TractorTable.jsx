@@ -383,20 +383,32 @@ const safeUzelFilter = uzelFilter || [];
 const isOnlyOldyMode = safeActualFilter.length === 1 && safeActualFilter[0] === 'oldy';
 
 const shouldHighlight = (tractor, componentType) => {
+
+   if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) {
+    return false;
+  }
   // Получаем статус и флаг is_actual для данного компонента
   const status = tractor[`${componentType}_status`];
-  const isActual = tractor[`${componentType}_is_actual`];
+  // Если статус не определён (нет компонента), не подсвечиваем
+  if (!status) return false;
 
-  // Применяем фильтр по узлам
-  if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) return false;
+  // 2. Если фильтр по статусам пуст — подсвечиваем все ячейки с любым статусом
+  if (safeActualFilter.length === 0) return true;
 
-  if (isOnlyOldyMode) {
-    // В режиме "только устаревшее" подсвечиваем только критические НЕактуальные компоненты
-    return status === 'critical' && isActual === false;
-  }
+  // 3. Иначе подсвечиваем только те, чей статус есть в actualFilter
+  return safeActualFilter.includes(status);
+  // const isActual = tractor[`${componentType}_is_actual`];
+
+  // // Применяем фильтр по узлам
+  // if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) return false;
+
+  // if (isOnlyOldyMode) {
+  //   // В режиме "только устаревшее" подсвечиваем только критические НЕактуальные компоненты
+  //   return status === 'critical' && isActual === false;
+  // }
 
   // Обычная логика: подсвечиваем, если статус есть в actualFilter
-  return safeActualFilter.includes(status);
+  // return safeActualFilter.includes(status);
 };
 
 const getStatusColorClass = (status) => {
