@@ -266,7 +266,7 @@ export function AddAggForm({ onBack, onSubmit }) {
           </svg>
         </button>
       ) : null} */}
-
+      <button onClick={onBack} className="go-back"></button>
       <h3 className="add-po-title">Добавление узла</h3>
 
       {error && (
