@@ -93,7 +93,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       is_critical:null,
       is_archive:null,
       query: searchQuery?.trim() || "",
-      dealer: searchDealer?.trim() || ""
+      consumer: searchDealer?.trim() || ""
     };
 
     if (dateFilter) {
@@ -233,7 +233,6 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
   return enriched;
 });
       }
-
       setTractors(enrichedTractors);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
@@ -486,7 +485,7 @@ const getStatusColorClass = (status) => {
                   <td>{tractor.model || '-'}</td>
                   <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
                   <td>{tractor.region || '-'}</td>
-                  <td>{tractor.consumer || tractor.dealer || '-'}</td> 
+                  <td>{tractor.consumer || '-'}</td> 
                   <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
                   {/* <td>{tractor.dvs || tractor.DVS || '-'}</td>
