@@ -466,12 +466,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
           {/* Статус */}
           <div className="add-po-field">
-            <label className="add-po-label">Статус *</label>
+            <label className="add-po-label">Назначение *</label>
             <Select
               options={statusOptions}
               value={selectedStatus}
               onChange={setSelectedStatus}
-              placeholder="Выберите статус"
+              placeholder="Выберите назначение"
               classNamePrefix="add-po-select"
               isClearable={false}
               styles={selectStyles}

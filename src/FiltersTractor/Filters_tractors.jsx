@@ -26,7 +26,7 @@ export function Filters2({
   ];
 
   const actualityOptions = [
-    {value:'critical', label: 'Критическое'},
+    {value:'critical', label: 'Требуется обновление'},
     {value:'actual', label: 'Актуальное'},
     {value:'oldy', label: 'Устаревшее'}
   ];

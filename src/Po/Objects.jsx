@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails}) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails,actualFilterPo}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -43,9 +43,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   const navigate = useNavigate();
 
-  // const handleAggregateDetails = () => {
-  //   navigate('/main/AggregateDetails');
-  // }
+ 
 
   const userRole = user?.role || 'user';
 
@@ -73,7 +71,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           type_comp: activeFilters,
           name_comp: Array.isArray(selectedModel) ? selectedModel : [],
           producers: Array.isArray(selectedProducers) ? selectedProducers : [],
-          status: Array.isArray(selectedStatus) ? selectedStatus : []
+          status: Array.isArray(selectedStatus) ? selectedStatus : [],
+          soft_state: Array.isArray(actualFilterPo) ? actualFilterPo : [],
         };
 
         const [activeResponse, archiveResponse] = await Promise.all([
@@ -95,7 +94,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     } else {
       setLoading(false);
     }
-  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus, userRole, choosedObjects, sortOrder, searchQuery]);
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus,actualFilterPo, userRole, choosedObjects, sortOrder, searchQuery]);
 
 
   useEffect(() => {

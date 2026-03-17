@@ -6,7 +6,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import {Header} from '../Header/Header.jsx'
 
 
-export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange, onUzelChange, isMobileSidebarOpen,
+export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonClick, activeMajMinButton, onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange, onModelChangeTrac, onFilterChangeTracByModel, onFilterChangeByStatus, onDealerChange, onAddPoClick, onAddAggClick, onAddCompPartClick, selectedModel, onDateChange, onActualChange,onActualChangePo, onUzelChange, isMobileSidebarOpen,
   toggleMobileSidebar}) {
 
   const isMobile = useCheckMobile();
@@ -93,7 +93,7 @@ export function Sidebar({ activeButton, handleButtonClick, handleMajMinButtonCli
         </div>
       )}
       
-      {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange} onStatusChange={onStatusChange}/>}
+      {activeButton === 'aggregates' && <Filters onFilterChange={onFilterChange} onFilterChange2={onFilterChange2} onModelChange={onModelChange} onProducerChange={onProducerChange} onStatusChange={onStatusChange} onActualChangePo={onActualChangePo}/>}
       {activeButton === 'tractor' && <Filters2 onFilterChangeTracByModel={onFilterChangeTracByModel} onFilterChangeByStatus={onFilterChangeByStatus} handleMajMinButtonClick={handleMajMinButtonClick} activeMajMinButton={activeMajMinButton} onDealerChange={onDealerChange} onDateChange={onDateChange} onActualChange={onActualChange} onUzelChange={onUzelChange}/>}
     </div>
   )

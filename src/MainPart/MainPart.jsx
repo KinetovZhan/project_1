@@ -20,6 +20,7 @@ export function MainPart({
   selectedStatus,
   actualFilter,   
   uzelFilter,
+  actualFilterPo,
 
   // --- Форма ПО ---
   showAddForm,
@@ -111,6 +112,7 @@ export function MainPart({
             onSearch={onSearch}
             searchQuery={searchQuery}
             selectedStatus={selectedStatus}
+            actualFilterPo = {actualFilterPo}
 
           />
         </>

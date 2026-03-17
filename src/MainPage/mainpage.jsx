@@ -38,6 +38,7 @@ function MainPage() {
   // Добавляем состояние для фильтра актуальности
   const [uzelFilter, setUzelFilter] = useState([]);
   const [actualFilter, setActualFilter] = useState([]);
+  const [actualFilterPo, setActualFilterPo] = useState([]);
 
   const { logout, user } = useAuth();
 
@@ -230,6 +231,11 @@ const handleUzelChange = (uzels) => {
   setUzelFilter(uzels);
 };
 
+const handleActualChangePo = (value) => {
+    console.log('📢 Фильтр актуальности po изменился:', value);
+    setActualFilterPo(value);
+  };
+
 
    //ОБРАБОТЧИК для Базы знаний
   const handleKnowledgeBase = () => {
@@ -294,6 +300,7 @@ const handleUzelChange = (uzels) => {
             onStatusChange={handleStatusChange} 
             onActualChange={handleActualChange}
             onUzelChange={handleUzelChange}
+            onActualChangePo={handleActualChangePo}
             isMobileSidebarOpen={isMobileSidebarOpen}
             toggleMobileSidebar={toggleMobileSidebar}
           />
@@ -328,6 +335,7 @@ const handleUzelChange = (uzels) => {
             dateFilter={dateFilter}
             actualFilter={actualFilter}
             uzelFilter={uzelFilter}
+            actualFilterPo={actualFilterPo}
           />
 
         </div>

@@ -4,7 +4,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
 
-export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange}) { 
+export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProducerChange, onStatusChange,onActualChangePo}) { 
 
 
   // const tractorModelOptions = [
@@ -28,7 +28,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const statusOptions = [
     { value: "serial", label: "Серийное" },
     { value: "experienced", label: 'Опытное' },
-    { value: "in_operation", label: 'В эксплуатации' }
+    { value: "in_operation", label: 'Для эксплуатации' }
   ];
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
@@ -37,6 +37,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const [componentModels, setComponentModels] = useState([]);
   const [producerOptions, setProducerOptions] = useState([]);
   const [tractorOptions, setTractorOptions] = useState([])
+  const [selectedActuality, setSelectedActuality] = useState(null);
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
   const [loadingTractorModels, setLoadingTractorModels] = useState(false);
@@ -52,6 +53,12 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const selectedStatusOptions = statusOptions.filter(opt =>
     selectedStatus.includes(opt.value)
   );
+
+  const actualityOptions = [
+    {value:'critical', label: 'Требуется обновление'},
+    {value:'actual', label: 'Актуальное'},
+    {value:'old', label: 'Устаревшее'}
+  ];
   useEffect (() => {
     const fetchProducers = async () => {
       if (!token) {
@@ -314,6 +321,39 @@ fetchModels();
     }
     console.log(`evfsd ${FilterItems.DVS}`)
   };
+  const handleActualChange = (selectedOptions) => {
+  const values = selectedOptions ? selectedOptions.map(opt => opt.value) : [];
+  setSelectedActuality(selectedOptions);
+  if (onActualChangePo) {
+    onActualChangePo(values); // передаём массив строк
+  }
+};
+
+  // Форматирование опций с цветным кружком для фильтра актуальности
+const formatActualityOptionLabel = ({ value, label }) => {
+  let color;
+  switch (value) {
+    case 'critical': color = '#ff4444'; break; // красный
+    case 'actual': color = '#44ff44'; break;   // зелёный
+    case 'old': color = '#ffff44'; break;     // жёлтый
+    default: color = '#ccc';
+  }
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <span
+        style={{
+          display: 'inline-block',
+          width: '12px',
+          height: '12px',
+          borderRadius: '50%',
+          backgroundColor: color,
+          marginRight: '8px',
+        }}
+      />
+      {label}
+    </div>
+  );
+};
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -550,7 +590,7 @@ fetchModels();
           options={statusOptions}
           value={selectedStatusOptions}
           onChange={handleStatusChange}
-          placeholder="Статус"
+          placeholder="Назначение"
           menuPortalTarget={document.body}
           menuPlacement="top" 
           isDisabled={loading}
@@ -592,6 +632,56 @@ fetchModels();
           }}
         />
       </div>
+        <div className="actuality-filter">
+          <Select
+            isMulti
+            className="actuality-select"
+            options={actualityOptions}
+            value={selectedActuality}
+            onChange={handleActualChange}
+            placeholder="Все статусы"
+            isClearable={true}
+            menuPlacement="top"
+            menuPortalTarget={document.body}
+            formatOptionLabel={formatActualityOptionLabel}   // <-- добавлено
+            styles={{
+              control: (base) => ({
+                ...base, 
+              maxHeight: 200, 
+              overflowY: 'auto', 
+              color: 'black', 
+              backgroundColor:'rgba(217, 217, 217, 1)', 
+              width: isMobile ? '100%':'42vh', 
+              borderRadius: '15px', 
+              height:'53px',
+              left: '50%',
+              transform: 'Translate(-50%)',
+              position: 'relative',
+              zIndex: 1
+              }),
+              multiValue: (base) => ({
+                ...base,
+                fontSize: '11px'
+              }),
+              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+              menuList: (base) => ({
+                ...base,
+                maxHeight: 150,
+                overflowY: 'auto',
+                backgroundColor: 'white',
+                color: 'black',
+                border: '1px solid rgba(217, 217, 217, 1)',
+                scrollbarWidth: 'thin',
+                fontSize: '11px'
+              }),
+              option: (base, state) => ({
+                ...base,
+                display: 'flex',
+                alignItems: 'center',
+              }),
+            }}
+          />
+        </div>
 
       <button 
         className='clear'
@@ -601,7 +691,7 @@ fetchModels();
             DVS: false,
             KPP: false,
             RK: false,
-            hydrorasp: false,
+            HR: false,
             AP:false,
             BK:false
           });
@@ -613,12 +703,14 @@ fetchModels();
           setSelectedProducers([]);
           setSelectedTractorModels([]);
           setSelectedStatus([]);
+          setSelectedActuality([])
 
           if (onFilterChange) onFilterChange([]);
           if (onFilterChange2) onFilterChange2([]);
           if (onModelChange) onModelChange([]);
           if (onProducerChange) onProducerChange([]);
           if (onStatusChange) {onStatusChange([])}
+          if (onActualChangePo) {onActualChangePo([])}
           
         }}
       >
@@ -627,3 +719,4 @@ fetchModels();
     </>
   );
 }
+

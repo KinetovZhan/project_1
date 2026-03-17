@@ -1,4 +1,4 @@
-import React, { useState,useRef, useEffect, useMemo } from 'react';
+import React, { useState,useRef, useEffect, useMemo, useCallback } from 'react';
 import {SearchBar} from "../SearchBar/SearchBar.jsx";
 import {TractorDetails} from "../TractorDetails/TractorDetails.jsx";
 import { useAuth } from '../auth/AuthContext.jsx';
@@ -79,6 +79,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     key: null,
     direction: null 
   });
+
+  
 
 
   const getPostData = () => {
@@ -292,6 +294,60 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
     return value || '-';
   };
 
+  const safeActualFilter = actualFilter || [];
+const safeUzelFilter = uzelFilter || [];
+
+const isOnlyOldyMode = safeActualFilter.length === 1 && safeActualFilter[0] === 'oldy';
+const isOldyCritMode = safeActualFilter.length === 2 && safeActualFilter[0] === 'oldy'||safeActualFilter[0] === 'actual'&& safeActualFilter[1] === 'actual'||safeActualFilter[1] === 'oldy';
+
+const shouldHighlight = useCallback((tractor, componentType) => {
+
+   if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) {
+    return false;
+  }
+  // Получаем статус и флаг is_actual для данного компонента
+  const status = tractor[`${componentType}_status`];
+
+  // Если статус не определён (нет компонента), не подсвечиваем
+  if (!status) return false;
+
+  // 2. Если фильтр по статусам пуст — подсвечиваем все ячейки с любым статусом
+  if (safeActualFilter.length === 0) return true;
+   if (isOnlyOldyMode) {
+    return status==='critical'||status==='oldy'
+  }
+
+  if (isOldyCritMode) {
+    return status
+  }
+
+  // 3. Иначе подсвечиваем только те, чей статус есть в actualFilter
+  return safeActualFilter.includes(status);
+  
+
+  // // Применяем фильтр по узлам
+  // if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) return false;
+
+  
+
+  // Обычная логика: подсвечиваем, если статус есть в actualFilter
+  // return safeActualFilter.includes(status);
+});
+
+const getStatusColorClass = (status) => {
+  // if (isOnlyOldyMode && status === 'critical') {
+  //   return 'cell-oldy'; // жёлтый
+  // }
+  switch (status) {
+    case 'critical': return 'cell-critical';
+    case 'actual': return 'cell-actual';
+    case 'oldy': return 'cell-oldy';
+    default: return '';
+  }
+};
+
+
+
   // Отсортированные тракторы с использованием useMemo
   const sortedTractors = useMemo(() => {
     let sortableTractors = [...tractors].filter(tractor => tractor.vin !== 'TEMPLATE_SOFTWARE_ASSIGNMENT');
@@ -328,6 +384,22 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
     
     return sortableTractors;
   }, [tractors, sortConfig]);
+  const filteredOnStatusTractors = useMemo(() => {
+    if (safeActualFilter.length === 0 && safeUzelFilter.length===0) {
+      return sortedTractors;
+    }
+    return sortedTractors.filter(tractor => {
+      const types = ['dvs', 'kpp', 'rk', 'bk', 'gr'];
+      for (let type of types) {
+        if (shouldHighlight(tractor,type)) {
+          return true;
+        }
+      }
+      return false;
+    });
+  },[sortedTractors,actualFilter,uzelFilter,shouldHighlight]);
+
+
 
   // Функция для отображения иконки сортировки
   const getSortIcon = (key) => {
@@ -376,53 +448,7 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
     );
   }
 
-  // Защита от null/undefined
-const safeActualFilter = actualFilter || [];
-const safeUzelFilter = uzelFilter || [];
-
-const isOnlyOldyMode = safeActualFilter.length === 1 && safeActualFilter[0] === 'oldy';
-
-const shouldHighlight = (tractor, componentType) => {
-
-   if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) {
-    return false;
-  }
-  // Получаем статус и флаг is_actual для данного компонента
-  const status = tractor[`${componentType}_status`];
-  // Если статус не определён (нет компонента), не подсвечиваем
-  if (!status) return false;
-
-  // 2. Если фильтр по статусам пуст — подсвечиваем все ячейки с любым статусом
-  if (safeActualFilter.length === 0) return true;
-
-  // 3. Иначе подсвечиваем только те, чей статус есть в actualFilter
-  return safeActualFilter.includes(status);
-  // const isActual = tractor[`${componentType}_is_actual`];
-
-  // // Применяем фильтр по узлам
-  // if (safeUzelFilter.length > 0 && !safeUzelFilter.includes(componentType)) return false;
-
-  // if (isOnlyOldyMode) {
-  //   // В режиме "только устаревшее" подсвечиваем только критические НЕактуальные компоненты
-  //   return status === 'critical' && isActual === false;
-  // }
-
-  // Обычная логика: подсвечиваем, если статус есть в actualFilter
-  // return safeActualFilter.includes(status);
-};
-
-const getStatusColorClass = (status) => {
-  if (isOnlyOldyMode && status === 'critical') {
-    return 'cell-oldy'; // жёлтый
-  }
-  switch (status) {
-    case 'critical': return 'cell-critical';
-    case 'actual': return 'cell-actual';
-    case 'oldy': return 'cell-oldy';
-    default: return '';
-  }
-};
-
+ 
 
   return (
     <div className="tractor-table-container" >
@@ -472,7 +498,7 @@ const getStatusColorClass = (status) => {
               </tr> 
             </thead>
             <tbody>
-              {sortedTractors.map((tractor, index) => (
+              {filteredOnStatusTractors.map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}
                   onClick={() => handleRowClick(tractor)}
@@ -489,13 +515,6 @@ const getStatusColorClass = (status) => {
                   <td>{tractor.consumer || tractor.dealer || '-'}</td> 
                   <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
                   <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
-                  {/* <td>{tractor.dvs || tractor.DVS || '-'}</td>
-                  <td>{tractor.kpp || tractor.KPP || '-'}</td>
-                  <td title={tractor.rk || tractor.RK || '-'} className="tractor-cell">
-                    {tractor.rk || tractor.RK || '-'}
-                  </td>
-                  <td>{tractor.bk || tractor.BK || '-'}</td>
-                  <td>{tractor.gr || tractor.GR || '-'}</td>                 */}
                   <td
   className={shouldHighlight(tractor, 'dvs') ? getStatusColorClass(tractor.dvs_status) : ''}
 >
