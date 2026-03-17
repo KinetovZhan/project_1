@@ -438,7 +438,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                 cursor: 'pointer',
                 fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
               }}>
-            <span>Новейшие версии ({softwareItems.length})</span>
+            <span>Актуальные версии ({softwareItems.length})</span>
           </button>
           <button 
             onClick={getArchivePO}

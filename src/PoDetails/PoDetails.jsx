@@ -273,7 +273,7 @@ export function PoDetails({ po, onBack }) {
             <p>{actualityPeriod}</p>
           </div>
           <div>
-            <h3>Статус</h3>
+            <h3>Назначение</h3>
             <p>{getStatusText()}</p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>

@@ -550,7 +550,7 @@ fetchModels();
           options={statusOptions}
           value={selectedStatusOptions}
           onChange={handleStatusChange}
-          placeholder="Статус"
+          placeholder="Назначение"
           menuPortalTarget={document.body}
           menuPlacement="top" 
           isDisabled={loading}
