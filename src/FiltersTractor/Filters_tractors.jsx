@@ -491,48 +491,6 @@ const formatActualityOptionLabel = ({ value, label }) => {
         </button>  
       </div>
 
-      {/* Фильтр по статусам */}
-      {/* <div className='filterstrac2'>
-        <label>
-          <span>Серийное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.serial} 
-            onChange={() => handleFilterByStatus('serial')}
-          />
-        </label>
-        <label>
-          <span>Опытное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.experimental} 
-            onChange={() => handleFilterByStatus('experimental')}
-          />
-        </label>
-        <label>
-          <span>Актуальное</span>
-          <input 
-            type="checkbox"
-            checked={FilterTractor_by_status.in_operation} 
-            onChange={() => handleFilterByStatus('in_operation')}
-          />
-        </label>
-      </div> */}
-
-      {/* <div className='Majmin'>
-        <button 
-          className={activeMajMinButton === 'MAJ' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleActualClick('MAJ')}
-        >
-          Актуальные
-        </button>
-        <button 
-          className={activeMajMinButton === 'MIN' ? 'majmin_button_active' : 'majmin_button'}
-          onClick={() => handleActualClick('MIN')}
-        >
-          Не актуальные
-        </button>
-      </div> */}
 
       <div className='tractors-status'>
         <span>Статус:</span>

@@ -1,7 +1,7 @@
 .po-details-container {
   box-sizing: border-box;
   width: 963px;
-  height: 650px;
+  height: 670px;
   background-color: rgb(219, 219, 219);
   border-radius: 30px;
   color: black;
@@ -44,7 +44,7 @@
   width: 50%;
   flex-direction: column;
   text-align: left;
-  justify-content: flex-start
+  justify-content: flex-start;
 }
 .left-column h2 {
   white-space: nowrap;       
@@ -58,6 +58,7 @@
 }
 .left-column .section {
   padding:0px;
+  gap:1vh
 }
 .right-column {
   display: flex;
