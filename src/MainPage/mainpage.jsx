@@ -328,6 +328,7 @@ const handleUzelChange = (uzels) => {
             dateFilter={dateFilter}
             actualFilter={actualFilter}
             uzelFilter={uzelFilter}
+            onCloseTab={(tabName) => handleButtonClick('tabName')}
           />
 
         </div>

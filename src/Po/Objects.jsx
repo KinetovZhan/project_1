@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails}) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -422,6 +422,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   return (
     <div className="maininfo">
+      <button onClick={onCloseTab} className="go-back"></button>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
         <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
           <button 

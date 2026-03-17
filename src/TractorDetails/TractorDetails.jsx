@@ -41,6 +41,7 @@ export function TractorDetails({ vin, onBack }) {
    const handleBack = () => {
     navigate(-1);
   };
+  
 
   useEffect(() => {
     const fetchTractorDetails = async () => {

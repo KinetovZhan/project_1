@@ -63,7 +63,7 @@ const groupTractors = (data) => {
   return Object.values(grouped);
 };
 export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],      
-  uzelFilter=[] }) {
+  uzelFilter=[], onCloseTab }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -414,10 +414,8 @@ const getStatusColorClass = (status) => {
 
   return (
     <div className="tractor-table-container" >
-        <div 
-          className="scroll-bar" 
-          
-        >
+        <button onClick={onCloseTab} className="go-back" style={{top: '-40px'}}></button>
+        <div className="scroll-bar">
           <table className="tractor-table">
             <thead>
               <tr>
