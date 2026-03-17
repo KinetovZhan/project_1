@@ -259,13 +259,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   return (
     <div className="add-po-form-container uzel">
-      {/* {!isMobile ? (
-        <button onClick={onBack} className="add-po-back-button">
-          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      ) : null} */}
+
 
       <h3 className="add-po-title">Добавление узла</h3>
 
@@ -278,7 +272,7 @@ export function AddAggForm({ onBack, onSubmit }) {
 
       <form className="add-po-form" onSubmit={handleSubmit}>
         <div className='add-po-field'>
-          <label htmlFor="type-select" className='add-po-label'>Тип</label>
+          <label htmlFor="type-select" className='add-po-label'>Тип *</label>
           <Select
             id="type-select"
             name="type"
@@ -316,7 +310,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         </div>
 
         <div className='add-po-field'>
-          <label className='add-po-label'>Название</label>
+          <label className='add-po-label'>Название *</label>
           <input
             type="text"
             name="name"
@@ -330,7 +324,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         </div>
 
         <div className='add-po-field'>
-          <label className='add-po-label'>Дата установки</label>
+          <label className='add-po-label'>Дата установки *</label>
           <input
             type="date"
             name="mounting_date"
@@ -342,92 +336,8 @@ export function AddAggForm({ onBack, onSubmit }) {
           />
         </div>
 
-        {/* Выбор трактора с использованием react-select */}
-        <div className="add-po-field">
-          <label className="add-po-label">Модели тракторов</label>
-          <Creatable
-            isMulti
-            options={tractorOptions}
-            value={selectedTractor}
-            onChange={handleTractorSelectChange}
-            onCreateOption={handleModelCreate}
-            placeholder={loadingTractors ? "Загрузка тракторов..." : "Выберите модель"}
-            classNamePrefix="add-po-select"
-            isClearable={true}
-            isSearchable={true}
-            isLoading={loadingTractors}
-            noOptionsMessage={() => "Нет доступных тракторов"}
-            
-            styles={{
-              control: (base, state) => ({
-                ...base,
-                color: '#ccc',
-                height: '40px',
-                minHeight: '40px',
-                width: '100%',
-                border: '1px solid',
-                borderColor: state.isFocused ? '#13be00' : '#ccc',
-                boxSizing: 'border-box',
-                fontSize: '16px',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s ease',
-                outline: 'none',
-                boxShadow: 'none',
-                '&:hover': {
-                  borderColor: '#070707'
-                }
-              }),
-              menuList: (base) => ({
-                ...base,
-                maxHeight: 200,
-                padding: '4px 0',
-                backgroundColor: 'white'
-              }),
-              option: (base, state) => ({
-                ...base,
-                backgroundColor: state.isSelected ? '#0a0a0a' : 
-                                state.isFocused ? '#f0f9ff' : 'white',
-                color: state.isSelected ? 'white' : '#1E1E1E',
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: '#f0f9ff'
-                }
-              }),
-              singleValue: (base) => ({
-                ...base,
-                color: '#1E1E1E'
-              }),
-              placeholder: (base) => ({
-                ...base,
-                color: '#999'
-              }),
-              loadingIndicator: (base) => ({
-                ...base,
-                color: '#0c0c0c'
-              })
-            }}
-              formatCreateLabel={(inputValue) => `Добавить: ${inputValue}`}
-          />
-          
-        </div>
-
-        {/* <div className='add-po-field'>
-          <label className='add-po-label'>Количество подчастей</label>
-          <input
-            type="number"
-            name="number_of_parts"
-            placeholder="Введите количество"
-            value={formData.number_of_parts}
-            onChange={handleChange}
-            className='add-po-input'
-            disabled={loading}
-          />
-        </div> */}
-
-        {/* Производитель с загрузкой из бэкенда */}
-        {/* Производитель с загрузкой из бэкенда */}
 <div className="add-po-field">
-  <label className="add-po-label">Производитель</label>
+  <label className="add-po-label">Производитель *</label>
   <Creatable
     options={producerOptions}
     value={selectedProducer}
