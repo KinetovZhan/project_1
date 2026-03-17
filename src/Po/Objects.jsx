@@ -12,6 +12,8 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
 import { useNavigate } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails}) {
 
@@ -139,6 +141,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     }
     if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) {
       return JMZImage;
+    }
+    else {
+      return WeiImage;
     }
 
   }
@@ -543,7 +548,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           )}
         </ul>
       </div>
-        {tooltip.visible && (
+        {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal (
         <div 
           className="popup-window"
           style={{
@@ -555,7 +560,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
           }}
         >
           {tooltip.text}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

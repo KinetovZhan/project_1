@@ -58,27 +58,27 @@ export function Filters2({
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [agg, setAgg] = useState(null);
-  const [isCritical, setIsCritical] = useState(null);
-  const [isActual, setIsActual] = useState(null);
-  const [isOldy, setIsOldy] = useState(null);
+  // const [isCritical, setIsCritical] = useState(null);
+  // const [isActual, setIsActual] = useState(null);
+  // const [isOldy, setIsOldy] = useState(null);
 
 
-  useEffect(() => {
-    const checkStatus =() => {
-      if (actualityOptions.value === 'critical') {
-        setIsCritical(true)
-      } else {setIsCritical(false)}
+  // useEffect(() => {
+  //   const checkStatus =() => {
+  //     if (actualityOptions.value === 'critical') {
+  //       setIsCritical(true)
+  //     } else {setIsCritical(false)}
 
-      if(actualityOptions.value === 'actual') {
-        setIsActual(true)
-      } else {setIsActual(false)}
+  //     if(actualityOptions.value === 'actual') {
+  //       setIsActual(true)
+  //     } else {setIsActual(false)}
 
-      if(actualityOptions.value === 'oldy') {
-        setIsOldy(true)
-      } else {setIsOldy(false)}
-    }
-    checkStatus()
-  },[])
+  //     if(actualityOptions.value === 'oldy') {
+  //       setIsOldy(true)
+  //     } else {setIsOldy(false)}
+  //   }
+  //   checkStatus()
+  // },[])
 
 
   const handleSearch = () => {

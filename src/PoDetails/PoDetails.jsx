@@ -242,8 +242,8 @@ export function PoDetails({ po, onBack }) {
   };
 
   return (
-    <div className="po-details-container add-po-form-scroll-bar">
-      <div className="po-details-content">
+    <div className="po-details-container ">
+      <div className="po-details-content ">
         <div className="left-column">
           <div className="section">
             <h2>
