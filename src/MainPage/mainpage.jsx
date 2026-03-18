@@ -103,6 +103,11 @@ function MainPage() {
       newParams.delete('model');
       setSearchParams(newParams, { replace: true });
     }
+    
+    // Сбрасываем выбранное ПО при уходе с вкладки "ПО"
+    if (activeButton !== 'aggregates') {
+      sessionStorage.removeItem('selectedPo');
+    }
   }, [activeButton, searchParams, setSearchParams]);
 
   // Общие обработчики
@@ -116,6 +121,12 @@ function MainPage() {
     if (buttonName !== 'tractor') {
       newParams.delete('model');
     }
+    
+    // Сбрасываем выбранный трактор при нажатии на кнопку "Трактор"
+    if (buttonName === 'tractor') {
+      sessionStorage.removeItem('selectedTractor');
+    }
+    
     setSearchParams(newParams);
   };
 

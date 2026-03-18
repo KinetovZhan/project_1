@@ -24,7 +24,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [downloading, setDownloading] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
-  const [selectedPo,setSelectedPo]=useState(null);
+  const [selectedPo,setSelectedPo]=useState(() => {
+    const saved = sessionStorage.getItem('selectedPo');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [choosedObjects, setChoosedObjects] = useState('active')
   const [changingArchive, setChangingArchive] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -48,6 +51,15 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   // }
 
   const userRole = user?.role || 'user';
+
+  // Сохраняем selectedPo в sessionStorage при изменении
+  useEffect(() => {
+    if (selectedPo) {
+      sessionStorage.setItem('selectedPo', JSON.stringify(selectedPo));
+    } else {
+      sessionStorage.removeItem('selectedPo');
+    }
+  }, [selectedPo]);
 
   const fetchFilteredData = useCallback(async () => {
     setLoading(true);
