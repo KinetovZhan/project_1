@@ -1,13 +1,54 @@
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext.jsx';
+import { api } from '../fetchAPI.js';
+import { useEffect, useState } from 'react';
 
 export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen, toggleMobileSidebar }) {
   const isMobile = useCheckMobile();
   const navigate = useNavigate();
+  const { token, user } = useAuth();
+  const userRole = user?.role || 'user';
+  const isModerator = userRole === 'moderator';
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
+  const [error, setError] = useState('')
 
   const handleMainPage = () => {
     navigate('/main');
   }
+
+
+  useEffect(() => {
+    if(!token) {
+      console.log("Пользователь не авторизован")
+      setHasUnreadMessages(false)
+      return
+    }
+
+    const fetchUnread = async () => {
+      try{
+        if(isModerator){
+          let data = await api.get('/support/unread')
+          console.log(data)
+          if (data.unread_count !== 0 ){
+            setHasUnreadMessages(true)
+          }else{setHasUnreadMessages(false)}
+        } else {
+          let data = await api.get('/support/unread/replies-count')
+          if(data.unread_replies_count !== 0){
+            setHasUnreadMessages(true)
+          }else {
+            setHasUnreadMessages(false)
+          }
+        }
+      } catch (err){
+        setError('Ошибка загрузки cчетчика непрочитанных сообщений', err);
+      }
+    }
+
+    fetchUnread()
+
+  },[token, navigate])
 
   return (
     <header className="header">
@@ -36,7 +77,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
       
       <div className='navigation'>
         <h3 onClick={onKnowledgeBase} style={{cursor: 'pointer'}}>База знаний</h3>
-        <h3 onClick={onHelp} style={{cursor: 'pointer'}}>Помощь</h3>
+        <h3 onClick={onHelp} style={{cursor: 'pointer'}}>Помощь {hasUnreadMessages && <span style={{ marginLeft: '5px' }}>🔴</span>}</h3>
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}

@@ -25,6 +25,7 @@
   width: 40%;
   display: flex;
   flex-direction: column;
+  user-select: none
 }
 
 .help-right-column {
@@ -351,4 +352,43 @@
 
 .messages-scroll-container::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+
+.users {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  color:black;
+  padding:1vh;
+  border-radius: 8px;
+  gap:10px;
+  height: auto;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.user-item {
+  display: flex;
+  justify-content: center;
+  background-color:#b6bbc1;
+  border-radius: 8px;
+  padding: 1vh;
+}
+
+.user-item.selected {
+  background-color: #666;
+}
+
+.user-item.selected:hover{
+  background-color: #666;
+}
+.user-item:hover{
+  background-color: #c2c7ce;
+  cursor: pointer;
+}
+
+.user-name {
+  font-size:medium;
+  user-select: none;
 }

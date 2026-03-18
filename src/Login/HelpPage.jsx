@@ -11,6 +11,8 @@ export function HelpPage() {
   const [replyContent, setReplyContent] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [userList, setUserList] = useState([])
+  const [choosedUser, setChoosedUser] = useState(null)
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -72,6 +74,16 @@ export function HelpPage() {
       
       const normalizedMessages = normalizeMessages(response);
       console.log('Нормализованные сообщения:', normalizedMessages);
+      if(isModerator) {
+        const users = response.map(userData => ({
+        user_id: userData.user_id,
+        username: userData.username,
+        role: userData.role,
+        unread_count: userData.messages?.filter(msg => !msg.is_read).length || 0
+      }));
+      setUserList(users);
+        console.log("список пользователей",userList)
+      }
       
       setMessages(normalizedMessages);
       setError('');
@@ -134,14 +146,9 @@ export function HelpPage() {
 
   const getFilteredMessages = () => {
     if (!isModerator) return messages;
-    
-    switch(filter) {
-      case 'unread':
-        return messages.filter(msg => !msg.is_read);
-      case 'answered':
-        return messages.filter(msg => msg.replies && msg.replies.length > 0);
-      default:
-        return messages;
+    if(choosedUser === null) return messages;
+    else{
+      return messages.filter(msg => msg.sender_name === choosedUser)
     }
   };
 
@@ -165,11 +172,12 @@ export function HelpPage() {
         <div className="help-left-column" style={{display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
           <div>
 
-            <h1 className="help-title">
+            <h1 className="help-title" style={{color:'white'}}>
               {isModerator ? 'Панель модератора' : 'Служба поддержки'}
             </h1>
 
             {isModerator && (
+              <>
               <div className="moderator-filters">
                 <button 
                   className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
@@ -177,24 +185,33 @@ export function HelpPage() {
                 >
                   Все сообщения
                 </button>
-                <button 
-                  className={`filter-btn ${filter === 'unread' ? 'active' : ''}`}
-                  onClick={() => setFilter('unread')}
-                >
-                  Непрочитанные
-                </button>
-                <button 
-                  className={`filter-btn ${filter === 'answered' ? 'active' : ''}`}
-                  onClick={() => setFilter('answered')}
-                >
-                  С ответами
-                </button>
               </div>
+              <div className='chooseUsers'>
+                <div className='users'>
+                  {userList.map((item) => (
+                    <div 
+                      key={item.user_id} 
+                      className={`user-item ${choosedUser === item.username ? 'selected' : ''}`} 
+                      onClick={() => {
+                        if(choosedUser !== item.username) {
+                          setChoosedUser(item.username)}
+                        else{
+                          setChoosedUser(null)}}
+                        }>
+                      
+                      <div className="user-info" >
+                        <span className="user-name">Пользователь {item.username} Роль  {item.role}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              </>
             )}
 
             {!isModerator && (
               <div className="new-message-form">
-                <h3>Создать обращение</h3>
+                <h3>Создать обращение</h3>  
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -220,7 +237,7 @@ export function HelpPage() {
 
         {/* Правая колонка - список сообщений */}
         <div className="help-right-column">
-          <h3>
+          <h3 style={{userSelect: 'none', color:'white'}}>
             {isModerator ? 'Обращения пользователей' : 'Ваши обращения'}
             {filteredMessages.length > 0 && (
               <span className="messages-count"> ({filteredMessages.length})</span>
