@@ -18,6 +18,8 @@ export function PoDetails({ po, onBack }) {
   const [downloading, setDownloading] = useState(false);
   const [allPreviousVersions, setAllPreviousVersions] = useState([]);
   const [loadingVersions, setLoadingVersions] = useState(false);
+  const [nextVersions, setNextVersions] = useState([]);
+  const [loadingNextVersions, setLoadingNextVersions] = useState(false);
 
   // Загрузка основных деталей ПО
   useEffect(() => {
@@ -90,6 +92,31 @@ export function PoDetails({ po, onBack }) {
 
     fetchAllPreviousVersions();
   }, [details?.software_previous_sw_version, po.id_Component]);
+
+
+  // Загрузка новых версий (тех, которые ссылаются на текущую)
+useEffect(() => {
+  const fetchNextVersions = async () => {
+    if (!details?.id_firmwares || !details?.id_component) {
+      setNextVersions([]);
+      return;
+    }
+
+    setLoadingNextVersions(true);
+    try {
+      const url = `/search/software-component-next-versions?id_firmwares=${encodeURIComponent(details.id_firmwares)}&id_component=${encodeURIComponent(details.id_component)}`;
+      const data = await api.get(url);
+      setNextVersions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Ошибка загрузки новых версий:', err);
+      setNextVersions([]);
+    } finally {
+      setLoadingNextVersions(false);
+    }
+  };
+
+  fetchNextVersions();
+}, [details?.id_firmwares, details?.id_component]);
 
   const handleVersionClick = async (e, versionId) => {
     e.preventDefault();
@@ -334,6 +361,29 @@ export function PoDetails({ po, onBack }) {
                 <p>Загрузка версий...</p>
               ) : allPreviousVersions.length > 0 ? (
                 allPreviousVersions.map((version, index) => (
+                  <div key={index} className='version'>
+                    <a
+                      href="#"
+                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                      className="prev-version-link"
+                    >
+                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <p>—</p>
+              )}
+            </div>
+          </div>
+
+          <div className="section">
+            <h3>Новые версии</h3>
+            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+              {loadingNextVersions ? (
+                <p>Загрузка версий...</p>
+              ) : nextVersions.length > 0 ? (
+                nextVersions.map((version, index) => (
                   <div key={index} className='version'>
                     <a
                       href="#"
