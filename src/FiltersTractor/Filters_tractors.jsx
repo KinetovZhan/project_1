@@ -3,7 +3,9 @@ import DatePicker from 'react-datepicker';
 import Select from 'react-select';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useAuth } from '../auth/AuthContext.jsx';
 import 'react-datepicker/dist/react-datepicker.css';
+import { api } from '../fetchAPI.js';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 
 // Трактор
@@ -19,11 +21,11 @@ export function Filters2({
   onUzelChange 
 }) {
   // Опции для Select с моделями тракторов
-  const tractorOptions = [
-    { value: 'K-742МСТ', label: 'К-742МСТ' },
-    { value: 'K-7', label: 'К-7' },
-    { value: 'K-525', label: 'К-525' }
-  ];
+  // const tractorOptions = [
+  //   { value: 'K-742МСТ', label: 'К-742МСТ' },
+  //   { value: 'K-7', label: 'К-7' },
+  //   { value: 'K-525', label: 'К-525' }
+  // ];
 
   const actualityOptions = [
     {value:'critical', label: 'Требуется обновление'},
@@ -49,15 +51,20 @@ export function Filters2({
 
   const isMobile = useCheckMobile()
   const [selectedActuality, setSelectedActuality] = useState(null);
+  const [loadingTractorModels, setLoadingTractorModels] = useState(null);
+  const [tractorError, setTractorError] = useState(null);
   const [selectedModels, setSelectedModels] = useState([]);
   const [selectedUzel, setSelectedUzel] = useState(null);
-  const [Dealer, setDealer] = useState('')
+  const [Dealer, setDealer] = useState('');
+  const [tractorOptions, setTractorOptions] = useState([]);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [isYearOpen, setIsYearOpen] = useState(false);
   const [isMonthOpen, setIsMonthOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [agg, setAgg] = useState(null);
+  const { token } = useAuth();
+
   // const [isCritical, setIsCritical] = useState(null);
   // const [isActual, setIsActual] = useState(null);
   // const [isOldy, setIsOldy] = useState(null);
@@ -80,6 +87,42 @@ export function Filters2({
   //   checkStatus()
   // },[])
 
+  useEffect(() => {
+    const fetchTractorModel = async () => {
+      if (!token) {
+        setTractorOptions([]);
+        return;
+      }
+
+      try {
+        setLoadingTractorModels(true);
+        setTractorError(null);
+        
+        const response = await api.get('search/get-all-models-from-back');
+        // Извлекаем уникальные модели тракторов из поля tractor_model (которое является массивом)
+        const tractorModels= response.map(item => item.model).filter(Boolean);
+        tractorModels.sort();
+  
+        // Формируем опции для react-select
+        const options = tractorModels.map(model => ({
+          value: model,
+          label: model
+        }));
+  
+        console.log('Найденные модели тракторов:', tractorModels); // Для отладки
+        setTractorOptions(options);
+        
+      } catch (err) {
+        console.error('Ошибка загрузки моделей тракторов:', err);
+        setTractorError(err.message);
+      } finally {
+        setLoadingTractorModels(false);
+      }
+    };
+  
+    fetchTractorModel();
+  }, [token]);
+
 
   const handleSearch = () => {
     if (onDealerChange && typeof onDealerChange === 'function') {
@@ -87,14 +130,6 @@ export function Filters2({
     }
   };
 
-  const handleAgg = (selectedOption) => {
-    // value может быть 'MAJ' (актуальные) или 'MIN' (не актуальные)
-    setAgg(selectedOption);
-    
-    if (onAggChange) {
-        onAggChange(selectedOption ? selectedOption.value : null);
-      } 
-  };
 
   const handleChange = (e) => {
     const dealer = e.target.value;
