@@ -10,8 +10,10 @@ import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
 import { api } from '../fetchAPI.js';
 
+
+
 export function PoDetails({ po, onBack }) {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +22,31 @@ export function PoDetails({ po, onBack }) {
   const [loadingVersions, setLoadingVersions] = useState(false);
   const [nextVersions, setNextVersions] = useState([]);
   const [loadingNextVersions, setLoadingNextVersions] = useState(false);
+  const userRole = user?.role || 'user';
+  const isModerator = userRole === 'moderator';
+  const [discr, setDiscr ] = useState(po.description);
+  const [producer, setProducer] = useState('');
+  // const [isActual, setIsActual] = useState(null);
+  // const [isArchive, setIsArchive] = useState(null);
+  // const [isCritical, setIsCritical] = useState(null);
+  const [status, setStatus] = useState(po.status);
+  const isEngineer = userRole === 'engineer';
+  const [change, setChange] = useState(false);
+  const swId = po.id_Firmwares
+
+  console.log(`Айдишник ${swId}`)
+  console.log(po)
+
+  const postData = {
+    description: discr,
+    producer: producer,
+    status: status || po.status,
+  }
+
+  const postData2 = {
+    description: discr,
+    status: status || po.status
+  }
 
   // Загрузка основных деталей ПО
   useEffect(() => {
@@ -40,6 +67,9 @@ export function PoDetails({ po, onBack }) {
         const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
         if (!item) throw new Error('Данные не найдены');
         setDetails(item);
+        console.log(details)
+        // setStatus(details.software_status)
+        // setDiscr(details.software_description)
       } catch (err) {
         console.error('Ошибка загрузки деталей ПО:', err);
         setError(`Ошибка: ${err.message}`);
@@ -49,7 +79,9 @@ export function PoDetails({ po, onBack }) {
     };
 
     fetchDetails();
-  }, [po]);
+  }, [po, status,  change]);
+  
+  
 
   // Загрузка всех предыдущих версий
   useEffect(() => {
@@ -117,6 +149,25 @@ useEffect(() => {
 
   fetchNextVersions();
 }, [details?.id_firmwares, details?.id_component]);
+
+
+  const changePoInfo = async (swId) => {
+    try{
+      console.log(`Данные запроса ${postData}`)
+      console.log(`Данные запроса ${postData2}`)
+      if(userRole === 'moderator') {
+        const data = await api.patch(`/software/${swId}`, postData)
+        console.log(`Успешно выполнен fetch к patch/software`)
+      }
+      if (userRole == 'engineer') {
+        const data = await api.patch(`/software/${swId}`, postData2)
+        console.log(`Успешно выполнен fetch к patch/software`)
+      }
+      setChange(false)
+    } catch(err) {
+      setError("Ошибка изменения данных ПО", err)
+    }
+  }
 
   const handleVersionClick = async (e, versionId) => {
     e.preventDefault();
@@ -267,6 +318,19 @@ useEffect(() => {
     if (details.software_status === 'in operation' || details.software_status === 'in_operation') return 'Для эксплуатации';
     return '—';
   };
+
+  const getChange = () => {
+    if(change === false){
+      setChange(true)
+    }else {
+        setChange(false)
+    }
+    console.log(`нажатие на кнопку изменить ${change}`)
+  }
+  
+  const offChange = () => {
+    setChange(false)
+  }
   
   const getStatusActualityText = () => {
     if (details.software_is_critical === true) return 'Требуется обновление';
@@ -276,127 +340,155 @@ useEffect(() => {
    
   };
 
+  const changeStatus = (e) => {
+    const query = e.target.value
+    if(query === "serial"){
+      setStatus("serial")
+    }
+    if(query === "experienced"){
+      setStatus('experienced')
+    }
+    if(query === "in operation"){
+      setStatus('in operation')
+    }
+  }
+
 
   return (
-    <div className="po-details-container ">
+    <div style={{ position: 'relative' }}>
+      <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
+      <div className="po-details-container ">
+        {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
+      {change === true?(<><button onClick={offChange}>Отменить</button> <button onClick={() => changePoInfo(swId)}>Принять</button></>):(<div></div>)}
       <div className="po-details-content ">
-        <div className="left-column">
-          <div className="section">
-            <h2>
-              <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
-              <br />
-              <span className='text-names'>{details.component_name}</span>
-              <br />
-              {po.tractor_model && po.tractor_model.length > 0 && (
-                <span className='text-names'>
-                  <span>Модели тракторов: </span>
-                  <span>{po.tractor_model.join(', ')}</span>
-                </span>
-              )}
-            </h2>
-            <img
-              className="object-po"
-              src={ImageToComponent(details.component_type, details.component_name)}
-              alt={details.component_type}
-            />
-          </div>
-          <div className="section">
-            <h3>Дата выпуска</h3>
-            <p>{formatDate(details.software_release_date)}</p>
-          </div>
-          <div className="section">
-            <h3>Период актуальности</h3>
-            <p>{actualityPeriod}</p>
-          </div>
-          <div>
-            <h3>Назначение</h3>
-            <p>{getStatusText()}</p>
-          </div>
-          <div>
-            <h3>Статус</h3>
-            <p>{getStatusActualityText()}</p>
-          </div>
-          <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
-          <div className="section">
-            <h3>Установщик</h3>
-              {details.software_path ? (
-                <button
-                  className="download-button"
-                  onClick={handleDownloadSoftware}
-                  disabled={downloading}
-                >
-                  {downloading ? 'Скачивание...' : 'Скачать'}
-                </button>
-              ) : (
-                <p>—</p>
-              )}
+          <div className="left-column">
+            <div className="section">
+              <h2>
+                <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
+                <br />
+                <span className='text-names'>{details.component_name}</span>
+                <br />
+                {po.tractor_model && po.tractor_model.length > 0 && (
+                  <span className='text-names'>
+                    <span>Модели тракторов: </span>
+                    <span>{po.tractor_model.join(', ')}</span>
+                  </span>
+                )}
+              </h2>
+              <img
+                className="object-po"
+                src={ImageToComponent(details.component_type, details.component_name)}
+                alt={details.component_type}
+              />
             </div>
             <div className="section">
-              <h3>Инструкция</h3>
-              {details.software_path_instruction ? (
-                <button
-                  className="download-button"
-                  onClick={handleDownloadInstruction}
-                  disabled={downloading}
-                >
-                  {downloading ? 'Скачивание...' : 'Скачать'}
-                </button>
-              ) : (
-                <p>—</p>
-              )}
+              <h3>Дата выпуска</h3>
+              <p>{formatDate(details.software_release_date)}</p>
+            </div>
+            <div className="section">
+              <h3>Период актуальности</h3>
+              <p>{actualityPeriod}</p>
+            </div>
+            {change===false?
+          (<div>
+              <h3>Назначение</h3>
+              <p>{getStatusText()}</p>
+            </div>):(<><h3>Назначение</h3>
+                      <select value={status} onChange={changeStatus}>
+                        <option value="serial">Серийное</option>
+                        <option value="experienced">Опытное</option>
+                        <option value="in operation">Требуется обновление</option>
+                    </select></>)}
+            <div>
+              <h3>Статус</h3>
+              <p>{getStatusActualityText()}</p>
+            </div>
+            <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
+            <div className="section">
+              <h3>Установщик</h3>
+                {details.software_path ? (
+                  <button
+                    className="download-button"
+                    onClick={handleDownloadSoftware}
+                    disabled={downloading}
+                  >
+                    {downloading ? 'Скачивание...' : 'Скачать'}
+                  </button>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
+              <div className="section">
+                <h3>Инструкция</h3>
+                {details.software_path_instruction ? (
+                  <button
+                    className="download-button"
+                    onClick={handleDownloadInstruction}
+                    disabled={downloading}
+                  >
+                    {downloading ? 'Скачивание...' : 'Скачать'}
+                  </button>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="right-column">
-          <div className="section">
-            <h3>Описание</h3>
-            <div className="description">
-              {details.software_description || 'Описание отсутствует'}
+          <div className="right-column">
+            <div className="section">
+              <h3>Описание</h3>
+              {change===false?(<div className="description">
+                {details.software_description || 'Описание отсутствует'}
+              </div>):(<> <input
+                        type="text"
+                        placeholder={details.software_description}
+                        value={discr}
+                        onChange={(e) => {setDiscr(e.target.value)}}/></>)}
             </div>
-          </div>
-          <div className="section">
-            <h3>Предыдущие версии</h3>
-            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
-              {loadingVersions ? (
-                <p>Загрузка версий...</p>
-              ) : allPreviousVersions.length > 0 ? (
-                allPreviousVersions.map((version, index) => (
-                  <div key={index} className='version'>
-                    <a
-                      href="#"
-                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
-                      className="prev-version-link"
-                    >
-                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
-                    </a>
-                  </div>
-                ))
-              ) : (
-                <p>—</p>
-              )}
+            <div className="section">
+              <h3>Предыдущие версии</h3>
+              <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+                {loadingVersions ? (
+                  <p>Загрузка версий...</p>
+                ) : allPreviousVersions.length > 0 ? (
+                  allPreviousVersions.map((version, index) => (
+                    <div key={index} className='version'>
+                      <a
+                        href="#"
+                        onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                        className="prev-version-link"
+                      >
+                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="section">
-            <h3>Новые версии</h3>
-            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
-              {loadingNextVersions ? (
-                <p>Загрузка версий...</p>
-              ) : nextVersions.length > 0 ? (
-                nextVersions.map((version, index) => (
-                  <div key={index} className='version'>
-                    <a
-                      href="#"
-                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
-                      className="prev-version-link"
-                    >
-                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
-                    </a>
-                  </div>
-                ))
-              ) : (
-                <p>—</p>
-              )}
+            <div className="section">
+              <h3>Новые версии</h3>
+              <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+                {loadingNextVersions ? (
+                  <p>Загрузка версий...</p>
+                ) : nextVersions.length > 0 ? (
+                  nextVersions.map((version, index) => (
+                    <div key={index} className='version'>
+                      <a
+                        href="#"
+                        onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                        className="prev-version-link"
+                      >
+                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

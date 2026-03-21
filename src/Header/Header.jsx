@@ -85,7 +85,26 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
       
       <div className='navigation'>
         <h3 onClick={onKnowledgeBase} style={{cursor: 'pointer'}}>База знаний</h3>
-        <h3 onClick={onHelp} style={{cursor: 'pointer'}}>Помощь {hasUnreadMessages && <span style={{ marginLeft: '5px' }}>🔴</span>}</h3>
+        <h3 onClick={onHelp} 
+          style={{
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}
+          >
+          Помощь
+          {hasUnreadMessages && (
+            <span style={{
+              width: '10px',
+              height: '10px',
+              backgroundColor: 'red',
+              borderRadius: '50%',
+              display: 'inline-block',
+              marginTop: '-8px'
+            }} />
+          )}
+        </h3>
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}

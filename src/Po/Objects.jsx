@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails,actualFilterPo}) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -24,7 +24,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [downloading, setDownloading] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
-  const [selectedPo,setSelectedPo]=useState(null);
+  const [selectedPo,setSelectedPo]=useState(() => {
+    const saved = sessionStorage.getItem('selectedPo');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [choosedObjects, setChoosedObjects] = useState('active')
   const [changingArchive, setChangingArchive] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -46,6 +49,15 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
  
 
   const userRole = user?.role || 'user';
+
+  // Сохраняем selectedPo в sessionStorage при изменении
+  useEffect(() => {
+    if (selectedPo) {
+      sessionStorage.setItem('selectedPo', JSON.stringify(selectedPo));
+    } else {
+      sessionStorage.removeItem('selectedPo');
+    }
+  }, [selectedPo]);
 
   const fetchFilteredData = useCallback(async () => {
     setLoading(true);
@@ -423,148 +435,149 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   
 
   return (
-    <div className="maininfo">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
-        <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
-          <button 
-            onClick={getNewPO} 
-            style={{
+      <div className="maininfo">
+        <button onClick={onCloseTab} className="go-back" style={{top:'-30px', left:'-40px'}}></button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
+          <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
+            <button 
+              onClick={getNewPO} 
+              style={{
+                  padding: '8px 20px',
+                  backgroundColor: choosedObjects === 'active' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
+                  color: choosedObjects === 'active' ? 'white' : 'black',
+                  border: choosedObjects === 'active' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
+                }}>
+              <span>Актуальные версии ({softwareItems.length})</span>
+            </button>
+            <button 
+              onClick={getArchivePO}
+              style={{
                 padding: '8px 20px',
-                backgroundColor: choosedObjects === 'active' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
-                color: choosedObjects === 'active' ? 'white' : 'black',
-                border: choosedObjects === 'active' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
+                backgroundColor: choosedObjects === 'archive' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
+                color: choosedObjects === 'archive' ? 'white' : 'black',
+                border: choosedObjects === 'archive' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
                 borderRadius: '20px',
                 cursor: 'pointer',
-                fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
+                fontWeight: choosedObjects === 'archive' ? 'bold' : 'normal'
               }}>
-            <span>Актуальные версии ({softwareItems.length})</span>
-          </button>
+              Архивные версии ({archiveItems.length})
+            </button>
+          </div>
           <button 
-            onClick={getArchivePO}
+            onClick={toggleSortOrder}
             style={{
-              padding: '8px 20px',
-              backgroundColor: choosedObjects === 'archive' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
-              color: choosedObjects === 'archive' ? 'white' : 'black',
-              border: choosedObjects === 'archive' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
+              padding: '8px 15px',
+              backgroundColor: 'rgba(217, 217, 217, 1)',
+              border: '1px solid #ddd',
               borderRadius: '20px',
               cursor: 'pointer',
-              fontWeight: choosedObjects === 'archive' ? 'bold' : 'normal'
-            }}>
-            Архивные версии ({archiveItems.length})
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              fontSize: '14px',
+              width:'30%',
+            }}
+          >
+            <span>Сортировка по дате</span>
+            <span style={{ marginLeft: '5px', color: '#666', fontSize: '12px' }}>
+              {sortOrder === 'desc' ? '(сначала новые)' : '(сначала старые)'}
+            </span>
           </button>
-        </div>
-        <button 
-          onClick={toggleSortOrder}
-          style={{
-            padding: '8px 15px',
-            backgroundColor: 'rgba(217, 217, 217, 1)',
-            border: '1px solid #ddd',
-            borderRadius: '20px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontSize: '14px',
-            width:'30%',
-          }}
-        >
-          <span>Сортировка по дате</span>
-          <span style={{ marginLeft: '5px', color: '#666', fontSize: '12px' }}>
-            {sortOrder === 'desc' ? '(сначала новые)' : '(сначала старые)'}
-          </span>
-        </button>
-        </div>
-      <div>
-        {activeFilters.length > 0 && (
-          <div style={{ marginBottom: '10px', color: '#666' }}>
-            Активные фильтры: {getAllActiveFilters()}
           </div>
-        )}
-      </div>
-      <div className="list-container">
-        <ul className="List">
-          {filteredAndSortedItems.length === 0 ? (
-            <li>
-              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                <h4>Ничего не найдено</h4>
-                <p>Попробуйте изменить фильтры или запрос</p>
-              </div>
-            </li>
-          ) : (
-            filteredAndSortedItems
-              .filter((item) => item.id_Firmwares)
-              .map((item) => {
-                // Формируем текст для тултипа
-                const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
-                const tooltipText2 = `${item.download_link} от ${new Date(item.release_date).toLocaleDateString()}`;
-              return (
-                <li key={item.id_Firmwares}>
-                  <div className="objectmenu" data-testid="objectmenu">
-                    <img
-                      className="object"
-                      src={ImageToComponent(item.type_component, item.model_component || item.name_component)}
-                      alt={item.type_component}
-                      onClick={()=> {handlePoClick(item.id_Firmwares) 
-                                    handleAggregateDetails()}}
-                      style={{ cursor: 'pointer' }}
-                    />
-                    <div className="inform" >
+        <div>
+          {activeFilters.length > 0 && (
+            <div style={{ marginBottom: '10px', color: '#666' }}>
+              Активные фильтры: {getAllActiveFilters()}
+            </div>
+          )}
+        </div>
+        <div className="list-container">
+          <ul className="List">
+            {filteredAndSortedItems.length === 0 ? (
+              <li>
+                <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                  <h4>Ничего не найдено</h4>
+                  <p>Попробуйте изменить фильтры или запрос</p>
+                </div>
+              </li>
+            ) : (
+              filteredAndSortedItems
+                .filter((item) => item.id_Firmwares)
+                .map((item) => {
+                  // Формируем текст для тултипа
+                  const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
+                  const tooltipText2 = `${item.download_link} от ${new Date(item.release_date).toLocaleDateString()}`;
+                return (
+                  <li key={item.id_Firmwares}>
+                    <div className="objectmenu" data-testid="objectmenu">
+                      <img
+                        className="object"
+                        src={ImageToComponent(item.type_component, item.model_component || item.name_component)}
+                        alt={item.type_component}
+                        onClick={()=> {handlePoClick(item.id_Firmwares) 
+                                      handleAggregateDetails()}}
+                        style={{ cursor: 'pointer' }}
+                      />
+                      <div className="inform" >
                       <div className="inform-left">
-                      <h4 
-                      className="poster"
-                      onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
-                      onMouseMove={handleMouseMove}
-                      onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
-                        {item.download_link} от {new Date(item.release_date).toLocaleDateString()}
-                      </h4>
-                      <div className="infodisc">
-                        <h5
-                          className="textunder"
-                          onMouseEnter={(e) => handleMouseEnter(e, tooltipText, item.id_Firmwares)}
-                          onMouseMove={handleMouseMove}
-                          onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
-                        >
-                          Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
-                      
-                        </h5>
+                        <h4 
+                        className="poster"
+                        onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
+                          {item.download_link} от {new Date(item.release_date).toLocaleDateString()}
+                        </h4>
+                        <div className="infodisc">
+                          <h5
+                            className="textunder"
+                            onMouseEnter={(e) => handleMouseEnter(e, tooltipText, item.id_Firmwares)}
+                            onMouseMove={handleMouseMove}
+                            onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
+                          >
+                            Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
+                        
+                          </h5>
+                          </div>
+                        </div>
+                      <div className = "container-download">
+                          <button
+                            className="download"
+                            onClick={() => handleDownload(item)}
+                            disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
+                          >
+                            Скачать
+                          </button>
+                          <button onClick={() => handleMoveToArchive(item, choosedObjects === 'active')} className='archive-button'>
+                            <span>{(choosedObjects == 'active')?'В архив':'Из архива'}</span>
+                          </button>
                         </div>
                       </div>
-                      <div className = "container-download">
-                        <button
-                          className="download"
-                          onClick={() => handleDownload(item)}
-                          disabled={!item.id_Firmwares || downloading === item.id_Firmwares}
-                        >
-                          Скачать
-                        </button>
-                        <button onClick={() => handleMoveToArchive(item, choosedObjects === 'active')} className='archive-button'>
-                          <span>{(choosedObjects == 'active')?'В архив':'Из архива'}</span>
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                </li>
-              )
-            })
-          )}
-        </ul>
+                  </li>
+                )
+              })
+            )}
+          </ul>
+        </div>
+          {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal (
+          <div 
+            className="popup-window"
+            style={{
+              position: 'fixed',
+              left: tooltip.x + 15,
+              top: tooltip.y + 15,
+              pointerEvents: 'none',
+              zIndex: 1000,
+            }}
+          >
+            {tooltip.text}
+          </div>,
+          document.body
+        )}
       </div>
-        {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal (
-        <div 
-          className="popup-window"
-          style={{
-            position: 'fixed',
-            left: tooltip.x + 15,
-            top: tooltip.y + 15,
-            pointerEvents: 'none',
-            zIndex: 1000,
-          }}
-        >
-          {tooltip.text}
-        </div>,
-        document.body
-      )}
-    </div>
   );
 }
     

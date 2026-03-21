@@ -259,8 +259,14 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   return (
     <div className="add-po-form-container uzel">
-
-
+      {/* {!isMobile ? (
+        <button onClick={onBack} className="add-po-back-button">
+          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      ) : null} */}
+      <button onClick={onBack} className="go-back" style={{left:'-50px'}}></button>
       <h3 className="add-po-title">Добавление узла</h3>
 
       {error && (
