@@ -5,6 +5,7 @@ import { Header } from '../Header/Header.jsx';
 import { Sidebar } from '../Sidebar/Sidebar.jsx';
 import { MainPart } from '../MainPart/MainPart.jsx';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { useAlert } from '../Alert/Alert.jsx';
 
 function MainPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,6 +42,8 @@ function MainPage() {
   const [actualFilterPo, setActualFilterPo] = useState([]);
 
   const { logout, user } = useAuth();
+
+  const { showAlert, AlertComponent } = useAlert();
 
   const navigate = useNavigate();
 
@@ -149,7 +152,7 @@ function MainPage() {
   const handleAddSubmit = (responseData) => {
   // Без preventDefault — это уже не событие, а ответ с бэка
   const poNumber = responseData?.name || 'без номера';
-  alert(`✅ ПО «${poNumber}» успешно добавлено!`);
+  showAlert(`✅ ПО «${poNumber}» успешно добавлено!`, 'success');
   closeAddForm();
   };
 
@@ -173,7 +176,7 @@ function MainPage() {
   // ===== Форма "Агрегат" =====
   const handleAddAggSubmit = (responseData) => {
     console.log('Агрегат добавлен:', responseData);
-    alert('Модель создана!');
+    showAlert('Модель создана!', 'success');
     closeAddAggForm();
   };
 
@@ -352,6 +355,7 @@ const handleActualChangePo = (value) => {
 
         </div>
       </main>
+      {AlertComponent}
     </>
   );
 }
