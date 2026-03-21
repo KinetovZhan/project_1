@@ -702,6 +702,7 @@ button.search_button {
 }
 
 .tractors-status{
+  animation: slideRightFadeIn 0.5s ease-out forwards;
   background-color: rgba(217, 217, 217, 1);
   border-radius: 25px;
   display: flex;

@@ -1,5 +1,6 @@
 /* Окно с детальной информацией о тракторе */
 .tractor-details-container {
+  animation: slideUpFadeIn 0.5s ease-out forwards;
   box-sizing: border-box;
   width: 963px;
   height: 600px;

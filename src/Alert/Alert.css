@@ -1,0 +1,124 @@
+/* Оверлей для центрирования */
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Основной контейнер алерта */
+.alert-container {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 40px 50px -10px rgba(0, 0, 0, 0.15), 0 20px 20px -10px rgba(0, 0, 0, 0.08);
+  min-width: 600px;
+  max-width: 1000px;
+  pointer-events: auto;
+}
+
+/* Анимация появления */
+.alert-opening {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* Анимация исчезновения */
+.alert-closing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Содержимое алерта */
+.alert-content {
+  display: flex;
+  align-items: center;
+  padding: 32px 40px;
+  gap: 24px;
+}
+
+/* Иконка */
+.alert-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: bold;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Сообщение */
+.alert-message {
+  flex: 1;
+  font-size: 28px;
+  line-height: 1.5;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+/* Типы алертов */
+.alert-success {
+  border-left: 8px solid #10b981;
+}
+
+.alert-success .alert-icon {
+  color: #10b981;
+  background-color: #d1fae5;
+}
+
+.alert-error {
+  border-left: 8px solid #ef4444;
+}
+
+.alert-error .alert-icon {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+.alert-warning {
+  border-left: 8px solid #f59e0b;
+}
+
+.alert-warning .alert-icon {
+  color: #f59e0b;
+  background-color: #fed7aa;
+}
+
+.alert-info {
+  border-left: 8px solid #3b82f6;
+}
+
+.alert-info .alert-icon {
+  color: #3b82f6;
+  background-color: #dbeafe;
+}
+
+/* Анимация появления */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Анимация исчезновения */
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}

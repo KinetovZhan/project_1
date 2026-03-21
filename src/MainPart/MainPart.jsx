@@ -40,7 +40,8 @@ export function MainPart({
   onAddCompPartSubmit,
 
   handleTractorDetails,
-  handleAggregateDetails
+  handleAggregateDetails,
+  onCloseTab
 
   // onBack — не нужен, используйте onClose...
 }) {
@@ -112,6 +113,7 @@ export function MainPart({
             onSearch={onSearch}
             searchQuery={searchQuery}
             selectedStatus={selectedStatus}
+            onCloseTab={() => onCloseTab('aggregates')}
             actualFilterPo = {actualFilterPo}
 
           />
@@ -130,6 +132,7 @@ export function MainPart({
             activeMajMinButton={activeMajMinButton}
             actualFilter = {actualFilter}    
             uzelFilter = {uzelFilter}
+            onCloseTab={() => onCloseTab('tractor')}
           />
         </>
       )}

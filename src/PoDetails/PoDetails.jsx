@@ -355,137 +355,140 @@ useEffect(() => {
 
 
   return (
-    <div className="po-details-container ">
-      {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
+    <div style={{ position: 'relative' }}>
+      <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
+      <div className="po-details-container ">
+        {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
       {change === true?(<><button onClick={offChange}>Отменить</button> <button onClick={() => changePoInfo(swId)}>Принять</button></>):(<div></div>)}
       <div className="po-details-content ">
-        <div className="left-column">
-          <div className="section">
-            <h2>
-              <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
-              <br />
-              <span className='text-names'>{details.component_name}</span>
-              <br />
-              {po.tractor_model && po.tractor_model.length > 0 && (
-                <span className='text-names'>
-                  <span>Модели тракторов: </span>
-                  <span>{po.tractor_model.join(', ')}</span>
-                </span>
-              )}
-            </h2>
-            <img
-              className="object"
-              src={ImageToComponent(details.component_type, details.component_name)}
-              alt={details.component_type}
-            />
-          </div>
-          <div className="section">
-            <h3>Дата выпуска</h3>
-            <p>{formatDate(details.software_release_date)}</p>
-          </div>
-          <div className="section">
-            <h3>Период актуальности</h3>
-            <p>{actualityPeriod}</p>
-          </div>
-          {change===false?
+          <div className="left-column">
+            <div className="section">
+              <h2>
+                <span>{details.name || 'ПО'} от {new Date(details.software_release_date).toLocaleDateString()}</span>
+                <br />
+                <span className='text-names'>{details.component_name}</span>
+                <br />
+                {po.tractor_model && po.tractor_model.length > 0 && (
+                  <span className='text-names'>
+                    <span>Модели тракторов: </span>
+                    <span>{po.tractor_model.join(', ')}</span>
+                  </span>
+                )}
+              </h2>
+              <img
+                className="object"
+                src={ImageToComponent(details.component_type, details.component_name)}
+                alt={details.component_type}
+              />
+            </div>
+            <div className="section">
+              <h3>Дата выпуска</h3>
+              <p>{formatDate(details.software_release_date)}</p>
+            </div>
+            <div className="section">
+              <h3>Период актуальности</h3>
+              <p>{actualityPeriod}</p>
+            </div>
+            {change===false?
           (<div>
-            <h3>Назначение</h3>
-            <p>{getStatusText()}</p>
-          </div>):(<><h3>Назначение</h3>
+              <h3>Назначение</h3>
+              <p>{getStatusText()}</p>
+            </div>):(<><h3>Назначение</h3>
                       <select value={status} onChange={changeStatus}>
                         <option value="serial">Серийное</option>
                         <option value="experienced">Опытное</option>
                         <option value="in operation">Требуется обновление</option>
                     </select></>)}
-          <div>
-            <h3>Статус</h3>
-            <p>{getStatusActualityText()}</p>
-          </div>
-          <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
-          <div className="section">
-            <h3>Установщик</h3>
-              {details.software_path ? (
-                <button
-                  className="download-button"
-                  onClick={handleDownloadSoftware}
-                  disabled={downloading}
-                >
-                  {downloading ? 'Скачивание...' : 'Скачать'}
-                </button>
-              ) : (
-                <p>—</p>
-              )}
+            <div>
+              <h3>Статус</h3>
+              <p>{getStatusActualityText()}</p>
             </div>
+            <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
             <div className="section">
-              <h3>Инструкция</h3>
-              {details.software_path_instruction ? (
-                <button
-                  className="download-button"
-                  onClick={handleDownloadInstruction}
-                  disabled={downloading}
-                >
-                  {downloading ? 'Скачивание...' : 'Скачать'}
-                </button>
-              ) : (
-                <p>—</p>
-              )}
+              <h3>Установщик</h3>
+                {details.software_path ? (
+                  <button
+                    className="download-button"
+                    onClick={handleDownloadSoftware}
+                    disabled={downloading}
+                  >
+                    {downloading ? 'Скачивание...' : 'Скачать'}
+                  </button>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
+              <div className="section">
+                <h3>Инструкция</h3>
+                {details.software_path_instruction ? (
+                  <button
+                    className="download-button"
+                    onClick={handleDownloadInstruction}
+                    disabled={downloading}
+                  >
+                    {downloading ? 'Скачивание...' : 'Скачать'}
+                  </button>
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="right-column">
-          <div className="section">
-            <h3>Описание</h3>
-            {change===false?(<div className="description">
-              {details.software_description || 'Описание отсутствует'}
-            </div>):(<> <input
+          <div className="right-column">
+            <div className="section">
+              <h3>Описание</h3>
+              {change===false?(<div className="description">
+                {details.software_description || 'Описание отсутствует'}
+              </div>):(<> <input
                         type="text"
                         placeholder={details.software_description}
                         value={discr}
                         onChange={(e) => {setDiscr(e.target.value)}}/></>)}
-          </div>
-          <div className="section">
-            <h3>Предыдущие версии</h3>
-            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
-              {loadingVersions ? (
-                <p>Загрузка версий...</p>
-              ) : allPreviousVersions.length > 0 ? (
-                allPreviousVersions.map((version, index) => (
-                  <div key={index} className='version'>
-                    <a
-                      href="#"
-                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
-                      className="prev-version-link"
-                    >
-                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
-                    </a>
-                  </div>
-                ))
-              ) : (
-                <p>—</p>
-              )}
             </div>
-          </div>
+            <div className="section">
+              <h3>Предыдущие версии</h3>
+              <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+                {loadingVersions ? (
+                  <p>Загрузка версий...</p>
+                ) : allPreviousVersions.length > 0 ? (
+                  allPreviousVersions.map((version, index) => (
+                    <div key={index} className='version'>
+                      <a
+                        href="#"
+                        onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                        className="prev-version-link"
+                      >
+                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
+            </div>
 
-          <div className="section">
-            <h3>Новые версии</h3>
-            <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
-              {loadingNextVersions ? (
-                <p>Загрузка версий...</p>
-              ) : nextVersions.length > 0 ? (
-                nextVersions.map((version, index) => (
-                  <div key={index} className='version'>
-                    <a
-                      href="#"
-                      onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
-                      className="prev-version-link"
-                    >
-                      {version.name || 'Версия'} от {formatDate(version.software_release_date)}
-                    </a>
-                  </div>
-                ))
-              ) : (
-                <p>—</p>
-              )}
+            <div className="section">
+              <h3>Новые версии</h3>
+              <div className='prev-version' style={{display:'flex', flexDirection:'column', gap:'1vh'}}>
+                {loadingNextVersions ? (
+                  <p>Загрузка версий...</p>
+                ) : nextVersions.length > 0 ? (
+                  nextVersions.map((version, index) => (
+                    <div key={index} className='version'>
+                      <a
+                        href="#"
+                        onClick={(e) => handleVersionClick(e, version.id_firmwares || version.id_Firmwares)}
+                        className="prev-version-link"
+                      >
+                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <p>—</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
