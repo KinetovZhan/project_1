@@ -195,90 +195,92 @@ export function TractorDetails({ vin, onBack }) {
   
 
   return (
-    <div className="tractor-details-container add-po-form-scroll-bar">
-      <button onClick={onBack} className="go-back"></button>
-      <div className="tractor-details-content">
-        <div className="tractor-info">
-          <h2>{model} {VIN}</h2>
-          <img src={ImageToModel(model)} alt={model} className="tractor-image" />
-        </div>
-
-        <div className="details-columns">
-          <div className="column">
-            <div className="section">
-              <h3>Дата выпуска</h3>
-              <p>{assembly_date ? new Date(assembly_date).toLocaleDateString('ru-RU') : '-'}</p>
-            </div>
-            <div className="section">
-              <h3>Регион эксплуатации</h3>
-              <p>{region || '-'}</p>
-            </div>
-            <div className="section">
-              <h3>Дата последней эксплуатации, Кол-во МЧ</h3>
-              <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
-            </div>
+    <div style={{ position: 'relative' }}>
+      <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
+      <div className="tractor-details-container add-po-form-scroll-bar">
+        <div className="tractor-details-content">
+          <div className="tractor-info">
+            <h2>{model} {VIN}</h2>
+            <img src={ImageToModel(model)} alt={model} className="tractor-image" />
           </div>
 
-          <div className="column">
-            <div className="section">
-              <h3>Комплектация и ПО</h3>
-              <ul className="po-list">
-                {displayComponents.map((item, index) => (
-                  <li
-                    key={index}
-                    // onClick={() => handleItemClick(index)}
-                    className="po-item"
-                    onMouseEnter={(e) => handleMouseEnter(e,item.description)}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={handleMouseLeave}
-                    onClick={()=> handlePoClick(item)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <div className="po-item-content">
-                      <span className="po-item-name">{item.name}:</span>
-                      <span className="po-item-version">{item.version}</span>
-                      {item.model && item.model !== '-' && (
-                        <span className="po-item-model">({item.model})</span>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <div className="details-columns">
+            <div className="column">
+              <div className="section">
+                <h3>Дата выпуска</h3>
+                <p>{assembly_date ? new Date(assembly_date).toLocaleDateString('ru-RU') : '-'}</p>
+              </div>
+              <div className="section">
+                <h3>Регион эксплуатации</h3>
+                <p>{region || '-'}</p>
+              </div>
+              <div className="section">
+                <h3>Дата последней эксплуатации, Кол-во МЧ</h3>
+                <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
+              </div>
             </div>
-            <div className="section">
-              <h3>Последние ошибки, дата</h3>
-              <p>Информация об ошибках временно недоступна</p>
+
+            <div className="column">
+              <div className="section">
+                <h3>Комплектация и ПО</h3>
+                <ul className="po-list">
+                  {displayComponents.map((item, index) => (
+                    <li
+                      key={index}
+                      // onClick={() => handleItemClick(index)}
+                      className="po-item"
+                      onMouseEnter={(e) => handleMouseEnter(e,item.description)}
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={handleMouseLeave}
+                      onClick={()=> handlePoClick(item)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="po-item-content">
+                        <span className="po-item-name">{item.name}:</span>
+                        <span className="po-item-version">{item.version}</span>
+                        {item.model && item.model !== '-' && (
+                          <span className="po-item-model">({item.model})</span>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="section">
+                <h3>Последние ошибки, дата</h3>
+                <p>Информация об ошибках временно недоступна</p>
+              </div>
             </div>
           </div>
-        </div>
-         </div>
-     {/* Кастомный тултип с вашими стилями */}
-      {/* Кастомный тултип с порталом */}
-{tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal(
-  <div 
-    className="tooltip"
-    style={{
-      position: 'fixed',
-      left: tooltip.x + 15,
-      top: tooltip.y + 15,
-      marginLeft: 0,
-      pointerEvents: 'none',
-      width: '200px',
-      background: '#333',
-      color: 'white',
-      padding: '12px',
-      borderRadius: '6px',
-      zIndex: 1000,
-      fontSize: '14px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-      wordWrap: 'break-word',
-      height: 'auto'
-    }}
-  >
-    {tooltip.text}
-  </div>,
-  document.body
-)}
+          </div>
+      {/* Кастомный тултип с вашими стилями */}
+        {/* Кастомный тултип с порталом */}
+  {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal(
+    <div 
+      className="tooltip"
+      style={{
+        position: 'fixed',
+        left: tooltip.x + 15,
+        top: tooltip.y + 15,
+        marginLeft: 0,
+        pointerEvents: 'none',
+        width: '200px',
+        background: '#333',
+        color: 'white',
+        padding: '12px',
+        borderRadius: '6px',
+        zIndex: 1000,
+        fontSize: '14px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+        wordWrap: 'break-word',
+        height: 'auto'
+      }}
+    >
+      {tooltip.text}
+    </div>,
+    document.body
+  )}
+      </div>
     </div>
   );
 }

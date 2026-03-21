@@ -353,7 +353,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
   return (
     <div className="add-po-form-container">
-      <button onClick={onBack} className="go-back"></button>
+      <button onClick={onBack} className="go-back" style={{left:'-50px'}}></button>
       <h3 className="add-po-title">Добавление нового ПО</h3>
 
       <div className="add-po-form-scroll-bar">
