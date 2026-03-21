@@ -576,7 +576,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
           />
         </div>
 
-        <span>У узлов:</span>
+        <span>Узел:</span>
         <div className="uzel-filter">
           <Select
             isMulti

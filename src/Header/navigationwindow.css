@@ -87,7 +87,7 @@
 @media (min-width:1200px) {
   .mainText h3 {
   cursor: pointer;
-  padding: 80px;
+  padding: 20px;
   font-size:14px;
 }
 
@@ -96,5 +96,18 @@
 
 .mainText {
   position: relative;
+}
+
+.icon-ptz {
+  display:flex;
+  align-items: center;
+  width:10vh;
+  height:180px
+}
+
+.object-pi {
+width: 10vh;
+  height: 10vh;
+  margin: 0px;
 }
 

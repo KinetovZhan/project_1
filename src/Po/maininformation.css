@@ -26,9 +26,9 @@
 
 .object {
   box-sizing: border-box;
-  width: 16vh;
-  height: 16vh;
-  margin: 24px;
+  width: 10vh;
+  height: 10vh;
+  margin: 10px;
 
   
 }
@@ -37,7 +37,7 @@
 .objectmenu {
   /* Внешний вид */
   width: 835px;
-  height: 208px;
+  height: 12vh;
   border-style: solid;
   border-width: 1px;
   border-color: grey;
@@ -49,6 +49,14 @@
 
 .inform {
   gap: 0px;
+  width:80%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+}
+.inform-left {
+  width:60%;
+  
 }
 
 .textunder {
@@ -109,6 +117,16 @@ button:active {
   max-width: 600px;
 }
 
+.container-download {
+  width:40%; 
+  display: flex;
+  gap:10px; 
+  margin-right: 0px ;
+  justify-content: space-between; 
+  align-items: center;
+  margin-top: 30px 
+}
+
 
 
 .List {
@@ -144,8 +162,8 @@ button:active {
 
 /* ===== КНОПКА ЗАГРУЗКИ ===== */
 .download {
-  width: 268px;
-  height: 60px;
+  width: 8vw;
+  height: 5vh;
   border-radius: 20px;
   background-color: rgba(217, 217, 217, 1);
   border-color: transparent;
@@ -168,6 +186,17 @@ button:active {
   background-color: #707479;
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.archive-button {
+  display: flex;
+  height: 5vh;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  width:100px;
+  border: none;
+  background-color:#d7dcf3
 }
 
 @media (max-width:767px) {

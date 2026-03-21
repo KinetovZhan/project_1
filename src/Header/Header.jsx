@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
 import { useEffect, useState } from 'react';
+import icon from '../img/icon.png';
 
 export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen, toggleMobileSidebar }) {
   const isMobile = useCheckMobile();
@@ -71,6 +72,13 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
         </button>
       )}
       
+      <div className='icon-ptz'>
+         <img
+              className="object-pi"
+              src={icon}
+              alt={icon}
+            /> 
+      </div>
       <div className='mainText'>
         <h3 onClick={handleMainPage}>Сервис просмотра версий ПО</h3>
       </div>

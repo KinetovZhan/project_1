@@ -68,6 +68,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedTractor, setSelectedTractor] = useState(null);
+  const [colorVin, setColorVin] = useState(null);
   const tableContainerRef = useRef(null);
   const { token, user } = useAuth();
 
@@ -80,6 +81,30 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     direction: null 
   });
 
+  const columnsConfig = {
+    vin: { label: 'VIN', getValue: (t) => t.vin || t.VIN || '-', isBase: true },
+    model: { label: 'Модель', getValue: (t) => t.model || '-', isBase: true },
+    assembly_date: { label: 'Дата выпуска', getValue: (t) => formatDateTime(t.assembly_date || t.releaseDate), isBase: true },
+    region: { label: 'Регион', getValue: (t) => t.region || '-', isBase: true },
+    consumer: { label: 'Дилер', getValue: (t) => t.dealer || '-', isBase: true },
+    oh_hour: { label: 'Моточасы', getValue: (t) => t.oh_hour || t.motoHours || '-', isBase: true },
+    last_activity: { label: 'Последняя активность', getValue: (t) => formatDateTime(t.last_activity || t.lastActivity), isBase: true },
+    dvs: { label: 'ДВС', getValue: (t) => t.dvs || '-', getStatus: (t) => t.dvs_status, isNode: true },
+    kpp: { label: 'КПП', getValue: (t) => t.kpp || '-', getStatus: (t) => t.kpp_status, isNode: true },
+    rk: { label: 'РК', getValue: (t) => t.rk || '-', getStatus: (t) => t.rk_status, isNode: true },
+    bk: { label: 'БК', getValue: (t) => t.bk || '-', getStatus: (t) => t.bk_status, isNode: true },
+    gr: { label: 'ГР', getValue: (t) => t.gr || '-', getStatus: (t) => t.gr_status, isNode: true }
+  };
+
+  const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr'];
+  // Порядок столбцов с учётом выбранных узлов
+  const orderedColumns = useMemo(() => {
+    const baseColumns = ['vin', 'model', 'assembly_date', 'region', 'consumer', 'oh_hour', 'last_activity'];
+    const selectedNodes = uzelFilter || []; // массив строк, например ['dvs', 'kpp']
+    const otherNodes = allNodes.filter(node => !selectedNodes.includes(node));
+    // Выбранные узлы в порядке фильтра, остальные в исходном порядке
+    return [...baseColumns, ...selectedNodes, ...otherNodes];
+  }, [uzelFilter]);
   
 
 
@@ -95,7 +120,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       is_critical:null,
       is_archive:null,
       query: searchQuery?.trim() || "",
-      consumer: searchDealer?.trim() || ""
+      dealer: searchDealer?.trim() || "" 
     };
 
     if (dateFilter) {
@@ -122,6 +147,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
     console.log('postData.is_actual:', postData.is_actual);
+    console.log('postData.is_actual:', postData.consumer);
 
     return postData;
   };
@@ -415,10 +441,18 @@ const getStatusColorClass = (status) => {
   }
 
 
-  const handleRowClick = (tractor) => {
+  const handleColorClick = (tractor) => {
+    if (colorVin === tractor.vin) {
+      setColorVin(null);
+    } else {
+      setColorVin(tractor.vin)
+    }
+  };
+   const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
     setSelectedTractor(tractor.vin);
   };
+
 
   if (selectedTractor) {
     return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
@@ -458,7 +492,7 @@ const getStatusColorClass = (status) => {
           <table className="tractor-table">
             <thead>
               <tr>
-                <th onClick={() => handleSort('vin')} style={{ cursor: 'pointer' }}>
+                {/* <th onClick={() => handleSort('vin')} style={{ cursor: 'pointer' }}>
                   VIN{getSortIcon('vin')}
                 </th>
                 <th onClick={() => handleSort('model')} style={{ cursor: 'pointer' }}>
@@ -493,19 +527,29 @@ const getStatusColorClass = (status) => {
                 </th>
                 <th onClick={() => handleSort('gr')} style={{ cursor: 'pointer' }}>
                   ГР{getSortIcon('gr')}
+                </th> */}
+                {orderedColumns.map(colKey => (
+                <th
+                  key={colKey}
+                  onClick={() => handleSort(colKey)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {columnsConfig[colKey].label}{getSortIcon(colKey)}
                 </th>
+              ))}
               </tr> 
             </thead>
             <tbody>
               {filteredOnStatusTractors.map((tractor, index) => (
                 <tr 
                   key={tractor.id || tractor.vin || index}
-                  onClick={() => handleRowClick(tractor)}
+                  onClick={() => handleColorClick(tractor)}
+                  onDoubleClick={() => handleRowClick(tractor)}
                   style={{ cursor: 'pointer' }}
-                  className="clickable-row"
+                  className={colorVin === tractor.vin ? "colored-row" : "clickable-row"}
 
                 >
-                  <td title={tractor.vin || tractor.VIN || '-'} className="tractor-cell">
+                  {/* <td title={tractor.vin || tractor.VIN || '-'} className="tractor-cell">
                     {tractor.vin || tractor.VIN || '-'}
                   </td>
                   <td>{tractor.model || '-'}</td>
@@ -542,7 +586,18 @@ const getStatusColorClass = (status) => {
   className={shouldHighlight(tractor, 'gr') ? getStatusColorClass(tractor.gr_status) : ''}
 >
   {tractor.gr || '-'}
-</td>
+</td> */}
+                {orderedColumns.map(colKey => {
+                  const col = columnsConfig[colKey];
+                  const value = col.getValue(tractor);
+                  if (col.isNode) {
+                    const status = col.getStatus(tractor);
+                    const className = shouldHighlight(tractor, colKey) ? getStatusColorClass(status) : '';
+                    return <td key={colKey} className={className}>{value}</td>;
+                  }
+                  return <td key={colKey}>{value}</td>;
+                })}
+
                 </tr>
               ))}
             </tbody>

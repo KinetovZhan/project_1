@@ -508,7 +508,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                                     handleAggregateDetails()}}
                       style={{ cursor: 'pointer' }}
                     />
-                    <div className="inform" style ={{width:'70%'}}>
+                    <div className="inform" >
+                      <div className="inform-left">
                       <h4 
                       className="poster"
                       onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
@@ -526,8 +527,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                           Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
                       
                         </h5>
+                        </div>
                       </div>
-                      <div style={{width:'100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <div className = "container-download">
                         <button
                           className="download"
                           onClick={() => handleDownload(item)}
@@ -535,7 +537,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                         >
                           Скачать
                         </button>
-                        <button onClick={() => handleMoveToArchive(item, choosedObjects === 'active')} style={{width:'100px', border: 'none', backgroundColor:'#d7dcf3'}}>
+                        <button onClick={() => handleMoveToArchive(item, choosedObjects === 'active')} className='archive-button'>
                           <span>{(choosedObjects == 'active')?'В архив':'Из архива'}</span>
                         </button>
                       </div>

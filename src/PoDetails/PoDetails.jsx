@@ -295,7 +295,7 @@ useEffect(() => {
               )}
             </h2>
             <img
-              className="object"
+              className="object-po"
               src={ImageToComponent(details.component_type, details.component_name)}
               alt={details.component_type}
             />

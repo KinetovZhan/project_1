@@ -133,3 +133,11 @@
   font-style: italic;
   /* color: rgba(0, 0, 0, 0.8); */
 }
+
+.object-po {
+  box-sizing: border-box;
+  width: 20vh;
+  height: 20vh;
+  margin: 10px;
+
+}
