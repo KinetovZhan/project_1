@@ -279,6 +279,9 @@ useEffect(() => {
 
   return (
     <div className="po-details-container ">
+      <button onClick={onBack} className="go-back">
+        
+      </button>
       <div className="po-details-content ">
         <div className="left-column">
           <div className="section">

@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails,actualFilterPo}) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -24,7 +24,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   const [downloading, setDownloading] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc');
   const { token, user } = useAuth();
-  const [selectedPo,setSelectedPo]=useState(null);
+  const [selectedPo,setSelectedPo]=useState(() => {
+    const saved = sessionStorage.getItem('selectedPo');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [choosedObjects, setChoosedObjects] = useState('active')
   const [changingArchive, setChangingArchive] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
@@ -46,6 +49,15 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
  
 
   const userRole = user?.role || 'user';
+
+  // Сохраняем selectedPo в sessionStorage при изменении
+  useEffect(() => {
+    if (selectedPo) {
+      sessionStorage.setItem('selectedPo', JSON.stringify(selectedPo));
+    } else {
+      sessionStorage.removeItem('selectedPo');
+    }
+  }, [selectedPo]);
 
   const fetchFilteredData = useCallback(async () => {
     setLoading(true);
@@ -424,6 +436,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   return (
     <div className="maininfo">
+      <button onClick={onCloseTab} className="go-back"></button>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
         <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
           <button 

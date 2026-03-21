@@ -62,15 +62,26 @@ const groupTractors = (data) => {
   console.log(grouped)
   return Object.values(grouped);
 };
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],      
-  uzelFilter=[] }) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],
+  uzelFilter=[], onCloseTab }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedTractor, setSelectedTractor] = useState(null);
+  const [selectedTractor, setSelectedTractor] = useState(() => {
+    const saved = sessionStorage.getItem('selectedTractor');
+    return saved || null;
+  });
   const tableContainerRef = useRef(null);
   const { token, user } = useAuth();
 
+    // Сохраняем в sessionStorage при изменении selectedTractor
+  useEffect(() => {
+    if (selectedTractor) {
+      sessionStorage.setItem('selectedTractor', selectedTractor);
+    } else {
+      sessionStorage.removeItem('selectedTractor');
+    }
+  }, [selectedTractor]);
 
   const userRole = user?.role || 'user';
 
@@ -451,10 +462,8 @@ const getStatusColorClass = (status) => {
 
   return (
     <div className="tractor-table-container" >
-        <div 
-          className="scroll-bar" 
-          
-        >
+        <button onClick={onCloseTab} className="go-back" style={{top: '-40px'}}></button>
+        <div className="scroll-bar">
           <table className="tractor-table">
             <thead>
               <tr>
