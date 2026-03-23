@@ -9,6 +9,7 @@ import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
 import { api } from '../fetchAPI.js';
+import { input } from '@testing-library/user-event/dist/cjs/event/input.js';
 
 
 
@@ -26,21 +27,31 @@ export function PoDetails({ po, onBack }) {
   const isModerator = userRole === 'moderator';
   const [discr, setDiscr ] = useState(po.description);
   const [producer, setProducer] = useState('');
-  // const [isActual, setIsActual] = useState(null);
-  // const [isArchive, setIsArchive] = useState(null);
-  // const [isCritical, setIsCritical] = useState(null);
+  const [isActual, setIsActual] = useState(po.software_is_actual);
+  const [isArchive, setIsArchive] = useState(po.software_is_archive);
+  const [isCritical, setIsCritical] = useState(po.software_is_critical);
   const [status, setStatus] = useState(po.status);
   const isEngineer = userRole === 'engineer';
+  const [releaseDate, setReleaseDate] = useState(po.release_date)
   const [change, setChange] = useState(false);
+  const [instruction, setInstruction] = useState(po.software_path_instruction)
+
   const swId = po.id_Firmwares
 
   console.log(`Айдишник ${swId}`)
   console.log(po)
+  console.log(releaseDate)
+
 
   const postData = {
     description: discr,
     producer: producer,
     status: status || po.status,
+    release_date: releaseDate,
+    software_path_instruction: instruction,
+    is_actual:isActual,
+    is_archive:isArchive,
+    is_critical:isCritical
   }
 
   const postData2 = {
@@ -158,6 +169,7 @@ useEffect(() => {
       if(userRole === 'moderator') {
         const data = await api.patch(`/software/${swId}`, postData)
         console.log(`Успешно выполнен fetch к patch/software`)
+        console.log(`данные postData ${data   }`)
       }
       if (userRole == 'engineer') {
         const data = await api.patch(`/software/${swId}`, postData2)
@@ -333,7 +345,7 @@ useEffect(() => {
   }
   
   const getStatusActualityText = () => {
-    if (details.software_is_critical === true) return 'Требуется обновление';
+    if (details.software_is_critical === true) return 'Требует обновление';
     if (details.software_is_actual === true && details.software_is_critical === false) return 'Актуальное';
     else {
       return 'Устаревшее';}
@@ -351,6 +363,21 @@ useEffect(() => {
     if(query === "in operation"){
       setStatus('in operation')
     }
+  }
+
+  const chooseActual = (e) => {
+    const query = e.target.value
+    if(query === "Актуальное"){
+      setIsActual(true)
+      setIsCritical(false)
+    }
+    if(query === "Требует обновление"){
+      setIsCritical(true) 
+    }
+    else if (query === "Устаревшее") {
+    setIsActual(false);
+    setIsCritical(false);
+  }
   }
 
 
@@ -383,7 +410,13 @@ useEffect(() => {
             </div>
             <div className="section">
               <h3>Дата выпуска</h3>
-              <p>{formatDate(details.software_release_date)}</p>
+              {(change === true && isModerator)?
+                
+                (<input
+                  type="date"
+                  value={releaseDate?.split('T')[0] || ''}
+                  onChange={(e) => setReleaseDate(e.target.value)}/>):(<p>{formatDate(details.software_release_date)}</p>)
+              }
             </div>
             <div className="section">
               <h3>Период актуальности</h3>
@@ -397,11 +430,15 @@ useEffect(() => {
                       <select value={status} onChange={changeStatus}>
                         <option value="serial">Серийное</option>
                         <option value="experienced">Опытное</option>
-                        <option value="in operation">Требуется обновление</option>
+                        <option value="in operation">Для эксплуатации</option>
                     </select></>)}
             <div>
               <h3>Статус</h3>
-              <p>{getStatusActualityText()}</p>
+              {(isModerator && change===true)?(<select defaultValue={getStatusActualityText()} onChange={chooseActual}>
+                                                  <option value="Актуальное">Актуальное</option>
+                                                  <option value="Устаревшее">Устаревшее</option>
+                                                  <option value="Требует обновление">Требует обновление</option>
+                                                </select> ):<p>{getStatusActualityText()}</p>}
             </div>
             <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
             <div className="section">
@@ -420,17 +457,23 @@ useEffect(() => {
               </div>
               <div className="section">
                 <h3>Инструкция</h3>
-                {details.software_path_instruction ? (
-                  <button
-                    className="download-button"
-                    onClick={handleDownloadInstruction}
-                    disabled={downloading}
-                  >
-                    {downloading ? 'Скачивание...' : 'Скачать'}
-                  </button>
-                ) : (
-                  <p>—</p>
-                )}
+                {
+                  (change===true && isModerator)?(<input
+                                    type="file"
+                                    onChange={(e) => setInstruction(e.target.files[0])}/>):
+
+                                (details.software_path_instruction ? (
+                                  <button
+                                    className="download-button"
+                                    onClick={handleDownloadInstruction}
+                                    disabled={downloading}
+                                  >
+                                    {downloading ? 'Скачивание...' : 'Скачать'}
+                                  </button>
+                                ) : (
+                                  <p>—</p>
+                                ))
+            }
               </div>
             </div>
           </div>
@@ -439,10 +482,11 @@ useEffect(() => {
               <h3>Описание</h3>
               {change===false?(<div className="description">
                 {details.software_description || 'Описание отсутствует'}
-              </div>):(<> <input
-                        type="text"
+              </div>):(<> <textarea
+                        rows='4'
                         placeholder={details.software_description}
                         value={discr}
+                        style={{width:'300px', maxHeight:'300px', overflowY:'auto'}}
                         onChange={(e) => {setDiscr(e.target.value)}}/></>)}
             </div>
             <div className="section">
