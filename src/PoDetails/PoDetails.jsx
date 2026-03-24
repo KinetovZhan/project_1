@@ -35,6 +35,7 @@ export function PoDetails({ po, onBack }) {
   const [releaseDate, setReleaseDate] = useState(po.release_date)
   const [change, setChange] = useState(false);
   const [instruction, setInstruction] = useState(po.software_path_instruction)
+  const [endActuality, setEndActuality] = useState(po.end_actuality)
 
   const swId = po.id_Firmwares
 
@@ -51,7 +52,8 @@ export function PoDetails({ po, onBack }) {
     software_path_instruction: instruction,
     is_actual:isActual,
     is_archive:isArchive,
-    is_critical:isCritical
+    is_critical:isCritical,
+    end_actuality: endActuality
   }
 
   const postData2 = {
@@ -419,8 +421,11 @@ useEffect(() => {
               }
             </div>
             <div className="section">
-              <h3>Период актуальности</h3>
-              <p>{actualityPeriod}</p>
+
+              {(isModerator && change === true)?(<><h3>Дата конца актуальности</h3><input
+                                                    type='date'
+                                                    value={(endActuality === null || endActuality === undefined)?(new Date().toISOString().split('T')[0]):(endActuality.split('T')[0])}
+                                                    onChange={(e)=>setEndActuality(e.target.value)}/></>):(<><h3>Период актуальности</h3><p>{actualityPeriod}</p></>)}
             </div>
             {change===false?
           (<div>
