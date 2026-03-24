@@ -115,7 +115,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     };
     
     fetchProducers();
-  }, [token, selectedModel]);
+  }, [token, selectedModel,selectedTractorModels,selectedStatus]);
 
   useEffect(() => {
   const fetchTractorModel = async () => {
@@ -137,13 +137,19 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       .map(key => typeCodeMap[key]);
 
     // Используем ту же структуру, что и в Objects
+    // const requestBody = {
+    //   search: '', 
+    //   trac_model: [], 
+    //   type_comp: activeTypes,
+    //   name_comp: selectedModel,
+    //   producers: selectedProducers,
+    //   status: selectedStatus
+    // };
     const requestBody = {
-      search: '', // Пустой поиск
-      trac_model: [], // Не фильтруем по тракторам, чтобы получить все доступные
-      type_comp: activeTypes,
-      name_comp: selectedModel,
-      producers: selectedProducers,
-      status: selectedStatus
+    component_models: selectedModel.length > 0 ? selectedModel : [],
+    component_types: activeTypes,
+    component_producers: selectedProducers,
+    software_status: selectedStatus
     };
 
     try {
@@ -152,32 +158,47 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
 
       // Используем тот же эндпоинт, что и в Objects
       
-      const response = await api.post('search/component-info', requestBody);
-      const response2 = await api.post('search/archive-component-info', requestBody);
+      // const response = await api.post('search/component-info', requestBody);
+      // const response2 = await api.post('search/archive-component-info', requestBody);
+      const response = await api.post('search/tractor-models', requestBody);
 
-      const combinedResponse = [...response, ...response2];
+      // const combinedResponse = [...response, ...response2];
       
       // Извлекаем уникальные модели тракторов из поля tractor_model (которое является массивом)
-      const tractorModels = [];
+       let tractorModels = [];
       
-      combinedResponse.forEach(item => {
-        if (item.tractor_model && Array.isArray(item.tractor_model)) {
-          item.tractor_model.forEach(model => {
-            if (model && model.trim() !== '' && !tractorModels.includes(model)) {
-              tractorModels.push(model);
-            }
-          });
+      // combinedResponse.forEach(item => {
+      //   if (item.tractor_model && Array.isArray(item.tractor_model)) {
+      //     item.tractor_model.forEach(model => {
+      //       if (model && model.trim() !== '' && !tractorModels.includes(model)) {
+      //         tractorModels.push(model);
+      //       }
+      //     });
+      //   }
+      // });
+     
+      if (Array.isArray(response)) {
+          tractorModels = response;
+        } else if (response && Array.isArray(response.tractor_models)) {
+          tractorModels = response.tractor_models;
+        } else {
+          console.warn('Неожиданный формат ответа:', response);
+          tractorModels = [];
         }
-      });
-      
-      // Сортируем по алфавиту
-      tractorModels.sort();
+
+        const modelNames = tractorModels
+          .map(item => item&&item.model)
+          .filter(model => typeof model === 'string' && model.trim() !== '')
+          .map(model => model.trim());
+
+        // const uniqueNames = [...new Set(modelNames)].sort();
 
       // Формируем опции для react-select
-      const options = tractorModels.map(model => ({
-        value: model,
-        label: model
-      }));
+      // const options = tractorModels.map(model => ({
+      //   value: model,
+      //   label: model
+      // }));
+      const options = modelNames.map(model => ({ value: model, label: model }));
 
       console.log('Найденные модели тракторов:', tractorModels); // Для отладки
       setTractorOptions(options);
@@ -256,6 +277,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     };
 fetchModels();
 }, [FilterItems, selectedTractorModels, selectedProducers, selectedStatus]);
+
 
   const handleModelChange = (selectedOptions) => {
     const values = selectedOptions

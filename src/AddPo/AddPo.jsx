@@ -107,48 +107,51 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   useEffect(() => {
   if (!token) {
     setTractorError('Для загрузки моделей тракторов требуется авторизация');
+    setTractorOptions([]); // очищаем опции, если нет токена
     return;
   }
-  setLoadingTractors(true);
-  setTractorError(null);
 
-  // Тело запроса без фильтров
-  const requestBody = {
-    search: '',
-    trac_model: [],
-    type_comp: [],
-    name_comp: [],
-    producers: [],
-    status: []
-  };
+  const fetchAllTractorModels = async () => {
+    setLoadingTractors(true);
+    setTractorError(null);
 
-  Promise.all([
-    api.post('search/component-info', requestBody),
-    api.post('search/archive-component-info', requestBody)
-  ])
-    .then(([activeData, archiveData]) => {
-      const combined = [...activeData, ...archiveData];
-      const tractorModels = new Set();
-      combined.forEach(item => {
-        if (item.tractor_model && Array.isArray(item.tractor_model)) {
-          item.tractor_model.forEach(model => {
-            if (model && model.trim() !== '') {
-              tractorModels.add(model.trim());
-            }
-          });
-        }
-      });
-      const sortedModels = Array.from(tractorModels).sort();
-      const options = sortedModels.map(model => ({ value: model, label: model }));
+    const requestBody = {
+      component_models: [],
+      component_types: [],
+      component_producers: [],
+      software_status: []
+    };
+
+    try {
+      const response = await api.post('search/tractor-models', requestBody);
+      
+      let tractorModels = [];
+      if (Array.isArray(response)) {
+        tractorModels = response;
+      } else if (response && Array.isArray(response.tractor_models)) {
+        tractorModels = response.tractor_models;
+      } else {
+        console.warn('Неожиданный формат ответа:', response);
+        tractorModels = [];
+      }
+
+      const modelNames = tractorModels
+        .map(item => item && item.model)
+        .filter(model => typeof model === 'string' && model.trim() !== '')
+        .map(model => model.trim());
+
+      const options = modelNames.map(model => ({ value: model, label: model }));
       setTractorOptions(options);
-    })
-    .catch(err => {
+    } catch (err) {
       console.error('Ошибка загрузки моделей тракторов:', err);
       setTractorError(err.message);
-    })
-    .finally(() => setLoadingTractors(false));
-}, [token]);
+    } finally {
+      setLoadingTractors(false);
+    }
+  };
 
+  fetchAllTractorModels();
+}, [token]);
   // Загрузка производителей из ПО
   useEffect(() => {
     if (!token) {
