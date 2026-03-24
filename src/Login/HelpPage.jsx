@@ -10,9 +10,10 @@ export function HelpPage() {
   const [newMessage, setNewMessage] = useState('');
   const [replyContent, setReplyContent] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('new');
   const [userList, setUserList] = useState([])
   const [choosedUser, setChoosedUser] = useState(null)
+  const [isRead,setIsRead] = useState()
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ export function HelpPage() {
     }
     fetchMessages();
   }, [token, navigate]);
+  console.log(choosedUser)
+  console.log(`isRead ${isRead}`)
 
   // Функция для нормализации данных
   const normalizeMessages = (data) => {
@@ -86,6 +89,8 @@ export function HelpPage() {
       }
       
       setMessages(normalizedMessages);
+      console.log(messages)
+      setIsRead(response.is_read)
       setError('');
     } catch (err) {
       setError('Ошибка загрузки сообщений');
@@ -128,6 +133,47 @@ export function HelpPage() {
     }
   };
 
+//   /**
+//  * Удаляет сообщение по ID
+//  * @param {number} messageId - ID сообщения для удаления
+//  * @param {string} senderName - имя отправителя для подтверждения
+//  **/
+const handleDeleteMessage = async (messageId, senderName) => {
+    // Подтверждение удаления
+    const confirmDelete = window.confirm(
+      `Вы действительно хотите удалить сообщение от "${senderName}"?\nЭто действие нельзя отменить.`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      setLoading(true);
+      // Вызов API для удаления сообщения
+      await api.delete(`/support/messages/${messageId}`);
+      
+      // Оптимистичное обновление интерфейса: удаляем сообщение из состояния
+      setMessages(prevMessages => 
+        prevMessages.filter(msg => msg.id !== messageId)
+      );
+      
+      // Если удаляем ответ, сбрасываем форму
+      if (selectedMessageId === messageId) {
+        setSelectedMessageId(null);
+        setReplyContent('');
+      }
+      
+      console.log(`Сообщение #${messageId} успешно удалено`);
+    } catch (err) {
+      console.error('Ошибка при удалении сообщения:', err);
+      setError('Не удалось удалить сообщение. Попробуйте позже.');
+      
+      // При ошибке перезагружаем список сообщений для синхронизации
+      fetchMessages();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Автоматически отмечаем как прочитанное при клике на сообщение
   const handleMessageClick = async (message) => {
     if (isModerator && !message.is_read) {
@@ -145,14 +191,34 @@ export function HelpPage() {
   };
 
   const getFilteredMessages = () => {
-    if (!isModerator) return messages;
-    if(choosedUser === null) return messages;
-    else{
-      return messages.filter(msg => msg.sender_name === choosedUser)
-    }
-  };
+  if (!isModerator) return messages || [];
+  if (choosedUser === null) return [];
+  
+  const userMessages = messages.filter(msg => msg.sender_name === choosedUser);
+  
+  switch(filter) {
+    case 'new':
+      return userMessages.filter(msg => !msg.is_read && msg.replies.length === 0);
+    case 'in-work':
+      return userMessages.filter(msg => msg.is_read === true);
+    case 'closed':
+      return userMessages.filter(msg => msg.is_read === true && is_closed===true);
+  }};
 
   const filteredMessages = getFilteredMessages();
+
+  const fetchRead = async (id) => {
+    try{
+      if(isModerator){
+        const data = api.get(`/support/read-message/{moderator_id}/${id}`)
+        console.log(data)
+
+      }
+    } catch(err){
+      setError('Ошибка прочтения сообщения', err)
+    }
+    
+  }
 
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -180,10 +246,24 @@ export function HelpPage() {
               <>
               <div className="moderator-filters">
                 <button 
-                  className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                  onClick={() => setFilter('all')}
+                  className={`filter-btn ${filter === 'new' ? 'active' : ''}`}
+                  onClick={() => setFilter('new')}
                 >
-                  Все сообщения
+                  Новые
+                </button>
+
+                <button 
+                  className={`filter-btn ${filter === 'in-work' ? 'active' : ''}`}
+                  onClick={() => setFilter('in-work')}
+                >
+                  В работе
+                </button>
+
+                <button 
+                  className={`filter-btn ${filter === 'closed' ? 'active' : ''}`}
+                  onClick={() => setFilter('closed')}
+                >
+                  Закрытые
                 </button>
               </div>
               <div className='chooseUsers'>
@@ -200,7 +280,7 @@ export function HelpPage() {
                         }>
                       
                       <div className="user-info" >
-                        <span className="user-name">Пользователь {item.username} Роль  {item.role}</span>
+                        <span className="user-name">Пользователь {item.username} Роль  {item.role} {(item.unread_count !== undefined && item.unread_count !== null && item.unread_count !== 0)?(`Непрочитанных сообщений ${item.unread_count}  `):''}</span>
                       </div>
                     </div>
                   ))}
@@ -239,7 +319,7 @@ export function HelpPage() {
         <div className="help-right-column">
           <h3 style={{userSelect: 'none', color:'white'}}>
             {isModerator ? 'Обращения пользователей' : 'Ваши обращения'}
-            {filteredMessages.length > 0 && (
+            {filteredMessages !== undefined && filteredMessages !== null && filteredMessages.length > 0 && (
               <span className="messages-count"> ({filteredMessages.length})</span>
             )}
           </h3>
@@ -256,7 +336,7 @@ export function HelpPage() {
                 <div 
                   key={message.id} 
                   className={`message-item ${!message.is_read && isModerator ? 'unread' : ''}`}
-                  onClick={() => handleMessageClick(message)}
+
                 >
                   <div className="message-header">
                     <div className="message-header-left">
@@ -271,11 +351,16 @@ export function HelpPage() {
                       {!message.is_read && isModerator && (
                         <span className="unread-badge">Новое</span>
                       )}
+                      {!message.is_read?(<input
+                                            type='checkbox'
+                                            onChange={()=>fetchRead(message.id)}/>):('')}
                     </div>
                     <div className="message-header-right">
                       <span className="message-date">
                         {new Date(message.created_at).toLocaleString()}
                       </span>
+                      
+                      {/* Кнопка "Ответить" для модератора */}
                       {isModerator && (
                         <button 
                           className="reply-button"
@@ -288,6 +373,33 @@ export function HelpPage() {
                           }}
                         >
                           {selectedMessageId === message.id ? 'Отмена' : 'Ответить'}
+                        </button>
+                      )}
+                      
+                      {/* НОВАЯ КНОПКА: Удалить сообщение */}
+                      {isModerator && (
+                        <button 
+                          className="delete-button"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Чтобы не срабатывал клик по сообщению
+                            handleDeleteMessage(message.id, message.sender_name);
+                          }}
+                          title="Удалить сообщение"
+                          aria-label={`Удалить сообщение от ${message.sender_name}`}
+                        >
+                          {/* Иконка корзины */}
+                          <svg 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2"
+                          >
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
                         </button>
                       )}
                     </div>

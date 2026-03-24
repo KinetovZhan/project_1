@@ -75,6 +75,16 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const tableContainerRef = useRef(null);
   const { token, user } = useAuth();
 
+    // Состояние для выбранных столбцов
+  const [visibleColumns, setVisibleColumns] = useState({
+    model: true,
+    assembly_date: true,
+    region: true,
+    consumer: true,
+    oh_hour: true,
+    last_activity: true
+  });
+
     // Сохраняем в sessionStorage при изменении selectedTractor
   useEffect(() => {
     if (selectedTractor) {
@@ -83,6 +93,30 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       sessionStorage.removeItem('selectedTractor');
     }
   }, [selectedTractor]);
+
+    // Загружаем сохраненные настройки столбцов
+  useEffect(() => {
+    const saved = localStorage.getItem('visibleColumns');
+    if (saved) {
+      try {
+        setVisibleColumns(JSON.parse(saved));
+      } catch (e) {
+        console.error('Ошибка загрузки настроек столбцов:', e);
+      }
+    }
+  }, []);
+
+    // Сохраняем выбранные столбцы в localStorage (с проверкой на первый рендер)
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+    // Сохраняем выбранные столбцы в localStorage
+  useEffect(() => {
+    if (isInitialLoad){
+      setIsInitialLoad(false);
+      return;
+    }
+    localStorage.setItem('visibleColumns', JSON.stringify(visibleColumns));
+  }, [visibleColumns]);
 
   const userRole = user?.role || 'user';
 
@@ -108,14 +142,31 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   };
 
   const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr'];
-  // Порядок столбцов с учётом выбранных узлов
+  // Порядок столбцов с учётом выбранных узлов и видимости
   const orderedColumns = useMemo(() => {
     const baseColumns = ['vin', 'model', 'assembly_date', 'region', 'consumer', 'oh_hour', 'last_activity'];
     const selectedNodes = uzelFilter || []; // массив строк, например ['dvs', 'kpp']
     const otherNodes = allNodes.filter(node => !selectedNodes.includes(node));
-    // Выбранные узлы в порядке фильтра, остальные в исходном порядке
-    return [...baseColumns, ...selectedNodes, ...otherNodes];
-  }, [uzelFilter]);
+    // Все возможные столбцы в правильном порядке
+    const allPossibleColumns = [...baseColumns, ...selectedNodes, ...otherNodes];
+
+    // Фильтруем столбцы по видимости
+    return allPossibleColumns.filter(colKey => {
+      const col = columnsConfig[colKey];
+      // Всегда показываем VIN и узлы
+      if (col.alwaysShow) return true;
+      // Для остальных проверяем состояние видимости
+      return visibleColumns[colKey] !== false;
+    });
+  }, [uzelFilter, visibleColumns]);
+
+  // Функция для переключения видимости столбца
+  const toggleColumnVisibility = (columnKey) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [columnKey]: !prev[columnKey]
+    }));
+  };
   
 
 
@@ -492,9 +543,37 @@ const getStatusColorClass = (status) => {
     );
   }
 
- 
+    // Список столбцов, которые можно скрыть
+  const hideableColumns = [
+    { key: 'model', label: 'Модель' },
+    { key: 'assembly_date', label: 'Дата выпуска' },
+    { key: 'region', label: 'Регион' },
+    { key: 'consumer', label: 'Дилер' },
+    { key: 'oh_hour', label: 'Моточасы' },
+    { key: 'last_activity', label: 'Последняя активность' }
+  ];
 
   return (
+    <>
+          <div className="columns-selector" >
+        {hideableColumns.map(col => (
+          <label key={col.key} style={{ 
+            display: 'flex',  
+            cursor: 'pointer',
+            fontSize: '16px',
+            color: 'black',
+          }}>
+            <input
+              type="checkbox"
+              checked={visibleColumns[col.key] !== false}
+              onChange={() => toggleColumnVisibility(col.key)}
+              style={{ cursor: 'pointer' }}
+            />
+            {col.label}
+          </label>
+        ))}
+      </div>
+
     <div className="tractor-table-container" >
         <button onClick={onCloseTab} className="go-back" style={{top: '-40px'}}></button>
         <div className="scroll-bar">
@@ -612,4 +691,5 @@ const getStatusColorClass = (status) => {
             </tbody>
           </table>
         </div>
-    </div>  );}
+    </div>
+  </>  );}

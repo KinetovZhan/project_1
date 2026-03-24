@@ -67,11 +67,24 @@
   background: #e0e0e0;
 }
 
-.filter-btn.active {
+.filter-btn.all {
   background: grey;
   color: black;
   border-color: grey;
 }
+
+.filter-btn.unread {
+  background: grey;
+  color: black;
+  border-color: grey;
+}
+
+.filter-btn.done {
+  background: grey;
+  color: black;
+  border-color: grey;
+}
+
 
 .new-message-form {
   background: #f8f9fa;
@@ -392,4 +405,74 @@
 .user-name {
   font-size:medium;
   user-select: none;
+}
+
+/* Кнопка удаления сообщения */
+.delete-button {
+  background: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.delete-button:hover {
+  background: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.delete-button:active {
+  transform: translateY(0);
+}
+
+.delete-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .message-header-right {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .delete-button,
+  .reply-button {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+  
+  .delete-button svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Анимация исчезновения при удалении */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.message-item.deleting {
+  animation: fadeOut 0.3s ease-out forwards;
+  pointer-events: none;
 }
