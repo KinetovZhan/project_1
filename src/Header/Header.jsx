@@ -72,13 +72,13 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
         </button>
       )}
       
-      <div className='icon-ptz'>
-         <img
-              className="object-pi"
-              src={icon}
-              alt={icon}
-            /> 
-      </div>
+      {/* <div className='icon-ptz'>
+        <img
+          className="object-pi"
+          src={icon}
+          alt={icon}
+        /> 
+      </div> */}
       <div className='mainText'>
         <h3 onClick={handleMainPage}>Сервис просмотра версий ПО</h3>
       </div>
@@ -108,6 +108,13 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}
+      </div>
+      <div className='icon-ptz'>
+        <img
+          className="object-pi"
+          src={icon}
+          alt={icon}
+        /> 
       </div>
     </header>
   )
