@@ -133,7 +133,62 @@ export function HelpPage() {
     }
   };
 
- 
+//   /**
+//  * Удаляет сообщение по ID
+//  * @param {number} messageId - ID сообщения для удаления
+//  * @param {string} senderName - имя отправителя для подтверждения
+//  **/
+const handleDeleteMessage = async (messageId, senderName) => {
+    // Подтверждение удаления
+    const confirmDelete = window.confirm(
+      `Вы действительно хотите удалить сообщение от "${senderName}"?\nЭто действие нельзя отменить.`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      setLoading(true);
+      // Вызов API для удаления сообщения
+      await api.delete(`/support/messages/${messageId}`);
+      
+      // Оптимистичное обновление интерфейса: удаляем сообщение из состояния
+      setMessages(prevMessages => 
+        prevMessages.filter(msg => msg.id !== messageId)
+      );
+      
+      // Если удаляем ответ, сбрасываем форму
+      if (selectedMessageId === messageId) {
+        setSelectedMessageId(null);
+        setReplyContent('');
+      }
+      
+      console.log(`Сообщение #${messageId} успешно удалено`);
+    } catch (err) {
+      console.error('Ошибка при удалении сообщения:', err);
+      setError('Не удалось удалить сообщение. Попробуйте позже.');
+      
+      // При ошибке перезагружаем список сообщений для синхронизации
+      fetchMessages();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Автоматически отмечаем как прочитанное при клике на сообщение
+  const handleMessageClick = async (message) => {
+    if (isModerator && !message.is_read) {
+      try {
+        await api.patch(`/support/messages/${message.id}/read`);
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === message.id ? { ...msg, is_read: true } : msg
+          )
+        );
+      } catch (err) {
+        console.error('Ошибка при отметке о прочтении:', err);
+      }
+    }
+  };
 
   const getFilteredMessages = () => {
   if (!isModerator) return messages || [];
@@ -304,6 +359,8 @@ export function HelpPage() {
                       <span className="message-date">
                         {new Date(message.created_at).toLocaleString()}
                       </span>
+                      
+                      {/* Кнопка "Ответить" для модератора */}
                       {isModerator && (
                         <button 
                           className="reply-button"
@@ -316,6 +373,33 @@ export function HelpPage() {
                           }}
                         >
                           {selectedMessageId === message.id ? 'Отмена' : 'Ответить'}
+                        </button>
+                      )}
+                      
+                      {/* НОВАЯ КНОПКА: Удалить сообщение */}
+                      {isModerator && (
+                        <button 
+                          className="delete-button"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Чтобы не срабатывал клик по сообщению
+                            handleDeleteMessage(message.id, message.sender_name);
+                          }}
+                          title="Удалить сообщение"
+                          aria-label={`Удалить сообщение от ${message.sender_name}`}
+                        >
+                          {/* Иконка корзины */}
+                          <svg 
+                            width="16" 
+                            height="16" 
+                            viewBox="0 0 24 24" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            strokeWidth="2"
+                          >
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            <line x1="10" y1="11" x2="10" y2="17" />
+                            <line x1="14" y1="11" x2="14" y2="17" />
+                          </svg>
                         </button>
                       )}
                     </div>
