@@ -67,11 +67,24 @@
   background: #e0e0e0;
 }
 
-.filter-btn.active {
+.filter-btn.all {
   background: grey;
   color: black;
   border-color: grey;
 }
+
+.filter-btn.unread {
+  background: grey;
+  color: black;
+  border-color: grey;
+}
+
+.filter-btn.done {
+  background: grey;
+  color: black;
+  border-color: grey;
+}
+
 
 .new-message-form {
   background: #f8f9fa;
@@ -392,4 +405,8 @@
 .user-name {
   font-size:medium;
   user-select: none;
+}
+
+.unread {
+  background-color: #721c24;
 }

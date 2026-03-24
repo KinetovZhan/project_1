@@ -10,9 +10,10 @@ export function HelpPage() {
   const [newMessage, setNewMessage] = useState('');
   const [replyContent, setReplyContent] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('new');
   const [userList, setUserList] = useState([])
   const [choosedUser, setChoosedUser] = useState(null)
+  const [isRead,setIsRead] = useState()
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ export function HelpPage() {
     }
     fetchMessages();
   }, [token, navigate]);
+  console.log(choosedUser)
+  console.log(`isRead ${isRead}`)
 
   // Функция для нормализации данных
   const normalizeMessages = (data) => {
@@ -86,6 +89,8 @@ export function HelpPage() {
       }
       
       setMessages(normalizedMessages);
+      console.log(messages)
+      setIsRead(response.is_read)
       setError('');
     } catch (err) {
       setError('Ошибка загрузки сообщений');
@@ -128,31 +133,37 @@ export function HelpPage() {
     }
   };
 
-  // Автоматически отмечаем как прочитанное при клике на сообщение
-  const handleMessageClick = async (message) => {
-    if (isModerator && !message.is_read) {
-      try {
-        await api.patch(`/support/messages/${message.id}/read`);
-        setMessages(prevMessages => 
-          prevMessages.map(msg => 
-            msg.id === message.id ? { ...msg, is_read: true } : msg
-          )
-        );
-      } catch (err) {
-        console.error('Ошибка при отметке о прочтении:', err);
-      }
-    }
-  };
+ 
 
   const getFilteredMessages = () => {
-    if (!isModerator) return messages;
-    if(choosedUser === null) return messages;
-    else{
-      return messages.filter(msg => msg.sender_name === choosedUser)
-    }
-  };
+  if (!isModerator) return messages || [];
+  if (choosedUser === null) return [];
+  
+  const userMessages = messages.filter(msg => msg.sender_name === choosedUser);
+  
+  switch(filter) {
+    case 'new':
+      return userMessages.filter(msg => !msg.is_read && msg.replies.length === 0);
+    case 'in-work':
+      return userMessages.filter(msg => msg.is_read === true);
+    case 'closed':
+      return userMessages.filter(msg => msg.is_read === true && is_closed===true);
+  }};
 
   const filteredMessages = getFilteredMessages();
+
+  const fetchRead = async (id) => {
+    try{
+      if(isModerator){
+        const data = api.get(`/support/read-message/{moderator_id}/${id}`)
+        console.log(data)
+
+      }
+    } catch(err){
+      setError('Ошибка прочтения сообщения', err)
+    }
+    
+  }
 
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -180,10 +191,24 @@ export function HelpPage() {
               <>
               <div className="moderator-filters">
                 <button 
-                  className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                  onClick={() => setFilter('all')}
+                  className={`filter-btn ${filter === 'new' ? 'active' : ''}`}
+                  onClick={() => setFilter('new')}
                 >
-                  Все сообщения
+                  Новые
+                </button>
+
+                <button 
+                  className={`filter-btn ${filter === 'in-work' ? 'active' : ''}`}
+                  onClick={() => setFilter('in-work')}
+                >
+                  В работе
+                </button>
+
+                <button 
+                  className={`filter-btn ${filter === 'closed' ? 'active' : ''}`}
+                  onClick={() => setFilter('closed')}
+                >
+                  Закрытые
                 </button>
               </div>
               <div className='chooseUsers'>
@@ -200,7 +225,7 @@ export function HelpPage() {
                         }>
                       
                       <div className="user-info" >
-                        <span className="user-name">Пользователь {item.username} Роль  {item.role}</span>
+                        <span className="user-name">Пользователь {item.username} Роль  {item.role} {(item.unread_count !== undefined && item.unread_count !== null && item.unread_count !== 0)?(`Непрочитанных сообщений ${item.unread_count}  `):''}</span>
                       </div>
                     </div>
                   ))}
@@ -239,7 +264,7 @@ export function HelpPage() {
         <div className="help-right-column">
           <h3 style={{userSelect: 'none', color:'white'}}>
             {isModerator ? 'Обращения пользователей' : 'Ваши обращения'}
-            {filteredMessages.length > 0 && (
+            {filteredMessages !== undefined && filteredMessages !== null && filteredMessages.length > 0 && (
               <span className="messages-count"> ({filteredMessages.length})</span>
             )}
           </h3>
@@ -256,7 +281,7 @@ export function HelpPage() {
                 <div 
                   key={message.id} 
                   className={`message-item ${!message.is_read && isModerator ? 'unread' : ''}`}
-                  onClick={() => handleMessageClick(message)}
+
                 >
                   <div className="message-header">
                     <div className="message-header-left">
@@ -271,6 +296,9 @@ export function HelpPage() {
                       {!message.is_read && isModerator && (
                         <span className="unread-badge">Новое</span>
                       )}
+                      {!message.is_read?(<input
+                                            type='checkbox'
+                                            onChange={()=>fetchRead(message.id)}/>):('')}
                     </div>
                     <div className="message-header-right">
                       <span className="message-date">

@@ -51,6 +51,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
 
   },[token, navigate])
 
+
   return (
     <header className="header">
       {isMobile && (
