@@ -14,6 +14,7 @@ export function HelpPage() {
   const [userList, setUserList] = useState([])
   const [choosedUser, setChoosedUser] = useState(null)
   const [isRead,setIsRead] = useState()
+  const [hookForClosed, setHookForClosed] = useState(false)
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export function HelpPage() {
       return;
     }
     fetchMessages();
-  }, [token, navigate]);
+  }, [token, navigate, isRead, hookForClosed]);
   console.log(choosedUser)
   console.log(`isRead ${isRead}`)
 
@@ -198,11 +199,11 @@ const handleDeleteMessage = async (messageId, senderName) => {
   
   switch(filter) {
     case 'new':
-      return userMessages.filter(msg => !msg.is_read && msg.replies.length === 0);
+      return userMessages.filter(msg => !msg.is_read && msg.is_closed === false);
     case 'in-work':
-      return userMessages.filter(msg => msg.is_read === true);
+      return userMessages.filter(msg => msg.is_read === true && msg.is_closed === false);
     case 'closed':
-      return userMessages.filter(msg => msg.is_read === true && is_closed===true);
+      return userMessages.filter(msg => msg.is_closed===true && msg.is_read);
   }};
 
   const filteredMessages = getFilteredMessages();
@@ -210,14 +211,29 @@ const handleDeleteMessage = async (messageId, senderName) => {
   const fetchRead = async (id) => {
     try{
       if(isModerator){
-        const data = api.get(`/support/read-message/{moderator_id}/${id}`)
+        const data = api.get(`/support/read-message/${id}`)
         console.log(data)
+        if(isRead===true){
+          setIsRead(false)
+        }else{
+          setIsRead(true)
+        }
 
       }
     } catch(err){
       setError('Ошибка прочтения сообщения', err)
     }
     
+  }
+
+  const fetchClosed = async (id) => {
+    try{
+      const data = api.patch(`/support/close-message/${id}`)
+      if(hookForClosed === false){
+        setHookForClosed(true) }else{setHookForClosed(false)}
+    } catch(err){
+      setError("Ошибка переноса в закрытые обращения", err)
+    }
   }
 
   useEffect(() => {
@@ -351,9 +367,12 @@ const handleDeleteMessage = async (messageId, senderName) => {
                       {!message.is_read && isModerator && (
                         <span className="unread-badge">Новое</span>
                       )}
-                      {!message.is_read?(<input
+                      {(!message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
                                             type='checkbox'
-                                            onChange={()=>fetchRead(message.id)}/>):('')}
+                                            onChange={()=>fetchRead(message.id)}/><label>Прочитано</label></div>):('')}
+                      {(!message.is_closed && message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
+                                            type='checkbox'
+                                            onChange={()=>fetchClosed(message.id)}/><label>Закрыть</label></div>):null}
                     </div>
                     <div className="message-header-right">
                       <span className="message-date">
@@ -369,6 +388,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
                             setSelectedMessageId(
                               selectedMessageId === message.id ? null : message.id
                             );
+                            
                             setReplyContent('');
                           }}
                         >
@@ -441,7 +461,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
                       />
                       <div className="reply-form-actions">
                         <button 
-                          onClick={() => handleSendReply(message.id)}
+                          onClick={() => {handleSendReply(message.id), fetchRead(message.id)}}
                           disabled={loading || !replyContent.trim()}
                           className="send-reply-btn"
                         >
