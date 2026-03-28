@@ -29,7 +29,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     const fetchUnread = async () => {
       try{
         if(isModerator){
-          let data = await api.get('/support/unread')
+          let data = await api.get('/support/support/unread-count')
           console.log(data)
           if (data.unread_count !== 0 ){
             setHasUnreadMessages(true)
