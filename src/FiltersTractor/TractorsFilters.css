@@ -736,14 +736,16 @@ button.search_button {
 /* ========== ДЕСКТОПЫ (1200px - 1600px) ========== */
 @media (min-width: 1200px) and (max-width: 1600px) {
   .tractorModel {
-    top: 100px;
+    position: absolute;
+    top: 70%;
     font-size: 12px;
   }
   .release-date-container {
-    top: 230px;
+    position: absolute;
+    top: 150%;
     width: 42vh;
     font-size: 12px;
-    left: 50%;
+    /* left: 50%; */
     transform: translateX(-50%);
   }
   
@@ -752,14 +754,19 @@ button.search_button {
   }
 
   .search_by_dealer {
-    top: 327px;
-    left: 50%;
+    position: absolute;
+    top: 203%;
+    /* left: 50%; */
     transform: translateX(-50%);
     width: 42vh;
     font-size: 12px;
     z-index: -1;
   }
-
+ 
+  .tractors-status{
+    position: absolute;
+    top: 258%;
+  }
 
   .filterstrac2 {
     top: 420px;
