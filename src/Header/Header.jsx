@@ -51,6 +51,14 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
 
   },[token, navigate])
 
+  const roleMap = ()=>{
+    if(userRole === 'moderator') return 'модератор';
+    if(userRole === 'dealer') return 'дилер';
+    if(userRole === 'engineer') return 'инженер';
+  }
+    
+  
+
 
   return (
     <header className="header">
@@ -109,7 +117,11 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}
-      </div>
+        
+
+        <h3 >Роль:{roleMap()}</h3>
+      
+  </div>
       <div className='icon-ptz'>
         <img
           className="object-pi"

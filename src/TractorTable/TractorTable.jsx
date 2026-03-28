@@ -580,42 +580,6 @@ const getStatusColorClass = (status) => {
           <table className="tractor-table">
             <thead>
               <tr>
-                {/* <th onClick={() => handleSort('vin')} style={{ cursor: 'pointer' }}>
-                  VIN{getSortIcon('vin')}
-                </th>
-                <th onClick={() => handleSort('model')} style={{ cursor: 'pointer' }}>
-                  Модель{getSortIcon('model')}
-                </th>
-                <th onClick={() => handleSort('assembly_date')} style={{ cursor: 'pointer' }}>
-                  Дата выпуска{getSortIcon('assembly_date')}
-                </th>
-                <th onClick={() => handleSort('region')} style={{ cursor: 'pointer' }}>
-                  Регион{getSortIcon('region')}
-                </th>
-                <th onClick={() => handleSort('consumer')} style={{ cursor: 'pointer' }}>
-                  Дилер{getSortIcon('consumer')}
-                </th>
-                <th onClick={() => handleSort('oh_hour')} style={{ cursor: 'pointer' }}>
-                  Моточасы{getSortIcon('oh_hour')}
-                </th>
-                <th onClick={() => handleSort('last_activity')} style={{ cursor: 'pointer' }}>
-                  Последняя активность{getSortIcon('last_activity')}
-                </th>
-                <th onClick={() => handleSort('dvs')} style={{ cursor: 'pointer' }}>
-                  ДВС{getSortIcon('dvs')}
-                </th>
-                <th onClick={() => handleSort('kpp')} style={{ cursor: 'pointer' }}>
-                  КПП{getSortIcon('kpp')}
-                </th>
-                <th onClick={() => handleSort('rk')} style={{ cursor: 'pointer' }}>
-                  РК{getSortIcon('rk')}
-                </th>
-                <th onClick={() => handleSort('bk')} style={{ cursor: 'pointer' }}>
-                  БК{getSortIcon('bk')}
-                </th>
-                <th onClick={() => handleSort('gr')} style={{ cursor: 'pointer' }}>
-                  ГР{getSortIcon('gr')}
-                </th> */}
                 {orderedColumns.map(colKey => (
                 <th
                   key={colKey}
@@ -637,44 +601,6 @@ const getStatusColorClass = (status) => {
                   className={colorVin === tractor.vin ? "colored-row" : "clickable-row"}
 
                 >
-                  {/* <td title={tractor.vin || tractor.VIN || '-'} className="tractor-cell">
-                    {tractor.vin || tractor.VIN || '-'}
-                  </td>
-                  <td>{tractor.model || '-'}</td>
-                  <td>{formatDateTime(tractor.assembly_date || tractor.releaseDate)}</td>
-                  <td>{tractor.region || '-'}</td>
-                  <td>{tractor.consumer || '-'}</td> 
-                  <td>{tractor.oh_hour || tractor.motoHours || '-'}</td>
-                  <td>{formatDateTime(tractor.last_activity || tractor.lastActivity)}</td>
-                  <td
-  className={shouldHighlight(tractor, 'dvs') ? getStatusColorClass(tractor.dvs_status) : ''}
->
-  {tractor.dvs || '-'}
-</td>
-
-<td
-  className={shouldHighlight(tractor, 'kpp') ? getStatusColorClass(tractor.kpp_status) : ''}
->
-  {tractor.kpp || '-'}
-</td>
-
-<td
-  className={shouldHighlight(tractor, 'rk') ? getStatusColorClass(tractor.rk_status) : ''}
->
-  {tractor.rk || '-'}
-</td>
-
-<td
-  className={shouldHighlight(tractor, 'bk') ? getStatusColorClass(tractor.bk_status) : ''}
->
-  {tractor.bk || '-'}
-</td>
-
-<td
-  className={shouldHighlight(tractor, 'gr') ? getStatusColorClass(tractor.gr_status) : ''}
->
-  {tractor.gr || '-'}
-</td> */}
                 {orderedColumns.map(colKey => {
                   const col = columnsConfig[colKey];
                   const value = col.getValue(tractor);
