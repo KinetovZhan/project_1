@@ -128,39 +128,6 @@
 }
 
 
-@media (min-width: 1200px) and (max-width: 1600px) {
-  .tractor-table-container {
-    position: relative;
-    max-width: 100vh;
-    /* height: auto; */
-    /* max-height: 60vh; */
-    top: 15vh;
-    margin: 0px;
-    font-size: 12px;
-    /* height: fit-content; */
-    max-height: 60vh;
-  }
-
-  .tractor-table td {
-    font-size: 12px;
-    
-  }
-  
-  
-  .tractor-table {
-    height: auto;
-  }
-
-  .scroll-bar {
-    overflow-y: auto;
-    overflow-x: auto;
-    border-radius: 10px;
-    min-height: auto; 
-    height: auto;
-  }
-
-}
-
 .cell-critical {
   background-color: #ffcccc !important; /* красный */
 }
@@ -184,4 +151,52 @@
   gap: 20px;
   flex-wrap: wrap;
   align-items: center;
+}
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .tractor-table-container {
+    position: absolute;
+    top: 10%;
+   
+    display: inline-block;
+    align-items: stretch;
+    background: #ffffff;
+    border-radius: 10px 5px 10px 5px;
+    padding: 0;
+    width: auto ;
+    /* max-height: 80vh; */
+    /* width:100%; */
+    box-sizing: border-box;
+    margin:90px;
+    margin-top: 60px;
+    max-width: 94%;
+    max-height: 60vh;
+  }
+
+  .tractor-table td {
+    font-size: 12px;
+    
+  }
+  
+  
+  .tractor-table {
+    height: auto;
+  }
+
+  .scroll-bar {
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 10px;
+    min-height: auto; 
+    height: auto;
+    max-height: 60vh;
+  }
+
+  .columns-selector {
+    position: absolute;
+    right: 30%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
 }

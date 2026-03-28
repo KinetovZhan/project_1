@@ -13,8 +13,8 @@ export function HelpPage() {
   const [filter, setFilter] = useState('new');
   const [userList, setUserList] = useState([])
   const [choosedUser, setChoosedUser] = useState(null)
-  const [isRead,setIsRead] = useState()
-  const [hookForClosed, setHookForClosed] = useState(false)
+  const [isRead,setIsRead] = useState(null)
+  const [hookForClosed, setHookForClosed] = useState(null)
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -32,9 +32,12 @@ export function HelpPage() {
       return;
     }
     fetchMessages();
+    setHookForClosed(null)
+    setIsRead(null)
   }, [token, navigate, isRead, hookForClosed]);
   console.log(choosedUser)
   console.log(`isRead ${isRead}`)
+  console.log(`hookForClosed ${hookForClosed}`)
 
   // Функция для нормализации данных
   const normalizeMessages = (data) => {
@@ -91,7 +94,7 @@ export function HelpPage() {
       
       setMessages(normalizedMessages);
       console.log(messages)
-      setIsRead(response.is_read)
+      // setIsRead(response.is_read)
       setError('');
     } catch (err) {
       setError('Ошибка загрузки сообщений');
@@ -134,13 +137,8 @@ export function HelpPage() {
     }
   };
 
-//   /**
-//  * Удаляет сообщение по ID
-//  * @param {number} messageId - ID сообщения для удаления
-//  * @param {string} senderName - имя отправителя для подтверждения
-//  **/
+
 const handleDeleteMessage = async (messageId, senderName) => {
-    // Подтверждение удаления
     const confirmDelete = window.confirm(
       `Вы действительно хотите удалить сообщение от "${senderName}"?\nЭто действие нельзя отменить.`
     );
@@ -149,15 +147,15 @@ const handleDeleteMessage = async (messageId, senderName) => {
     
     try {
       setLoading(true);
-      // Вызов API для удаления сообщения
+      
       await api.delete(`/support/messages/${messageId}`);
       
-      // Оптимистичное обновление интерфейса: удаляем сообщение из состояния
+
       setMessages(prevMessages => 
         prevMessages.filter(msg => msg.id !== messageId)
       );
       
-      // Если удаляем ответ, сбрасываем форму
+  
       if (selectedMessageId === messageId) {
         setSelectedMessageId(null);
         setReplyContent('');
@@ -168,14 +166,14 @@ const handleDeleteMessage = async (messageId, senderName) => {
       console.error('Ошибка при удалении сообщения:', err);
       setError('Не удалось удалить сообщение. Попробуйте позже.');
       
-      // При ошибке перезагружаем список сообщений для синхронизации
+
       fetchMessages();
     } finally {
       setLoading(false);
     }
   };
 
-  // Автоматически отмечаем как прочитанное при клике на сообщение
+
   const handleMessageClick = async (message) => {
     if (isModerator && !message.is_read) {
       try {
@@ -203,7 +201,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
     case 'in-work':
       return userMessages.filter(msg => msg.is_read === true && msg.is_closed === false);
     case 'closed':
-      return userMessages.filter(msg => msg.is_closed===true && msg.is_read);
+      return userMessages.filter(msg => msg.is_closed===true);
   }};
 
   const filteredMessages = getFilteredMessages();
@@ -213,7 +211,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
       if(isModerator){
         const data = api.get(`/support/read-message/${id}`)
         console.log(data)
-        if(isRead===true){
+        if(data.is_read===true){
           setIsRead(false)
         }else{
           setIsRead(true)
@@ -228,9 +226,10 @@ const handleDeleteMessage = async (messageId, senderName) => {
 
   const fetchClosed = async (id) => {
     try{
-      const data = api.patch(`/support/close-message/${id}`)
-      if(hookForClosed === false){
-        setHookForClosed(true) }else{setHookForClosed(false)}
+      const data = api.patch(`/support/close-message/${id}/${user.id}`)
+      if(data.is_closed === true){
+        setHookForClosed(true) 
+        setIsRead(true)}else{setHookForClosed(false)}
     } catch(err){
       setError("Ошибка переноса в закрытые обращения", err)
     }
@@ -369,10 +368,16 @@ const handleDeleteMessage = async (messageId, senderName) => {
                       )}
                       {(!message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
                                             type='checkbox'
-                                            onChange={()=>fetchRead(message.id)}/><label>Прочитано</label></div>):('')}
+                                            onChange={()=>fetchRead(message.id)}/><label onClick={() => fetchRead(message.id)}>Прочитано</label></div>):('')}
                       {(!message.is_closed && message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
                                             type='checkbox'
-                                            onChange={()=>fetchClosed(message.id)}/><label>Закрыть</label></div>):null}
+                                            onChange={()=>fetchClosed(message.id)}/><label onClick={() => fetchClosed(message.id)}>Закрыть</label></div>):null}
+                      {(message.is_closed && isModerator)?(<div><input
+                                            type='checkbox'
+                                            onChange={() => fetchClosed(message.id)}/><label onClick={() => fetchClosed(message.id)}>Вернуть в работу</label></div>):null}
+                      {(isModerator && message.is_read && !message.is_closed)?(<div><input
+                                            type='checkbox'
+                                            onChange={() => fetchRead(message.id)}/><label onClick={() => fetchRead(message.id)}>Убрать прочтение</label></div>):null}
                     </div>
                     <div className="message-header-right">
                       <span className="message-date">
