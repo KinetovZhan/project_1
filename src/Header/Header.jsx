@@ -29,7 +29,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     const fetchUnread = async () => {
       try{
         if(isModerator){
-          let data = await api.get('/support/unread')
+          let data = await api.get('/support/support/unread-count')
           console.log(data)
           if (data.unread_count !== 0 ){
             setHasUnreadMessages(true)
@@ -50,6 +50,14 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     fetchUnread()
 
   },[token, navigate])
+
+  const roleMap = ()=>{
+    if(userRole === 'moderator') return 'модератор';
+    if(userRole === 'dealer') return 'дилер';
+    if(userRole === 'engineer') return 'инженер';
+  }
+    
+  
 
 
   return (
@@ -109,7 +117,11 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}
-      </div>
+        
+
+        <h3 >Роль:{roleMap()}</h3>
+      
+  </div>
       <div className='icon-ptz'>
         <img
           className="object-pi"

@@ -191,13 +191,14 @@ button:active {
 
 .archive-button {
   display: flex;
-  height: 5vh;
+  height: 6vh;
   align-items: center;
   text-align: center;
   justify-content: center;
   width:100px;
   border: none;
-  background-color:#d7dcf3
+  background-color:#d7dcf3;
+  border-radius: 20px;
 }
 
 @media (max-width:767px) {
@@ -299,6 +300,19 @@ background-color: transparent;
     height: auto;
     left: 50%;
     transform: translateX(-50%);
+
+    box-sizing: border-box;
+    width: 80%;
+    height: 80%;
+    background-color: white;
+    border-radius: 30px;
+    color: black;
+    padding: 0px 70px;
+
+
+    position: absolute;
+    left: 10%;
+    top: 15%;
   }
 
   .objectmenu {
@@ -315,6 +329,14 @@ background-color: transparent;
     height: 6vh;
     border-radius: 15px;
     font-size: 12px;
+  }
+
+  .inform-left {
+    width:40%;
+  }
+
+  .archive-button {
+    width:150px;
   }
 }
 

@@ -60,13 +60,7 @@ export function TractorDetails({ vin, onBack }) {
 
         // Используем нашу новую api утилиту
         const data = await api.get(
-          `search/search-tractor-vin?request=${encodeURIComponent(vin)}`,
-          {
-            headers: {
-              // Можно добавить специфические заголовки
-              'X-Custom-Header': 'value',
-            },
-          }
+          `search/search-tractor-vin?request=${encodeURIComponent(vin)}`
         );
 
         console.log('Полученные данные:', data);
@@ -154,6 +148,7 @@ export function TractorDetails({ vin, onBack }) {
     assembly_date,
     region,
     oh_hour,
+    consumer,
     last_activity,
   } = tractor;
 
@@ -220,8 +215,8 @@ export function TractorDetails({ vin, onBack }) {
                 <p>{region || '-'}</p>
               </div>
               <div className="section">
-                <h3>Дата последней эксплуатации, Кол-во МЧ</h3>
-                <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
+                <h3>Дилер</h3>
+                <p>{consumer || '-'}</p>
               </div>
             </div>
 
@@ -252,8 +247,12 @@ export function TractorDetails({ vin, onBack }) {
                 </ul>
               </div>
               <div className="section">
-                <h3>Последние ошибки, дата</h3>
-                <p>Информация об ошибках временно недоступна</p>
+                <h3>Дата последней эксплуатации</h3>
+                <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
+              </div>
+              <div className="section">
+                <h3>Кол-во МЧ</h3>
+                <p>{oh_hour || '-'}</p>
               </div>
             </div>
           </div>
