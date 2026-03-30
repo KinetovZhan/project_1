@@ -38,6 +38,7 @@ export function TractorDetails({ vin, onBack }) {
     return ImageJpg[model]|| DefaultImage;
   }
 
+
    const handleBack = () => {
     navigate(-1);
   };
@@ -209,6 +210,10 @@ export function TractorDetails({ vin, onBack }) {
               <div className="section">
                 <h3>Дата выпуска</h3>
                 <p>{assembly_date ? new Date(assembly_date).toLocaleDateString('ru-RU') : '-'}</p>
+              </div>
+              <div className='section'>
+                <h3>Владелец</h3>
+                <p>{components[0].consumer}</p>
               </div>
               <div className="section">
                 <h3>Регион эксплуатации</h3>

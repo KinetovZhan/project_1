@@ -86,7 +86,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
       
       <div className='navigation'>
         <h3 onClick={onKnowledgeBase} style={{cursor: 'pointer'}}>База знаний</h3>
-        <h3 onClick={onHelp} 
+        {onLogout?(<h3 onClick={onHelp} 
           style={{
             cursor: 'pointer',
             display: 'flex',
@@ -105,7 +105,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
               marginTop: '-8px'
             }} />
           )}
-        </h3>
+        </h3>):null}
         {onLogout && (
           <h3 onClick={onLogout} style={{cursor: 'pointer'}}>Выйти</h3>
         )}
