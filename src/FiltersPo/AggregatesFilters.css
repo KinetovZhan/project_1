@@ -91,13 +91,66 @@
   }
 }
 
+.model-tractor {
+  position:absolute;
+  top: 304px;
+}
+
+.model-producer {
+  position:absolute;
+  top: 364px;
+}
+
+.model-uzel {
+  position:absolute;
+  top: 424px;
+}
+
+.model-purpose {
+  position:absolute;
+  top: 484px;
+}
+
+.model-status {
+  position:absolute;
+  top: 544px;
+}
+
 /* ===== НОУТБУКИ ===== */
 @media (min-width: 992px) and (max-width: 1199px) {
-  .model {
-    width: 320px;
-  }
-  
+ 
   .clear {
     width: 320px;
+  }
+
+  
+}
+
+/* ========== ДЕСКТОПЫ (1200px - 1600px) ========== */
+@media (min-width: 1200px) and (max-width: 1600px) {
+ 
+  .model-tractor {
+    position:absolute;
+    top: 304px;
+  }
+
+  .model-producer {
+    position:absolute;
+    top: 364px;
+  }
+
+  .model-uzel {
+    position:absolute;
+    top: 424px;
+  }
+
+  .model-purpose {
+    position:absolute;
+    top: 494px;
+  }
+
+  .model-status {
+    position:absolute;
+    top: 584px;
   }
 }
