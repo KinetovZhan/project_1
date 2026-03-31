@@ -4,7 +4,7 @@ export const IS_PROD = import.meta.env.PROD;
 export const MODE = import.meta.env.MODE;
 
 // API конфигурация - ИСПРАВЛЕНО: добавлен http://
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://172.20.46.66:8000';
 console.log('API_BASE_URL =', API_BASE_URL);
 
 // Таймауты и настройки запросов
@@ -313,6 +313,116 @@ class fetchAPI {
             method: 'PATCH',
             body: JSON.stringify(body),
         });
+    }
+
+    /**
+     * Upload a file to the server
+     */
+    async uploadFile(endpoint, file, fieldName = 'file', additionalData = {}, options = {}) {
+        const formData = new FormData();
+        
+        // Append the file to the form data
+        formData.append(fieldName, file);
+        
+        // Append any additional data
+        Object.keys(additionalData).forEach(key => {
+            formData.append(key, additionalData[key]);
+        });
+
+        // Remove Content-Type header for file uploads as it will be set automatically
+        const headers = { ...options.headers };
+        delete headers['Content-Type'];
+
+        return this.request(endpoint, {
+            ...options,
+            method: 'POST',
+            body: formData,
+            headers,
+        }, options.retryCount || RETRY_COUNT);
+    }
+
+    /**
+     * Update a file on the server (PUT method)
+     */
+    async updateFile(endpoint, file, fieldName = 'file', additionalData = {}, options = {}) {
+        const formData = new FormData();
+        
+        // Append the file to the form data
+        formData.append(fieldName, file);
+        
+        // Append any additional data
+        Object.keys(additionalData).forEach(key => {
+            formData.append(key, additionalData[key]);
+        });
+
+        // Remove Content-Type header for file uploads as it will be set automatically
+        const headers = { ...options.headers };
+        delete headers['Content-Type'];
+
+        return this.request(endpoint, {
+            ...options,
+            method: 'PUT',
+            body: formData,
+            headers,
+        }, options.retryCount || RETRY_COUNT);
+    }
+
+    /**
+     * Replace the main software file
+     */
+    async replaceSoftwareFile(softwareId, file, options = {}) {
+        // Validate inputs
+        if (!softwareId || !file) {
+            throw new Error('Software ID and file are required');
+        }
+
+        // Create FormData and append the file with the expected field name
+        const formData = new FormData();
+        // Server expects the file parameter to be named 'file' according to the backend API
+        formData.append('file', file, file.name);
+
+        // Remove Content-Type header for file uploads as it will be set automatically by the browser
+        const headers = { ...options.headers };
+        delete headers['Content-Type'];
+
+        // Make the request using native fetch to bypass any content-type issues
+        const url = buildApiUrl(`/software/upload-file/${softwareId}`);
+        const token = localStorage.getItem('accessToken');
+        
+        const fetchOptions = {
+            method: 'POST',
+            headers: {
+                ...headers,
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            },
+            body: formData,
+            ...options
+        };
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+        try {
+            logger.log(`Uploading file to: ${url}`, fetchOptions);
+            
+            const response = await fetch(url, {
+                ...fetchOptions,
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            // Handle response using the same logic as other methods
+            return await this.handleResponse(response, `/software/upload-file/${softwareId}`, options);
+            
+        } catch (error) {
+            clearTimeout(timeoutId);
+            
+            if (error.name === 'AbortError') {
+                throw new Error('Запрос превысил время ожидания');
+            }
+            
+            throw error;
+        }
     }
 }
 
