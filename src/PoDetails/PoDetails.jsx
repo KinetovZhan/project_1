@@ -457,7 +457,7 @@ useEffect(() => {
 
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className='bolvanchyk' style={{ position: 'relative' }}>
       <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
       <div className="po-details-container ">
         {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
