@@ -37,29 +37,29 @@ export function PoDetails({ po, onBack }) {
   const [instruction, setInstruction] = useState(po.software_path_instruction)
   const [endActuality, setEndActuality] = useState(po.end_actuality)
 
-  const swId = po.id_Firmwares
+  // const swId = po.id_Firmwares
 
-  console.log(`Айдишник ${swId}`)
+  // console.log(`Айдишник ${swId}`)
   console.log(po)
   console.log(releaseDate)
 
 
-  const postData = {
-    description: discr,
-    producer: producer,
-    status: status || po.status,
-    release_date: releaseDate,
-    software_path_instruction: instruction,
-    is_actual:isActual,
-    is_archive:isArchive,
-    is_critical:isCritical,
-    end_actuality: endActuality
-  }
+  // const postData = {
+  //   description: discr,
+  //   producer: producer,
+  //   status: status || po.status,
+  //   release_date: releaseDate,
+  //   software_path_instruction: instruction,
+  //   is_actual:isActual,
+  //   is_archive:isArchive,
+  //   is_critical:isCritical,
+  //   end_actuality: endActuality
+  // }
 
-  const postData2 = {
-    description: discr,
-    status: status || po.status
-  }
+  // const postData2 = {
+  //   description: discr,
+  //   status: status || po.status
+  // }
 
   // Загрузка основных деталей ПО
   useEffect(() => {
@@ -162,26 +162,61 @@ useEffect(() => {
 
   fetchNextVersions();
 }, [details?.id_firmwares, details?.id_component]);
-
-
-  const changePoInfo = async (swId) => {
-    try{
-      console.log(`Данные запроса ${postData}`)
-      console.log(`Данные запроса ${postData2}`)
-      if(userRole === 'moderator') {
-        const data = await api.patch(`/software/${swId}`, postData)
-        console.log(`Успешно выполнен fetch к patch/software`)
-        console.log(`данные postData ${data   }`)
-      }
-      if (userRole == 'engineer') {
-        const data = await api.patch(`/software/${swId}`, postData2)
-        console.log(`Успешно выполнен fetch к patch/software`)
-      }
-      setChange(false)
-    } catch(err) {
-      setError("Ошибка изменения данных ПО", err)
-    }
+useEffect(() => {
+  if (details) {
+    setDiscr(details.software_description || '');
+    setStatus(details.software_status || '');
+    setIsActual(details.software_is_actual);
+    setIsCritical(details.software_is_critical);
+    setReleaseDate(details.software_release_date?.split('T')[0] || '');
+    setEndActuality(details.software_end_actuality?.split('T')[0] || '');
+    setInstruction(details.software_path_instruction || '');
+    setProducer(details.software_producer || '');
   }
+}, [details]);
+
+
+  const changePoInfo = async () => {
+    const swId = details?.id_firmwares;
+  if (!swId) {
+    setError('Нет ID прошивки для обновления');
+    return;
+  }
+
+  try {
+    // Формируем payload ТОЛЬКО из актуальных значений стейта
+    const payload = isModerator ? {
+      description: discr,
+      producer: producer,
+      status: status || po.status,
+      release_date: releaseDate,
+      software_path_instruction: instruction,
+      is_actual: isActual,
+      is_archive: isArchive,
+      is_critical: isCritical,
+      end_actuality: endActuality
+    } : {
+      description: discr,
+      status: status || po.status
+    };
+
+    console.log('PATCH payload:', payload);
+    
+    await api.patch(`/software/${swId}`, payload);
+    
+    // Обновляем данные после успешного изменения
+    const url = `/search/software-component-info?id_firmwares=${swId}&id_component=${details.id_component}`;
+    const updated = await api.get(url);
+    if (updated?.[0]) {
+      setDetails(updated[0]);
+    }
+    
+    setChange(false);
+  } catch(err) {
+    console.error('Ошибка обновления ПО:', err);
+    setError(`Ошибка изменения данных: ${err.message || err}`);
+  }
+};
 
   const handleVersionClick = async (e, versionId) => {
     e.preventDefault();
@@ -382,13 +417,14 @@ useEffect(() => {
   }
   }
 
+ 
 
   return (
     <div style={{ position: 'relative' }}>
       <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
       <div className="po-details-container ">
         {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
-      {change === true?(<><button onClick={offChange}>Отменить</button> <button onClick={() => changePoInfo(swId)}>Принять</button></>):(<div></div>)}
+      {change === true?(<><button onClick={offChange}>Отменить</button> <button onClick={changePoInfo}>Принять</button></>):(<div></div>)}
       <div className="po-details-content ">
           <div className="left-column">
             <div className="section">
@@ -397,7 +433,7 @@ useEffect(() => {
                 <br />
                 <span className='text-names'>{details.component_name}</span>
                 <br />
-                {po.tractor_model && po.tractor_model.length > 0 && (
+                {details.software_tractor_models && details.software_tractor_models.length > 0 && (
                   <span className='text-names'>
                     <span>Модели тракторов: </span>
                     <span>{po.tractor_model.join(', ')}</span>

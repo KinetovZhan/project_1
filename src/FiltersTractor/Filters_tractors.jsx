@@ -554,7 +554,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
               }),
               multiValue: (base) => ({
                 ...base,
-                fontSize: '11px'
+                fontSize: '13px'
               }),
               menuPortal: (base) => ({ ...base, zIndex: 9999 }),
               menuList: (base) => ({
@@ -565,7 +565,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
                 color: 'black',
                 border: '1px solid rgba(217, 217, 217, 1)',
                 scrollbarWidth: 'thin',
-                fontSize: '11px'
+                fontSize: '16px'
               }),
               option: (base, state) => ({
                 ...base,
@@ -606,7 +606,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
                 color: 'black',
                 border: '1px solid rgba(217, 217, 217, 1)',
                 scrollbarWidth: 'thin',
-                fontSize: '11px'
+                fontSize: '16px'
               })
             }}
           />
