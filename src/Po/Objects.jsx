@@ -512,7 +512,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                   const tooltipText2 = `${item.download_link} от ${new Date(item.release_date).toLocaleDateString()}`;
                 return (
                   <li key={item.id_Firmwares}>
-                    <div className="objectmenu" data-testid="objectmenu">
+                    <div className="objectmenu" data-testid="objectmenu" >
+                      <div>
+                        
+                      </div>
                       <img
                         className="object"
                         src={ImageToComponent(item.type_component, item.model_component || item.name_component)}
@@ -522,7 +525,8 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                         style={{ cursor: 'pointer' }}
                       />
                       <div className="inform" >
-                      <div className="inform-left">
+                      <div className="inform-left"  onClick={()=> {handlePoClick(item.id_Firmwares) 
+                                      handleAggregateDetails()}}>
                         <h4 
                         className="poster"
                         onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
@@ -542,6 +546,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                           </h5>
                           </div>
                         </div>
+                        
                       <div className = "container-download">
                           <button
                             className="download"
