@@ -40,6 +40,7 @@ export function PoDetails({ po, onBack }) {
   const [uploadingInstruction, setUploadingInstruction] = useState(false);
   const [softwareFile, setSoftwareFile] = useState(null); // Добавляем состояние для основного файла ПО
   const [uploadingSoftware, setUploadingSoftware] = useState(false); // Добавляем состояние для загрузки основного файла
+  const [previousSWVersion, setPreviousSWVersion] = useState(null);
 
   const swId = po.id_Firmwares
 
@@ -57,7 +58,8 @@ export function PoDetails({ po, onBack }) {
     is_actual:isActual,
     is_archive:isArchive,
     is_critical:isCritical,
-    end_actuality: endActuality
+    end_actuality: endActuality,
+    previous_sw_version:previousSWVersion
   }
 
   const postData2 = {
@@ -84,7 +86,7 @@ export function PoDetails({ po, onBack }) {
         const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
         if (!item) throw new Error('Данные не найдены');
         setDetails(item);
-        console.log(details)
+        console.log(`details ${details}`)
         // setStatus(details.software_status)
         // setDiscr(details.software_description)
       } catch (err) {
