@@ -13,7 +13,7 @@
   right: 235px;
   overflow-y: auto;
   overflow-x: hidden;
-
+  max-height: 65vh;
 }
 
 .po-details-container::-webkit-scrollbar {
@@ -141,4 +141,20 @@
   height: 20vh;
   margin: 10px;
 
+}
+
+@media (min-width: 1200px) and (max-width: 1600px) {
+  .bolvanchyk {
+    position:absolute;
+    width: 100%;
+    max-height: 90%;
+    top:2%;
+    left: -9%;
+  }
+
+  .po-details-container{
+    position: absolute;
+    width: 120vh;
+    
+  }
 }
