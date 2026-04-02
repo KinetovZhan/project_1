@@ -435,7 +435,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
       </div>
       
 
-      <div className='model' style={{ top: '370px' }}>
+      <div className='model model-tractor'>
         <Select
           className='modelSelect'
           isMulti
@@ -485,7 +485,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
       </div>
 
       {/* Фильтр по производителю */}
-      <div className='model' style={{top: '444px'}}>
+      <div className='model model-producer'>
         <Select
           className='modelSelect'
           isMulti
@@ -555,7 +555,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
         )}
       </div>
 
-      <div className='model' style={{top: '520px'}}>
+      <div className='model model-uzel'>
         <Select
           className='modelSelect'
           isMulti
@@ -605,7 +605,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
         />
       </div>
 
-      <div className='model' style ={{top: '600px'}}>
+      <div className='model model-purpose'>
         <Select
           className='modelStatus'
           isMulti
@@ -654,7 +654,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
           }}
         />
       </div>
-        <div className="actuality-filter">
+        <div className="actuality-filter model-status">
           <Select
             isMulti
             className="actuality-select"

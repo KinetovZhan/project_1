@@ -8,7 +8,7 @@ import WeiImage from '../img/ДВС Weichai.png';
 import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
-import { api } from '../fetchAPI.js';
+import { api, buildApiUrl } from '../fetchAPI.js';
 import { input } from '@testing-library/user-event/dist/cjs/event/input.js';
 
 
@@ -36,6 +36,10 @@ export function PoDetails({ po, onBack }) {
   const [change, setChange] = useState(false);
   const [instruction, setInstruction] = useState(po.software_path_instruction)
   const [endActuality, setEndActuality] = useState(po.end_actuality)
+  const [instructionFile, setInstructionFile] = useState(null);
+  const [uploadingInstruction, setUploadingInstruction] = useState(false);
+  const [softwareFile, setSoftwareFile] = useState(null); // Добавляем состояние для основного файла ПО
+  const [uploadingSoftware, setUploadingSoftware] = useState(false); // Добавляем состояние для загрузки основного файла
 
   const swId = po.id_Firmwares
 
@@ -165,23 +169,90 @@ useEffect(() => {
 
 
   const changePoInfo = async (swId) => {
-    try{
-      console.log(`Данные запроса ${postData}`)
-      console.log(`Данные запроса ${postData2}`)
-      if(userRole === 'moderator') {
-        const data = await api.patch(`/software/${swId}`, postData)
-        console.log(`Успешно выполнен fetch к patch/software`)
-        console.log(`данные postData ${data   }`)
+    try {
+      // Если есть новый файл инструкции, загружаем его отдельно
+      if (instructionFile && (isModerator || isEngineer)) {
+        setUploadingInstruction(true);
+        const formData = new FormData();
+        formData.append('instruction_file', instructionFile);
+        
+        // Используем НАТИВНЫЙ fetch вместо api.post
+        const uploadUrl = buildApiUrl(`/software/upload-instruction/${swId}`);
+        const response = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+            // НЕ добавляем Content-Type - браузер сам установит multipart/form-data с boundary
+          },
+          body: formData
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || `HTTP ${response.status}`);
+        }
+        
+        const result = await response.json();
+        console.log('Инструкция успешно загружена:', result);
       }
-      if (userRole == 'engineer') {
-        const data = await api.patch(`/software/${swId}`, postData2)
-        console.log(`Успешно выполнен fetch к patch/software`)
+
+      // Обновляем остальные данные ПО
+      console.log(`Данные запроса:`, postData);
+      console.log(`Данные запроса:`, postData2);
+      
+      if (userRole === 'moderator') {
+        const data = await api.patch(`/software/${swId}`, postData);
+        console.log(`Успешно обновлено ПО (moderator):`, data);
       }
-      setChange(false)
-    } catch(err) {
-      setError("Ошибка изменения данных ПО", err)
+      if (userRole === 'engineer') {
+        const data = await api.patch(`/software/${swId}`, postData2);
+        console.log(`Успешно обновлено ПО (engineer):`, data);
+      }
+      
+      // Если есть новый основной файл ПО, загружаем его
+      if (softwareFile && isModerator) {
+        setUploadingSoftware(true);
+        try {
+          await api.replaceSoftwareFile(swId, softwareFile);
+          console.log('Основной файл ПО успешно заменен');
+        } catch (err) {
+          console.error('Ошибка при замене основного файла ПО:', err);
+          setUploadingSoftware(false);
+          // Показываем более подробное сообщение об ошибке
+          console.error('Детали ошибки:', err.message);
+          throw err; // Бросаем ошибку дальше, чтобы обработать в основном блоке catch
+        }
+      }
+      
+      setChange(false);
+      setInstructionFile(null);
+      setSoftwareFile(null); // Сбрасываем состояние файла
+      
+      // Перезагружаем детали
+      const url = `/search/software-component-info?id_firmwares=${encodeURIComponent(swId)}&id_component=${encodeURIComponent(po.id_Component)}`;
+      const data = await api.get(url);
+      const item = Array.isArray(data) && data.length > 0 ? data[0] : null;
+      if (item) {
+        setDetails(item);
+      }
+      
+      alert('Данные успешно обновлены');
+      
+    } catch (err) {
+      console.error('Ошибка:', err);
+      // Показываем более информативное сообщение об ошибке
+      let errorMessage = err.message;
+      if (err.message.includes('Field required')) {
+        errorMessage = 'Ошибка при замене файла: сервер ожидает обязательные поля. Пожалуйста, проверьте, что файл выбран.';
+      }
+      alert(`Ошибка: ${errorMessage}`);
+      setUploadingInstruction(false);
+      setUploadingSoftware(false);
+    } finally {
+      setUploadingInstruction(false);
+      setUploadingSoftware(false);
     }
-  }
+  };
 
   const handleVersionClick = async (e, versionId) => {
     e.preventDefault();
@@ -384,7 +455,7 @@ useEffect(() => {
 
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className='bolvanchyk' style={{ position: 'relative' }}>
       <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
       <div className="po-details-container ">
       <div className="po-details-content ">
@@ -446,7 +517,21 @@ useEffect(() => {
             <div style={{display:'flex', flexDirection:'row', gap:'5%'}}>
             <div className="section">
               <h3>Установщик</h3>
-                {details.software_path ? (
+                  
+                {change === true && isModerator ? (
+                  <div className="upload-section" style={{ marginTop: '10px' }}>
+                    <input
+                      type="file"
+                      onChange={(e) => setSoftwareFile(e.target.files[0])}
+                    />
+                    {softwareFile && (
+                      <p style={{ fontSize: '12px', marginTop: '5px' }}>
+                        Выбран файл: {softwareFile.name}
+                      </p>
+                    )}
+                    {uploadingSoftware && <p>Загрузка основного файла...</p>}
+                  </div>
+                ): (details.software_path ? (
                   <button
                     className="download-button"
                     onClick={handleDownloadSoftware}
@@ -456,27 +541,37 @@ useEffect(() => {
                   </button>
                 ) : (
                   <p>—</p>
-                )}
+                ))}
               </div>
               <div className="section">
                 <h3>Инструкция</h3>
-                {
-                  (change===true && isModerator)?(<input
-                                    type="file"
-                                    onChange={(e) => setInstruction(e.target.files[0])}/>):
-
-                                (details.software_path_instruction ? (
-                                  <button
-                                    className="download-button"
-                                    onClick={handleDownloadInstruction}
-                                    disabled={downloading}
-                                  >
-                                    {downloading ? 'Скачивание...' : 'Скачать'}
-                                  </button>
-                                ) : (
-                                  <p>—</p>
-                                ))
-            }
+                {change === true && isModerator ? (
+                  <div>
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => setInstructionFile(e.target.files[0])}
+                    />
+                    {instructionFile && (
+                      <p style={{ fontSize: '12px', marginTop: '5px' }}>
+                        Выбран файл: {instructionFile.name}
+                      </p>
+                    )}
+                    {uploadingInstruction && <p>Загрузка...</p>}
+                  </div>
+                ) : (
+                  details.software_path_instruction ? (
+                    <button
+                      className="download-button"
+                      onClick={handleDownloadInstruction}
+                      disabled={downloading}
+                    >
+                      {downloading ? 'Скачивание...' : 'Скачать'}
+                    </button>
+                  ) : (
+                    <p>—</p>
+                  )
+                )}
               </div>
             </div>
           </div>
