@@ -460,8 +460,6 @@ useEffect(() => {
     <div className='bolvanchyk' style={{ position: 'relative' }}>
       <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
       <div className="po-details-container ">
-        {isModerator||isEngineer?(<button onClick={getChange}>Изменить</button>):<div></div>}
-      {change === true?(<><button onClick={offChange}>Отменить</button> <button onClick={() => changePoInfo(swId)}>Принять</button></>):(<div></div>)}
       <div className="po-details-content ">
           <div className="left-column">
             <div className="section">
@@ -637,6 +635,10 @@ useEffect(() => {
               </div>
             </div>
           </div>
+        </div>
+        <div className='change-buttons-container'>
+          {isModerator || isEngineer ? (<button onClick={getChange} className='change-buttons'>Изменить</button>) : <div></div>}
+          {change === true ? (<><button onClick={offChange} className='change-buttons'>Отменить</button> <button onClick={() => changePoInfo(swId)} className='change-buttons'>Принять</button></>) : (<div></div>)}
         </div>
       </div>
     </div>

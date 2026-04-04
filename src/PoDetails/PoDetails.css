@@ -143,6 +143,22 @@
 
 }
 
+.change-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2%;
+  height: 9%;
+}
+
+.change-buttons{
+  background-color: #b3b4b6;
+  width: 32%;
+}
+
+.change-buttons:hover {
+  background-color: #7c7c7c;
+}
+
 @media (min-width: 1200px) and (max-width: 1600px) {
   .bolvanchyk {
     position:absolute;
