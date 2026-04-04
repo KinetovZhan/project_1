@@ -39,7 +39,7 @@ const groupTractors = (data) => {
         rk: '-',
         bk: '-',
         gr: '-',
-        ap: '-',
+        autopilot: '-',
       };
     }
     const type = item.component_type;
@@ -55,7 +55,7 @@ const groupTractors = (data) => {
       grouped[vin].bk = model;
     } else if ((type === 'gr')||(type === 'hydraulics')) {
       grouped[vin].gr = model;
-    } else if (type === 'ap') {
+    } else if (type === 'autopilot') {
       grouped[vin].ap = model;
     } 
   });
@@ -138,10 +138,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     kpp: { label: 'КПП', getValue: (t) => t.kpp || '-', getStatus: (t) => t.kpp_status, isNode: true },
     rk: { label: 'РК', getValue: (t) => t.rk || '-', getStatus: (t) => t.rk_status, isNode: true },
     bk: { label: 'БК', getValue: (t) => t.bk || '-', getStatus: (t) => t.bk_status, isNode: true },
-    gr: { label: 'ГР', getValue: (t) => t.gr || '-', getStatus: (t) => t.gr_status, isNode: true }
+    gr: { label: 'ГР', getValue: (t) => t.gr || '-', getStatus: (t) => t.gr_status, isNode: true },
+    autopilot: { label: 'Автопилот', getValue: (t) => t.autopilot || '-', getStatus: (t) => t.autopilot_status, isNode: true },
   };
 
-  const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr'];
+  const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
   // Порядок столбцов с учётом выбранных узлов и видимости
   const orderedColumns = useMemo(() => {
     const baseColumns = ['vin', 'model', 'assembly_date', 'region', 'consumer', 'oh_hour', 'last_activity'];
@@ -296,6 +297,7 @@ const typeToField = {
 
   'rk': 'rk',
   'hr': 'gr',
+  'autopilot': 'autopilot'
   // Добавьте другие варианты по необходимости
 };
           enrichedTractors = tractors.map(t => {
@@ -477,7 +479,7 @@ const getStatusColorClass = (status) => {
       return sortedTractors;
     }
     return sortedTractors.filter(tractor => {
-      const types = ['dvs', 'kpp', 'rk', 'bk', 'gr'];
+      const types = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
       for (let type of types) {
         if (shouldHighlight(tractor,type)) {
           return true;

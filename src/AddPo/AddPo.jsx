@@ -22,6 +22,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
   const [isArchive, setIsArchive] = useState(false);
   const [isCritical, setIsCritical] = useState(false);
   const [isActual, setIsActual] = useState(false);
+  const [PoName, setPoName] = useState('');
 
   // Состояния для производителей
   const [producerOptions, setProducerOptions] = useState([]);
@@ -227,6 +228,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
     const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
 
     const formData = new FormData();
+    formData.append('name', PoName.value)
     formData.append('file', file);
     formData.append('instruction_file', instructionFile);
 
@@ -361,6 +363,18 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
       <div className="add-po-form-scroll-bar">
         <form className="add-po-form" onSubmit={handleSubmit}>
+          <div className='add-po-field'>
+            <label className="add-po-label">Название *</label>
+            <input
+              type="text"
+              name="PoName"
+              className="add-po-input"
+              placeholder="Введите название"
+              value={PoName}
+              onChange={(e) => {setPoName(e.target.value)}}
+              required
+            />
+          </div>
 
           {/* Производитель */}
           <div className="add-po-field">

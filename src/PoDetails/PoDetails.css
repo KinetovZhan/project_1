@@ -173,6 +173,6 @@
   .po-details-container{
     position: absolute;
     width: 120vh;
-    
+    height: 60vh;
   }
 }

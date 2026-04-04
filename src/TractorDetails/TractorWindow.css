@@ -192,15 +192,13 @@
 @media (min-width: 1200px) and (max-width: 1600px) {
   .tractor-details-container {
   box-sizing: border-box;
-  width: 100vh;
-  height: 65vh;
+  width: 120vh;
+  height: 60vh;
   background-color: rgb(219, 219, 219);
   border-radius: 30px;
   color: black;
   padding: 50px 70px;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
+  /* top: 80px; */
+
 }
-  
 }

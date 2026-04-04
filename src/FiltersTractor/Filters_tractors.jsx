@@ -47,6 +47,7 @@ export function Filters2({
   {value:'rk', label: 'РК'},
   {value:'bk', label: 'БК'},
   {value:'kpp', label: 'КПП'},
+  {value:'autopilot', label: 'Автопилот'}
 ];
 
   const isMobile = useCheckMobile()

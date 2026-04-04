@@ -192,7 +192,7 @@ export function TractorDetails({ vin, onBack }) {
   
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className='bolvanchyk' style={{ position: 'relative' }}>
       <button onClick={onBack} className="go-back" style={{top: '50px', left:'120px'}}></button>
       <div className="tractor-details-container add-po-form-scroll-bar">
         <div className="tractor-details-content">

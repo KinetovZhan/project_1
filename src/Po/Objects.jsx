@@ -532,7 +532,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                         onMouseEnter={(e) => handleMouseEnter(e, tooltipText2, item.id_Firmwares)}
                         onMouseMove={handleMouseMove}
                         onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}>
-                          {item.download_link} от {new Date(item.release_date).toLocaleDateString()}
+                          {item.name} от {new Date(item.release_date).toLocaleDateString()}
                         </h4>
                         <div className="infodisc">
                           <h5
