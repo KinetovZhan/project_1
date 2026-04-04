@@ -149,6 +149,7 @@ export function TractorDetails({ vin, onBack }) {
     region,
     oh_hour,
     consumer,
+    dealer,
     last_activity,
   } = tractor;
 
@@ -211,9 +212,13 @@ export function TractorDetails({ vin, onBack }) {
                 <h3>Регион эксплуатации</h3>
                 <p>{region || '-'}</p>
               </div>
+              <div className='section'>
+                <h3>Владелец</h3>
+                <p>{consumer|| '-'}</p>
+              </div>
               <div className="section">
                 <h3>Дилер</h3>
-                <p>{consumer || '-'}</p>
+                <p>{dealer || '-'}</p>
               </div>
             </div>
 

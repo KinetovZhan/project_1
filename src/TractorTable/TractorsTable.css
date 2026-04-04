@@ -200,3 +200,15 @@
     align-items: center;
   }
 }
+
+.colored-row .cell-critical {
+  filter: brightness(0.7);
+}
+
+.colored-row .cell-actual {
+  filter: brightness(0.7);
+}
+
+.colored-row .cell-oldy {
+  filter: brightness(0.7);
+}
