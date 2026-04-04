@@ -102,6 +102,7 @@
 .icon-ptz {
   display:flex;
   align-items: center;
+  justify-content: center;
   width:10vh;
   height:180px;
   padding-right: 80px;
@@ -113,5 +114,8 @@
   margin: 0px;
   border-radius: 50%;
   background-color: #D9D9D9;
+  object-position: -1px -1px;
+  
+  
 }
 
