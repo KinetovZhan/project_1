@@ -19,7 +19,8 @@ export function AddAggForm({ onBack, onSubmit }) {
     { value: 'KPP', label: 'КПП' },
     { value: 'RK', label: 'РК' },
     { value: 'HR', label: 'Гидрораспределитель' },
-    { value: 'BK', label: 'БК' }
+    { value: 'BK', label: 'БК' },
+    { value: 'AUTOPILOT', label: 'Автопилот' }
   ];
 
   const isMobile = useCheckMobile();
