@@ -267,6 +267,7 @@ console.log('Первый трактор:', tractors[0]);
   if (!c.component_type) {
     console.warn(`Компонент для VIN ${c.vin} не имеет типа:`, c);
   }
+  
 
    let status;
             if (c.is_critical) {
