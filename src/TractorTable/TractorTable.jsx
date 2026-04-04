@@ -318,6 +318,14 @@ const typeToField = {
       enriched[`${field}_status`] = c.status;
       enriched[`${field}_is_actual`] = c.is_actual;   // <-- добавляем
 enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
+
+      // Добавляем поле path, если оно существует в компоненте
+      if (c.hasOwnProperty('path')) {
+        enriched[`${field}_path`] = c.path || '';
+      } else {
+        // По умолчанию пустая строка, если поле path отсутствует
+        enriched[`${field}_path`] = '';
+      }
     } else {
       console.warn(`Неизвестный тип компонента: ${c.type} для VIN ${t.vin}`);
     }
@@ -435,6 +443,25 @@ const getStatusColorClass = (status) => {
   }
 };
 
+  // Функция для определения стиля текста в зависимости от значения поля path
+  const getTextStyle = (tractor, colKey) => {
+    // Определяем, является ли столбец одним из компонентов ПО
+    const nodeFields = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
+    
+    if (nodeFields.includes(colKey)) {
+      // Используем поле path, связанное с конкретным компонентом
+      const pathField = `${colKey}_path`; // Например, dvs_path, kpp_path и т.д.
+      const pathValue = tractor[pathField];
+      
+      // Применяем стиль в зависимости от значения path
+      return {
+        color: pathValue === '' || pathValue === null || pathValue === undefined ? 'gray' : 'black'
+      };
+    }
+    
+    // Для других столбцов не применяем специальное форматирование
+    return {};
+  };
 
 
   // Отсортированные тракторы с использованием useMemo
@@ -606,12 +633,21 @@ const getStatusColorClass = (status) => {
                 {orderedColumns.map(colKey => {
                   const col = columnsConfig[colKey];
                   const value = col.getValue(tractor);
+                  
                   if (col.isNode) {
                     const status = col.getStatus(tractor);
                     const className = shouldHighlight(tractor, colKey) ? getStatusColorClass(status) : '';
-                    return <td key={colKey} className={className}>{value}</td>;
+                    
+                    // Применяем стиль цвета текста в зависимости от значения поля path
+                    const textStyle = getTextStyle(tractor, colKey);
+                    
+                    return <td key={colKey} className={className} style={textStyle}>{value}</td>;
                   }
-                  return <td key={colKey}>{value}</td>;
+                  
+                  // Применяем стиль цвета текста в зависимости от значения поля path
+                  const textStyle = getTextStyle(tractor, colKey);
+                  
+                  return <td key={colKey} style={textStyle}>{value}</td>;
                 })}
 
                 </tr>
