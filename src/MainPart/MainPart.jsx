@@ -1,8 +1,9 @@
-import { SearchBar } from '../SearchBar/SearchBar';
-import { Objects } from '../Po/Objects';
-import { TractorTable } from '../TractorTable/TractorTable';
-import { AddPoForm } from '../AddPo/AddPo';
-import { AddAggForm } from '../AddUzel/AddAgg';
+import { SearchBar } from '../SearchBar/SearchBar.jsx';
+import { Objects } from '../Po/Objects.jsx';
+import { TractorTable } from '../TractorTable/TractorTable.jsx';
+import { AddPoForm } from '../AddPo/AddPo.jsx';
+import { AddAggForm } from '../AddUzel/AddAgg.jsx';
+
 import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
 import { useNavigate } from 'react-router-dom';
 
@@ -11,16 +12,11 @@ export function MainPart({
   activeFilters,
   activeFilters2,
   selectedModel,
-  selectedProducers,
   activeFiltersTrac,
   activeFiltersTrac2,
   onSearch,
   searchQuery,
   searchDealer,
-  selectedStatus,
-  actualFilter,   
-  uzelFilter,
-  actualFilterPo,
 
   // --- Форма ПО ---
   showAddForm,
@@ -34,16 +30,9 @@ export function MainPart({
   onCloseAddAggForm,
   onAddAggSubmit, // ← ДОБАВЛЕНО: отдельный колбэк для агрегата
 
-
   showAddCompPartForm,
   onCloseAddCompPartForm,
-  onAddCompPartSubmit,
-
-  handleTractorDetails,
-  handleAggregateDetails,
-  onCloseTab
-
-  // onBack — не нужен, используйте onClose...
+  onAddCompPartSubmit
 }) {
   const navigate = useNavigate();
 
@@ -52,27 +41,6 @@ export function MainPart({
   const handleGoBack = () => {
     navigate(-1); // Возврат на предыдущую страницу в истории
   };
-
-  // Закрываем форму ПО, если переключились на другую вкладку
-  useEffect(() => {
-    if (activeButton && activeButton !== 'addPO' && showAddForm) {
-      onCloseAddForm();
-    }
-  }, [activeButton, showAddForm, onCloseAddForm]);
-
-  // Закрываем форму агрегата, если переключились
-  useEffect(() => {
-    if (activeButton && activeButton !== 'addAgg' && showAddAggForm) {
-      onCloseAddAggForm();
-    }
-  }, [activeButton, showAddAggForm, onCloseAddAggForm]);
-
-
-  useEffect(() => {
-    if (activeButton && activeButton !== 'AddCompPart' && showAddCompPartForm) {
-      onCloseAddCompPartForm();
-    }
-  }, [activeButton, showAddCompPartForm, onCloseAddCompPartForm]);
 
   // Отображаем форму ПО
   if (showAddForm) {
@@ -92,49 +60,36 @@ export function MainPart({
     );
   }
 
-  
 
   // Основной контент
-  if (!activeButton) {
-    return <div className="MainPart"></div>;
-  }
-
   return (
     <div className="MainPart">
-      
-      {activeButton === 'aggregates' && (
-        <>
-          <SearchBar onSearch={onSearch} activeButton={activeButton} />
-          <Objects
-            activeFilters={activeFilters}
-            activeFilters2={activeFilters2}
-            selectedModel={selectedModel}
-            selectedProducers={selectedProducers}
-            onSearch={onSearch}
-            searchQuery={searchQuery}
-            selectedStatus={selectedStatus}
-            onCloseTab={() => onCloseTab('aggregates')}
-            actualFilterPo = {actualFilterPo}
+      <SearchBar onSearch={onSearch} searchQuery={searchQuery} />
 
-          />
-        </>
+      {activeButton === 'aggregates' && (
+        <Objects 
+          activeFilters={activeFilters}
+          activeFilters2={activeFilters2}
+          selectedModel={selectedModel}
+          handleAggregateDetails={() => {}}
+          onCloseTab={() => {}}
+          actualFilterPo={[]}
+        />
       )}
+
       {activeButton === 'tractor' && (
-        <>
-          <SearchBar onSearch={onSearch} activeButton={activeButton}/>
-          <TractorTable
-            activeFiltersTrac={activeFiltersTrac}
-            activeFiltersTrac2={activeFiltersTrac2}
-            onSearch={onSearch}
-            searchQuery={searchQuery}
-            searchDealer={searchDealer}
-            dateFilter={dateFilter}
-            activeMajMinButton={activeMajMinButton}
-            actualFilter = {actualFilter}    
-            uzelFilter = {uzelFilter}
-            onCloseTab={() => onCloseTab('tractor')}
-          />
-        </>
+        <TractorTable 
+          activeFiltersTrac={activeFiltersTrac}
+          activeFiltersTrac2={activeFiltersTrac2}
+          searchQuery={searchQuery}
+          searchDealer={searchDealer}
+          dateFilter={dateFilter}
+          activeMajMinButton={activeMajMinButton}
+          onCloseTab={() => {}}
+          showAddForm={showAddForm}
+          onCloseAddForm={onCloseAddForm}
+          onAddSubmit={onAddSubmit}
+        />
       )}
     </div>
   );

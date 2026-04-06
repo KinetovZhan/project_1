@@ -1,6 +1,7 @@
 import React, { useState,useRef, useEffect, useMemo, useCallback } from 'react';
 import {SearchBar} from "../SearchBar/SearchBar.jsx";
 import {TractorDetails} from "../TractorDetails/TractorDetails.jsx";
+import {AddPoForm} from "../AddPo/AddPo.jsx"; // Импортируем AddPoForm
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
 
@@ -62,8 +63,20 @@ const groupTractors = (data) => {
   console.log(grouped)
   return Object.values(grouped);
 };
-export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],
-  uzelFilter=[], onCloseTab }) {
+export function TractorTable({ 
+  activeFiltersTrac, 
+  activeFiltersTrac2, 
+  searchQuery, 
+  searchDealer, 
+  dateFilter, 
+  activeMajMinButton, 
+  actualFilter=[],
+  uzelFilter=[], 
+  onCloseTab,
+  showAddForm, // добавляем пропсы для управления формой
+  onCloseAddForm,
+  onAddSubmit 
+}) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -281,6 +294,7 @@ console.log('Первый трактор:', tractors[0]);
 
   if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
   vinToComponents[c.vin].push({
+    id_Firmwares: c.id_Firmwares || null,
     type: c.component_type || 'unknown',
     model: c.comp_model || '-',
     status: status 
@@ -363,6 +377,7 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
       return { key, direction: 'asc' };
     });
   };
+
 
 
   const getCellValue = (tractor, key) => {
@@ -545,6 +560,34 @@ const getStatusColorClass = (status) => {
     setSelectedTractor(tractor.vin);
   };
 
+  // Функция для обработки клика по компоненту ПО
+  const handlePoClick = (componentType, tractor) => {
+    // Проверяем, есть ли компонент в тракторе
+    if (tractor[componentType] && tractor[componentType] !== '-') {
+      // Вместо открытия PoDetails, вызываем переданную функцию для открытия формы добавления ПО
+      if (onAddSubmit) {
+        // Передаем информацию о компоненте и тракторе в форму
+        const componentInfo = {
+          component_type: componentType,
+          component_name: tractor[componentType] || componentType.toUpperCase(),
+          tractor_vin: tractor.vin,
+          tractor_model: tractor.model
+        };
+        
+        // Вызываем функцию открытия формы добавления ПО
+        onAddSubmit(componentInfo);
+      }
+    }
+  };
+
+  // Если нужно открыть форму добавления ПО, отображаем её
+  if (showAddForm) {
+    return (
+      <div className="MainPart">
+        <AddPoForm onBack={onCloseAddForm} onSubmit={onAddSubmit} />
+      </div>
+    );
+  }
 
   if (selectedTractor) {
     return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
@@ -642,7 +685,19 @@ const getStatusColorClass = (status) => {
                     // Применяем стиль цвета текста в зависимости от значения поля path
                     const textStyle = getTextStyle(tractor, colKey);
                     
-                    return <td key={colKey} className={className} style={textStyle}>{value}</td>;
+                    // Добавляем обработчик клика для открытия PoDetails
+                    return <td 
+                      key={colKey} 
+                      className={className} 
+                      style={textStyle}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Останавливаем всплытие события
+                        // Проверяем, что значение не "-" и компонент существует
+                        if (value !== '-' && value) {
+                          handlePoClick(colKey, tractor); // Вызываем обработчик клика по ПО
+                        }
+                      }}
+                    >{value}</td>;
                   }
                   
                   // Применяем стиль цвета текста в зависимости от значения поля path
