@@ -83,27 +83,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
       .finally(() => setLoadingSoftware(false));
   }, [token]);
 
-  // Загрузка уникальных моделей тракторов
-  // useEffect(() => {
-  //   if (!token) {
-  //     setTractorError('Для загрузки моделей тракторов требуется авторизация');
-  //     return;
-  //   }
-  //   setLoadingTractors(true);
-  //   setTractorError(null);
 
-  //   api.get('tractors/')
-  //     .then(data => {
-  //       const models = [...new Set(data.map(item => item.model).filter(Boolean))];
-  //       const options = models.map(model => ({ value: model, label: model }));
-  //       setTractorOptions(options);
-  //     })
-  //     .catch(err => {
-  //       console.error('Ошибка загрузки тракторов:', err);
-  //       setTractorError(err.message);
-  //     })
-  //     .finally(() => setLoadingTractors(false));
-  // }, [token]);
 
   useEffect(() => {
   if (!token) {
