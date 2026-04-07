@@ -2,7 +2,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { AddPoForm } from '../Function/AddPo.jsx'
+import { AddPoForm } from '../AddPo/AddPo.jsx'
+
+// 2. Устанавливаем переменную окружения ДО импорта компонента
+vi.stubEnv('VITE_API_URL', 'http://127.0.0.1');
 
 // Мокируем зависимости
 vi.mock('../auth/AuthContext', () => ({
@@ -11,11 +14,9 @@ vi.mock('../auth/AuthContext', () => ({
   })
 }))
 
-vi.mock('../shrineofvsakoe/ip.jsx', () => ({
-  ip: 'localhost:8000'
-}))
 
-vi.mock('../shrineofvsakoe/checkMobile.jsx', () => ({
+
+vi.mock('../CheckMobile/checkMobile.jsx', () => ({
   default: () => false
 }))
 

@@ -14,7 +14,7 @@ vi.mock('../auth/AuthContext', () => ({
 }));
 
 // Мокаем компоненты Filters и Filters2
-vi.mock('../Function/Filters_agregates.jsx', () => ({
+vi.mock('../FiltersPo/Filters_agregates.jsx', () => ({
   Filters: vi.fn(({ onFilterChange, onFilterChange2, onModelChange }) => (
     <div data-testid="filters-aggregates">
       <button onClick={() => onFilterChange?.('filter1')}>Filter 1</button>
@@ -24,7 +24,7 @@ vi.mock('../Function/Filters_agregates.jsx', () => ({
   ))
 }));
 
-vi.mock('../Function/Filters_tractors.jsx', () => ({
+vi.mock('../FiltersTractor/Filters_tractors.jsx', () => ({
   Filters2: vi.fn(({ 
     onFilterChangeTracByModel, 
     onFilterChangeByStatus, 
@@ -53,7 +53,7 @@ vi.mock('../Function/Filters_tractors.jsx', () => ({
 }));
 
 // Импортируем замокированные хуки
-import useCheckMobile from '../shrineofvsakoe/checkMobile.jsx';
+import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { useAuth } from '../auth/AuthContext';
 
 describe('Sidebar Component', () => {
@@ -80,7 +80,11 @@ describe('Sidebar Component', () => {
     vi.clearAllMocks();
     
     // Настройка моков по умолчанию - десктоп режим
-    useCheckMobile.mockReturnValue(false);
+    useAuth.mockReturnValue({
+  user: { role: 'moderator' },
+  isAuthenticated: true,
+  token: 'mock-token'  // ← добавить
+});
     useAuth.mockReturnValue({
       user: { role: 'moderator' },
       isAuthenticated: true,
@@ -393,7 +397,11 @@ describe('Sidebar Component', () => {
 
   describe('Mobile Menu', () => {
     beforeEach(() => {
-      useCheckMobile.mockReturnValue(true);
+      useAuth.mockReturnValue({
+  user: { role: 'moderator' },
+  isAuthenticated: true,
+  token: 'mock-token'  // ← добавить
+});
     });
 
     // Скипаем мобильные тесты, так как мобильное меню пока нестабильно

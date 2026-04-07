@@ -1,25 +1,32 @@
-// 1. Сначала импортируем jest-dom matchers
+// 1. Импортируем jest-dom matchers
 import '@testing-library/jest-dom/vitest';
 
-// 2. Мокаем useAuth ДО импортов
-const mockUseAuth = vi.hoisted(() => vi.fn());
+// 2. Устанавливаем переменную окружения ДО импорта компонента
+vi.stubEnv('VITE_API_URL', 'http://127.0.0.1');
 
+// 3. Мокаем useAuth
+const mockUseAuth = vi.hoisted(() => vi.fn());
 vi.mock('../auth/AuthContext', () => ({
   useAuth: mockUseAuth,
 }));
 
-// 3. Мокаем IP
-vi.mock('../shrineofvsakoe/ip.jsx', () => ({
-  ip: '127.0.0.1',
+// 4. Мокаем fetchAPI.js
+vi.mock('../fetchAPI.js', () => ({
+  api: {
+    post: vi.fn(),
+    get: vi.fn(),
+    request: vi.fn(),
+  },
+  buildApiUrl: (path) => `http://127.0.0.1${path}`,
+  API_BASE_URL: 'http://127.0.0.1',
 }));
 
-// 4. Мокаем SearchBar (чтобы не влиял на покрытие)
-vi.mock('../Function/SearchBar.jsx', () => ({
+// 5. Мокаем SearchBar и TractorDetails
+vi.mock('../SearchBar/SearchBar.jsx', () => ({
   SearchBar: vi.fn(() => <div data-testid="search-bar-mock">SearchBar Mock</div>)
 }));
 
-// 5. Мокаем TractorDetails
-vi.mock('../Function/TractorDetails.jsx', () => ({
+vi.mock('../TractorDetails/TractorDetails.jsx', () => ({
   TractorDetails: vi.fn(({ vin, onBack }) => (
     <div data-testid="tractor-details">
       <span>Детали трактора: {vin}</span>
@@ -32,10 +39,8 @@ vi.mock('../Function/TractorDetails.jsx', () => ({
 import { render, screen, waitFor, fireEvent, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { TractorTable } from '../Function/TractorTable';
-
-// 7. Мокаем fetch глобально
-global.fetch = vi.fn();
+import { TractorTable } from '../TractorTable/TractorTable';
+import { api } from '../fetchAPI.js';
 
 describe('TractorTable', () => {
   const mockTractorData = [
@@ -55,21 +60,33 @@ describe('TractorTable', () => {
       vin: 'VIN123',
       component_type: 'dvs',
       comp_model: 'MotorX',
+      software_path: 'some/path/MotorX_v1.bin',
+      is_critical: false,
+      is_actual: true,
     },
     {
       vin: 'VIN123',
       component_type: 'kpp',
       comp_model: 'GearBoxY',
+      software_path: 'some/path/GearBoxY_v2.bin',
+      is_critical: false,
+      is_actual: true,
     },
     {
       vin: 'VIN123',
       component_type: 'rk',
       comp_model: 'SuspensionZ',
+      software_path: null,
+      is_critical: false,
+      is_actual: false,
     },
     {
       vin: 'VIN123',
       component_type: 'bk',
       comp_model: 'ControllerW',
+      software_path: 'some/path/ControllerW.bin',
+      is_critical: true,
+      is_actual: false,
     }
   ];
 
@@ -79,16 +96,19 @@ describe('TractorTable', () => {
     searchQuery: '',
     searchDealer: '',
     dateFilter: null,
-    activeMajMinButton: null
+    activeMajMinButton: null,
+    actualFilter: [],
+    uzelFilter: [],
+    onCloseTab: vi.fn(),
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    fetch.mockClear();
     mockUseAuth.mockReturnValue({ 
       token: 'mock-token',
       user: { role: 'user', sub: 'test-user', username: 'test-user' }
     });
+    api.post.mockReset();
   });
 
   afterEach(() => {
@@ -97,7 +117,7 @@ describe('TractorTable', () => {
 
   describe('Loading and Error States', () => {
     it('рендерит загрузку при первом рендере', async () => {
-      fetch.mockImplementationOnce(() => new Promise(() => {}));
+      api.post.mockImplementationOnce(() => new Promise(() => {}));
 
       render(<TractorTable {...defaultProps} />);
 
@@ -113,7 +133,7 @@ describe('TractorTable', () => {
     });
 
     it('показывает ошибку при ошибке fetch', async () => {
-      fetch.mockRejectedValueOnce(new Error('Network error'));
+      api.post.mockRejectedValueOnce(new Error('Network error'));
 
       render(<TractorTable {...defaultProps} />);
 
@@ -123,27 +143,13 @@ describe('TractorTable', () => {
 
       expect(screen.getByRole('button', { name: /Перезагрузить/i })).toBeInTheDocument();
     });
-
-    it('показывает ошибку при HTTP ошибке', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        json: async () => ({})
-      });
-
-      render(<TractorTable {...defaultProps} />);
-
-      await waitFor(() => {
-        expect(screen.getByText(/Ошибка подключения к серверу: HTTP error! status: 500/i)).toBeInTheDocument();
-      });
-    });
   });
 
   describe('Successful Data Loading', () => {
     beforeEach(() => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => mockComponentsData });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce(mockComponentsData);
     });
 
     it('рендерит таблицу с данными после успешного запроса', async () => {
@@ -154,10 +160,11 @@ describe('TractorTable', () => {
       });
 
       expect(screen.getByText('T-150')).toBeInTheDocument();
-      expect(screen.getByText('MotorX')).toBeInTheDocument();
-      expect(screen.getByText('GearBoxY')).toBeInTheDocument();
-      expect(screen.getByText('SuspensionZ')).toBeInTheDocument();
-      expect(screen.getByText('ControllerW')).toBeInTheDocument();
+      expect(screen.getByText('MotorX_v1.bin')).toBeInTheDocument();
+      expect(screen.getByText('GearBoxY_v2.bin')).toBeInTheDocument();
+      // Для rk нет software_path, поэтому отображается '-'
+      expect(screen.getByText('-')).toBeInTheDocument();
+      expect(screen.getByText('ControllerW.bin')).toBeInTheDocument();
       expect(screen.getByText('Дилер Сибирь')).toBeInTheDocument();
     });
 
@@ -168,15 +175,14 @@ describe('TractorTable', () => {
         expect(screen.getByText('VIN123')).toBeInTheDocument();
       });
 
-      expect(screen.getByText(/01.01.2023/)).toBeInTheDocument();
-      expect(screen.getByText(/01.01.2024/)).toBeInTheDocument();
+      expect(screen.getByText(/01.01.2023, 10:00/)).toBeInTheDocument();
+      expect(screen.getByText(/01.01.2024, 12:00/)).toBeInTheDocument();
     });
 
     it('отображает прочерки для отсутствующих компонентов', async () => {
-      fetch.mockReset();
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -193,11 +199,9 @@ describe('TractorTable', () => {
         ...mockTractorData,
         { vin: 'TEMPLATE_SOFTWARE_ASSIGNMENT', model: 'Template' }
       ];
-
-      fetch.mockReset();
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => dataWithTemplate })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(dataWithTemplate)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -224,21 +228,21 @@ describe('TractorTable', () => {
       ];
 
       const componentsForGrouping = [
-        { vin: 'VIN789', component_type: 'dvs', comp_model: 'EngineX' },
-        { vin: 'VIN789', component_type: 'engine', comp_model: 'EngineX' },
-        { vin: 'VIN789', component_type: 'kpp', comp_model: 'TransmissionY' },
-        { vin: 'VIN789', component_type: 'transmission', comp_model: 'TransmissionY' },
-        { vin: 'VIN789', component_type: 'rk', comp_model: 'SuspensionZ' },
-        { vin: 'VIN789', component_type: 'suspension', comp_model: 'SuspensionZ' },
-        { vin: 'VIN789', component_type: 'bk', comp_model: 'ControllerW' },
-        { vin: 'VIN789', component_type: 'gr', comp_model: 'HydraulicsV' },
-        { vin: 'VIN789', component_type: 'hydraulics', comp_model: 'HydraulicsV' },
-        { vin: 'VIN789', component_type: 'ap', comp_model: 'AutopilotU' },
+        { vin: 'VIN789', component_type: 'dvs', comp_model: 'EngineX', software_path: 'engine.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'engine', comp_model: 'EngineX', software_path: 'engine.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'kpp', comp_model: 'TransmissionY', software_path: 'trans.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'transmission', comp_model: 'TransmissionY', software_path: 'trans.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'rk', comp_model: 'SuspensionZ', software_path: null, is_critical: false, is_actual: false },
+        { vin: 'VIN789', component_type: 'suspension', comp_model: 'SuspensionZ', software_path: null, is_critical: false, is_actual: false },
+        { vin: 'VIN789', component_type: 'bk', comp_model: 'ControllerW', software_path: 'ctrl.bin', is_critical: true, is_actual: false },
+        { vin: 'VIN789', component_type: 'gr', comp_model: 'HydraulicsV', software_path: 'hydr.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'hydraulics', comp_model: 'HydraulicsV', software_path: 'hydr.bin', is_critical: false, is_actual: true },
+        { vin: 'VIN789', component_type: 'ap', comp_model: 'AutopilotU', software_path: 'ap.bin', is_critical: false, is_actual: true },
       ];
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => tractorWithMultipleComponents })
-        .mockResolvedValueOnce({ ok: true, json: async () => componentsForGrouping });
+      api.post
+        .mockResolvedValueOnce(tractorWithMultipleComponents)
+        .mockResolvedValueOnce(componentsForGrouping);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -246,18 +250,18 @@ describe('TractorTable', () => {
         expect(screen.getByText('VIN789')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('EngineX')).toBeInTheDocument();
-      expect(screen.getByText('TransmissionY')).toBeInTheDocument();
-      expect(screen.getByText('SuspensionZ')).toBeInTheDocument();
-      expect(screen.getByText('ControllerW')).toBeInTheDocument();
-      expect(screen.getByText('HydraulicsV')).toBeInTheDocument();
-      expect(screen.getByText('AutopilotU')).toBeInTheDocument();
+      expect(screen.getByText('engine.bin')).toBeInTheDocument();
+      expect(screen.getByText('trans.bin')).toBeInTheDocument();
+      expect(screen.getByText('-')).toBeInTheDocument(); // rk без software_path
+      expect(screen.getByText('ctrl.bin')).toBeInTheDocument();
+      expect(screen.getByText('hydr.bin')).toBeInTheDocument();
+      expect(screen.getByText('ap.bin')).toBeInTheDocument();
     });
 
     it('обрабатывает ошибку во втором запросе компонентов', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: false, status: 500 });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockRejectedValueOnce(new Error('Components error'));
 
       render(<TractorTable {...defaultProps} />);
 
@@ -270,9 +274,9 @@ describe('TractorTable', () => {
     });
 
     it('обрабатывает пустой массив компонентов', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -300,16 +304,12 @@ describe('TractorTable', () => {
     it('фильтрует тракторы для дилера', async () => {
       mockUseAuth.mockReturnValue({
         token: 'mock-token',
-        user: { 
-          role: 'dealer', 
-          sub: 'test-dealer',
-          username: 'test-dealer'
-        }
+        user: { role: 'dealer', sub: 'test-dealer', username: 'test-dealer' }
       });
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [dealerTractor, otherTractor] })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([dealerTractor, otherTractor])
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -323,11 +323,7 @@ describe('TractorTable', () => {
     it('фильтрует тракторы для дилера с полем dealer вместо consumer', async () => {
       mockUseAuth.mockReturnValue({
         token: 'mock-token',
-        user: { 
-          role: 'dealer', 
-          sub: 'test-dealer',
-          username: 'test-dealer'
-        }
+        user: { role: 'dealer', sub: 'test-dealer', username: 'test-dealer' }
       });
 
       const dealerTractorWithDealerField = {
@@ -336,9 +332,9 @@ describe('TractorTable', () => {
         consumer: undefined
       };
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [dealerTractorWithDealerField] })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([dealerTractorWithDealerField])
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -350,11 +346,7 @@ describe('TractorTable', () => {
     it('использует разные поля user для фильтрации дилера', async () => {
       mockUseAuth.mockReturnValue({
         token: 'mock-token',
-        user: { 
-          role: 'dealer', 
-          name: 'test-dealer',
-          username: 'test-dealer'
-        }
+        user: { role: 'dealer', name: 'test-dealer', username: 'test-dealer' }
       });
 
       const dealerTractor = {
@@ -362,9 +354,9 @@ describe('TractorTable', () => {
         consumer: 'test-dealer'
       };
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [dealerTractor] })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([dealerTractor])
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -379,9 +371,9 @@ describe('TractorTable', () => {
         user: { role: 'moderator', sub: 'moderator' }
       });
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [dealerTractor, otherTractor] })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([dealerTractor, otherTractor])
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -394,11 +386,7 @@ describe('TractorTable', () => {
     it('обрабатывает отсутствие consumer у трактора для дилера', async () => {
       mockUseAuth.mockReturnValue({
         token: 'mock-token',
-        user: { 
-          role: 'dealer', 
-          sub: 'test-dealer',
-          username: 'test-dealer'
-        }
+        user: { role: 'dealer', sub: 'test-dealer', username: 'test-dealer' }
       });
 
       const tractorWithoutConsumer = {
@@ -406,9 +394,9 @@ describe('TractorTable', () => {
         consumer: undefined
       };
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [tractorWithoutConsumer] })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([tractorWithoutConsumer])
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -420,13 +408,13 @@ describe('TractorTable', () => {
 
   describe('Navigation to TractorDetails', () => {
     beforeEach(() => {
-      fetch.mockReset();
+      api.post.mockReset();
     });
 
-    it('переходит к TractorDetails при клике на строку', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => mockComponentsData });
+    it('переходит к TractorDetails при двойном клике на строку', async () => {
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce(mockComponentsData);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -435,7 +423,7 @@ describe('TractorTable', () => {
       });
 
       const row = screen.getByText('VIN123').closest('tr');
-      fireEvent.click(row);
+      fireEvent.doubleClick(row);
 
       await waitFor(() => {
         expect(screen.getByTestId('tractor-details')).toBeInTheDocument();
@@ -444,9 +432,9 @@ describe('TractorTable', () => {
     });
 
     it('возвращается к таблице при клике на "Назад"', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => mockComponentsData });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce(mockComponentsData);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -455,7 +443,7 @@ describe('TractorTable', () => {
       });
 
       const row = screen.getByText('VIN123').closest('tr');
-      fireEvent.click(row);
+      fireEvent.doubleClick(row);
 
       await waitFor(() => {
         expect(screen.getByTestId('tractor-details')).toBeInTheDocument();
@@ -481,16 +469,16 @@ describe('TractorTable', () => {
         date_assemle: null,
         date_start: '2023-01-01',
         date_end: '2023-12-31',
-        is_major: true,
+        is_actual: true,
+        is_critical: null,
+        is_archive: null,
       };
 
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      });
+      api.post.mockResolvedValueOnce([]);
 
       render(
         <TractorTable
+          {...defaultProps}
           activeFiltersTrac={['T-150']}
           activeFiltersTrac2={['active']}
           searchQuery="VIN123"
@@ -504,23 +492,13 @@ describe('TractorTable', () => {
       );
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(api.post).toHaveBeenCalledTimes(1);
       });
 
-      expect(fetch).toHaveBeenCalledWith(
-        'http://127.0.0.1/search/tractor-info',
-        expect.objectContaining({
-          method: 'POST',
-          headers: expect.objectContaining({
-            Authorization: 'Bearer mock-token',
-            'Content-Type': 'application/json',
-          }),
-        })
+      expect(api.post).toHaveBeenCalledWith(
+        'search/tractor-info',
+        expectedPostData
       );
-
-      const call = fetch.mock.calls[0];
-      const actualBody = JSON.parse(call[1].body);
-      expect(actualBody).toEqual(expectedPostData);
     });
 
     it('отправляет корректные данные для MAJ/MIN фильтрации', async () => {
@@ -531,8 +509,8 @@ describe('TractorTable', () => {
       ];
 
       for (const { button, expected } of testCases) {
-        fetch.mockReset();
-        fetch.mockResolvedValueOnce({ ok: true, json: async () => [] });
+        api.post.mockReset();
+        api.post.mockResolvedValueOnce([]);
 
         render(
           <TractorTable
@@ -542,12 +520,12 @@ describe('TractorTable', () => {
         );
 
         await waitFor(() => {
-          expect(fetch).toHaveBeenCalled();
+          expect(api.post).toHaveBeenCalled();
         });
 
-        const call = fetch.mock.calls[0];
-        const actualBody = JSON.parse(call[1].body);
-        expect(actualBody.is_major).toBe(expected);
+        const call = api.post.mock.calls[0];
+        const actualBody = call[1];
+        expect(actualBody.is_actual).toBe(expected);
         
         cleanup();
       }
@@ -566,8 +544,8 @@ describe('TractorTable', () => {
       ];
 
       for (const { dateFilter, expected } of testCases) {
-        fetch.mockReset();
-        fetch.mockResolvedValueOnce({ ok: true, json: async () => [] });
+        api.post.mockReset();
+        api.post.mockResolvedValueOnce([]);
 
         render(
           <TractorTable
@@ -577,11 +555,11 @@ describe('TractorTable', () => {
         );
 
         await waitFor(() => {
-          expect(fetch).toHaveBeenCalled();
+          expect(api.post).toHaveBeenCalled();
         });
 
-        const call = fetch.mock.calls[0];
-        const actualBody = JSON.parse(call[1].body);
+        const call = api.post.mock.calls[0];
+        const actualBody = call[1];
         expect(actualBody.date_assemle).toBe(expected.date_assemle);
         expect(actualBody.date_start).toBe(expected.date_start);
         expect(actualBody.date_end).toBe(expected.date_end);
@@ -591,10 +569,7 @@ describe('TractorTable', () => {
     });
 
     it('обрабатывает undefined в searchQuery и searchDealer', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => []
-      });
+      api.post.mockResolvedValueOnce([]);
 
       render(
         <TractorTable
@@ -605,20 +580,17 @@ describe('TractorTable', () => {
       );
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalled();
+        expect(api.post).toHaveBeenCalled();
       });
 
-      const call = fetch.mock.calls[0];
-      const actualBody = JSON.parse(call[1].body);
+      const call = api.post.mock.calls[0];
+      const actualBody = call[1];
       expect(actualBody.query).toBe('');
       expect(actualBody.dealer).toBe('');
     });
 
     it('обрабатывает пустую строку в searchQuery и searchDealer', async () => {
-      fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => []
-      });
+      api.post.mockResolvedValueOnce([]);
 
       render(
         <TractorTable
@@ -629,47 +601,44 @@ describe('TractorTable', () => {
       );
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalled();
+        expect(api.post).toHaveBeenCalled();
       });
 
-      const call = fetch.mock.calls[0];
-      const actualBody = JSON.parse(call[1].body);
+      const call = api.post.mock.calls[0];
+      const actualBody = call[1];
       expect(actualBody.query).toBe('');
       expect(actualBody.dealer).toBe('');
     });
 
     it('делает второй запрос за компонентами', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => mockTractorData })
-        .mockResolvedValueOnce({ ok: true, json: async () => mockComponentsData });
+      api.post
+        .mockResolvedValueOnce(mockTractorData)
+        .mockResolvedValueOnce(mockComponentsData);
 
       render(<TractorTable {...defaultProps} />);
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledTimes(2);
+        expect(api.post).toHaveBeenCalledTimes(2);
       });
 
-      expect(fetch).toHaveBeenCalledWith(
-        'http://127.0.0.1/search/tractor-components',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ vins: ['VIN123'] })
-        })
+      expect(api.post).toHaveBeenCalledWith(
+        'search/tractor-components',
+        { vins: ['VIN123'] }
       );
     });
 
     it('не делает запрос за компонентами если нет тракторов', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
       await waitFor(() => {
-        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(api.post).toHaveBeenCalledTimes(1);
       });
 
-      expect(fetch).not.toHaveBeenCalledWith(
-        'http://127.0.0.1/search/tractor-components',
+      expect(api.post).not.toHaveBeenCalledWith(
+        'search/tractor-components',
         expect.anything()
       );
     });
@@ -683,9 +652,9 @@ describe('TractorTable', () => {
         last_activity: null
       }];
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => tractorWithNullDates })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(tractorWithNullDates)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -703,9 +672,9 @@ describe('TractorTable', () => {
         last_activity: undefined
       }];
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => tractorWithUndefinedDates })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(tractorWithUndefinedDates)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -724,18 +693,12 @@ describe('TractorTable', () => {
         region: 'Сибирь',
         motoHours: 1200,
         lastActivity: '2024-01-01T12:00:00Z',
-        DVS: 'MotorX',
-        KPP: 'GearBoxY',
-        RK: 'SuspensionZ',
-        BK: 'ControllerW',
-        GR: '-',
-        AP: '-',
         dealer: 'Дилер Сибирь'
       }];
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => tractorWithAltFields })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(tractorWithAltFields)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -743,8 +706,6 @@ describe('TractorTable', () => {
         expect(screen.getByText('ALT123')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('MotorX')).toBeInTheDocument();
-      expect(screen.getByText('GearBoxY')).toBeInTheDocument();
       expect(screen.getByText('Дилер Сибирь')).toBeInTheDocument();
     });
 
@@ -755,9 +716,9 @@ describe('TractorTable', () => {
         { ...mockTractorData[0], vin: 'VIN2' }
       ];
 
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => unsortedTractors })
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce(unsortedTractors)
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -770,8 +731,8 @@ describe('TractorTable', () => {
     });
 
     it('обрабатывает случай, когда нет данных о тракторах', async () => {
-      fetch
-        .mockResolvedValueOnce({ ok: true, json: async () => [] });
+      api.post
+        .mockResolvedValueOnce([]);
 
       render(<TractorTable {...defaultProps} />);
 
@@ -780,7 +741,7 @@ describe('TractorTable', () => {
       });
 
       const rows = screen.queryAllByRole('row');
-      expect(rows.length).toBe(1);
+      expect(rows.length).toBe(1); // только заголовок
     });
   });
 });

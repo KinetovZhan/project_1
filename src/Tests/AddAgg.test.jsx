@@ -1,15 +1,15 @@
+// 2. Устанавливаем переменную окружения ДО импорта компонента
+vi.stubEnv('VITE_API_URL', 'http://127.0.0.1');
+
 // 1. Сначала создаём переменную для мока
 const mockUseAuth = vi.hoisted(() => vi.fn());
+
 
 // 2. Потом мокаем модуль (обязательно до импортов!)
 vi.mock('../auth/AuthContext', () => ({
   useAuth: mockUseAuth
 }));
 
-// 3. Мокаем ip
-vi.mock('../shrineofvsakoe/ip.jsx', () => ({
-  ip: '127.0.0.1'
-}));
 
 // 4. Мокаем react-select для тестирования
 vi.mock('react-select', () => {
@@ -62,7 +62,7 @@ vi.mock('react-select', () => {
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { AddAggForm } from '../Function/AddAgg.jsx';
+import { AddAggForm } from '../AddUzel/AddAgg.jsx';
 
 // 6. Добавьте этот импорт для matchers
 import '@testing-library/jest-dom';
