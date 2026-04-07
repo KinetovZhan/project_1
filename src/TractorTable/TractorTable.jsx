@@ -297,7 +297,8 @@ console.log('Первый трактор:', tractors[0]);
     id_Firmwares: c.id_Firmwares || null,
     type: c.component_type || 'unknown',
     model: c.comp_model || '-',
-    status: status 
+    status: status ,
+    path: c.software_path
   });
 });
 console.log('vinToComponents:', vinToComponents); // отладка
@@ -329,7 +330,7 @@ const typeToField = {
     const type = c.type.toLowerCase();
     const field = typeToField[type];
     if (field) {
-      enriched[field] = c.model;
+      enriched[field] = c.path;
       enriched[`${field}_status`] = c.status;
       enriched[`${field}_is_actual`] = c.is_actual;   // <-- добавляем
 enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
