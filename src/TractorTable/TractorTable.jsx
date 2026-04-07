@@ -1,9 +1,9 @@
 import React, { useState,useRef, useEffect, useMemo, useCallback } from 'react';
 import {SearchBar} from "../SearchBar/SearchBar.jsx";
 import {TractorDetails} from "../TractorDetails/TractorDetails.jsx";
-import {AddPoForm} from "../AddPo/AddPo.jsx"; // Импортируем AddPoForm
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
+import { AddPo } from '../AddPo/AddPo.jsx';
 
 
 
@@ -63,20 +63,8 @@ const groupTractors = (data) => {
   console.log(grouped)
   return Object.values(grouped);
 };
-export function TractorTable({ 
-  activeFiltersTrac, 
-  activeFiltersTrac2, 
-  searchQuery, 
-  searchDealer, 
-  dateFilter, 
-  activeMajMinButton, 
-  actualFilter=[],
-  uzelFilter=[], 
-  onCloseTab,
-  showAddForm, // добавляем пропсы для управления формой
-  onCloseAddForm,
-  onAddSubmit 
-}) {
+export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],
+  uzelFilter=[], onCloseTab }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -140,19 +128,119 @@ export function TractorTable({
   });
 
   const columnsConfig = {
-    vin: { label: 'VIN', getValue: (t) => t.vin || t.VIN || '-', isBase: true },
-    model: { label: 'Модель', getValue: (t) => t.model || '-', isBase: true },
-    assembly_date: { label: 'Дата выпуска', getValue: (t) => formatDateTime(t.assembly_date || t.releaseDate), isBase: true },
-    region: { label: 'Регион', getValue: (t) => t.region || '-', isBase: true },
-    consumer: { label: 'Дилер', getValue: (t) => t.dealer || '-', isBase: true },
-    oh_hour: { label: 'Моточасы', getValue: (t) => t.oh_hour || t.motoHours || '-', isBase: true },
-    last_activity: { label: 'Последняя активность', getValue: (t) => formatDateTime(t.last_activity || t.lastActivity), isBase: true },
-    dvs: { label: 'ДВС', getValue: (t) => t.dvs || '-', getStatus: (t) => t.dvs_status, isNode: true },
-    kpp: { label: 'КПП', getValue: (t) => t.kpp || '-', getStatus: (t) => t.kpp_status, isNode: true },
-    rk: { label: 'РК', getValue: (t) => t.rk || '-', getStatus: (t) => t.rk_status, isNode: true },
-    bk: { label: 'БК', getValue: (t) => t.bk || '-', getStatus: (t) => t.bk_status, isNode: true },
-    gr: { label: 'ГР', getValue: (t) => t.gr || '-', getStatus: (t) => t.gr_status, isNode: true },
-    autopilot: { label: 'Автопилот', getValue: (t) => t.autopilot || '-', getStatus: (t) => t.autopilot_status, isNode: true },
+    vin: { 
+      label: 'VIN', 
+      getValue: (t) => t.vin || t.VIN || '-', 
+      isBase: true 
+    },
+    model: { 
+      label: 'Модель', 
+      getValue: (t) => t.model || '-', 
+      isBase: true 
+    },
+    assembly_date: { 
+      label: 'Дата выпуска', 
+      getValue: (t) => formatDateTime(t.assembly_date || t.releaseDate), 
+      isBase: true 
+    },
+    region: { 
+      label: 'Регион', 
+      getValue: (t) => t.region || '-', 
+      isBase: true 
+    },
+    consumer: { 
+      label: 'Дилер', 
+      getValue: (t) => t.dealer || '-', 
+      isBase: true 
+    },
+    oh_hour: { 
+      label: 'Моточасы', 
+      getValue: (t) => t.oh_hour || t.motoHours || '-', 
+      isBase: true 
+    },
+    last_activity: { 
+      label: 'Последняя активность', 
+      getValue: (t) => formatDateTime(t.last_activity || t.lastActivity), 
+      isBase: true 
+    },
+    dvs: { 
+      label: 'ДВС', 
+      getValue: (t) => {
+        const softwareName = t.dvs_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version =  softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.dvs_status, 
+      isNode: true 
+    },
+    kpp: { 
+      label: 'КПП', 
+      getValue: (t) => {
+        const softwareName = t.kpp_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version =  softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.kpp_status, 
+      isNode: true 
+    },
+    rk: { 
+      label: 'РК', 
+      getValue: (t) => {
+        const softwareName = t.rk_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version = softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.rk_status, 
+      isNode: true 
+    },
+    bk: { 
+      label: 'БК', 
+      getValue: (t) => {
+        const softwareName = t.bk_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version = softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.bk_status, 
+      isNode: true 
+    },
+    gr: { 
+      label: 'ГР', 
+      getValue: (t) => {
+        const softwareName = t.gr_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version = softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.gr_status, 
+      isNode: true 
+    },
+    autopilot: { 
+      label: 'Автопилот', 
+      getValue: (t) => {
+        const softwareName = t.autopilot_software_name;
+        if (softwareName && softwareName !== '-') {
+          const version = softwareName;
+          return version;
+        }
+        return '-';
+      }, 
+      getStatus: (t) => t.autopilot_status, 
+      isNode: true 
+    },
   };
 
   const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
@@ -234,7 +322,6 @@ console.log('Первый трактор:', tractors[0]);
 
   useEffect(() => {
   const fetchTractors = async () => {
-
     console.log('DEBUG: userRole =', userRole);
     console.log('DEBUG: user =', user); 
 
@@ -250,103 +337,132 @@ console.log('Первый трактор:', tractors[0]);
       setLoading(true);
 
       // 1. Получаем тракторы
-      let tractors = await api.post('search/tractor-info',postData);
+      let tractors = await api.post('search/tractor-info', postData);
         
-      console.log(`dfsdfdasfdasvasdv ${userRole}`)
-
       if (userRole === 'dealer') {
         tractors = tractors.filter(tractor => {
-          // Проверяем разные поля, где может быть информация о дилере
           const tractorConsumer = tractor.consumer || tractor.dealer || '';
           const userName = user?.sub || user?.name || user?.username || '';
-          
-          console.log (`dsfasdadfd ${tractorConsumer}`)
-          // Ищем совпадение по имени пользователя или ID
           return tractorConsumer.toLowerCase().includes(userName.toLowerCase())
         });
         console.log(`Для дилера ${user?.username || user?.sub} отфильтровано ${tractors.length} тракторов`);
       }
 
-      // 2. Если есть тракторы — получаем компоненты
+      // 2. Получаем компоненты (НОВЫЙ ФОРМАТ ОТВЕТА)
       let enrichedTractors = tractors;
       if (tractors.length > 0) {
         const vins = tractors.map(t => t.vin);
-        const components = await api.post('search/tractor-components', {vins});
-          const vinToComponents = {};
-          components.forEach(c => {
-  if (!c.vin) {
-    console.warn('Компонент без VIN:', c);
-    return;
-  }
-  if (!c.component_type) {
-    console.warn(`Компонент для VIN ${c.vin} не имеет типа:`, c);
-  }
-  
-
-   let status;
-            if (c.is_critical) {
-              status = 'critical';
-            } else if (c.is_actual) {
-              status = 'actual';
-            } else {
-              status = 'oldy';
+        const componentsResponse = await api.post('search/tractor-components', {vins});
+        
+        // 🔄 Новый формат: [{vin, components: []}]
+        const vinToComponents = {};
+        
+        componentsResponse.forEach(item => {
+          if (!item.vin) {
+            console.warn('Элемент без VIN:', item);
+            return;
+          }
+          
+          const vin = item.vin;
+          if (!vinToComponents[vin]) {
+            vinToComponents[vin] = [];
+          }
+          
+          // Обрабатываем вложенный массив компонентов
+          if (Array.isArray(item.components)) {
+            item.components.forEach(c => {
+              if (!c.component_type) {
+                console.warn(`Компонент для VIN ${vin} не имеет типа:`, c);
+                return;
+              }
+              
+              // Определяем статус
+              let status;
+              if (c.is_critical) {
+                status = 'critical';
+              } else if (c.is_actual) {
+                status = 'actual';
+              } else {
+                status = 'oldy';
+              }
+              
+              vinToComponents[vin].push({
+                type: c.component_type.toLowerCase(), // приводим к нижнему регистру
+                model: c.comp_model || '-',
+                status: status,
+                is_actual: c.is_actual,
+                is_critical: c.is_critical,
+                path: c.software_path || '',
+                name: c.software_name || '-'
+              });
+            });
+          }
+        });
+        
+        console.log('vinToComponents:', vinToComponents);
+        
+        // Маппинг типов (поддерживаем оба регистра)
+        const typeToField = {
+          'dvs': 'dvs', 'engine': 'dvs',
+          'kpp': 'kpp', 'transmission': 'kpp',
+          'rk': 'rk', 'suspension': 'rk',
+          'bk': 'bk',
+          'gr': 'gr', 'hydraulics': 'gr', 'hr': 'gr',
+          'autopilot': 'autopilot'
+        };
+        
+        enrichedTractors = tractors.map(t => {
+          if (!t.vin) {
+            console.warn('Трактор без VIN:', t);
+            return t;
+          }
+          
+          const comps = vinToComponents[t.vin] || [];
+          const enriched = { ...t };
+          
+          // Инициализируем все поля компонентов со значениями по умолчанию
+          ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'].forEach(field => {
+            enriched[field] = '-';
+            enriched[`${field}_status`] = null;
+            enriched[`${field}_is_actual`] = false;
+            enriched[`${field}_is_critical`] = false;
+            enriched[`${field}_path`] = '';
+            enriched[`${field}_software_name`] = '-';
+          });
+          
+          // Группируем компоненты по типу
+          const groupedByType = {};
+          comps.forEach(c => {
+            const field = typeToField[c.type];
+            if (!field) {
+              console.warn(`Неизвестный тип компонента: ${c.type} для VIN ${t.vin}`);
+              return;
             }
-
-  if (!vinToComponents[c.vin]) vinToComponents[c.vin] = [];
-  vinToComponents[c.vin].push({
-    id_Firmwares: c.id_Firmwares || null,
-    type: c.component_type || 'unknown',
-    model: c.comp_model || '-',
-    status: status 
-  });
-});
-console.log('vinToComponents:', vinToComponents); // отладка
-
-// Маппинг типов компонентов на поля в таблице
-const typeToField = {
-  // Русские названия
-  'dvs': 'dvs',
-  'kpp': 'kpp',
-  'bk': 'bk',
-
-  'rk': 'rk',
-  'hr': 'gr',
-  'autopilot': 'autopilot'
-  // Добавьте другие варианты по необходимости
-};
-          enrichedTractors = tractors.map(t => {
-  if (!t.vin) {
-    console.warn('Трактор без VIN:', t);
-    return t;
-  }
-  const comps = vinToComponents[t.vin] || [];
-  const enriched = { ...t };
-  comps.forEach(c => {
-    if (!c.type || c.type === 'unknown') {
-      console.warn(`Пропуск компонента с неизвестным типом для VIN ${t.vin}:`, c);
-      return;
-    }
-    const type = c.type.toLowerCase();
-    const field = typeToField[type];
-    if (field) {
-      enriched[field] = c.model;
-      enriched[`${field}_status`] = c.status;
-      enriched[`${field}_is_actual`] = c.is_actual;   // <-- добавляем
-enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
-
-      // Добавляем поле path, если оно существует в компоненте
-      if (c.hasOwnProperty('path')) {
-        enriched[`${field}_path`] = c.path || '';
-      } else {
-        // По умолчанию пустая строка, если поле path отсутствует
-        enriched[`${field}_path`] = '';
-      }
-    } else {
-      console.warn(`Неизвестный тип компонента: ${c.type} для VIN ${t.vin}`);
-    }
-  });
-  return enriched;
-});
+            if (!groupedByType[field]) groupedByType[field] = [];
+            groupedByType[field].push(c);
+          });
+          
+          // Выбираем приоритетный компонент для каждого типа: critical > actual > oldy
+          Object.entries(groupedByType).forEach(([field, components]) => {
+            const sorted = components.sort((a, b) => {
+              if (a.is_critical && !b.is_critical) return -1;
+              if (!a.is_critical && b.is_critical) return 1;
+              if (a.is_actual && !b.is_actual) return -1;
+              if (!a.is_actual && b.is_actual) return 1;
+              return 0;
+            });
+            
+            const selected = sorted[0];
+            enriched[field] = selected.model;
+            enriched[`${field}_status`] = selected.status;
+            enriched[`${field}_is_actual`] = selected.is_actual;
+            enriched[`${field}_is_critical`] = selected.is_critical;
+            enriched[`${field}_path`] = selected.path || '';
+            enriched[`${field}_software_name`] = selected.name || '-';
+          });
+          
+          return enriched;
+        });
       }
       setTractors(enrichedTractors);
     } catch (error) {
@@ -377,7 +493,6 @@ enriched[`${field}_is_critical`] = c.is_critical; // <-- добавляем
       return { key, direction: 'asc' };
     });
   };
-
 
 
   const getCellValue = (tractor, key) => {
@@ -461,21 +576,19 @@ const getStatusColorClass = (status) => {
 
   // Функция для определения стиля текста в зависимости от значения поля path
   const getTextStyle = (tractor, colKey) => {
-    // Определяем, является ли столбец одним из компонентов ПО
     const nodeFields = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
     
     if (nodeFields.includes(colKey)) {
-      // Используем поле path, связанное с конкретным компонентом
-      const pathField = `${colKey}_path`; // Например, dvs_path, kpp_path и т.д.
+      const pathField = `${colKey}_path`;
       const pathValue = tractor[pathField];
       
-      // Применяем стиль в зависимости от значения path
       return {
-        color: pathValue === '' || pathValue === null || pathValue === undefined ? 'gray' : 'black'
+        color: !pathValue || pathValue === '' ? 'gray' : 'black',
+        // Опционально: можно добавить tooltip с путём
+        // title: pathValue || undefined
       };
     }
     
-    // Для других столбцов не применяем специальное форматирование
     return {};
   };
 
@@ -548,6 +661,19 @@ const getStatusColorClass = (status) => {
   }
 
 
+  const handleSoftwareClick = useCallback((e, tractor, componentType) => {
+    e.stopPropagation(); // 🔥 Важно: не триггерить клик по строке!
+    
+    const path = tractor[`${componentType}_path`];
+    const softwareName = tractor[`${componentType}_software_name`];
+    const model = tractor[componentType];
+    
+    console.log(`Click on ${componentType} software:`, { path, softwareName, model });
+    
+    // Если путь пустой — переход на страницу создания ПО
+    if (!path || path === '' || path === '-') {
+      return <><AddPoForm onBack={onCloseTab} onSubmit={onAddSubmit} skipValidation={true} /></>}})
+
   const handleColorClick = (tractor) => {
     if (colorVin === tractor.vin) {
       setColorVin(null);
@@ -560,34 +686,6 @@ const getStatusColorClass = (status) => {
     setSelectedTractor(tractor.vin);
   };
 
-  // Функция для обработки клика по компоненту ПО
-  const handlePoClick = (componentType, tractor) => {
-    // Проверяем, есть ли компонент в тракторе
-    if (tractor[componentType] && tractor[componentType] !== '-') {
-      // Вместо открытия PoDetails, вызываем переданную функцию для открытия формы добавления ПО
-      if (onAddSubmit) {
-        // Передаем информацию о компоненте и тракторе в форму
-        const componentInfo = {
-          component_type: componentType,
-          component_name: tractor[componentType] || componentType.toUpperCase(),
-          tractor_vin: tractor.vin,
-          tractor_model: tractor.model
-        };
-        
-        // Вызываем функцию открытия формы добавления ПО
-        onAddSubmit(componentInfo);
-      }
-    }
-  };
-
-  // Если нужно открыть форму добавления ПО, отображаем её
-  if (showAddForm) {
-    return (
-      <div className="MainPart">
-        <AddPoForm onBack={onCloseAddForm} onSubmit={onAddSubmit} />
-      </div>
-    );
-  }
 
   if (selectedTractor) {
     return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
@@ -629,23 +727,23 @@ const getStatusColorClass = (status) => {
   return (
     <>
           <div className="columns-selector" >
-        {hideableColumns.map(col => (
-          <label key={col.key} style={{ 
-            display: 'flex',  
-            cursor: 'pointer',
-            fontSize: '16px',
-            color: 'black',
-          }}>
-            <input
-              type="checkbox"
-              checked={visibleColumns[col.key] !== false}
-              onChange={() => toggleColumnVisibility(col.key)}
-              style={{ cursor: 'pointer' }}
-            />
-            {col.label}
-          </label>
-        ))}
-      </div>
+            {hideableColumns.map(col => (
+              <label key={col.key} style={{ 
+                display: 'flex',  
+                cursor: 'pointer',
+                fontSize: '16px',
+                color: 'black',
+              }}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns[col.key] !== false}
+                  onChange={() => toggleColumnVisibility(col.key)}
+                  style={{ cursor: 'pointer' }}
+                />
+                {col.label}
+              </label>
+            ))}
+          </div>
 
     <div className="tractor-table-container" >
         <button onClick={onCloseTab} className="go-back" style={{top: '-40px'}}></button>
@@ -685,19 +783,7 @@ const getStatusColorClass = (status) => {
                     // Применяем стиль цвета текста в зависимости от значения поля path
                     const textStyle = getTextStyle(tractor, colKey);
                     
-                    // Добавляем обработчик клика для открытия PoDetails
-                    return <td 
-                      key={colKey} 
-                      className={className} 
-                      style={textStyle}
-                      onClick={(e) => {
-                        e.stopPropagation(); // Останавливаем всплытие события
-                        // Проверяем, что значение не "-" и компонент существует
-                        if (value !== '-' && value) {
-                          handlePoClick(colKey, tractor); // Вызываем обработчик клика по ПО
-                        }
-                      }}
-                    >{value}</td>;
+                    return <td key={colKey} className={className} style={textStyle}>{value}</td>;
                   }
                   
                   // Применяем стиль цвета текста в зависимости от значения поля path
