@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
+import { MemoryRouter } from 'react-router-dom';
 import { TractorDetails } from '../TractorDetails/TractorDetails';
 
 // Мокаем изображения
@@ -10,22 +11,16 @@ vi.mock('../img/К5.png', () => ({ default: 'k5-image-mock' }));
 vi.mock('../img/К7М.png', () => ({ default: 'k7-image-mock' }));
 
 // Мокаем useAuth
-vi.mock('../auth/AuthContext', () => ({
-  useAuth: vi.fn()
-}));
+vi.mock('../auth/AuthContext', () => ({ useAuth: vi.fn() }));
 
 // Мокаем fetchAPI.js
 vi.mock('../fetchAPI.js', () => ({
-  api: {
-    get: vi.fn(),
-    post: vi.fn(),
-    request: vi.fn(),
-  },
+  api: { get: vi.fn(), post: vi.fn(), request: vi.fn() },
   buildApiUrl: (path) => `http://localhost:3000${path}`,
   API_BASE_URL: 'http://localhost:3000',
 }));
 
-// Мокаем PoDetails, чтобы не усложнять
+// Мокаем PoDetails
 vi.mock('../PoDetails/PoDetails.jsx', () => ({
   PoDetails: vi.fn(({ po, onBack }) => (
     <div data-testid="po-details-mock">
@@ -83,26 +78,31 @@ describe('TractorDetails', () => {
     }
   ];
 
+  const renderWithRouter = (ui, { initialEntries = ['/'], ...options } = {}) => {
+    return render(
+      <MemoryRouter initialEntries={initialEntries}>{ui}</MemoryRouter>,
+      options
+    );
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     useAuth.mockReturnValue({ token: mockToken });
     api.get.mockReset();
   });
 
-  afterEach(() => {
-    cleanup();
-  });
+  afterEach(() => cleanup());
 
   describe('Rendering states', () => {
     it('should show loading state when fetching data', () => {
       api.get.mockImplementationOnce(() => new Promise(() => {}));
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       expect(screen.getByText(/Загрузка деталей трактора/i)).toBeInTheDocument();
       expect(screen.getByText(`VIN: ${mockVin}`)).toBeInTheDocument();
     });
 
     it('should show error when no VIN provided', async () => {
-      render(<TractorDetails vin={null} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={null} onBack={mockOnBack} />);
       await waitFor(() => {
         expect(screen.getByText('VIN не указан')).toBeInTheDocument();
       });
@@ -111,7 +111,7 @@ describe('TractorDetails', () => {
 
     it('should show error when fetch fails', async () => {
       api.get.mockRejectedValueOnce(new Error('Network error'));
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
         expect(screen.getByText(/Ошибка: Network error/i)).toBeInTheDocument();
       });
@@ -119,7 +119,7 @@ describe('TractorDetails', () => {
 
     it('should show error when response is empty array', async () => {
       api.get.mockResolvedValueOnce([]);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
         expect(screen.getByText('Данные по трактору не найдены')).toBeInTheDocument();
       });
@@ -127,26 +127,26 @@ describe('TractorDetails', () => {
   });
 
   describe('Successful data loading', () => {
-    beforeEach(() => {
-      api.get.mockResolvedValueOnce(mockTractorData);
-    });
+    beforeEach(() => { api.get.mockResolvedValueOnce(mockTractorData); });
 
     it('should render tractor details correctly', async () => {
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
-        expect(screen.getByText('K-5')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /K-5/ })).toBeInTheDocument();
       });
-      // Проверяем дату выпуска
-      const dateSection = screen.getByText(/Дата выпуска/).parentElement;
+      const dateSection = screen.getByText(/Дата выпуска/).closest('.section');
       expect(dateSection).toHaveTextContent(/2024/);
       expect(screen.getByText('Московская область')).toBeInTheDocument();
-      const lastActivitySection = screen.getByText(/Дата последней эксплуатации/).parentElement;
+      const lastActivitySection = screen.getByText(/Дата последней эксплуатации/).closest('.section');
       expect(lastActivitySection).toHaveTextContent(/2024/);
-      expect(screen.getByText(/150/)).toBeInTheDocument(); // моточасы
+      
+      // 🔧 Исправлено: ищем 150 внутри конкретной секции "Кол-во МЧ"
+      const ohHourSection = screen.getByText(/Кол-во МЧ/).closest('.section');
+      expect(ohHourSection).toHaveTextContent('150');
     });
 
     it('should render tractor image based on model', async () => {
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
         const image = screen.getByAltText('K-5');
         expect(image).toBeInTheDocument();
@@ -158,7 +158,7 @@ describe('TractorDetails', () => {
       const dataWithUnknownModel = [{ ...mockTractorData[0], model: 'Unknown' }, ...mockTractorData.slice(1)];
       api.get.mockReset();
       api.get.mockResolvedValueOnce(dataWithUnknownModel);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
         const image = screen.getByAltText('Unknown');
         expect(image).toHaveAttribute('src', 'default-image-mock');
@@ -166,29 +166,29 @@ describe('TractorDetails', () => {
     });
 
     it('should render components/PO list correctly', async () => {
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
-        expect(screen.getByText('ДВС:')).toBeInTheDocument();
+        expect(screen.getByText(/ДВС:/)).toBeInTheDocument();
         expect(screen.getByText('v2.1.0')).toBeInTheDocument();
         expect(screen.getByText('(CUMMINS QSB6.7)')).toBeInTheDocument();
-        expect(screen.getByText('КПП:')).toBeInTheDocument();
+        expect(screen.getByText(/КПП:/)).toBeInTheDocument();
         expect(screen.getByText('v1.5.2')).toBeInTheDocument();
-        expect(screen.getByText('БК:')).toBeInTheDocument();
+        expect(screen.getByText(/БК:/)).toBeInTheDocument();
         expect(screen.getByText('v3.0.1')).toBeInTheDocument();
       });
     });
 
     it('should show placeholder components when no data', async () => {
       api.get.mockReset();
-      api.get.mockResolvedValueOnce([mockTractorData[0]]); // только трактор
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      api.get.mockResolvedValueOnce([mockTractorData[0]]);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => {
-        expect(screen.getByText('ДВС:')).toBeInTheDocument();
-        expect(screen.getByText('КПП:')).toBeInTheDocument();
-        expect(screen.getByText('РК:')).toBeInTheDocument();
-        expect(screen.getByText('БК:')).toBeInTheDocument();
-        expect(screen.getByText('ГР:')).toBeInTheDocument();
-        expect(screen.getByText('Автопилот:')).toBeInTheDocument();
+        expect(screen.getByText(/ДВС:/)).toBeInTheDocument();
+        expect(screen.getByText(/КПП:/)).toBeInTheDocument();
+        expect(screen.getByText(/РК:/)).toBeInTheDocument();
+        expect(screen.getByText(/БК:/)).toBeInTheDocument();
+        expect(screen.getByText(/ГР:/)).toBeInTheDocument();
+        expect(screen.getByText(/Автопилот:/)).toBeInTheDocument();
         const dashes = screen.getAllByText('-');
         expect(dashes.length).toBeGreaterThanOrEqual(6);
       });
@@ -198,18 +198,18 @@ describe('TractorDetails', () => {
   describe('Tooltip functionality', () => {
     beforeEach(async () => {
       api.get.mockResolvedValueOnce(mockTractorData);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('K-5')).toBeInTheDocument());
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByRole('heading', { name: /K-5/ })).toBeInTheDocument());
     });
 
     it('should show tooltip when hovering on component', () => {
-      const componentItem = screen.getByText('ДВС:').closest('.po-item');
+      const componentItem = screen.getByText(/ДВС:/).closest('.po-item');
       fireEvent.mouseEnter(componentItem);
       expect(screen.getByText('Двигатель Cummins с системой common rail')).toBeInTheDocument();
     });
 
     it('should hide tooltip on mouse leave', () => {
-      const componentItem = screen.getByText('ДВС:').closest('.po-item');
+      const componentItem = screen.getByText(/ДВС:/).closest('.po-item');
       fireEvent.mouseEnter(componentItem);
       expect(screen.getByText('Двигатель Cummins с системой common rail')).toBeInTheDocument();
       fireEvent.mouseLeave(componentItem);
@@ -220,16 +220,20 @@ describe('TractorDetails', () => {
   describe('Navigation', () => {
     it('should call onBack when back button is clicked', async () => {
       api.get.mockResolvedValueOnce(mockTractorData);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('K-5')).toBeInTheDocument());
-      const backButton = screen.getByRole('button', { name: /Назад/ }); // класс go-back, текст отсутствует, но role button есть
+      // 🔧 Исправлено: получаем container из render для доступа к кнопке по классу
+      const { container } = renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByRole('heading', { name: /K-5/ })).toBeInTheDocument());
+      
+      // 🔧 Исправлено: ищем кнопку по классу, т.к. у неё нет accessible name
+      const backButton = container.querySelector('.go-back');
+      expect(backButton).toBeInTheDocument();
       fireEvent.click(backButton);
       expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
 
     it('should call onBack when clicking "Назад к списку" on error screen', async () => {
       api.get.mockRejectedValueOnce(new Error('Network error'));
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => expect(screen.getByText(/Ошибка: Network error/i)).toBeInTheDocument());
       const backButton = screen.getByRole('button', { name: /Назад к списку/i });
       fireEvent.click(backButton);
@@ -240,7 +244,7 @@ describe('TractorDetails', () => {
   describe('API calls', () => {
     it('should call api.get with correct URL', async () => {
       api.get.mockResolvedValueOnce(mockTractorData);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
       await waitFor(() => expect(api.get).toHaveBeenCalledTimes(1));
       expect(api.get).toHaveBeenCalledWith(
         `search/search-tractor-vin?request=${encodeURIComponent(mockVin)}`
@@ -248,7 +252,7 @@ describe('TractorDetails', () => {
     });
 
     it('should not call api.get when vin is null', async () => {
-      render(<TractorDetails vin={null} onBack={mockOnBack} />);
+      renderWithRouter(<TractorDetails vin={null} onBack={mockOnBack} />);
       await waitFor(() => expect(screen.getByText('VIN не указан')).toBeInTheDocument());
       expect(api.get).not.toHaveBeenCalled();
     });
@@ -258,23 +262,23 @@ describe('TractorDetails', () => {
     it('should handle missing optional fields gracefully', async () => {
       const incompleteData = [{ vin: 'TEST123', model: 'K-5' }];
       api.get.mockResolvedValueOnce(incompleteData);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('K-5')).toBeInTheDocument());
-      expect(screen.getByText(/Дата выпуска/).parentElement).toHaveTextContent(/-/);
-      expect(screen.getByText(/Регион эксплуатации/).parentElement).toHaveTextContent(/-/);
-      expect(screen.getByText(/Кол-во МЧ/).parentElement).toHaveTextContent(/-/);
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByRole('heading', { name: /K-5/ })).toBeInTheDocument());
+      expect(screen.getByText(/Дата выпуска/).closest('.section')).toHaveTextContent(/-/);
+      expect(screen.getByText(/Регион эксплуатации/).closest('.section')).toHaveTextContent(/-/);
+      expect(screen.getByText(/Кол-во МЧ/).closest('.section')).toHaveTextContent(/-/);
     });
 
     it('should handle components without version and model', async () => {
       const dataWithIncompleteComponents = [
         mockTractorData[0],
-        { vin: 'TEST123', component_type: 'ГР' } // нет comp_model, recommend_sw_version, description
+        { vin: 'TEST123', component_type: 'ГР' }
       ];
       api.get.mockReset();
       api.get.mockResolvedValueOnce(dataWithIncompleteComponents);
-      render(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('ГР:')).toBeInTheDocument());
-      const versionSpan = screen.getByText('ГР:').closest('.po-item').querySelector('.po-item-version');
+      renderWithRouter(<TractorDetails vin={mockVin} onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByText(/ГР:/)).toBeInTheDocument());
+      const versionSpan = screen.getByText(/ГР:/).closest('.po-item').querySelector('.po-item-version');
       expect(versionSpan).toHaveTextContent('-');
     });
   });

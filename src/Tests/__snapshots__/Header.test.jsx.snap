@@ -17,8 +17,20 @@ exports[`Header > Snapshots > соответствует снимку без onL
     <h3
       style="cursor: pointer;"
     >
-      Помощь
+      База знаний
     </h3>
+    <h3>
+      Роль:
+    </h3>
+  </div>
+  <div
+    class="icon-ptz"
+  >
+    <img
+      alt="/src/img/icon.png"
+      class="object-pi"
+      src="/src/img/icon.png"
+    />
   </div>
 </header>
 `;
@@ -40,8 +52,20 @@ exports[`Header > Snapshots > соответствует снимку без о�
     <h3
       style="cursor: pointer;"
     >
-      Помощь
+      База знаний
     </h3>
+    <h3>
+      Роль:
+    </h3>
+  </div>
+  <div
+    class="icon-ptz"
+  >
+    <img
+      alt="/src/img/icon.png"
+      class="object-pi"
+      src="/src/img/icon.png"
+    />
   </div>
 </header>
 `;
@@ -63,6 +87,11 @@ exports[`Header > Snapshots > соответствует снимку с пол�
     <h3
       style="cursor: pointer;"
     >
+      База знаний
+    </h3>
+    <h3
+      style="cursor: pointer; display: flex; align-items: center; gap: 5px;"
+    >
       Помощь
     </h3>
     <h3
@@ -70,6 +99,18 @@ exports[`Header > Snapshots > соответствует снимку с пол�
     >
       Выйти
     </h3>
+    <h3>
+      Роль:
+    </h3>
+  </div>
+  <div
+    class="icon-ptz"
+  >
+    <img
+      alt="/src/img/icon.png"
+      class="object-pi"
+      src="/src/img/icon.png"
+    />
   </div>
 </header>
 `;

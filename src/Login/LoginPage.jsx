@@ -18,67 +18,72 @@ const LoginPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setAuthorizationError('');
-    e.preventDefault();
-    setAuthorizationError('');
+  e.preventDefault();
+  setAuthorizationError('');
 
-    if (!login || !password) {
-      setAuthorizationError('Введите логин и пароль');
-      return;
-    }
+  if (!login || !password) {
+    setAuthorizationError('Введите логин и пароль');
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    const formData = new URLSearchParams();
-    formData.append('grant_type', 'password');
-    formData.append('username', login);
-    formData.append('password', password);
-    formData.append('scope', '');
-    formData.append('client_id', '');
-    formData.append('client_secret', '');
+  const formData = new URLSearchParams();
+  formData.append('grant_type', 'password');
+  formData.append('username', login);
+  formData.append('password', password);
+  formData.append('scope', '');
+  formData.append('client_id', '');
+  formData.append('client_secret', '');
 
-    // Подробное логирование
-    const fullUrl = buildApiUrl('/token/');
-    console.log('=== ДЕТАЛИ ЗАПРОСА ===');
-    console.log('API_BASE_URL:', API_BASE_URL);
-    console.log('Полный URL:', fullUrl);
-    console.log('Метод:', 'POST');
-    console.log('Данные:', formData.toString());
-    console.log('Content-Type:', 'application/x-www-form-urlencoded');
-    console.log('======================');
+  const fullUrl = buildApiUrl('/token/');
+  console.log('=== ДЕТАЛИ ЗАПРОСА ===');
+  console.log('API_BASE_URL:', API_BASE_URL);
+  console.log('Полный URL:', fullUrl);
+  console.log('Метод:', 'POST');
+  console.log('Данные:', formData.toString());
+  console.log('Content-Type:', 'application/x-www-form-urlencoded');
+  console.log('======================');
 
-    
+  try {
+    const data = await api.request('/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(),
+      skipAuth: true,
+    });
 
+    console.log('Полученные данные:', data);
 
-    try {
-      const data = await api.request('/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString(),
-        skipAuth: true,
-      });
-
-      console.log('Полученные данные:', data);
-
-      if (data.access_token) {
-        try {
-          loginContext(data.access_token);
-          navigate('/main', { replace: true });
-        } catch (err) {
-          console.error('Ошибка при сохранении токена:', err);
-          setAuthorizationError('Ошибка при входе: ' + err.message);
-        }
-      } else {
-        setAuthorizationError('Сервер не вернул токен');
+    if (data.access_token) {
+      try {
+        loginContext(data.access_token);
+        navigate('/main', { replace: true });
+      } catch (err) {
+        console.error('Ошибка при сохранении токена:', err);
+        setAuthorizationError('Ошибка при входе: ' + err.message);
       }
-    } catch (error) {
-      console.error('Ошибка при авторизации:', error);
-      setAuthorizationError(error.message);
-    } finally {
-      setIsLoading(false);
+    } else {
+      setAuthorizationError('Сервер не вернул токен');
     }
-  };
+  } catch (error) {
+    console.error('Ошибка при авторизации:', error);
+    
+    // 🔧 Исправление: маппинг ошибок на пользовательские сообщения
+    if (error.message === 'Network Error' || 
+        error.message?.includes('Network') ||
+        error.message?.includes('Failed to fetch')) {
+      setAuthorizationError('Ошибка сети. Проверьте подключение.');
+    } else if (error.message?.includes('401') || 
+               error.message?.toLowerCase().includes('unauthorized')) {
+      setAuthorizationError('Unauthorized');
+    } else {
+      setAuthorizationError(error.message || 'Произошла ошибка при входе');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <>
