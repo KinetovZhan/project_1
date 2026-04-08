@@ -5,23 +5,23 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api, buildApiUrl } from '../fetchAPI.js';
 
-export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
+export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, setFormData }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
-  const [selectedComponents, setSelectedComponents] = useState([]);
+  const [selectedComponents, setSelectedComponents] = useState(formData ? formData.selectedComponents : []);
   const [softwareOptions, setSoftwareOptions] = useState([]);
-  const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(null);
+  const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(formData ? formData.selectedPreviousVersion : null);
   const [loadingSoftware, setLoadingSoftware] = useState(false);
   const [softwareError, setSoftwareError] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(null);         // Статус (serial/experienced/in operation)
-  const [selectedProducer, setSelectedProducer] = useState(null);
-  const [selectedTractorModels, setSelectedTractorModels] = useState([]); // массив выбранных моделей
+  const [selectedStatus, setSelectedStatus] = useState(formData ? formData.selectedStatus : null);         // Статус (serial/experienced/in operation)
+  const [selectedProducer, setSelectedProducer] = useState(formData ? formData.selectedProducer : null);
+  const [selectedTractorModels, setSelectedTractorModels] = useState(formData ? formData.selectedTractorModels : []); // массив выбранных моделей
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
-  const [isArchive, setIsArchive] = useState(false);
-  const [isCritical, setIsCritical] = useState(false);
-  const [isActual, setIsActual] = useState(false);
+  const [isArchive, setIsArchive] = useState(formData ? formData.isArchive : false);
+  const [isCritical, setIsCritical] = useState(formData ? formData.isCritical : false);
+  const [isActual, setIsActual] = useState(formData ? formData.isActual : false);
 
 
   // Состояния для производителей
@@ -31,6 +31,22 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
 
   const { token } = useAuth();
   const isMobile = useCheckMobile();
+
+  // Update formData state when values change
+  useEffect(() => {
+    if (setFormData) {
+      setFormData({
+        selectedProducer,
+        selectedTractorModels,
+        selectedComponents,
+        selectedPreviousVersion,
+        selectedStatus,
+        isArchive,
+        isCritical,
+        isActual
+      });
+    }
+  }, [selectedProducer, selectedTractorModels, selectedComponents, selectedPreviousVersion, selectedStatus, isArchive, isCritical, isActual, setFormData]);
 
   // Опции для статуса (software_status)
   const statusOptions = [
@@ -308,6 +324,20 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false }) {
         throw new Error(`HTTP ${response.status}:\n${errMsg}`);
       }
 
+      // Reset form data after successful submission
+      if (setFormData) {
+        setFormData({
+          selectedProducer: null,
+          selectedTractorModels: [],
+          selectedComponents: [],
+          selectedPreviousVersion: null,
+          selectedStatus: null,
+          isArchive: false,
+          isCritical: false,
+          isActual: false
+        });
+      }
+      
       onSubmit?.(data);
     } catch (err) {
       console.error('❌ Ошибка:', err);

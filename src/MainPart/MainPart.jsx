@@ -3,7 +3,7 @@ import { Objects } from '../Po/Objects';
 import { TractorTable } from '../TractorTable/TractorTable';
 import { AddPoForm } from '../AddPo/AddPo';
 import { AddAggForm } from '../AddUzel/AddAgg';
-import React, { useEffect } from 'react'; //  исправлено: useEffect, а не useffect
+import React, { useEffect, useState } from 'react'; //  исправлено: useEffect, а не useffect
 import { useNavigate } from 'react-router-dom';
 
 export function MainPart({
@@ -47,7 +47,17 @@ export function MainPart({
 }) {
   const navigate = useNavigate();
 
-  
+  // State to persist form data when switching tabs
+  const [formData, setFormData] = useState({
+    selectedProducer: null,
+    selectedTractorModels: [],
+    selectedComponents: [],
+    selectedPreviousVersion: null,
+    selectedStatus: null,
+    isArchive: false,
+    isCritical: false,
+    isActual: false
+  });
 
   const handleGoBack = () => {
     navigate(-1); // Возврат на предыдущую страницу в истории
@@ -78,7 +88,12 @@ export function MainPart({
   if (showAddForm) {
     return (
       <div className="MainPart">
-        <AddPoForm onBack={onCloseAddForm} onSubmit={onAddSubmit} />
+        <AddPoForm 
+          onBack={onCloseAddForm} 
+          onSubmit={onAddSubmit} 
+          formData={formData}
+          setFormData={setFormData}
+        />
       </div>
     );
   }
