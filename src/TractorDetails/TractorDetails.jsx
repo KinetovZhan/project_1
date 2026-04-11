@@ -156,7 +156,7 @@ export function TractorDetails({ vin, onBack }) {
   // Создаем список для комплектации и ПО на основе реальных данных
   const poList = components.map(component => ({
     name: component.component_type,
-    version: component.recommend_sw_version || component.sw_name || '-',
+    version: component.software_name || '-',
     model: component.comp_model,
     description: component.description || 'Нет описания' ,
     component_id: component.component_id,
@@ -238,11 +238,11 @@ export function TractorDetails({ vin, onBack }) {
                       style={{ cursor: 'pointer' }}
                     >
                       <div className="po-item-content">
-                        <span className="po-item-name">{item.name}:</span>
+                        <span className="po-item-name">{item.model}: </span>
                         <span className="po-item-version">{item.version}</span>
-                        {item.model && item.model !== '-' && (
+                        {/* {item.model && item.model !== '-' && (
                           <span className="po-item-model">({item.model})</span>
-                        )}
+                        )} */}
                       </div>
                     </li>
                   ))}
@@ -250,7 +250,7 @@ export function TractorDetails({ vin, onBack }) {
               </div>
               <div className="section">
                 <h3>Дата последней эксплуатации</h3>
-                <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}, {oh_hour || '-'}</p>
+                <p>{last_activity ? new Date(last_activity).toLocaleString('ru-RU') : '-'}</p>
               </div>
               <div className="section">
                 <h3>Кол-во МЧ</h3>

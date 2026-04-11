@@ -329,7 +329,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       KPP: 'КПП',
       RK: 'РК',
       HR: 'Гидрораспределитель',
-      AP: 'Автопилот',
+      AUTOPILOT: 'Автопилот',
       BK: 'БК',
       K7: 'К-7',
       K5: 'К-5',
@@ -348,7 +348,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       KPP: 'КПП',
       RK: 'РК',
       hydrorasp: 'Гидрораспределитель',
-      AP: 'Автопилот',
+      AUTOPILOT: 'Автопилот',
       BK: 'БК',
     };
 

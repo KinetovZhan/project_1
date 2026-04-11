@@ -71,7 +71,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       KPP: 'KPP', 
       RK: 'RK',
       hydrorasp: 'HR',   
-      BK: 'BK'
+      BK: 'BK',
+      AUTOPILOT:'AUTOPILOT'
     };
 
     const activeTypes = Object.keys(FilterItems)
@@ -129,7 +130,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
       KPP: 'KPP',
       RK: 'RK',
       HR: 'HR',
-      BK: 'BK'
+      BK: 'BK',
+      AUTOPILOT:'AUTOPILOT'
     };
 
     const activeTypes = Object.keys(FilterItems)
@@ -228,7 +230,8 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
     KPP: 'KPP',
     RK: 'RK',
     HR: 'HR',   // важно: hydrorasp -> HR
-    BK: 'BK'
+    BK: 'BK',
+    AUTOPILOT:'AUTOPILOT'
   };
 
   const activeTypes = Object.keys(FilterItems)
@@ -428,6 +431,15 @@ const formatActualityOptionLabel = ({ value, label }) => {
               <input 
                 checked={FilterItems.BK}
                 onChange={() => handleFilterChange('BK')}
+                type="checkbox"/>
+            </label>
+          </div>
+          <div className='filter'>
+            <label> 
+              <span>Автопилот</span>
+              <input 
+                checked={FilterItems.AUTOPILOT}
+                onChange={() => handleFilterChange('AUTOPILOT')}
                 type="checkbox"/>
             </label>
           </div>
@@ -683,7 +695,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
               }),
               multiValue: (base) => ({
                 ...base,
-                fontSize: '11px'
+                fontSize: '13px'
               }),
               menuPortal: (base) => ({ ...base, zIndex: 9999 }),
               menuList: (base) => ({
@@ -694,7 +706,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
                 color: 'black',
                 border: '1px solid rgba(217, 217, 217, 1)',
                 scrollbarWidth: 'thin',
-                fontSize: '11px'
+                fontSize: '16px'
               }),
               option: (base, state) => ({
                 ...base,
