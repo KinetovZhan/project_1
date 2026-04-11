@@ -3,10 +3,7 @@ import {SearchBar} from "../SearchBar/SearchBar.jsx";
 import {TractorDetails} from "../TractorDetails/TractorDetails.jsx";
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
-// import { AddPo } from '../AddPo/AddPo.jsx';
-
-
-
+import { AddPoForm } from '../AddPo/AddPo.jsx';
 
 
 const formatDateTime = (dateString) => {
@@ -73,6 +70,8 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     return saved || null;
   });
   const [colorVin, setColorVin] = useState(null);
+  const [showAddPoForm, setShowAddPoForm] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState(null);
   const tableContainerRef = useRef(null);
   const { token, user } = useAuth();
 
@@ -645,7 +644,6 @@ const getStatusColorClass = (status) => {
   },[sortedTractors,actualFilter,uzelFilter,shouldHighlight]);
 
 
-
   // Функция для отображения иконки сортировки
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) {
@@ -670,9 +668,17 @@ const getStatusColorClass = (status) => {
     
     console.log(`Click on ${componentType} software:`, { path, softwareName, model });
     
-    // Если путь пустой — переход на страницу создания ПО
+    // Если путь пустой — показываем форму создания ПО
     if (!path || path === '' || path === '-') {
-      return <><AddPoForm onBack={onCloseTab} onSubmit={onAddSubmit} skipValidation={true} /></>}})
+      setSelectedComponent({
+        type: componentType,
+        model: model,
+        tractor: tractor
+      });
+      setShowAddPoForm(true);
+    }
+  }, [])
+
 
   const handleColorClick = (tractor) => {
     if (colorVin === tractor.vin) {
@@ -681,11 +687,29 @@ const getStatusColorClass = (status) => {
       setColorVin(tractor.vin)
     }
   };
+   
    const handleRowClick = (tractor) => {
     console.log('Клик по трактору:', tractor.vin);
     setSelectedTractor(tractor.vin);
   };
 
+  // Обработчик для возврата назад из формы добавления PO
+  const handleAddPoBack = () => {
+    setShowAddPoForm(false);
+    setSelectedComponent(null);
+  };
+
+  // Обработчик после успешного добавления PO
+  const handleAddPoSubmit = () => {
+    setShowAddPoForm(false);
+    setSelectedComponent(null);
+    // Перезагружаем данные таблицы
+    // fetchTractors(); // вызов повторного получения данных
+  };
+
+  if (showAddPoForm && selectedComponent) {
+    return <AddPoForm onBack={handleAddPoBack} onSubmit={handleAddPoSubmit} />;
+  }
 
   if (selectedTractor) {
     return <TractorDetails vin={selectedTractor} onBack={() => setSelectedTractor(null)} />;
@@ -714,36 +738,8 @@ const getStatusColorClass = (status) => {
     );
   }
 
-    // Список столбцов, которые можно скрыть
-  const hideableColumns = [
-    { key: 'model', label: 'Модель' },
-    { key: 'assembly_date', label: 'Дата выпуска' },
-    { key: 'region', label: 'Регион' },
-    { key: 'consumer', label: 'Дилер' },
-    { key: 'oh_hour', label: 'Моточасы' },
-    { key: 'last_activity', label: 'Последняя активность' }
-  ];
-
   return (
     <>
-          <div className="columns-selector" >
-            {hideableColumns.map(col => (
-              <label key={col.key} style={{ 
-                display: 'flex',  
-                cursor: 'pointer',
-                fontSize: '16px',
-                color: 'black',
-              }}>
-                <input
-                  type="checkbox"
-                  checked={visibleColumns[col.key] !== false}
-                  onChange={() => toggleColumnVisibility(col.key)}
-                  style={{ cursor: 'pointer' }}
-                />
-                {col.label}
-              </label>
-            ))}
-          </div>
 
     <div className="tractor-table-container" >
         <button onClick={onCloseTab} className="go-back" style={{top: '-40px'}}></button>
@@ -783,7 +779,12 @@ const getStatusColorClass = (status) => {
                     // Применяем стиль цвета текста в зависимости от значения поля path
                     const textStyle = getTextStyle(tractor, colKey);
                     
-                    return <td key={colKey} className={className} style={textStyle}>{value}</td>;
+                    return <td 
+                      key={colKey} 
+                      className={className} 
+                      style={textStyle}
+                      onClick={(e) => handleSoftwareClick(e, tractor, colKey)}
+                    >{value}</td>;
                   }
                   
                   // Применяем стиль цвета текста в зависимости от значения поля path
@@ -798,4 +799,5 @@ const getStatusColorClass = (status) => {
           </table>
         </div>
     </div>
-  </>  );}
+  </>);
+}
