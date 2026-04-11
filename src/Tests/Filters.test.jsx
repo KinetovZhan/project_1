@@ -1,70 +1,58 @@
 // src/Tests/Filters.test.jsx
-
-// 1. Создаём моки
-const mockUseAuth = vi.hoisted(() => vi.fn());
-const mockUseCheckMobile = vi.hoisted(() => vi.fn());
-
-// 2. Мокаем модули ДО импортов
-vi.mock('../auth/AuthContext', () => ({
-  useAuth: mockUseAuth
-}));
-
-vi.mock('../shrineofvsakoe/checkMobile.jsx', () => ({
-  default: mockUseCheckMobile
-}));
-
-// 3. Импорты
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import { Filters } from '../Function/Filters_agregates.jsx';
+import { Filters } from '../FiltersPo/Filters_agregates.jsx';
 import '@testing-library/jest-dom';
 
-// 4. Мокаем ip
-vi.mock('../shrineofvsakoe/ip.jsx', () => ({ 
-  ip: '127.0.0.1' 
+// Мокаем API
+vi.mock('../fetchAPI.js', () => ({
+  api: {
+    post: vi.fn(),
+  },
 }));
 
-// 5. Улучшенный мок для react-select с разными testid
+// Мокаем useAuth
+const mockUseAuth = vi.hoisted(() => vi.fn());
+vi.mock('../auth/AuthContext', () => ({
+  useAuth: mockUseAuth,
+}));
+
+// Мокаем useCheckMobile
+const mockUseCheckMobile = vi.hoisted(() => vi.fn());
+vi.mock('../CheckMobile/checkMobile.jsx', () => ({
+  default: mockUseCheckMobile,
+}));
+
+// Мокаем react-select (упрощённая версия для тестов)
 vi.mock('react-select', () => {
-  const MockSelect = ({ 
-    options, 
-    value, 
-    onChange, 
-    placeholder, 
-    isMulti, 
-    isDisabled,
-    styles,
-    className
-  }) => {
+  const MockSelect = ({ options, value, onChange, placeholder, isMulti, isDisabled, menuPortalTarget, styles, className }) => {
     const handleChange = (e) => {
+      const selectedValue = e.target.value;
       if (!isMulti) {
-        const selectedValue = e.target.value;
-        if (!selectedValue) {
-          onChange(null);
-          return;
-        }
         const selected = options?.find(opt => opt.value === selectedValue);
         onChange(selected);
       } else {
+        // Для множественного выбора – эмулируем через массив
         const selectedOptions = Array.from(e.target.selectedOptions).map(opt => ({
           value: opt.value,
-          label: opt.textContent
+          label: opt.textContent,
         }));
         onChange(selectedOptions);
       }
     };
 
-    const currentValue = isMulti 
+    // Определяем testId по placeholder
+    let testId = 'react-select';
+    if (placeholder === 'Модель трактора') testId = 'tractor-model-select';
+    else if (placeholder === 'Производитель') testId = 'producer-select';
+    else if (placeholder === 'Название узла') testId = 'component-model-select';
+    else if (placeholder === 'Назначение') testId = 'status-select';
+    else if (placeholder === 'Все статусы') testId = 'actuality-select';
+
+    const currentValue = isMulti
       ? (Array.isArray(value) ? value.map(v => v.value) : [])
       : (value?.value || '');
-
-    // Определяем testid по placeholder
-    const testId = placeholder === 'Модель трактора' 
-      ? 'tractor-model-select' 
-      : placeholder === 'Модель'
-      ? 'component-model-select'
-      : 'react-select';
 
     return (
       <div data-testid={testId}>
@@ -73,11 +61,10 @@ vi.mock('react-select', () => {
           onChange={handleChange}
           multiple={isMulti}
           disabled={isDisabled}
-          style={{ width: '100%', padding: '8px' }}
           data-testid={`${testId}-inner`}
         >
-          <option value="">{placeholder || 'Select...'}</option>
-          {options?.map((opt) => (
+          <option value="">{placeholder}</option>
+          {options?.map(opt => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -86,35 +73,40 @@ vi.mock('react-select', () => {
       </div>
     );
   };
-  
-  return { 
-    default: MockSelect 
-  };
+  return { default: MockSelect };
 });
+
+import { api } from '../fetchAPI.js';
 
 describe('Filters', () => {
   const mockOnFilterChange = vi.fn();
   const mockOnFilterChange2 = vi.fn();
   const mockOnModelChange = vi.fn();
+  const mockOnProducerChange = vi.fn();
+  const mockOnStatusChange = vi.fn();
+  const mockOnActualChangePo = vi.fn();
 
   const mockComponentModels = ['T-150', 'K-700', 'T-400', 'K-500'];
+  const mockTractorModels = ['K-7', 'K-5', 'K-742МСТ'];
+  const mockProducers = ['Производитель 1', 'Производитель 2'];
 
   beforeEach(() => {
-    // Настройка моков
+    vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ token: 'mock-token' });
     mockUseCheckMobile.mockReturnValue(false);
-    
-    // Сброс всех функций
-    mockOnFilterChange.mockClear();
-    mockOnFilterChange2.mockClear();
-    mockOnModelChange.mockClear();
-    
-    // Мок fetch по умолчанию
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        component_models: mockComponentModels
-      })
+
+    // Мокаем api.post для всех вызовов
+    api.post.mockImplementation(async (url, data) => {
+      if (url === 'search/component-models') {
+        return { component_models: mockComponentModels.map(name => ({ name })) };
+      }
+      if (url === 'search/tractor-models') {
+        return mockTractorModels.map(model => ({ model }));
+      }
+      if (url === 'search/component-producers') {
+        return mockProducers.map(producer => ({ producer }));
+      }
+      return [];
     });
   });
 
@@ -122,7 +114,6 @@ describe('Filters', () => {
     vi.clearAllMocks();
   });
 
-  // 1. Базовый рендеринг
   it('рендерит все чекбоксы фильтров', () => {
     render(
       <Filters
@@ -131,16 +122,13 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
     expect(screen.getByText('ДВС')).toBeInTheDocument();
     expect(screen.getByText('КПП')).toBeInTheDocument();
-    expect(screen.getByText('РК')).toBeInTheDocument();
+    expect(screen.getByText('Рулевая колонка')).toBeInTheDocument();
     expect(screen.getByText('Гидрораспределитель')).toBeInTheDocument();
-    expect(screen.getByText('Автопилот')).toBeInTheDocument();
     expect(screen.getByText('БК')).toBeInTheDocument();
   });
 
-  // 2. Проверка выбора компонентов - ИСПРАВЛЕННАЯ ВЕРСИЯ
   it('обрабатывает выбор компонента ДВС', () => {
     render(
       <Filters
@@ -149,18 +137,7 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Находим все элементы с текстом "ДВС" и берем первый
-    const dvsElements = screen.getAllByText('ДВС');
-    expect(dvsElements.length).toBeGreaterThan(0);
-    
-    // Находим чекбокс рядом с текстом "ДВС"
-    const dvsLabel = dvsElements[0].closest('label');
-    expect(dvsLabel).toBeInTheDocument();
-    
-    const dvsCheckbox = dvsLabel.querySelector('input[type="checkbox"]');
-    expect(dvsCheckbox).toBeInTheDocument();
-    
+    const dvsCheckbox = screen.getByLabelText('ДВС');
     fireEvent.click(dvsCheckbox);
     expect(mockOnFilterChange).toHaveBeenCalledWith(['DVS']);
   });
@@ -173,23 +150,13 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Находим чекбоксы
-    const dvsElements = screen.getAllByText('ДВС');
-    const dvsLabel = dvsElements[0].closest('label');
-    const dvsCheckbox = dvsLabel.querySelector('input[type="checkbox"]');
-    
-    const kppElements = screen.getAllByText('КПП');
-    const kppLabel = kppElements[0].closest('label');
-    const kppCheckbox = kppLabel.querySelector('input[type="checkbox"]');
-    
+    const dvsCheckbox = screen.getByLabelText('ДВС');
+    const kppCheckbox = screen.getByLabelText('КПП');
     fireEvent.click(dvsCheckbox);
     fireEvent.click(kppCheckbox);
-
     expect(mockOnFilterChange).toHaveBeenCalledWith(['DVS', 'KPP']);
   });
 
-  // 3. Проверка выбора моделей тракторов - ИСПРАВЛЕННАЯ
   it('обрабатывает выбор модели трактора', async () => {
     render(
       <Filters
@@ -198,24 +165,14 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Ждем загрузки селектов
     await waitFor(() => {
       expect(screen.getByTestId('tractor-model-select')).toBeInTheDocument();
     });
-
-    // Находим селект для моделей тракторов
     const tractorSelect = screen.getByTestId('tractor-model-select-inner');
-    
-    fireEvent.change(tractorSelect, { 
-      target: { value: 'K7' } 
-    });
-
-    // Проверяем вызов onFilterChange2 с преобразованным значением
+    fireEvent.change(tractorSelect, { target: { value: 'K-7' } });
     expect(mockOnFilterChange2).toHaveBeenCalledWith(['K-7']);
   });
 
-  // 4. Проверка выбора моделей компонентов - ИСПРАВЛЕННАЯ
   it('обрабатывает выбор модели компонента', async () => {
     render(
       <Filters
@@ -224,48 +181,44 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
     await waitFor(() => {
       expect(screen.getByTestId('component-model-select')).toBeInTheDocument();
     });
-
-    // Находим селект для моделей компонентов
     const componentSelect = screen.getByTestId('component-model-select-inner');
-    
-    fireEvent.change(componentSelect, { 
-      target: { value: 'T-150' } 
-    });
-
+    fireEvent.change(componentSelect, { target: { value: 'T-150' } });
     expect(mockOnModelChange).toHaveBeenCalledWith(['T-150']);
   });
 
-  // 5. Проверка сброса фильтров
   it('сбрасывает все фильтры при нажатии кнопки "Сброс"', async () => {
     render(
       <Filters
         onFilterChange={mockOnFilterChange}
         onFilterChange2={mockOnFilterChange2}
         onModelChange={mockOnModelChange}
+        onProducerChange={mockOnProducerChange}
+        onStatusChange={mockOnStatusChange}
+        onActualChangePo={mockOnActualChangePo}
       />
     );
-
     // Выбираем несколько фильтров
-    const dvsElements = screen.getAllByText('ДВС');
-    const dvsLabel = dvsElements[0].closest('label');
-    const dvsCheckbox = dvsLabel.querySelector('input[type="checkbox"]');
-    
-    const clearButton = screen.getByTestId('Clearbutton');
-    
+    const dvsCheckbox = screen.getByLabelText('ДВС');
     fireEvent.click(dvsCheckbox);
+    // Ждём загрузки селектов
+    await waitFor(() => {
+      expect(screen.getByTestId('tractor-model-select')).toBeInTheDocument();
+    });
+    const tractorSelect = screen.getByTestId('tractor-model-select-inner');
+    fireEvent.change(tractorSelect, { target: { value: 'K-7' } });
+    const clearButton = screen.getByTestId('Clearbutton');
     fireEvent.click(clearButton);
-
-    // Проверяем, что все callback вызваны с пустыми массивами
     expect(mockOnFilterChange).toHaveBeenCalledWith([]);
     expect(mockOnFilterChange2).toHaveBeenCalledWith([]);
     expect(mockOnModelChange).toHaveBeenCalledWith([]);
+    expect(mockOnProducerChange).toHaveBeenCalledWith([]);
+    expect(mockOnStatusChange).toHaveBeenCalledWith([]);
+    expect(mockOnActualChangePo).toHaveBeenCalledWith([]);
   });
 
-  // 6. Проверка загрузки данных
   it('загружает модели компонентов при наличии токена', async () => {
     render(
       <Filters
@@ -274,24 +227,16 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Проверяем, что fetch был вызван
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://127.0.0.1/search/component-models',
-        expect.objectContaining({
-          method: 'POST',
-          headers: expect.objectContaining({
-            'Authorization': 'Bearer mock-token'
-          })
-        })
+      expect(api.post).toHaveBeenCalledWith(
+        'search/component-models',
+        expect.objectContaining({ trac_model: [], type_comp: [], producers: [], status: [] })
       );
     });
   });
 
   it('не загружает модели компонентов при отсутствии токена', async () => {
     mockUseAuth.mockReturnValue({ token: null });
-    
     render(
       <Filters
         onFilterChange={mockOnFilterChange}
@@ -299,17 +244,13 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Проверяем, что fetch не был вызван
     await waitFor(() => {
-      expect(global.fetch).not.toHaveBeenCalled();
+      expect(api.post).not.toHaveBeenCalled();
     });
   });
 
-  // 7. Обработка ошибок - ИСПРАВЛЕННАЯ
   it('обрабатывает ошибку сети при загрузке моделей', async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-    
+    api.post.mockRejectedValueOnce(new Error('Network error'));
     render(
       <Filters
         onFilterChange={mockOnFilterChange}
@@ -317,38 +258,14 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Компонент не должен упасть
+    // Компонент не должен упасть, селект должен быть виден (пустой)
     await waitFor(() => {
-      // Используем getAllByTestId, так как селектов несколько
-      const selects = screen.getAllByTestId('tractor-model-select');
-      expect(selects.length).toBeGreaterThan(0);
+      expect(screen.getByTestId('component-model-select')).toBeInTheDocument();
     });
+    const componentSelect = screen.getByTestId('component-model-select-inner');
+    expect(componentSelect).toBeInTheDocument();
   });
 
-  it('обрабатывает HTTP ошибку при загрузке моделей', async () => {
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: false,
-      status: 500,
-      json: async () => ({ error: 'Server error' })
-    });
-    
-    render(
-      <Filters
-        onFilterChange={mockOnFilterChange}
-        onFilterChange2={mockOnFilterChange2}
-        onModelChange={mockOnModelChange}
-      />
-    );
-
-    // Компонент не должен упасть
-    await waitFor(() => {
-      const selects = screen.getAllByTestId('tractor-model-select');
-      expect(selects.length).toBeGreaterThan(0);
-    });
-  });
-
-  // 8. Проверка преобразования типов компонентов
   it('правильно преобразует типы компонентов при отправке запроса', async () => {
     render(
       <Filters
@@ -357,37 +274,21 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Выбираем ДВС
-    const dvsElements = screen.getAllByText('ДВС');
-    const dvsLabel = dvsElements[0].closest('label');
-    const dvsCheckbox = dvsLabel.querySelector('input[type="checkbox"]');
+    const dvsCheckbox = screen.getByLabelText('ДВС');
     fireEvent.click(dvsCheckbox);
-
-    // Выбираем КПП
-    const kppElements = screen.getAllByText('КПП');
-    const kppLabel = kppElements[0].closest('label');
-    const kppCheckbox = kppLabel.querySelector('input[type="checkbox"]');
+    const kppCheckbox = screen.getByLabelText('КПП');
     fireEvent.click(kppCheckbox);
-
-    // Проверяем отправляемые данные в fetch
+    // Ждём, что после изменения фильтров будет сделан запрос
     await waitFor(() => {
-      const fetchCalls = global.fetch.mock.calls;
-      if (fetchCalls.length > 0) {
-        const lastCall = fetchCalls[fetchCalls.length - 1];
-        const body = JSON.parse(lastCall[1].body);
-        
-        // ДВС должен преобразоваться в 'dvs', КПП в 'kpp'
-        expect(body.type_comp).toContain('dvs');
-        expect(body.type_comp).toContain('kpp');
-      }
+      expect(api.post).toHaveBeenCalledWith(
+        'search/component-models',
+        expect.objectContaining({ type_comp: ['DVS', 'KPP'] })
+      );
     });
   });
 
-  // 9. Проверка работы с мобильным видом - ИСПРАВЛЕННАЯ
-  it('работает в мобильном режиме', async () => {
+  it('работает в мобильном режиме', () => {
     mockUseCheckMobile.mockReturnValue(true);
-    
     render(
       <Filters
         onFilterChange={mockOnFilterChange}
@@ -395,15 +296,9 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Компонент должен отрендериться
-    await waitFor(() => {
-      const selects = screen.getAllByTestId('tractor-model-select');
-      expect(selects.length).toBeGreaterThan(0);
-    });
+    expect(screen.getByTestId('tractor-model-select')).toBeInTheDocument();
   });
 
-  // 10. Проверка обновления при изменении фильтров - УПРОЩЕННАЯ
   it('обновляет запрос при изменении фильтров компонентов', async () => {
     render(
       <Filters
@@ -412,22 +307,14 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    const initialFetchCalls = global.fetch.mock.calls.length;
-
-    // Изменяем фильтр
-    const dvsElements = screen.getAllByText('ДВС');
-    const dvsLabel = dvsElements[0].closest('label');
-    const dvsCheckbox = dvsLabel.querySelector('input[type="checkbox"]');
+    const initialCalls = api.post.mock.calls.length;
+    const dvsCheckbox = screen.getByLabelText('ДВС');
     fireEvent.click(dvsCheckbox);
-
-    // Ждем нового запроса
     await waitFor(() => {
-      expect(global.fetch.mock.calls.length).toBeGreaterThan(initialFetchCalls);
+      expect(api.post.mock.calls.length).toBeGreaterThan(initialCalls);
     });
   });
 
-  // 11. Проверка обновления при изменении моделей тракторов - ИСПРАВЛЕННАЯ
   it('обновляет запрос при изменении моделей тракторов', async () => {
     render(
       <Filters
@@ -436,36 +323,22 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
     await waitFor(() => {
       expect(screen.getByTestId('tractor-model-select')).toBeInTheDocument();
     });
-
-    const initialFetchCalls = global.fetch.mock.calls.length;
-
-    // Находим и изменяем селект моделей тракторов
+    const initialCalls = api.post.mock.calls.length;
     const tractorSelect = screen.getByTestId('tractor-model-select-inner');
-    
-    fireEvent.change(tractorSelect, { 
-      target: { value: 'K7' } 
-    });
-
-    // Ждем нового запроса
+    fireEvent.change(tractorSelect, { target: { value: 'K-7' } });
     await waitFor(() => {
-      expect(global.fetch.mock.calls.length).toBeGreaterThan(initialFetchCalls);
+      expect(api.post.mock.calls.length).toBeGreaterThan(initialCalls);
     });
   });
 
-  // 12. Проверка деактивации селекта при загрузке - ИСПРАВЛЕННАЯ
   it('деактивирует селект моделей при загрузке', async () => {
-    // Мокаем долгий запрос
+    // Задерживаем ответ API
     let resolveFetch;
-    const fetchPromise = new Promise(resolve => {
-      resolveFetch = resolve;
-    });
-    
-    global.fetch = vi.fn().mockReturnValue(fetchPromise);
-
+    const promise = new Promise(resolve => { resolveFetch = resolve; });
+    api.post.mockImplementationOnce(() => promise);
     render(
       <Filters
         onFilterChange={mockOnFilterChange}
@@ -473,30 +346,18 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Ждем появления селектов
     await waitFor(() => {
       expect(screen.getByTestId('component-model-select')).toBeInTheDocument();
     });
-
-    // Селект моделей компонентов должен быть disabled
     const componentSelect = screen.getByTestId('component-model-select-inner');
     expect(componentSelect).toBeDisabled();
-
     // Разрешаем промис
-    resolveFetch({
-      ok: true,
-      json: async () => ({ component_models: mockComponentModels })
+    resolveFetch({ component_models: mockComponentModels.map(name => ({ name })) });
+    await waitFor(() => {
+      expect(componentSelect).not.toBeDisabled();
     });
-
-    // Ждем обновления
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Теперь селект должен быть активен
-    expect(componentSelect).not.toBeDisabled();
   });
 
-  // 13. Новый тест: проверка инициализации состояний
   it('инициализирует с правильными начальными значениями', () => {
     render(
       <Filters
@@ -505,46 +366,13 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
-    // Все чекбоксы должны быть не выбраны
     const checkboxes = screen.getAllByRole('checkbox');
     checkboxes.forEach(checkbox => {
       expect(checkbox).not.toBeChecked();
     });
-
-    // Кнопка сброса должна быть видна
     expect(screen.getByTestId('Clearbutton')).toBeInTheDocument();
   });
 
-  // 14. Новый тест: проверка маппинга типов компонентов
-  it('правильно маппит типы компонентов', () => {
-    render(
-      <Filters
-        onFilterChange={mockOnFilterChange}
-        onFilterChange2={mockOnFilterChange2}
-        onModelChange={mockOnModelChange}
-      />
-    );
-
-    // Проверяем, что при выборе разных типов они правильно преобразуются
-    const componentTypeMap = {
-      'DVS': 'dvs',
-      'KPP': 'kpp',
-      'RK': 'rk',
-      'hydrorasp': 'hydro',
-      'AP': 'ap',
-      'BK': 'bk',
-    };
-
-    // Для теста проверяем, что объект существует в компоненте
-    // (в реальном компоненте он определен как componentTypeMap)
-    expect(componentTypeMap['DVS']).toBe('dvs');
-    expect(componentTypeMap['KPP']).toBe('kpp');
-    expect(componentTypeMap['RK']).toBe('rk');
-    expect(componentTypeMap['hydrorasp']).toBe('hydro');
-  });
-
-  // 15. Новый тест: проверка множественного выбора в селектах
   it('поддерживает множественный выбор в селектах', async () => {
     render(
       <Filters
@@ -553,14 +381,10 @@ describe('Filters', () => {
         onModelChange={mockOnModelChange}
       />
     );
-
     await waitFor(() => {
       expect(screen.getByTestId('tractor-model-select')).toBeInTheDocument();
     });
-
     const tractorSelect = screen.getByTestId('tractor-model-select-inner');
-    
-    // Проверяем, что селект поддерживает multiple
     expect(tractorSelect.multiple).toBe(true);
   });
 });

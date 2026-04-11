@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
-import useCheckMobile from '../shrineofvsakoe/checkMobile';
+import useCheckMobile from '../CheckMobile/checkMobile';
 
 // 3. Тестовый компонент для проверки хука
 const TestComponent = () => {

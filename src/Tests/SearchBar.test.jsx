@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import React from 'react';
-import { SearchBar } from '../Function/SearchBar';
+import { SearchBar } from '../SearchBar/SearchBar';
 
 // Добавляем matchers из jest-dom
 import '@testing-library/jest-dom/vitest';

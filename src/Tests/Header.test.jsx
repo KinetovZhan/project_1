@@ -2,7 +2,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
-import { Header } from '../Function/Header';
+import { Header } from '../Header/Header';
 
 // Добавляем импорт для jest-dom matchers
 import '@testing-library/jest-dom';
