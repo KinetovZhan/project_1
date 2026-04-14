@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useMemo } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
@@ -9,6 +9,8 @@ import TMZImage from '../img/ДВС ТМЗ.png';
 import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
 import { api, buildApiUrl } from '../fetchAPI.js';
+import Select from 'react-select';
+
 
 export function PoDetails({ po, onBack }) {
   const { token, user } = useAuth();
@@ -31,6 +33,7 @@ export function PoDetails({ po, onBack }) {
   const [isArchive, setIsArchive] = useState(false);
   const [isCritical, setIsCritical] = useState(false);
   const [status, setStatus] = useState('');
+  const [type,setType] = useState ('');
   const [releaseDate, setReleaseDate] = useState('');
   const [change, setChange] = useState(false);
   const [endActuality, setEndActuality] = useState('');
@@ -39,6 +42,8 @@ export function PoDetails({ po, onBack }) {
   const [softwareFile, setSoftwareFile] = useState(null);
   const [uploadingSoftware, setUploadingSoftware] = useState(false);
   const [previousSWVersion, setPreviousSWVersion] = useState(null);
+  const [allTractorModels, setAllTractorModels] = useState([]);
+  const [selectedTractorModels, setSelectedTractorModels] = useState([]);
 
   // Загрузка основных деталей ПО
   useEffect(() => {
@@ -76,10 +81,16 @@ export function PoDetails({ po, onBack }) {
       setReleaseDate(details.software_release_date?.split('T')[0] || '');
       setEndActuality(details.software_end_actuality?.split('T')[0] || '');
       setProducer(details.software_producer || '');
+      setType(details.component_type|| '')
       setPreviousSWVersion(details.software_previous_sw_version || null);
       // инструкция – только путь, файл не восстанавливаем
       setInstructionFile(null);
       setSoftwareFile(null);
+       const initialSelected = (details.software_tractor_models || []).map(model => ({
+            label: model,
+            value: model
+        }));
+        setSelectedTractorModels(initialSelected);
     }
   }, [details]);
 
@@ -141,12 +152,17 @@ export function PoDetails({ po, onBack }) {
   // Сохранение изменений
   const changePoInfo = async () => {
     const swId = details?.id_firmwares;
-    if (!swId) {
+    const componentId = details?.id_component;
+    if (!swId||!componentId) {
       alert('Нет ID прошивки для обновления');
       return;
     }
 
     try {
+      if (type !== details.component_type && isModerator) {
+        await api.patch(`/components/${componentId}`,{type:type});
+        console.log('Тип компонента обновлён');
+      }
       // 1. Загрузка файла инструкции, если выбран
       if (instructionFile && isModerator) {
         setUploadingInstruction(true);
@@ -170,12 +186,14 @@ export function PoDetails({ po, onBack }) {
         description: discr,
         producer: producer,
         status: status,
+        component_type:type,
         release_date: releaseDate,
         is_actual: isActual,
         is_archive: isArchive,
         is_critical: isCritical,
         end_actuality: endActuality || null,
         previous_sw_version: previousSWVersion,
+        tractor_model: selectedTractorModels.map(item => item.value), 
       } : {
         description: discr,
         status: status,
@@ -209,6 +227,32 @@ export function PoDetails({ po, onBack }) {
       setUploadingSoftware(false);
     }
   };
+
+  useEffect(() => {
+  const fetchTractorModels = async () => {
+    try {
+       const response = await api.post('/search/tractor-models', {
+        component_types: [],
+        component_models: [],
+        component_producers: [],
+        software_status: []
+      });
+      const modelsArray = Array.isArray(response) ? response : [];
+      const modelNames = modelsArray.map(item => item.model).filter(Boolean);
+      setAllTractorModels(modelNames);
+    } catch (err) {
+      console.error('Ошибка загрузки моделей тракторов:', err);
+      setAllTractorModels([]);
+    }
+  };
+  fetchTractorModels();
+}, []);
+  const tractorOptions = useMemo(() => {
+    return allTractorModels.map(model => ({
+        label: model,
+        value: model
+    }));
+}, [allTractorModels]);
 
   // Переключение на другую версию
   const handleVersionClick = async (e, versionId) => {
@@ -248,6 +292,17 @@ export function PoDetails({ po, onBack }) {
     if (details.software_is_actual && !details.software_is_critical) return 'Актуальное';
     return 'Устаревшее';
   };
+  const typeRus = (type) => {
+     const rusNames = {
+      'HR':'Гидрораспределитель',
+      'BK':'БК',
+      'RK':'РК',
+      'KPP':'КПП',
+      'DVS':'ДВС',
+      'AUTOPILOT':'Автопилот',
+     } 
+     return rusNames[type]
+  }
 
   const chooseActual = (e) => {
     const val = e.target.value;
@@ -366,9 +421,12 @@ export function PoDetails({ po, onBack }) {
     );
   }
 
+
   const actualityPeriod = details.software_end_actuality
     ? `${formatDate(details.software_release_date)} — ${formatDate(details.software_end_actuality)}`
     : `с ${formatDate(details.software_release_date)} (бессрочно)`;
+
+    
 
   
   return (
@@ -381,14 +439,82 @@ export function PoDetails({ po, onBack }) {
               <h2>
                 <span>{details.name || 'ПО'} от {formatDate(details.software_release_date)}</span>
                 <br />
-                <span className='text-names'>{details.component_name}</span>
-                <br />
-                {details.software_tractor_models && details.software_tractor_models.length > 0 && (
-                  <span className='text-names'>
-                    <span>Модели тракторов: </span>
-                    <span>{details.software_tractor_models.join(', ')}</span>
-                  </span>
-                )}
+                {(change&&isModerator) ? 
+                 (<select value={type} onChange={(e) => setType(e.target.value)}>
+                  <option value="HR">Гидрораспределитель</option>
+                  <option value="DVS">ДВС</option>
+                  <option value="KPP">КПП</option>
+                  <option value="RK">РК</option>
+                  <option value="BK">БК</option>
+                  <option value="AUTOPILOT">Автопилот</option>
+                </select>)
+                  :
+                   (<span className='text-names'>{typeRus(details.component_type)}</span>)
+            }
+            <br />
+            <span className='text-names'>{details.component_name}</span>
+            <br />
+      {(change && isModerator) ? (
+          <div className="tractor-models-editor">
+              <label>Модели тракторов:</label>
+              <Select
+                  options={tractorOptions}
+                  value={selectedTractorModels}
+                  onChange={setSelectedTractorModels}
+                  isMulti
+                  placeholder="Выберите модели..."
+                  className="tractor-multiselect"
+                  classNamePrefix="react-select"
+                  menuPortalTarget={document.body}
+                  styles={{
+            control: (base) => ({
+              ...base,
+              maxHeight: 50,
+              overflowY: 'auto',
+              color: 'black',
+              backgroundColor: 'rgb(255, 255, 255)',
+              width:  '30vh',
+              borderRadius: '15px',
+              height: '53px',
+              left: '0%',
+              fontSize:'14px',
+              // transform: 'Translate(-50%)',
+            // position: 'relative',
+            zIndex: 1
+          }),
+          menu: (base) => ({ 
+            ...base,
+            zIndex: 9999,
+            position: 'absolute',
+            backgroundColor: 'white',
+            marginBottom: '5px',
+          }),
+          menuPortal: (base) => ({  
+            ...base,
+            zIndex: 9999
+            }),
+            menuList: (base) => ({
+              ...base,
+              maxHeight: 150,
+              overflowY: 'auto',
+              fontSize:'16px',
+              backgroundColor: 'white',
+              color: 'black',
+              border: '1px solid rgb(255, 255, 255)',
+              scrollbarWidth: 'thin',
+            zIndex: 9999
+            }),
+          }}
+              />
+          </div>
+      ) : (
+          details.software_tractor_models && details.software_tractor_models.length > 0 && (
+              <span className='text-names'>
+                  <span>Модели тракторов: </span>
+                  <span>{details.software_tractor_models.join(', ')}</span>
+              </span>
+          )
+      )}
               </h2>
               <img
                 className="object-po"

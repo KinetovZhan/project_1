@@ -392,6 +392,18 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     );
   }
 
+   const typeRus = (type) => {
+     const rusNames = {
+      'HR':'Гидрораспределитель',
+      'BK':'БК',
+      'RK':'РК',
+      'KPP':'КПП',
+      'DVS':'ДВС',
+      'AUTOPILOT':'Автопилот',
+     } 
+     return rusNames[type]
+  }
+
   const handlePoClick = (po) => {
     console.log('Клик по по:', po);
     const selectedItem = currentItems.find(item => item.id_Firmwares === po);
@@ -541,7 +553,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                             onMouseMove={handleMouseMove}
                             onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
                           >
-                            Для компонента {item.type_component || '—'}: {item.model_component || item.name_component }
+                            Для компонента {typeRus(item.type_component.toUpperCase()) || '—'}: {item.model_component || item.name_component }
                         
                           </h5>
                           </div>
