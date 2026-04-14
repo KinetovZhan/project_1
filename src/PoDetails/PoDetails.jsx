@@ -319,6 +319,13 @@ export function PoDetails({ po, onBack }) {
     }
   };
 
+  const removeExtension = (filename) => {
+    if (!filename) return '';
+    const lastDotIndex = filename.lastIndexOf('.');
+    if (lastDotIndex === -1) return filename;
+    return filename.substring(0, lastDotIndex);
+  };
+
   const ImageToComponent = (type_component, name_component) => {
     const typeLower = type_component?.toLowerCase() || '';
     const modelLower = name_component?.toLowerCase() || '';
@@ -438,7 +445,7 @@ export function PoDetails({ po, onBack }) {
           <div className="left-column">
             <div className="section">
               <h2>
-                <span>{details.name || 'ПО'} от {formatDate(details.software_release_date)}</span>
+                <span>{removeExtension(details.name) || 'ПО'} от {formatDate(details.software_release_date)}</span>
                 <br />
                 {(change&&isModerator) ? 
                  (<select value={type} onChange={(e) => setType(e.target.value)}>
@@ -587,7 +594,7 @@ export function PoDetails({ po, onBack }) {
                 {change && isModerator ? (
                   <div>
                     <input type="file" onChange={(e) => setSoftwareFile(e.target.files[0])} />
-                    {softwareFile && <p style={{ fontSize: '12px' }}>Выбран: {softwareFile.name}</p>}
+                    {softwareFile && <p style={{ fontSize: '12px' }}>Выбран: {removeExtension(softwareFile.name)}</p>}
                     {uploadingSoftware && <p>Загрузка...</p>}
                   </div>
                 ) : (
@@ -605,7 +612,7 @@ export function PoDetails({ po, onBack }) {
                 {change && isModerator ? (
                   <div>
                     <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setInstructionFile(e.target.files[0])} />
-                    {instructionFile && <p style={{ fontSize: '12px' }}>Выбран: {instructionFile.name}</p>}
+                    {instructionFile && <p style={{ fontSize: '12px' }}>Выбран: {removeExtension(instructionFile.name)}</p>}
                     {uploadingInstruction && <p>Загрузка...</p>}
                   </div>
                 ) : (
@@ -647,7 +654,7 @@ export function PoDetails({ po, onBack }) {
                     <div key={idx} className="version">
                       <a href="#" onClick={(e) => handleVersionClick(e, version.id_firmwares)}
                         className="prev-version-link">
-                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                        {removeExtension(version.name) || 'Версия'} от {formatDate(version.software_release_date)}
                       </a>
                     </div>
                   ))
@@ -667,7 +674,7 @@ export function PoDetails({ po, onBack }) {
                     <div key={idx} className="version">
                       <a href="#" onClick={(e) => handleVersionClick(e, version.id_firmwares)}
                         className="prev-version-link">
-                        {version.name || 'Версия'} от {formatDate(version.software_release_date)}
+                        {removeExtension(version.name) || 'Версия'} от {formatDate(version.software_release_date)}
                       </a>
                     </div>
                   ))
