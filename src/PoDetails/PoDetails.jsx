@@ -380,7 +380,7 @@ export function PoDetails({ po, onBack }) {
           <div className="left-column">
             <div className="section">
               <h2>
-                <span>{details.name || 'ПО'} от {formatDate(details.software_release_date)}</span>
+                <span>{details.software_name || 'ПО'} от {formatDate(details.software_release_date)}</span>
                 <br />
                 <span className='text-names'>{details.component_name}</span>
                 <br />
