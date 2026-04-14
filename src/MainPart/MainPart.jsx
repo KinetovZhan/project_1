@@ -3,7 +3,7 @@ import { Objects } from '../Po/Objects';
 import { TractorTable } from '../TractorTable/TractorTable';
 import { AddPoForm } from '../AddPo/AddPo';
 import { AddAggForm } from '../AddUzel/AddAgg';
-import React, { useEffect, useState } from 'react'; //  исправлено: useEffect, а не useffect
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export function MainPart({
@@ -25,15 +25,14 @@ export function MainPart({
   // --- Форма ПО ---
   showAddForm,
   onCloseAddForm,
-  onAddSubmit, // ← для AddPoForm
+  onAddSubmit,
   dateFilter,
   activeMajMinButton,
 
   // --- Форма агрегата ---
   showAddAggForm,
   onCloseAddAggForm,
-  onAddAggSubmit, // ← ДОБАВЛЕНО: отдельный колбэк для агрегата
-
+  onAddAggSubmit,
 
   showAddCompPartForm,
   onCloseAddCompPartForm,
@@ -42,12 +41,10 @@ export function MainPart({
   handleTractorDetails,
   handleAggregateDetails,
   onCloseTab
-
-  // onBack — не нужен, используйте onClose...
 }) {
   const navigate = useNavigate();
 
-  // State to persist form data when switching tabs
+  // State to persist form data when switching tabs for PO form
   const [formData, setFormData] = useState({
     selectedProducer: null,
     selectedTractorModels: [],
@@ -56,11 +53,23 @@ export function MainPart({
     selectedStatus: null,
     isArchive: false,
     isCritical: false,
-    isActual: false
+    isActual: false,
+    description: ''
+  });
+
+  // State to persist form data for Aggregate form
+  const [aggFormData, setAggFormData] = useState({
+    type: '',
+    name: '',
+    tractor_models: [],
+    mounting_date: '',
+    producer: '',
+    selected_tractor_id: '',
+    tractor_model: ''
   });
 
   const handleGoBack = () => {
-    navigate(-1); // Возврат на предыдущую страницу в истории
+    navigate(-1);
   };
 
   // Закрываем форму ПО, если переключились на другую вкладку
@@ -76,7 +85,6 @@ export function MainPart({
       onCloseAddAggForm();
     }
   }, [activeButton, showAddAggForm, onCloseAddAggForm]);
-
 
   useEffect(() => {
     if (activeButton && activeButton !== 'AddCompPart' && showAddCompPartForm) {
@@ -102,12 +110,25 @@ export function MainPart({
   if (showAddAggForm) {
     return (
       <div className="MainPart">
-        <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} />
+        <AddAggForm 
+          onBack={onCloseAddAggForm} 
+          onSubmit={onAddAggSubmit}
+          formData={aggFormData}
+          setFormData={setAggFormData}
+        />
       </div>
     );
   }
 
-  
+  // Отображаем форму компонента (если есть)
+  if (showAddCompPartForm) {
+    return (
+      <div className="MainPart">
+        {/* Здесь будет компонент AddCompPartForm, если он есть */}
+        <div>Форма добавления компонента</div>
+      </div>
+    );
+  }
 
   // Основной контент
   if (!activeButton) {
@@ -116,7 +137,6 @@ export function MainPart({
 
   return (
     <div className="MainPart">
-      
       {activeButton === 'aggregates' && (
         <>
           <SearchBar onSearch={onSearch} activeButton={activeButton} />
@@ -129,8 +149,7 @@ export function MainPart({
             searchQuery={searchQuery}
             selectedStatus={selectedStatus}
             onCloseTab={() => onCloseTab('aggregates')}
-            actualFilterPo = {actualFilterPo}
-
+            actualFilterPo={actualFilterPo}
           />
         </>
       )}
@@ -145,8 +164,8 @@ export function MainPart({
             searchDealer={searchDealer}
             dateFilter={dateFilter}
             activeMajMinButton={activeMajMinButton}
-            actualFilter = {actualFilter}    
-            uzelFilter = {uzelFilter}
+            actualFilter={actualFilter}    
+            uzelFilter={uzelFilter}
             onCloseTab={() => onCloseTab('tractor')}
           />
         </>

@@ -13,16 +13,16 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
   const [selectedPreviousVersion, setSelectedPreviousVersion] = useState(formData ? formData.selectedPreviousVersion : null);
   const [loadingSoftware, setLoadingSoftware] = useState(false);
   const [softwareError, setSoftwareError] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(formData ? formData.selectedStatus : null);         // Статус (serial/experienced/in operation)
+  const [selectedStatus, setSelectedStatus] = useState(formData ? formData.selectedStatus : null);
   const [selectedProducer, setSelectedProducer] = useState(formData ? formData.selectedProducer : null);
-  const [selectedTractorModels, setSelectedTractorModels] = useState(formData ? formData.selectedTractorModels : []); // массив выбранных моделей
+  const [selectedTractorModels, setSelectedTractorModels] = useState(formData ? formData.selectedTractorModels : []);
   const [tractorOptions, setTractorOptions] = useState([]);
   const [loadingTractors, setLoadingTractors] = useState(false);
   const [tractorError, setTractorError] = useState(null);
   const [isArchive, setIsArchive] = useState(formData ? formData.isArchive : false);
   const [isCritical, setIsCritical] = useState(formData ? formData.isCritical : false);
   const [isActual, setIsActual] = useState(formData ? formData.isActual : false);
-
+  const [description, setDescription] = useState(formData ? formData.description : '');
 
   // Состояния для производителей
   const [producerOptions, setProducerOptions] = useState([]);
@@ -43,10 +43,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
         selectedStatus,
         isArchive,
         isCritical,
-        isActual
+        isActual,
+        description
       });
     }
-  }, [selectedProducer, selectedTractorModels, selectedComponents, selectedPreviousVersion, selectedStatus, isArchive, isCritical, isActual, setFormData]);
+  }, [selectedProducer, selectedTractorModels, selectedComponents, selectedPreviousVersion, selectedStatus, isArchive, isCritical, isActual, description, setFormData]);
 
   // Опции для статуса (software_status)
   const statusOptions = [
@@ -99,55 +100,56 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
       .finally(() => setLoadingSoftware(false));
   }, [token]);
 
-
+  // Загрузка моделей тракторов
   useEffect(() => {
-  if (!token) {
-    setTractorError('Для загрузки моделей тракторов требуется авторизация');
-    setTractorOptions([]); // очищаем опции, если нет токена
-    return;
-  }
+    if (!token) {
+      setTractorError('Для загрузки моделей тракторов требуется авторизация');
+      setTractorOptions([]);
+      return;
+    }
 
-  const fetchAllTractorModels = async () => {
-    setLoadingTractors(true);
-    setTractorError(null);
+    const fetchAllTractorModels = async () => {
+      setLoadingTractors(true);
+      setTractorError(null);
 
-    const requestBody = {
-      component_models: [],
-      component_types: [],
-      component_producers: [],
-      software_status: []
+      const requestBody = {
+        component_models: [],
+        component_types: [],
+        component_producers: [],
+        software_status: []
+      };
+
+      try {
+        const response = await api.post('search/tractor-models', requestBody);
+        
+        let tractorModels = [];
+        if (Array.isArray(response)) {
+          tractorModels = response;
+        } else if (response && Array.isArray(response.tractor_models)) {
+          tractorModels = response.tractor_models;
+        } else {
+          console.warn('Неожиданный формат ответа:', response);
+          tractorModels = [];
+        }
+
+        const modelNames = tractorModels
+          .map(item => item && item.model)
+          .filter(model => typeof model === 'string' && model.trim() !== '')
+          .map(model => model.trim());
+
+        const options = modelNames.map(model => ({ value: model, label: model }));
+        setTractorOptions(options);
+      } catch (err) {
+        console.error('Ошибка загрузки моделей тракторов:', err);
+        setTractorError(err.message);
+      } finally {
+        setLoadingTractors(false);
+      }
     };
 
-    try {
-      const response = await api.post('search/tractor-models', requestBody);
-      
-      let tractorModels = [];
-      if (Array.isArray(response)) {
-        tractorModels = response;
-      } else if (response && Array.isArray(response.tractor_models)) {
-        tractorModels = response.tractor_models;
-      } else {
-        console.warn('Неожиданный формат ответа:', response);
-        tractorModels = [];
-      }
+    fetchAllTractorModels();
+  }, [token]);
 
-      const modelNames = tractorModels
-        .map(item => item && item.model)
-        .filter(model => typeof model === 'string' && model.trim() !== '')
-        .map(model => model.trim());
-
-      const options = modelNames.map(model => ({ value: model, label: model }));
-      setTractorOptions(options);
-    } catch (err) {
-      console.error('Ошибка загрузки моделей тракторов:', err);
-      setTractorError(err.message);
-    } finally {
-      setLoadingTractors(false);
-    }
-  };
-
-  fetchAllTractorModels();
-}, [token]);
   // Загрузка производителей из ПО
   useEffect(() => {
     if (!token) {
@@ -180,11 +182,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
     setSelectedProducer(newOption);
   };
   
-   const handleModelCreate = (inputValue) => {
+  const handleModelCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
     setTractorOptions(prev => [...prev, newOption]);
     setSelectedTractorModels(prev => [...prev, newOption]);
   };
+
   const handleProducerChange = (selectedOption) => {
     setSelectedProducer(selectedOption);
   };
@@ -196,6 +199,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
     const form = event.target;
     const file = form.elements.file.files[0];
     const instructionFile = form.elements.instructionFile.files[0];
+    const releaseDate = form.elements.releaseDate.value;
 
     // Валидация
     if (!file) {
@@ -220,9 +224,7 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
       return;
     }
 
-    const fileNameWithoutExt = file.name.split('.').slice(0, -1).join('.') || file.name;
-
-    const formData = new FormData()
+    const formData = new FormData();
     formData.append('file', file);
     formData.append('instruction_file', instructionFile);
 
@@ -254,14 +256,12 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
     formData.append('component_producers', JSON.stringify(componentProducers));
 
     // Дата релиза (опционально)
-    const releaseDate = form.elements.releaseDate.value;
     if (releaseDate) {
       formData.append('software_release_date', releaseDate);
     }
 
-    // Описание (опционально)
-    const description = form.elements.description.value.trim();
-    if (description) {
+    // Описание (опционально) - используем состояние
+    if (description.trim()) {
       formData.append('software_description', description);
     }
 
@@ -303,6 +303,16 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
       }
 
       // Reset form data after successful submission
+      setSelectedProducer(null);
+      setSelectedTractorModels([]);
+      setSelectedComponents([]);
+      setSelectedPreviousVersion(null);
+      setSelectedStatus(null);
+      setIsArchive(false);
+      setIsCritical(false);
+      setIsActual(false);
+      setDescription('');
+      
       if (setFormData) {
         setFormData({
           selectedProducer: null,
@@ -312,7 +322,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
           selectedStatus: null,
           isArchive: false,
           isCritical: false,
-          isActual: false
+          isActual: false,
+          description: ''
         });
       }
       
@@ -370,8 +381,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
 
       <div className="add-po-form-scroll-bar">
         <form className="add-po-form" onSubmit={handleSubmit}>
-
-
           {/* Производитель */}
           <div className="add-po-field">
             <label className="add-po-label">Производитель *</label>
@@ -477,7 +486,6 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
             )}
           </div>
 
-
           {/* Статус */}
           <div className="add-po-field">
             <label className="add-po-label">Назначение *</label>
@@ -567,6 +575,8 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
               placeholder="Что изменено..."
               rows="4"
               className="add-po-textarea"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
