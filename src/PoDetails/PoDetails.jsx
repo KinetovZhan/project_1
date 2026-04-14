@@ -37,6 +37,7 @@ export function PoDetails({ po, onBack }) {
   const [instructionFile, setInstructionFile] = useState(null);
   const [uploadingInstruction, setUploadingInstruction] = useState(false);
   const [softwareFile, setSoftwareFile] = useState(null);
+  const [fileName, setFileName] = useState(null);
   const [uploadingSoftware, setUploadingSoftware] = useState(false);
   const [previousSWVersion, setPreviousSWVersion] = useState(null);
 

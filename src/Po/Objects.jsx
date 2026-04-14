@@ -106,7 +106,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     } else {
       setLoading(false);
     }
-  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus,actualFilterPo, userRole, choosedObjects, sortOrder, searchQuery]);
+  }, [activeFilters, activeFilters2, selectedModel, selectedProducers, token, selectedStatus,actualFilterPo, userRole, choosedObjects, sortOrder, searchQuery, selectedPo]);
 
 
   useEffect(() => {
