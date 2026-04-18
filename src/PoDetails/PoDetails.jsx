@@ -219,7 +219,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       setChange(false);
       setInstructionFile(null);
       setSoftwareFile(null);
-      showAlert('✅ Данные успешно обновлены!', 'success');
+      showAlert('Данные успешно обновлены!', 'success');
     } catch (err) {
       console.error('Ошибка:', err);
       alert(`Ошибка: ${err.message}`);
