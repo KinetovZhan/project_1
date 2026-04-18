@@ -18,6 +18,7 @@ export function TractorDetails({ vin, onBack }) {
   const [poDescriptions, setPoDescriptions] = useState({});
   const [selectedPo,setSelectedPo]=useState(null);
   const { token } = useAuth();
+  const [showAddPoForm, setShowAddPoForm] = useState(false)
 
   const [tooltip, setTooltip] = useState({
     visible: false,
@@ -182,12 +183,15 @@ export function TractorDetails({ vin, onBack }) {
     });
   } else {
     console.warn('Недостаточно данных для отображения ПО', component);
+
   }
 };
+  
   
     if (selectedPo) {
         return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} />;
       }
+
   
   
 
