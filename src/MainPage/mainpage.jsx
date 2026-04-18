@@ -349,6 +349,7 @@ const handleActualChangePo = (value) => {
             uzelFilter={uzelFilter}
             onCloseTab={(tabName) => handleButtonClick('tabName')}
             actualFilterPo={actualFilterPo}
+            showAlert={showAlert}
           />
 
         </div>

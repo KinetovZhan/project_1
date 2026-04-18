@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 
 
-export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo}) {
+export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo, showAlert}) {
 
   const [softwareItems, setSoftwareItems] = useState([]);
   const [archiveItems, setArchiveItems] = useState([]);
@@ -411,7 +411,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
   };
 
   if (selectedPo) {
-      return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} />;
+      return <PoDetails po={selectedPo} onBack={() => setSelectedPo(null)} showAlert={showAlert} />;
     }
 
   const handleMoveToArchive = async (item, shouldArchive) => {

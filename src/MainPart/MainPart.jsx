@@ -41,7 +41,9 @@ export function MainPart({
 
   handleTractorDetails,
   handleAggregateDetails,
-  onCloseTab
+  onCloseTab,
+
+  showAlert,
 
   // onBack — не нужен, используйте onClose...
 }) {
@@ -130,7 +132,7 @@ export function MainPart({
             selectedStatus={selectedStatus}
             onCloseTab={() => onCloseTab('aggregates')}
             actualFilterPo = {actualFilterPo}
-
+            showAlert={showAlert}
           />
         </>
       )}
