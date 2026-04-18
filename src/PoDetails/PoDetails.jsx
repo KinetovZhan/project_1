@@ -445,7 +445,7 @@ export function PoDetails({ po, onBack }) {
           <div className="left-column">
             <div className="section">
               <h2>
-                <span>{removeExtension(details.name) || 'ПО'} от {formatDate(details.software_release_date)}</span>
+                <span>{details.software_name || 'ПО'} от {formatDate(details.software_release_date)}</span>
                 <br />
                 {(change&&isModerator) ? 
                  (<select value={type} onChange={(e) => setType(e.target.value)}>
