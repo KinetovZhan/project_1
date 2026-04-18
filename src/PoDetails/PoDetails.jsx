@@ -12,7 +12,7 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 
 
-export function PoDetails({ po, onBack }) {
+export function PoDetails({ po, onBack, showAlert }) {
   const { token, user } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -219,7 +219,7 @@ export function PoDetails({ po, onBack }) {
       setChange(false);
       setInstructionFile(null);
       setSoftwareFile(null);
-      alert('Данные успешно обновлены');
+      showAlert('✅ Данные успешно обновлены!', 'success');
     } catch (err) {
       console.error('Ошибка:', err);
       alert(`Ошибка: ${err.message}`);
