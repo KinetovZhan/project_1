@@ -1,4 +1,4 @@
-import { useState, useEffect,useMemo } from 'react';
+import { useState, useEffect,useMemo, useRef } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import DefaultImage from '../img/default.jpg';
 import KPPImage from '../img/КПП.png';
@@ -10,6 +10,8 @@ import JMZImage from '../img/ДВС ЯМЗ.png';
 import BKImage from '../img/БК дисплей контроллер.png';
 import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
+import ReactDOM from 'react-dom';
+
 
 
 export function PoDetails({ po, onBack }) {
@@ -45,6 +47,17 @@ export function PoDetails({ po, onBack }) {
   const [previousSWVersion, setPreviousSWVersion] = useState(null);
   const [allTractorModels, setAllTractorModels] = useState([]);
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
+
+   // Состояние для тултипа
+    const [tooltip, setTooltip] = useState({
+      visible: false,
+      text: '',
+      x: 0,
+      y: 0,
+      targetId:null
+    });
+  
+    const hoverTimers = useRef({});
 
   // Загрузка основных деталей ПО
   useEffect(() => {
@@ -275,6 +288,54 @@ export function PoDetails({ po, onBack }) {
     }
   };
 
+  // Обработчики для тултипа с задержкой 3 секунды
+  const handleMouseEnter = (event, text, id) => {
+    // Очищаем предыдущий таймер для этого элемента
+    if (hoverTimers.current[id]) {
+      clearTimeout(hoverTimers.current[id]);
+      delete hoverTimers.current[id];
+    }
+
+    // Устанавливаем таймер на 3 секунды для показа тултипа
+    hoverTimers.current[id] = setTimeout(() => {
+      setTooltip({
+        visible: true,
+        text: text,
+        x: event.clientX,
+        y: event.clientY,
+        targetId: id
+      });
+      delete hoverTimers.current[id];
+    }, 250);
+  };
+
+  const handleMouseMove = (event) => {
+    if (tooltip.visible && tooltip.targetId) {
+      setTooltip(prev => ({
+        ...prev,
+        x: event.clientX,
+        y: event.clientY
+      }));
+    }
+  };
+
+  const handleMouseLeave = (id) => {
+    // Очищаем таймер при уходе мыши
+    if (hoverTimers.current[id]) {
+      clearTimeout(hoverTimers.current[id]);
+      delete hoverTimers.current[id];
+    }
+
+    // Скрываем тултип сразу при уходе мыши
+    setTooltip({
+      visible: false,
+      text: '',
+      x: 0,
+      y: 0,
+      targetId: null
+    });
+  };
+
   // Вспомогательные функции
   const formatDate = (dateStr) => {
     if (!dateStr) return '—';
@@ -445,7 +506,13 @@ export function PoDetails({ po, onBack }) {
           <div className="left-column">
             <div className="section">
               <h2>
-                <span>{details.software_name || 'ПО'} от {formatDate(details.software_release_date)}</span>
+                <span 
+                      onMouseEnter={(e) => handleMouseEnter(e, details.software_path || details.software_name || 'Нет данных', details.id_firmwares)}
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={() => handleMouseLeave(details.id_firmwares)}
+                    >
+                      {details.software_name || 'ПО'} от {formatDate(details.software_release_date)}
+                 </span>
                 <br />
                 {(change&&isModerator) ? 
                  (<select value={type} onChange={(e) => setType(e.target.value)}>
@@ -697,6 +764,12 @@ export function PoDetails({ po, onBack }) {
           )}
         </div>
       </div>
+      {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal(
+        <div className="popup-window" style={{ position: 'fixed', left: tooltip.x + 15, top: tooltip.y + 15, pointerEvents: 'none', zIndex: 1000 }}>
+          {tooltip.text}
+        </div>,
+        document.body
+      )}
     </div>
-  );
+  )
 }
