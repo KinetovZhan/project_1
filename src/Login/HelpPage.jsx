@@ -11,10 +11,8 @@ export function HelpPage() {
   const [replyContent, setReplyContent] = useState('');
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [filter, setFilter] = useState('new');
-  const [userList, setUserList] = useState([])
-  const [choosedUser, setChoosedUser] = useState(null)
-  const [isRead,setIsRead] = useState(null)
-  const [hookForClosed, setHookForClosed] = useState(null)
+  const [userList, setUserList] = useState([]);
+  const [choosedUser, setChoosedUser] = useState(null);
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -32,12 +30,7 @@ export function HelpPage() {
       return;
     }
     fetchMessages();
-    setHookForClosed(null)
-    setIsRead(null)
-  }, [token, navigate, isRead, hookForClosed]);
-  console.log(choosedUser)
-  console.log(`isRead ${isRead}`)
-  console.log(`hookForClosed ${hookForClosed}`)
+  }, [token, navigate]);
 
   // Функция для нормализации данных
   const normalizeMessages = (data) => {
@@ -81,20 +74,18 @@ export function HelpPage() {
       
       const normalizedMessages = normalizeMessages(response);
       console.log('Нормализованные сообщения:', normalizedMessages);
-      if(isModerator) {
+      
+      if (isModerator) {
         const users = response.map(userData => ({
-        user_id: userData.user_id,
-        username: userData.username,
-        role: userData.role,
-        unread_count: userData.messages?.filter(msg => !msg.is_read).length || 0
-      }));
-      setUserList(users);
-        console.log("список пользователей",userList)
+          user_id: userData.user_id,
+          username: userData.username,
+          role: userData.role,
+          unread_count: userData.messages?.filter(msg => !msg.is_read).length || 0
+        }));
+        setUserList(users);
       }
       
       setMessages(normalizedMessages);
-      console.log(messages)
-      // setIsRead(response.is_read)
       setError('');
     } catch (err) {
       setError('Ошибка загрузки сообщений');
@@ -126,7 +117,6 @@ export function HelpPage() {
         content: replyContent,
         message_id: messageId
       });
-      console.log(` письмо ${replyContent} айдишник${messageId}`)
       setReplyContent('');
       setSelectedMessageId(null);
       fetchMessages();
@@ -137,8 +127,7 @@ export function HelpPage() {
     }
   };
 
-
-const handleDeleteMessage = async (messageId, senderName) => {
+  const handleDeleteMessage = async (messageId, senderName) => {
     const confirmDelete = window.confirm(
       `Вы действительно хотите удалить сообщение от "${senderName}"?\nЭто действие нельзя отменить.`
     );
@@ -147,15 +136,9 @@ const handleDeleteMessage = async (messageId, senderName) => {
     
     try {
       setLoading(true);
-      
       await api.delete(`/support/messages/${messageId}`);
+      setMessages(prevMessages => prevMessages.filter(msg => msg.id !== messageId));
       
-
-      setMessages(prevMessages => 
-        prevMessages.filter(msg => msg.id !== messageId)
-      );
-      
-  
       if (selectedMessageId === messageId) {
         setSelectedMessageId(null);
         setReplyContent('');
@@ -165,19 +148,64 @@ const handleDeleteMessage = async (messageId, senderName) => {
     } catch (err) {
       console.error('Ошибка при удалении сообщения:', err);
       setError('Не удалось удалить сообщение. Попробуйте позже.');
-      
-
       fetchMessages();
     } finally {
       setLoading(false);
     }
   };
 
+  // Функция для отметки сообщения как прочитанного
+  const markAsRead = async (messageId) => {
+    try {
+      setLoading(true);
+      await api.post(`/support/messages/${messageId}/read`);
+      await fetchMessages(); // перезагружаем список, чтобы обновить статус
+    } catch (err) {
+      console.error('Ошибка при отметке прочитанным:', err);
+      setError('Не удалось отметить сообщение как прочитанное');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Функция для снятия отметки "прочитано"
+  const markAsUnread = async (messageId) => {
+    try {
+      setLoading(true);
+      // Предполагается, что на сервере есть эндпоинт для снятия прочтения
+      // Если нет, можно отправить PATCH с полем is_read: false
+      await api.patch(`/support/messages/${messageId}/toggle-read`);
+      await fetchMessages();
+    } catch (err) {
+      console.error('Ошибка при снятии отметки прочитанного:', err);
+      setError('Не удалось изменить статус прочтения');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Функция для переключения статуса "закрыто/открыто"
+  const toggleClosed = async (messageId, currentClosedStatus) => {
+    try {
+      setLoading(true);
+      const newStatus = !currentClosedStatus;
+      // Используем тот же эндпоинт, что был в fetchClosed, но с правильным методом и телом
+      await api.patch(`/support/close-message/${messageId}/${user.id}`, {
+        is_closed: newStatus
+      });
+      await fetchMessages();
+    } catch (err) {
+      console.error('Ошибка при изменении статуса закрытия:', err);
+      setError('Не удалось изменить статус обращения');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleMessageClick = async (message) => {
     if (isModerator && !message.is_read) {
       try {
-        await api.patch(`/support/messages/${message.id}/read`);
+        await api.post(`/support/messages/${message.id}/read`);
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === message.id ? { ...msg, is_read: true } : msg
@@ -190,50 +218,24 @@ const handleDeleteMessage = async (messageId, senderName) => {
   };
 
   const getFilteredMessages = () => {
-  if (!isModerator) return messages || [];
-  if (choosedUser === null) return [];
-  
-  const userMessages = messages.filter(msg => msg.sender_name === choosedUser);
-  
-  switch(filter) {
-    case 'new':
-      return userMessages.filter(msg => !msg.is_read && msg.is_closed === false);
-    case 'in-work':
-      return userMessages.filter(msg => msg.is_read === true && msg.is_closed === false);
-    case 'closed':
-      return userMessages.filter(msg => msg.is_closed===true);
-  }};
+    if (!isModerator) return messages || [];
+    if (choosedUser === null) return [];
+    
+    const userMessages = messages.filter(msg => msg.sender_name === choosedUser);
+    
+    switch(filter) {
+      case 'new':
+        return userMessages.filter(msg => !msg.is_read && msg.is_closed === false);
+      case 'in-work':
+        return userMessages.filter(msg => msg.is_read === true && msg.is_closed === false);
+      case 'closed':
+        return userMessages.filter(msg => msg.is_closed === true);
+      default:
+        return userMessages;
+    }
+  };
 
   const filteredMessages = getFilteredMessages();
-
-  const fetchRead = async (id) => {
-    try{
-      if(isModerator){
-        const data = api.get(`/support/read-message/${id}`)
-        console.log(data)
-        if(data.is_read===true){
-          setIsRead(false)
-        }else{
-          setIsRead(true)
-        }
-
-      }
-    } catch(err){
-      setError('Ошибка прочтения сообщения', err)
-    }
-    
-  }
-
-  const fetchClosed = async (id) => {
-    try{
-      const data = api.patch(`/support/close-message/${id}/${user.id}`)
-      if(data.is_closed === true){
-        setHookForClosed(true) 
-        setIsRead(true)}else{setHookForClosed(false)}
-    } catch(err){
-      setError("Ошибка переноса в закрытые обращения", err)
-    }
-  }
 
   useEffect(() => {
     const handleEscKey = (event) => {
@@ -252,55 +254,58 @@ const handleDeleteMessage = async (messageId, senderName) => {
         {/* Левая колонка */}
         <div className="help-left-column" style={{display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
           <div>
-
             <h1 className="help-title" style={{color:'white'}}>
               {isModerator ? 'Панель модератора' : 'Служба поддержки'}
             </h1>
 
             {isModerator && (
               <>
-              <div className="moderator-filters">
-                <button 
-                  className={`filter-btn ${filter === 'new' ? 'active' : ''}`}
-                  onClick={() => setFilter('new')}
-                >
-                  Новые
-                </button>
-
-                <button 
-                  className={`filter-btn ${filter === 'in-work' ? 'active' : ''}`}
-                  onClick={() => setFilter('in-work')}
-                >
-                  В работе
-                </button>
-
-                <button 
-                  className={`filter-btn ${filter === 'closed' ? 'active' : ''}`}
-                  onClick={() => setFilter('closed')}
-                >
-                  Закрытые
-                </button>
-              </div>
-              <div className='chooseUsers'>
-                <div className='users'>
-                  {userList.map((item) => (
-                    <div 
-                      key={item.user_id} 
-                      className={`user-item ${choosedUser === item.username ? 'selected' : ''}`} 
-                      onClick={() => {
-                        if(choosedUser !== item.username) {
-                          setChoosedUser(item.username)}
-                        else{
-                          setChoosedUser(null)}}
-                        }>
-                      
-                      <div className="user-info" >
-                        <span className="user-name">Пользователь {item.username} Роль  {item.role} {(item.unread_count !== undefined && item.unread_count !== null && item.unread_count !== 0)?(`Непрочитанных сообщений ${item.unread_count}  `):''}</span>
-                      </div>
-                    </div>
-                  ))}
+                <div className="moderator-filters">
+                  <button 
+                    className={`filter-btn ${filter === 'new' ? 'active' : ''}`}
+                    onClick={() => setFilter('new')}
+                  >
+                    Новые
+                  </button>
+                  <button 
+                    className={`filter-btn ${filter === 'in-work' ? 'active' : ''}`}
+                    onClick={() => setFilter('in-work')}
+                  >
+                    В работе
+                  </button>
+                  <button 
+                    className={`filter-btn ${filter === 'closed' ? 'active' : ''}`}
+                    onClick={() => setFilter('closed')}
+                  >
+                    Закрытые
+                  </button>
                 </div>
-              </div>
+                <div className='chooseUsers'>
+                  <div className='users'>
+                    {userList.map((item) => (
+                      <div 
+                        key={item.user_id} 
+                        className={`user-item ${choosedUser === item.username ? 'selected' : ''}`} 
+                        onClick={() => {
+                          if(choosedUser !== item.username) {
+                            setChoosedUser(item.username);
+                          } else {
+                            setChoosedUser(null);
+                          }
+                        }}
+                      >
+                        <div className="user-info">
+                          <span className="user-name">
+                            Пользователь {item.username} Роль {item.role} 
+                            {(item.unread_count !== undefined && item.unread_count !== null && item.unread_count !== 0) && 
+                              (` Непрочитанных сообщений ${item.unread_count}`)
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </>
             )}
 
@@ -334,7 +339,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
         <div className="help-right-column">
           <h3 style={{userSelect: 'none', color:'white'}}>
             {isModerator ? 'Обращения пользователей' : 'Ваши обращения'}
-            {filteredMessages !== undefined && filteredMessages !== null && filteredMessages.length > 0 && (
+            {filteredMessages.length > 0 && (
               <span className="messages-count"> ({filteredMessages.length})</span>
             )}
           </h3>
@@ -351,7 +356,6 @@ const handleDeleteMessage = async (messageId, senderName) => {
                 <div 
                   key={message.id} 
                   className={`message-item ${!message.is_read && isModerator ? 'unread' : ''}`}
-
                 >
                   <div className="message-header">
                     <div className="message-header-left">
@@ -366,34 +370,59 @@ const handleDeleteMessage = async (messageId, senderName) => {
                       {!message.is_read && isModerator && (
                         <span className="unread-badge">Новое</span>
                       )}
-                      {(!message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
-                                            type='checkbox'
-                                            onChange={()=>fetchRead(message.id)}/><label onClick={() => fetchRead(message.id)}>Прочитано</label></div>):('')}
-                      {(!message.is_closed && message.is_read && isModerator)?(<div style={{display:'flex', flexDirection:'row'}}><input
-                                            type='checkbox'
-                                            onChange={()=>fetchClosed(message.id)}/><label onClick={() => fetchClosed(message.id)}>Закрыть</label></div>):null}
-                      {(message.is_closed && isModerator)?(<div><input
-                                            type='checkbox'
-                                            onChange={() => fetchClosed(message.id)}/><label onClick={() => fetchClosed(message.id)}>Вернуть в работу</label></div>):null}
-                      {(isModerator && message.is_read && !message.is_closed)?(<div><input
-                                            type='checkbox'
-                                            onChange={() => fetchRead(message.id)}/><label onClick={() => fetchRead(message.id)}>Убрать прочтение</label></div>):null}
+                      
+                      {/* Чекбокс "Прочитано" - появляется только если сообщение ещё не прочитано */}
+                      {isModerator && !message.is_read && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '10px' }}>
+                          <input
+                            type="checkbox"
+                            onChange={() => markAsRead(message.id)}
+                          />
+                          <label style={{ cursor: 'pointer', marginLeft: '4px' }}>
+                            Прочитано
+                          </label>
+                        </div>
+                      )}
+
+                      {/* Чекбокс "Закрыть" / "Вернуть в работу" - для прочитанных сообщений */}
+                      {isModerator && message.is_read && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '10px' }}>
+                          <input
+                            type="checkbox"
+                            checked={message.is_closed}
+                            onChange={() => toggleClosed(message.id, message.is_closed)}
+                          />
+                          <label style={{ cursor: 'pointer', marginLeft: '4px' }}>
+                            {message.is_closed ? 'Вернуть в работу' : 'Закрыть'}
+                          </label>
+                        </div>
+                      )}
+
+                      {/* Кнопка "Убрать прочтение" - для прочитанных и открытых обращений */}
+                      {isModerator && message.is_read && !message.is_closed && (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '10px' }}>
+                          <input
+                            type="checkbox"
+                            onChange={() => markAsUnread(message.id)}
+                          />
+                          <label style={{ cursor: 'pointer', marginLeft: '4px' }}>
+                            Убрать прочтение
+                          </label>
+                        </div>
+                      )}
                     </div>
+
                     <div className="message-header-right">
                       <span className="message-date">
                         {new Date(message.created_at).toLocaleString()}
                       </span>
                       
-                      {/* Кнопка "Ответить" для модератора */}
                       {isModerator && (
                         <button 
                           className="reply-button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedMessageId(
-                              selectedMessageId === message.id ? null : message.id
-                            );
-                            
+                            setSelectedMessageId(selectedMessageId === message.id ? null : message.id);
                             setReplyContent('');
                           }}
                         >
@@ -401,18 +430,16 @@ const handleDeleteMessage = async (messageId, senderName) => {
                         </button>
                       )}
                       
-                      {/* НОВАЯ КНОПКА: Удалить сообщение */}
                       {isModerator && (
                         <button 
                           className="delete-button"
                           onClick={(e) => {
-                            e.stopPropagation(); // Чтобы не срабатывал клик по сообщению
+                            e.stopPropagation();
                             handleDeleteMessage(message.id, message.sender_name);
                           }}
                           title="Удалить сообщение"
                           aria-label={`Удалить сообщение от ${message.sender_name}`}
                         >
-                          {/* Иконка корзины */}
                           <svg 
                             width="16" 
                             height="16" 
@@ -434,7 +461,6 @@ const handleDeleteMessage = async (messageId, senderName) => {
                     {message.content}
                   </div>
 
-                  {/* Ответы на сообщение */}
                   {message.replies && message.replies.length > 0 && (
                     <div className="message-replies">
                       <h4 className="replies-title">Ответы:</h4>
@@ -454,7 +480,6 @@ const handleDeleteMessage = async (messageId, senderName) => {
                     </div>
                   )}
 
-                  {/* Форма ответа для модератора */}
                   {isModerator && selectedMessageId === message.id && (
                     <div className="reply-form">
                       <textarea
@@ -466,7 +491,7 @@ const handleDeleteMessage = async (messageId, senderName) => {
                       />
                       <div className="reply-form-actions">
                         <button 
-                          onClick={() => {handleSendReply(message.id), fetchRead(message.id)}}
+                          onClick={() => handleSendReply(message.id)}
                           disabled={loading || !replyContent.trim()}
                           className="send-reply-btn"
                         >
