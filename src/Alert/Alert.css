@@ -68,26 +68,26 @@
 }
 
 .alert-success .alert-icon {
-  color: #55565a;
-  background-color: #e4e4e4;
+  color: #10b981;
+  background-color: #ffffff;
 }
 
 .alert-error {
-  border-left: 8px solid #ef4444;
+  border-left: 8px solid #8b8b8b;
 }
 
 .alert-error .alert-icon {
   color: #ef4444;
-  background-color: #fee2e2;
+  background-color: #ffffff;
 }
 
 .alert-warning {
-  border-left: 8px solid #f59e0b;
+  border-left: 8px solid #8b8b8b;
 }
 
 .alert-warning .alert-icon {
   color: #f59e0b;
-  background-color: #fed7aa;
+  background-color: #ffffff;
 }
 
 .alert-info {

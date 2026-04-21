@@ -61,7 +61,7 @@ const groupTractors = (data) => {
   return Object.values(grouped);
 };
 export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuery, searchDealer, dateFilter, activeMajMinButton, actualFilter=[],
-  uzelFilter=[], onCloseTab }) {
+  uzelFilter=[], onCloseTab, showAlert }) {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -325,6 +325,7 @@ console.log('Первый трактор:', tractors[0]);
     console.log('DEBUG: user =', user); 
 
     if (!token) {
+      showAlert("Пользователь не авторизован");
       setError("Пользователь не авторизован");
       setLoading(false);
       return;
@@ -466,6 +467,7 @@ console.log('Первый трактор:', tractors[0]);
       setTractors(enrichedTractors);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
+      showAlert('Ошибка подключния к серверу', 'error');
       setError(`Ошибка подключения к серверу: ${error.message}`);
     } finally {
       setLoading(false);

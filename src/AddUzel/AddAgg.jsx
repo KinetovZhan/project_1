@@ -5,7 +5,7 @@ import { api } from '../fetchAPI.js'; // Импортируем единый э�
 import Creatable from 'react-select/creatable';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 
-export function AddAggForm({ onBack, onSubmit }) {
+export function AddAggForm({ onBack, onSubmit, showAlert }) {
   const [formData, setFormData] = useState({
     type: '',
     name: '',
@@ -72,6 +72,7 @@ export function AddAggForm({ onBack, onSubmit }) {
         setError(null);
       } catch (err) {
         console.error('Ошибка при загрузке тракторов:', err);
+        showAlert('Ошибка при загрузке тракторов', 'error');
         setError('Не удалось загрузить список тракторов');
       } finally {
         setLoadingTractors(false);
@@ -143,7 +144,11 @@ export function AddAggForm({ onBack, onSubmit }) {
 
   const submitDataToServer = async () => {
     if (!token) {
-      setError('Пользователь не авторизован');
+      if (showAlert) {
+        showAlert('Пользователь не авторизован', 'error');
+      } else {
+        setError('Пользователь не авторизован');
+      }
       return;
     }
     try {
@@ -173,7 +178,11 @@ export function AddAggForm({ onBack, onSubmit }) {
 
     } catch (err) {
       console.error('Ошибка при добавлении агрегата:', err);
-      alert(err.message);
+      if (showAlert) {
+        showAlert(err.message, 'error');
+      } else {
+        alert(err.message);
+      }
     } finally {
       setLoading(false);
     }

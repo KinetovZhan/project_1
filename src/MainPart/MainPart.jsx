@@ -95,6 +95,7 @@ export function MainPart({
           onSubmit={onAddSubmit} 
           formData={formData}
           setFormData={setFormData}
+          showAlert={showAlert}
         />
       </div>
     );
@@ -104,7 +105,7 @@ export function MainPart({
   if (showAddAggForm) {
     return (
       <div className="MainPart">
-        <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} />
+        <AddAggForm onBack={onCloseAddAggForm} onSubmit={onAddAggSubmit} showAlert={showAlert}/>
       </div>
     );
   }
@@ -150,6 +151,7 @@ export function MainPart({
             actualFilter = {actualFilter}    
             uzelFilter = {uzelFilter}
             onCloseTab={() => onCloseTab('tractor')}
+            showAlert={showAlert}
           />
         </>
       )}

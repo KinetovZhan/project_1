@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext.jsx';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 import { api, buildApiUrl } from '../fetchAPI.js';
 
-export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, setFormData }) {
+export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, setFormData, showAlert }) {
   // Состояния
   const [componentOptions, setComponentOptions] = useState([]);
   const [selectedComponents, setSelectedComponents] = useState(formData ? formData.selectedComponents : []);
@@ -70,7 +70,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
       })
       .catch(err => {
         console.error('Ошибка загрузки компонентов:', err);
-        alert('Не удалось загрузить список компонентов');
+        if (showAlert) {
+          showAlert('Ошибка загрузки списка производителей', 'error');
+        } else {
+          alert('Не удалось загрузить список компонентов');
+        }
       });
   }, []);
 
@@ -199,24 +203,44 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
 
     // Валидация
     if (!file) {
-      alert('Пожалуйста, выберите файл ПО');
+      if (showAlert) {
+        showAlert('Пожалуйста, выберите файл ПО', 'warning');
+      } else {
+        alert('Пожалуйста, выберите файл ПО');
+      }
       return;
     }
     
     if (!selectedStatus) {
-      alert('Пожалуйста, выберите статус');
+      if (showAlert) {
+        showAlert('Пожалуйста, выберите статус', 'warning');
+      } else {
+        alert('Пожалуйста, выберите статус');
+      }
       return;
     }
     if (!selectedProducer) {
-      alert('Пожалуйста, укажите производителя');
+      if (showAlert) {
+        showAlert('Пожалуйста, укажите производителя', 'warning');
+      } else {
+        alert('Пожалуйста, укажите производителя');
+      }
       return;
     }
     if (selectedTractorModels.length === 0) {
-      alert('Пожалуйста, выберите хотя бы одну модель трактора');
+      if (showAlert) {
+        showAlert('Пожалуйста, выберите хотя бы одну модель трактора', 'warning');
+      } else {
+        alert('Пожалуйста, выберите хотя бы одну модель трактора');
+      }
       return;
     }
     if (!skipValidation && selectedComponents.length === 0) {
-      alert('Пожалуйста, выберите хотя бы один компонент');
+      if (showAlert) {
+        showAlert('Пожалуйста, выберите хотя бы один компонент', 'warning');
+      } else {
+        alert('Пожалуйста, выберите хотя бы один компонент');
+      }
       return;
     }
 
@@ -319,7 +343,11 @@ export function AddPoForm({ onBack, onSubmit, skipValidation = false, formData, 
       onSubmit?.(data);
     } catch (err) {
       console.error('❌ Ошибка:', err);
-      alert(`Ошибка: ${err.message}`);
+      if (showAlert) {
+        showAlert(`Ошибка: ${err.message}`, 'error');
+      } else {
+        alert(`Ошибка: ${err.message}`);
+      }
     }
   };
 

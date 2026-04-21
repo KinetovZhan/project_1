@@ -30,7 +30,7 @@ const Alert = ({ message, type = 'success', duration = 3000, onClose }) => {
         <div className="alert-content">
           <div className="alert-icon">
             {type === 'success' && '🗹'}
-            {type === 'error' && '✗'}
+            {type === 'error' && '⌧'}
             {type === 'warning' && '⚠'}
             {type === 'info' && 'ℹ'}
           </div>
