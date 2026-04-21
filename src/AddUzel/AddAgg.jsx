@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import Select from 'react-select';
-import { api } from '../fetchAPI.js'; // Импортируем единый экземпляр api
+import { api } from '../fetchAPI.js';
 import Creatable from 'react-select/creatable';
 import useCheckMobile from '../CheckMobile/checkMobile.jsx';
 
-export function AddAggForm({ onBack, onSubmit, showAlert }) {
-  const [formData, setFormData] = useState({
+export function AddAggForm({ onBack, onSubmit, formData: externalFormData, setFormData: setExternalFormData, showAlert }) {
+  const [formData, setFormData] = useState(externalFormData || {
     type: '',
     name: '',
     tractor_models: [],
@@ -33,13 +33,38 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
 
   // Для react-select нужен формат { value, label }
   const [tractorOptions, setTractorOptions] = useState([]);
-  const [selectedTractor, setSelectedTractor] = useState(null);
+  const [selectedTractor, setSelectedTractor] = useState(() => {
+    if (externalFormData && externalFormData.selected_tractor_id) {
+      return { value: externalFormData.selected_tractor_id, label: externalFormData.tractor_model || '' };
+    }
+    return null;
+  });
 
   // Состояния для производителей
-  const [selectedProducer, setSelectedProducer] = useState(null);
+  const [selectedProducer, setSelectedProducer] = useState(() => {
+    if (externalFormData && externalFormData.producer) {
+      return { value: externalFormData.producer, label: externalFormData.producer };
+    }
+    return null;
+  });
   const [producerOptions, setProducerOptions] = useState([]);
   const [loadingProducers, setLoadingProducers] = useState(false);
   const [producerError, setProducerError] = useState(null);
+
+  // Состояние для выбранного типа
+  const [selectedType, setSelectedType] = useState(() => {
+    if (externalFormData && externalFormData.type) {
+      return options.find(opt => opt.value === externalFormData.type);
+    }
+    return null;
+  });
+
+  // Обновляем внешний formData при изменении внутреннего состояния
+  useEffect(() => {
+    if (setExternalFormData) {
+      setExternalFormData(formData);
+    }
+  }, [formData, setExternalFormData]);
 
   useEffect(() => {
     const loadTractors = async () => {
@@ -49,24 +74,20 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
       }
       try {
         setLoadingTractors(true);
-        // Используем api.get вместо fetch
         const responseTractorsData = await api.get('/tractors/');
         
-        // Сохраняем исходные данные
         setTractors(responseTractorsData);
 
-           // Получаем уникальные модели
         const uniqueModels = responseTractorsData
           .map(t => t.model)
           .filter(model => model && model.trim() !== '')
           .filter((value, index, self) => self.indexOf(value) === index);
-            // Формируем опции для react-select
+        
         const options = uniqueModels.map(model => ({
           value: model,
           label: model
         }));
       
-        
         setTractorOptions(options);
         console.log('Трактора успешно загружены:', responseTractorsData);
         setError(null);
@@ -92,20 +113,17 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
         setLoadingProducers(true);
         setProducerError(null);
         
-        // Используем api.get вместо fetch
         const data = await api.get('/components/');
         
         console.log('Полученные данные компонентов для производителей:', data);
         
-        // Извлекаем уникальных производителей
         const producers = data
           .map(item => item.producer)
-          .filter(producer => producer && producer.trim() !== '') // убираем пустые и null
-          .filter((value, index, self) => self.indexOf(value) === index); // уникальные значения
+          .filter(producer => producer && producer.trim() !== '')
+          .filter((value, index, self) => self.indexOf(value) === index);
         
         console.log('Уникальные производители:', producers);
         
-        // Формируем опции для react-select
         const options = producers.map(producer => ({
           value: producer,
           label: producer
@@ -127,10 +145,10 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
   const handleTractorSelectChange = (selectedOption) => {
     setSelectedTractor(selectedOption);
     
-    // Обновляем formData с выбранным ID трактора
     setFormData(prev => ({
       ...prev,
-      selected_tractor_id: selectedOption ? selectedOption.value : ''
+      selected_tractor_id: selectedOption ? selectedOption.value : '',
+      tractor_model: selectedOption ? selectedOption.label : ''
     }));
   };
 
@@ -139,6 +157,14 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleTypeChange = (selected) => {
+    setSelectedType(selected);
+    setFormData(prev => ({
+      ...prev,
+      type: selected?.value || ''
     }));
   };
 
@@ -165,10 +191,29 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
 
       console.log('Отправляемые данные:', submitData);
 
-      // Используем api.post вместо fetch
       const responseData = await api.post('/components/', submitData);
 
       console.log('Агрегат успешно добавлен:', responseData);
+
+      // Сбрасываем форму после успешной отправки
+      const resetFormData = {
+        type: '',
+        name: '',
+        tractor_models: [],
+        mounting_date: '',
+        producer: '',
+        selected_tractor_id: '',
+        tractor_model: ''
+      };
+      
+      setFormData(resetFormData);
+      setSelectedType(null);
+      setSelectedTractor(null);
+      setSelectedProducer(null);
+      
+      if (setExternalFormData) {
+        setExternalFormData(resetFormData);
+      }
 
       if (typeof onSubmit === 'function') {
         onSubmit(responseData);
@@ -252,7 +297,7 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
     }));
   };
 
-  // Обработчик выбора производителя (существующего или нового)
+  // Обработчик выбора производителя
   const handleProducerChange = (selectedOption) => {
     setSelectedProducer(selectedOption);
     setFormData(prev => ({
@@ -261,21 +306,20 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
     }));
   };
 
+  // Обработчик создания новой модели трактора
   const handleModelCreate = (inputValue) => {
     const newOption = { value: inputValue, label: inputValue };
     setTractorOptions(prev => [...prev, newOption]);
-    setSelectedTractors(newOption);
+    setSelectedTractor(newOption);
+    setFormData(prev => ({
+      ...prev,
+      selected_tractor_id: inputValue,
+      tractor_model: inputValue
+    }));
   };
 
   return (
     <div className="add-po-form-container uzel">
-      {/* {!isMobile ? (
-        <button onClick={onBack} className="add-po-back-button">
-          <svg width="28" height="24" viewBox="0 0 28 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22L2 12L12 2M26 22L16 12L26 2" stroke="#1E1E1E" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
-      ) : null} */}
       <button onClick={onBack} className="go-back" style={{left:'-50px'}}></button>
       <h3 className="add-po-title">Добавление узла</h3>
 
@@ -285,170 +329,231 @@ export function AddAggForm({ onBack, onSubmit, showAlert }) {
         </div>
       )}
       <div className='add-po-form-scroll-bar'>
+        <form className="add-po-form" onSubmit={handleSubmit}>
+          <div className='add-po-field'>
+            <label htmlFor="type-select" className='add-po-label'>Тип *</label>
+            <Select
+              id="type-select"
+              name="type"
+              value={selectedType}
+              onChange={handleTypeChange}
+              options={options}
+              placeholder="Выберите узел"
+              isDisabled={loading}
+              styles={{
+                menu: (base) => ({ 
+                  ...base,
+                  zIndex: 9999,
+                  position: 'absolute',
+                  backgroundColor: 'white',
+                  marginBottom: '5px'
+                }),
+                menuPortal: (base) => ({  
+                  ...base,
+                  zIndex: 9999
+                }),
+                menuList: (base) => ({
+                  ...base,
+                  maxHeight: 150,
+                  overflowY: 'auto',
+                  backgroundColor: 'white',
+                  color: 'black',
+                  border: '1px solid rgba(217, 217, 217, 1)',
+                  scrollbarWidth: 'thin',
+                  zIndex: 9999
+                })
+              }}
+            />
+          </div>
 
-      <form className="add-po-form" onSubmit={handleSubmit}>
-        <div className='add-po-field'>
-          <label htmlFor="type-select" className='add-po-label'>Тип *</label>
-          <Select
-            id="type-select"
-            name="type"
-            value={options.find(opt => opt.value === formData.type)}
-            onChange={(selected) => handleChange({
-              target: { name: 'type', value: selected?.value }
-            })}
-            options={options}
-            placeholder="Выберите узел"
-            isDisabled={loading}
-            styles={{
-              menu: (base) => ({ 
-                ...base,
-                zIndex: 9999,
-                position: 'absolute',
-                backgroundColor: 'white',
-                marginBottom: '5px'
-              }),
-              menuPortal: (base) => ({  
-                ...base,
-                zIndex: 9999
-              }),
-              menuList: (base) => ({
-                ...base,
-                maxHeight: 150,
-                overflowY: 'auto',
-                backgroundColor: 'white',
-                color: 'black',
-                border: '1px solid rgba(217, 217, 217, 1)',
-                scrollbarWidth: 'thin',
-                zIndex: 9999
-              })
-            }}
-          />
-        </div>
+          <div className='add-po-field'>
+            <label className='add-po-label'>Название *</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Введите название"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className='add-po-input'
+              disabled={loading}
+            />
+          </div>
 
-        <div className='add-po-field'>
-          <label className='add-po-label'>Название *</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="Введите название"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className='add-po-input'
-            disabled={loading}
-          />
-        </div>
+          <div className='add-po-field'>
+            <label className='add-po-label'>Дата установки *</label>
+            <input
+              type="date"
+              name="mounting_date"
+              value={formData.mounting_date}
+              onChange={handleChange}
+              className='add-po-input'
+              disabled={loading}
+              style={{color:'grey'}}
+            />
+          </div>
 
-        <div className='add-po-field'>
-          <label className='add-po-label'>Дата установки *</label>
-          <input
-            type="date"
-            name="mounting_date"
-            value={formData.mounting_date}
-            onChange={handleChange}
-            className='add-po-input'
-            disabled={loading}
-            style={{color:'grey'}}
-          />
-        </div>
+          <div className="add-po-field">
+            <label className="add-po-label">Модель трактора *</label>
+            <Creatable
+              options={tractorOptions}
+              value={selectedTractor}
+              onChange={handleTractorSelectChange}
+              onCreateOption={handleModelCreate}
+              placeholder="Выберите модель трактора"
+              classNamePrefix="add-po-select"
+              isClearable={true}
+              isSearchable={true}
+              isLoading={loadingTractors}
+              menuPlacement="top"
+              isDisabled={!token || loadingTractors}
+              noOptionsMessage={() => {
+                if (!token) return "Требуется авторизация";
+                if (loadingTractors) return "Загрузка...";
+                if (error) return error;
+                return "Нет доступных моделей";
+              }}
+              formatCreateLabel={(inputValue) => `Добавить: ${inputValue}`}
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  color: '#333',
+                  height: '40px',
+                  width: '100%',
+                  border: '1px solid',
+                  borderColor: state.isFocused ? '#13be00' : '#ccc',
+                  boxSizing: 'border-box',
+                  fontSize: isMobile ? '12px' : '16px',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s ease',
+                  outline: 'none',
+                  boxShadow: 'none',
+                  backgroundColor: 'white',
+                }),
+                menuList: (base) => ({
+                  ...base,
+                  maxHeight: 200,
+                  padding: '4px 0',
+                  backgroundColor: 'white'
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  color: '#333',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: '#e6f7e4'
+                  }
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                  position: 'absolute',
+                  backgroundColor: 'white',
+                  marginBottom: '5px'
+                }),
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }}
+            />
+          </div>
 
-<div className="add-po-field">
-  <label className="add-po-label">Производитель *</label>
-  <Creatable
-    options={producerOptions}
-    value={selectedProducer}
-    onChange={handleProducerChange}
-    onCreateOption={handleProducerCreate}
-    placeholder="Выберите производителя"
-    classNamePrefix="add-po-select"
-    isClearable={true}
-    isSearchable={true}
-    isLoading={loadingProducers}
-    menuPlacement="top" 
-    isDisabled={!token || loadingProducers}
-    noOptionsMessage={() => {
-      if (!token) return "Требуется авторизация";
-      if (loadingProducers) return "Загрузка...";
-      if (producerError) return producerError;
-      if (producerOptions.length === 0) return "Нет доступных производителей";
-      return null;
-    }}
-    formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
-    styles={{
-      control: (base, state) => ({
-        ...base,
-        color: '#333',
-        height: '40px',
-        width: '100%',
-        border: '1px solid',
-        borderColor: state.isFocused ? '#f0f9ff' : '#ccc',
-        boxSizing: 'border-box',
-        fontSize: isMobile ? '12px' : '16px',
-        cursor: 'pointer',
-        transition: 'border-color 0.15s ease',
-        outline: 'none',
-        boxShadow: 'none',
-        backgroundColor: 'white',
-        '&:hover': {
-          borderColor: '#070707'
-        }
-      }),
-      menuList: (base) => ({
-        ...base,
-        maxHeight: 200,
-        padding: '4px 0',
-        backgroundColor: 'white'
-      }),
-      option: (base, state) => ({
-        ...base,
-        // backgroundColor: state.isSelected ? '#f0f9ff' : 
-        //                 state.isFocused ? '#f0f9ff' : 'white',
-        // color: state.isSelected ? '#333' : '#333',
-        cursor: 'pointer',
-        '&:hover': {
-          // backgroundColor: '#f0f9ff'
-        }
-      }),
-      singleValue: (base) => ({
-        ...base,
-        color: '#1E1E1E'
-      }),
-      placeholder: (base) => ({
-        ...base,
-        color: '#999'
-      }),
-      loadingIndicator: (base) => ({
-        ...base,
-        color: '#0c0c0c'
-      }),
-      menu: (base) => ({
-        ...base,
-        zIndex: 9999,
-        position: 'absolute',
-        backgroundColor: 'white',
-        marginBottom: '5px'
-      }),
-      menuPortal: (base) => ({
-        ...base,
-        zIndex: 9999
-      })
-    }}
-  />
-  {producerError && token && (
-    <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
-      Ошибка загрузки: {producerError}
-    </div>
-  )}
-</div>
+          <div className="add-po-field">
+            <label className="add-po-label">Производитель *</label>
+            <Creatable
+              options={producerOptions}
+              value={selectedProducer}
+              onChange={handleProducerChange}
+              onCreateOption={handleProducerCreate}
+              placeholder="Выберите производителя"
+              classNamePrefix="add-po-select"
+              isClearable={true}
+              isSearchable={true}
+              isLoading={loadingProducers}
+              menuPlacement="top" 
+              isDisabled={!token || loadingProducers}
+              noOptionsMessage={() => {
+                if (!token) return "Требуется авторизация";
+                if (loadingProducers) return "Загрузка...";
+                if (producerError) return producerError;
+                if (producerOptions.length === 0) return "Нет доступных производителей";
+                return null;
+              }}
+              formatCreateLabel={(inputValue) => `Создать: ${inputValue}`}
+              styles={{
+                control: (base, state) => ({
+                  ...base,
+                  color: '#333',
+                  height: '40px',
+                  width: '100%',
+                  border: '1px solid',
+                  borderColor: state.isFocused ? '#13be00' : '#ccc',
+                  boxSizing: 'border-box',
+                  fontSize: isMobile ? '12px' : '16px',
+                  cursor: 'pointer',
+                  transition: 'border-color 0.15s ease',
+                  outline: 'none',
+                  boxShadow: 'none',
+                  backgroundColor: 'white',
+                  '&:hover': {
+                    borderColor: '#13be00'
+                  }
+                }),
+                menuList: (base) => ({
+                  ...base,
+                  maxHeight: 200,
+                  padding: '4px 0',
+                  backgroundColor: 'white'
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  color: '#333',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: '#e6f7e4'
+                  }
+                }),
+                singleValue: (base) => ({
+                  ...base,
+                  color: '#1E1E1E'
+                }),
+                placeholder: (base) => ({
+                  ...base,
+                  color: '#999'
+                }),
+                loadingIndicator: (base) => ({
+                  ...base,
+                  color: '#0c0c0c'
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                  position: 'absolute',
+                  backgroundColor: 'white',
+                  marginBottom: '5px'
+                }),
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }}
+            />
+            {producerError && token && (
+              <div style={{ color: 'red', fontSize: '12px', marginTop: '4px' }}>
+                Ошибка загрузки: {producerError}
+              </div>
+            )}
+          </div>
 
-        <button
-          type="submit"
-          className='add-po-submit-button'
-          disabled={loading || loadingTractors}
-        >
-          {loading ? 'Добавление...' : 'Добавить'}
-        </button>
-      </form>
+          <button
+            type="submit"
+            className='add-po-submit-button'
+            disabled={loading || loadingTractors}
+          >
+            {loading ? 'Добавление...' : 'Добавить'}
+          </button>
+        </form>
       </div>
     </div>
   );
