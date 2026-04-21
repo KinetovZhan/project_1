@@ -40,7 +40,9 @@ export function MainPart({
 
   handleTractorDetails,
   handleAggregateDetails,
-  onCloseTab
+  onCloseTab,
+
+  showAlert,
 }) {
   const navigate = useNavigate();
 
@@ -149,7 +151,8 @@ export function MainPart({
             searchQuery={searchQuery}
             selectedStatus={selectedStatus}
             onCloseTab={() => onCloseTab('aggregates')}
-            actualFilterPo={actualFilterPo}
+            actualFilterPo = {actualFilterPo}
+            showAlert={showAlert}
           />
         </>
       )}

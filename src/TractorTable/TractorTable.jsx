@@ -669,7 +669,7 @@ const getStatusColorClass = (status) => {
     console.log(`Click on ${componentType} software:`, { path, softwareName, model });
     
     // Если путь пустой — показываем форму создания ПО
-    if (!path || path === '' || path === '-') {
+    if ((softwareName && softwareName !== '' && softwareName !== '-')&&(!path || path === '' || path === '-')) {
       setSelectedComponent({
         type: componentType,
         model: model,
