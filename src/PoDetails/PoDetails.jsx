@@ -268,6 +268,14 @@ export function PoDetails({ po, onBack, showAlert }) {
     }));
 }, [allTractorModels]);
 
+  // Синхронизация статусов при входе в режим редактирования
+  useEffect(() => {
+    if (change && details) {
+      setIsActual(details.software_is_actual);
+      setIsCritical(details.software_is_critical);
+    }
+  }, [change, details]);
+
   // Переключение на другую версию
   const handleVersionClick = async (e, versionId) => {
     e.preventDefault();
@@ -378,7 +386,21 @@ export function PoDetails({ po, onBack, showAlert }) {
       setIsActual(false);
       setIsCritical(false);
     }
+    console.log('выполнилась функция chooseActual')
   };
+
+  const validActuality = () => {
+    if(change===true){
+      if (isActual === true && isCritical === false) {return 'Актуальное'}
+      if (isCritical === true && isActual === false) {return 'Требует обновление'}
+      else {return 'Устаревшее'}
+    }
+    if(change===false){
+      setIsActual(details.software_is_actual),
+      setIsCritical(details.software_is_critical)
+    }
+
+  }
 
   const removeExtension = (filename) => {
     if (!filename) return '';
@@ -645,7 +667,7 @@ export function PoDetails({ po, onBack, showAlert }) {
             <div>
               <h3>Статус</h3>
               {(isModerator && change) ? (
-                <select value={getStatusActualityText()} onChange={chooseActual}>
+                <select value={validActuality()} onChange={chooseActual}>
                   <option value="Актуальное">Актуальное</option>
                   <option value="Устаревшее">Устаревшее</option>
                   <option value="Требует обновление">Требует обновление</option>

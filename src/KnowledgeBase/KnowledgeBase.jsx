@@ -57,11 +57,26 @@ export function KnowledgeBase() {
           </svg>
 
         </button>
-        <div className="knowledge-base-container">
-      
-          <h1 className="knowledge-base-title">
-            База знаний
-          </h1>
+        <div className="knowledge-base-container-base">
+          <div className="knowledge-base-container">
+            <div>
+              <h1 className="knowledge-base-title">
+                База знаний
+              </h1>
+            </div>
+            <div className='knowledge-base-maininfo'>
+              <a href="">ссылка 1</a>
+            </div>
+            <div className='knowledge-base-maininfo'>
+              <a href="">ссылка 2</a>
+            </div>
+            <div className='knowledge-base-maininfo'>
+              <a href="">ссылка 3</a>
+            </div>
+            <div className='knowledge-base-maininfo'>
+              <a href="">ссылка 4</a>
+            </div>
+          </div>
         </div>
 
       </div>
