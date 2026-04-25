@@ -150,7 +150,7 @@ function MainPage() {
 
   // ===== Форма "ПО" =====
   const handleAddSubmit = (responseData) => {
-  showAlert(`✅ ПО успешно добавлено!`, 'success');
+  showAlert(`ПО успешно добавлено!`, 'success');
   closeAddForm();
   };
 
@@ -221,7 +221,7 @@ function MainPage() {
 
   const handleAddCompPartSubmit = (responseData) => {
     console.log('Часть агрегата добавлен:', responseData);
-    alert('Часть агрегата создана!');
+    showAlert('Часть агрегата создана!', 'success');
     closeAddCompPartForm();
   }
 
@@ -349,6 +349,7 @@ const handleActualChangePo = (value) => {
             uzelFilter={uzelFilter}
             onCloseTab={(tabName) => handleButtonClick('tabName')}
             actualFilterPo={actualFilterPo}
+            showAlert={showAlert}
           />
 
         </div>
