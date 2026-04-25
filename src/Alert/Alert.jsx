@@ -41,8 +41,37 @@ const Alert = ({ message, type = 'success', duration = 3000, onClose }) => {
   );
 };
 
-// Хук для управления алертом
-export const useAlert = () => {
+// // Хук для управления алертом
+// export const useAlert = () => {
+//   const [alert, setAlert] = useState(null);
+
+//   const showAlert = (message, type = 'success', duration = 3000) => {
+//     setAlert({ message, type, duration });
+//   };
+
+//   const hideAlert = () => {
+//     setAlert(null);
+//   };
+
+//   const AlertComponent = alert ? (
+//     <Alert
+//       message={alert.message}
+//       type={alert.type}
+//       duration={alert.duration}
+//       onClose={hideAlert}
+//     />
+//   ) : null;
+
+//   return { showAlert, hideAlert, AlertComponent };
+// };
+
+// export default Alert;
+
+// Создаем контекст
+const AlertContext = createContext(null);
+
+// Провайдер для всего приложения
+export const AlertProvider = ({ children }) => {
   const [alert, setAlert] = useState(null);
 
   const showAlert = (message, type = 'success', duration = 3000) => {
@@ -53,16 +82,28 @@ export const useAlert = () => {
     setAlert(null);
   };
 
-  const AlertComponent = alert ? (
-    <Alert
-      message={alert.message}
-      type={alert.type}
-      duration={alert.duration}
-      onClose={hideAlert}
-    />
-  ) : null;
+  return (
+    <AlertContext.Provider value={{ showAlert, hideAlert }}>
+      {children}
+      {alert && (
+        <Alert
+          message={alert.message}
+          type={alert.type}
+          duration={alert.duration}
+          onClose={hideAlert}
+        />
+      )}
+    </AlertContext.Provider>
+  );
+};
 
-  return { showAlert, hideAlert, AlertComponent };
+// Хук для использования
+export const useAlert = () => {
+  const context = useContext(AlertContext);
+  if (!context) {
+    throw new Error('useAlert must be used within AlertProvider');
+  }
+  return context;
 };
 
 export default Alert;

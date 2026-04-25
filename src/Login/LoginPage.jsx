@@ -88,7 +88,7 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="login-form">
             <h2>Вход в систему</h2>
             {authorizationError && (
-              <div className="error-message">{authorizationError}</div>
+              <div className="error-message" style={{ color: 'red' }}>{authorizationError}</div>
             )}
             <div className="login-form-group">
               <label htmlFor="login-input">Логин</label>
