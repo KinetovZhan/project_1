@@ -63,7 +63,11 @@ export function PoDetails({ po, onBack, showAlert }) {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!po?.id_Firmwares || !po?.id_Component) {
-        setError('Недостаточно данных для загрузки');
+        if(showAlert) {
+          showAlert({message: 'Недостаточно данных для загрузки', type: 'error'});
+        }else{
+          setError('Недостаточно данных для загрузки');
+        }
         setLoading(false);
         return;
       }
@@ -76,7 +80,11 @@ export function PoDetails({ po, onBack, showAlert }) {
         setDetails(item);
       } catch (err) {
         console.error('Ошибка загрузки деталей ПО:', err);
-        setError(`Ошибка: ${err.message}`);
+        if(showAlert) {
+          showAlert({message: `Ошибка: ${err.message}`, type: 'error'}); 
+        }else{
+          setError(`Ошибка: ${err.message}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -168,7 +176,11 @@ export function PoDetails({ po, onBack, showAlert }) {
     const swId = details?.id_firmwares;
     const componentId = details?.id_component;
     if (!swId||!componentId) {
-      alert('Нет ID прошивки для обновления');
+      if (showAlert) {
+        showAlert({message: 'Нет ID прошивки для обновления', type: 'error'});
+      } else {
+        alert('Нет ID прошивки для обновления');
+      }
       return;
     }
 
@@ -235,7 +247,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       showAlert('Данные успешно обновлены!', 'success');
     } catch (err) {
       console.error('Ошибка:', err);
-      alert(`Ошибка: ${err.message}`);
+      showAlert(`Ошибка: ${err.message}`, 'error');
     } finally {
       setUploadingInstruction(false);
       setUploadingSoftware(false);
