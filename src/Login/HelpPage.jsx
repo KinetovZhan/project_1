@@ -385,7 +385,7 @@ export function HelpPage() {
                       )}
 
                       {/* Чекбокс "Закрыть" / "Вернуть в работу" - для прочитанных сообщений */}
-                      {isModerator && message.is_read && (
+                      {message.is_read && (
                         <div style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '10px' }}>
                           <input
                             type="checkbox"

@@ -142,11 +142,11 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
       getValue: (t) => formatDateTime(t.assembly_date || t.releaseDate), 
       isBase: true 
     },
-    region: { 
-      label: 'Регион', 
-      getValue: (t) => t.region || '-', 
-      isBase: true 
-    },
+    // region: { 
+    //   label: 'Регион', 
+    //   getValue: (t) => t.region || '-', 
+    //   isBase: true 
+    // },
     consumer: { 
       label: 'Дилер', 
       getValue: (t) => t.dealer || '-', 
@@ -245,7 +245,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
   // Порядок столбцов с учётом выбранных узлов и видимости
   const orderedColumns = useMemo(() => {
-    const baseColumns = ['vin', 'model', 'assembly_date', 'region', 'consumer', 'oh_hour', 'last_activity'];
+    const baseColumns = ['vin', 'model', 'assembly_date', 'consumer', 'oh_hour', 'last_activity'];
     const selectedNodes = uzelFilter || []; // массив строк, например ['dvs', 'kpp']
     const otherNodes = allNodes.filter(node => !selectedNodes.includes(node));
     // Все возможные столбцы в правильном порядке
@@ -339,14 +339,14 @@ console.log('Первый трактор:', tractors[0]);
       // 1. Получаем тракторы
       let tractors = await api.post('search/tractor-info', postData);
         
-      if (userRole === 'dealer') {
-        tractors = tractors.filter(tractor => {
-          const tractorConsumer = tractor.consumer || tractor.dealer || '';
-          const userName = user?.sub || user?.name || user?.username || '';
-          return tractorConsumer.toLowerCase().includes(userName.toLowerCase())
-        });
-        console.log(`Для дилера ${user?.username || user?.sub} отфильтровано ${tractors.length} тракторов`);
-      }
+      // if (userRole === 'dealer') {
+      //   tractors = tractors.filter(tractor => {
+      //     const tractorConsumer = tractor.dealer || '';
+      //     const userName = user?.sub || user?.name || user?.username || '';
+      //     return tractorConsumer.toLowerCase() === userName.toLowerCase();
+      //   });
+      //   console.log(`Для дилера ${user?.username || user?.sub} отфильтровано ${tractors.length} тракторов`);
+      // }
 
       // 2. Получаем компоненты (НОВЫЙ ФОРМАТ ОТВЕТА)
       let enrichedTractors = tractors;

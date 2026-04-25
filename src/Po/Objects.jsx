@@ -245,7 +245,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     
   } catch (error) {
     console.error('Ошибка при скачивании:', error);
-    alert(`Ошибка при скачивании: ${error.message}`);
+    showAlert(`Ошибка при скачивании: ${error.message}`, 'error');
   } finally {
     setDownloading(null);
   }
@@ -416,12 +416,12 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   const handleMoveToArchive = async (item, shouldArchive) => {
     if (!item?.id_Firmwares) {
-      alert('ID файла не указан');
+      showAlert('ID файла не указан', 'error');
       return;
     }
 
     if (!token) {
-      alert('Требуется авторизация');
+      showAlert('Требуется авторизация', 'error');
       return;
     }
 
@@ -438,7 +438,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       // alert(`ПО успешно ${shouldArchive ? 'перемещено в архив' : 'восстановлено из архива'}`);
     } catch (error) {
       console.error('Ошибка при изменении статуса архивации:', error);
-      alert(`Ошибка: ${error.message || 'Не удалось изменить статус архивации'}`);
+      showAlert(`Ошибка: ${error.message || 'Не удалось изменить статус архивации'}`, 'error');
     } finally {
       setChangingArchive(null);
     }

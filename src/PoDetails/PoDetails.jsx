@@ -63,7 +63,11 @@ export function PoDetails({ po, onBack, showAlert }) {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!po?.id_Firmwares || !po?.id_Component) {
-        setError('Недостаточно данных для загрузки');
+        if(showAlert) {
+          showAlert({message: 'Недостаточно данных для загрузки', type: 'error'});
+        }else{
+          setError('Недостаточно данных для загрузки');
+        }
         setLoading(false);
         return;
       }
@@ -76,7 +80,11 @@ export function PoDetails({ po, onBack, showAlert }) {
         setDetails(item);
       } catch (err) {
         console.error('Ошибка загрузки деталей ПО:', err);
-        setError(`Ошибка: ${err.message}`);
+        if(showAlert) {
+          showAlert({message: `Ошибка: ${err.message}`, type: 'error'}); 
+        }else{
+          setError(`Ошибка: ${err.message}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -168,7 +176,11 @@ export function PoDetails({ po, onBack, showAlert }) {
     const swId = details?.id_firmwares;
     const componentId = details?.id_component;
     if (!swId||!componentId) {
-      alert('Нет ID прошивки для обновления');
+      if (showAlert) {
+        showAlert({message: 'Нет ID прошивки для обновления', type: 'error'});
+      } else {
+        alert('Нет ID прошивки для обновления');
+      }
       return;
     }
 
@@ -235,7 +247,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       showAlert('Данные успешно обновлены!', 'success');
     } catch (err) {
       console.error('Ошибка:', err);
-      alert(`Ошибка: ${err.message}`);
+      showAlert(`Ошибка: ${err.message}`, 'error');
     } finally {
       setUploadingInstruction(false);
       setUploadingSoftware(false);
@@ -267,6 +279,14 @@ export function PoDetails({ po, onBack, showAlert }) {
         value: model
     }));
 }, [allTractorModels]);
+
+  // Синхронизация статусов при входе в режим редактирования
+  useEffect(() => {
+    if (change && details) {
+      setIsActual(details.software_is_actual);
+      setIsCritical(details.software_is_critical);
+    }
+  }, [change, details]);
 
   // Переключение на другую версию
   const handleVersionClick = async (e, versionId) => {
@@ -378,7 +398,21 @@ export function PoDetails({ po, onBack, showAlert }) {
       setIsActual(false);
       setIsCritical(false);
     }
+    console.log('выполнилась функция chooseActual')
   };
+
+  const validActuality = () => {
+    if(change===true){
+      if (isActual === true && isCritical === false) {return 'Актуальное'}
+      if (isCritical === true && isActual === false) {return 'Требует обновление'}
+      else {return 'Устаревшее'}
+    }
+    if(change===false){
+      setIsActual(details.software_is_actual),
+      setIsCritical(details.software_is_critical)
+    }
+
+  }
 
   const removeExtension = (filename) => {
     if (!filename) return '';
@@ -645,7 +679,7 @@ export function PoDetails({ po, onBack, showAlert }) {
             <div>
               <h3>Статус</h3>
               {(isModerator && change) ? (
-                <select value={getStatusActualityText()} onChange={chooseActual}>
+                <select value={validActuality()} onChange={chooseActual}>
                   <option value="Актуальное">Актуальное</option>
                   <option value="Устаревшее">Устаревшее</option>
                   <option value="Требует обновление">Требует обновление</option>
