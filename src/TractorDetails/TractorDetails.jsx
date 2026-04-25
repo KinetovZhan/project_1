@@ -27,16 +27,14 @@ export function TractorDetails({ vin, onBack }) {
     y: 0
   });
   const navigate = useNavigate ();
+ 
 
   const ImageToModel = (model) => {
-    const ImageJpg = {
-      'K-5': K5Image,
-      'K-7': K7Image,
-      'K-742МСТ':K7Image,
-      'K-525':K5Image,
-    }
-
-    return ImageJpg[model]|| DefaultImage;
+    const modelLower = model?.toLowerCase() || '';
+    if (modelLower.includes('к-7')||modelLower.includes('k-7')) return K7Image;
+    if (modelLower.includes('к-5')||modelLower.includes('k-5')) return K5Image;
+    else
+    return  DefaultImage;
   }
 
 

@@ -409,7 +409,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       if (modelLower.includes('тмз') || modelLower.includes('tmz')) return TMZImage;
       if (modelLower.includes('ямз') || modelLower.includes('yamz') || modelLower.includes('ymz')) return JMZImage;
     }
-    return DefaultImage;
+    return WeiImage;
   };
 
   const handleDownloadSoftware = async () => {

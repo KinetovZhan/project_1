@@ -159,7 +159,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
 
   }
 
-  return DefaultImage;
+  return WeiImage;
 };
 
   // Функция для получения имени файла из заголовков
