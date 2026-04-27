@@ -3,13 +3,25 @@
 .knowledge-base-container {
   animation: slideUpFadeIn 0.5s ease-out forwards;
   display: flex;
+  flex-direction: column;
   width: 90%;
   height: 75vh;
   margin-top: 20vh;
   margin-left: 7%;
-  justify-content: center;
+  justify-content: flex-start;
+  padding: 2vh;
   border-radius: 20px;
   background: #55565A;
+}
+
+.knowledge-base-maininfo{
+  display: flex;
+  align-items:left;
+  padding: 2vh;  
+}
+
+.knowledge-base-maininfo a{
+  color: white;
 }
 
 .close-button {
@@ -42,6 +54,8 @@
 
 .knowledge-base-title {
   color: white;
+  display: flex;
+  justify-content: center;
   font-size: 30px; 
   margin-top:2vh;
 }

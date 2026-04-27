@@ -145,7 +145,11 @@ class fetchAPI {
                     if (!options.skipAuth) {
                         this.handleUnauthorized();
                     }
-                    throw new Error('Сессия истекла. Пожалуйста, войдите снова');
+                    if (endpoint === '/token/' || endpoint.includes('token')) {
+                        throw new Error('Неверный логин или пароль');
+                    } else {
+                        throw new Error('Сессия истекла. Пожалуйста, войдите снова');
+                    }
 
                 case ERROR_CODES.FORBIDDEN:
                     throw new Error('У вас нет прав для этого действия');

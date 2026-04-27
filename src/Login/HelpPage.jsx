@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext.jsx';
 import { api } from '../fetchAPI.js';
+import { useAlert } from '../Alert/Alert.jsx';
 
 export function HelpPage() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,7 @@ export function HelpPage() {
   const [filter, setFilter] = useState('new');
   const [userList, setUserList] = useState([]);
   const [choosedUser, setChoosedUser] = useState(null);
+  const { showAlert, AlertComponent } = useAlert();
   
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ export function HelpPage() {
 
   useEffect(() => {
     if (!token) {
-      alert("У вас нет прав");
+      showAlert("У вас нет прав", "error");
       navigate("/main");
       return;
     }
@@ -88,7 +90,7 @@ export function HelpPage() {
       setMessages(normalizedMessages);
       setError('');
     } catch (err) {
-      setError('Ошибка загрузки сообщений');
+      showAlert('Ошибка загрузки сообщений', 'error');
       setMessages([]);
     } finally {
       setLoading(false);
@@ -103,7 +105,7 @@ export function HelpPage() {
       setNewMessage('');
       fetchMessages();
     } catch (err) {
-      setError('Ошибка отправки сообщения');
+      showAlert('Ошибка отправки сообщения', 'error');
     } finally {
       setLoading(false);
     }
@@ -121,7 +123,7 @@ export function HelpPage() {
       setSelectedMessageId(null);
       fetchMessages();
     } catch (err) {
-      setError('Ошибка отправки ответа');
+      showAlert('Ошибка отправки ответа', 'error');
     } finally {
       setLoading(false);
     }
@@ -147,7 +149,7 @@ export function HelpPage() {
       console.log(`Сообщение #${messageId} успешно удалено`);
     } catch (err) {
       console.error('Ошибка при удалении сообщения:', err);
-      setError('Не удалось удалить сообщение. Попробуйте позже.');
+      showAlert('Не удалось удалить сообщение. Попробуйте позже.', 'error');
       fetchMessages();
     } finally {
       setLoading(false);
@@ -162,7 +164,7 @@ export function HelpPage() {
       await fetchMessages(); // перезагружаем список, чтобы обновить статус
     } catch (err) {
       console.error('Ошибка при отметке прочитанным:', err);
-      setError('Не удалось отметить сообщение как прочитанное');
+      showAlert('Не удалось отметить сообщение как прочитанное', 'error');
     } finally {
       setLoading(false);
     }
@@ -178,7 +180,7 @@ export function HelpPage() {
       await fetchMessages();
     } catch (err) {
       console.error('Ошибка при снятии отметки прочитанного:', err);
-      setError('Не удалось изменить статус прочтения');
+      showAlert('Не удалось изменить статус прочтения', 'error');
     } finally {
       setLoading(false);
     }
@@ -196,7 +198,7 @@ export function HelpPage() {
       await fetchMessages();
     } catch (err) {
       console.error('Ошибка при изменении статуса закрытия:', err);
-      setError('Не удалось изменить статус обращения');
+      showAlert('Не удалось изменить статус обращения', 'error');
     } finally {
       setLoading(false);
     }
@@ -246,6 +248,8 @@ export function HelpPage() {
   }, [handleBack]);
 
   return (
+    <>
+    {AlertComponent}
     <div className="help-page-container">
       {loading && <div className="loading">Загрузка...</div>}
       {error && <div className="error">{error}</div>}
@@ -385,7 +389,7 @@ export function HelpPage() {
                       )}
 
                       {/* Чекбокс "Закрыть" / "Вернуть в работу" - для прочитанных сообщений */}
-                      {isModerator && message.is_read && (
+                      {message.is_read && (
                         <div style={{ display: 'inline-flex', alignItems: 'center', marginLeft: '10px' }}>
                           <input
                             type="checkbox"
@@ -507,5 +511,6 @@ export function HelpPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
