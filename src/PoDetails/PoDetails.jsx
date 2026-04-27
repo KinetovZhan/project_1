@@ -44,6 +44,9 @@ export function PoDetails({ po, onBack, showAlert }) {
   const [softwareFile, setSoftwareFile] = useState(null);
   const [fileName, setFileName] = useState(null);
   const [uploadingSoftware, setUploadingSoftware] = useState(false);
+  const [instructionViewerOpen, setInstructionViewerOpen] = useState(false);
+  const [instructionViewerUrl, setInstructionViewerUrl] = useState('');
+  const [instructionViewerFilename, setInstructionViewerFilename] = useState('');
   const [previousSWVersion, setPreviousSWVersion] = useState(null);
   const [allTractorModels, setAllTractorModels] = useState([]);
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
@@ -475,7 +478,16 @@ export function PoDetails({ po, onBack, showAlert }) {
     }
   };
 
-  const handleDownloadInstruction = async () => {
+  const closeInstructionViewer = () => {
+    if (instructionViewerUrl) {
+      window.URL.revokeObjectURL(instructionViewerUrl);
+    }
+    setInstructionViewerOpen(false);
+    setInstructionViewerUrl('');
+    setInstructionViewerFilename('');
+  };
+
+  const handleOpenInstruction = async () => {
     const fileId = details.id_firmwares;
     if (!fileId) return;
     setDownloading(true);
@@ -484,25 +496,50 @@ export function PoDetails({ po, onBack, showAlert }) {
       const blob = await response.blob();
       const contentDisposition = response.headers.get('content-disposition');
       let filename = details.software_path_instruction || `instruction_${fileId}.pdf`;
+
       if (contentDisposition) {
         const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+
+      const extension = filename.split('.').pop()?.toLowerCase();
+      const isPdf = blob.type === 'application/pdf' || extension === 'pdf';
+      if (!isPdf) {
+        alert('Просмотр доступен только для PDF. Файл будет скачан.');
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(downloadUrl);
+        document.body.removeChild(a);
+        return;
+      }
+
+      if (instructionViewerUrl) {
+        window.URL.revokeObjectURL(instructionViewerUrl);
+      }
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      setInstructionViewerFilename(filename);
+      setInstructionViewerUrl(blobUrl);
+      setInstructionViewerOpen(true);
     } catch (error) {
-      console.error('Ошибка скачивания инструкции:', error);
-      alert('Не удалось скачать инструкцию');
+      console.error('Ошибка открытия инструкции:', error);
+      alert('Не удалось открыть инструкцию');
     } finally {
       setDownloading(false);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (instructionViewerUrl) {
+        window.URL.revokeObjectURL(instructionViewerUrl);
+      }
+    };
+  }, [instructionViewerUrl]);
 
   if (loading) {
     return (
@@ -718,8 +755,8 @@ export function PoDetails({ po, onBack, showAlert }) {
                   </div>
                 ) : (
                   details.software_path_instruction ? (
-                    <button className="download-button" onClick={handleDownloadInstruction} disabled={downloading}>
-                      {downloading ? 'Скачивание...' : 'Скачать'}
+                    <button className="download-button" onClick={handleOpenInstruction} disabled={downloading}>
+                      {downloading ? 'Открытие...' : 'Открыть'}
                     </button>
                   ) : (
                     <p>—</p>
@@ -803,6 +840,30 @@ export function PoDetails({ po, onBack, showAlert }) {
           {tooltip.text}
         </div>,
         document.body
+      )}
+      {instructionViewerOpen && (
+        <div className="instruction-modal-overlay" onClick={closeInstructionViewer}>
+          <div className="instruction-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="instruction-modal-header">
+              <h3>Инструкция</h3>
+              <div className="instruction-modal-actions">
+                <a
+                  className="instruction-modal-download"
+                  href={instructionViewerUrl}
+                  download={instructionViewerFilename || 'instruction.pdf'}
+                >
+                  Скачать PDF
+                </a>
+                <button className="instruction-modal-close" onClick={closeInstructionViewer}>Закрыть</button>
+              </div>
+            </div>
+            <iframe
+              className="instruction-modal-frame"
+              src={instructionViewerUrl}
+              title="Инструкция PDF"
+            />
+          </div>
+        </div>
       )}
     </div>
   )
