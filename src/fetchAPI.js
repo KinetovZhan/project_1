@@ -133,6 +133,11 @@ class fetchAPI {
      * Обработка ответа от сервера
      */
     async handleResponse(response, endpoint, options, retryCount) {
+
+        if (response.status === 204) {
+        return null;
+    }
+
         // Проверяем Content-Type ответа
         const contentType = response.headers.get('content-type');
         

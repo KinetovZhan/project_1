@@ -70,18 +70,15 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   };
 
   // Удаление уведомления
- const deleteNotification = async (notificationId, event) => {
+ // Удаление уведомления
+const deleteNotification = async (notificationId, event) => {
   event.stopPropagation();
   try {
     await api.delete(`/dealer/notifications/${notificationId}`);
-    // Обновляем счётчик (он обновится фоном)
-    await fetchDealerUnreadCount();
-    // Перезагружаем дропдаун: закрываем и открываем заново
-    setDropdownOpen(false);
-    setTimeout(() => {
-      setDropdownOpen(true);
-      loadNotifications(); // загрузим свежий список после открытия
-    }, 50);
+    await Promise.all([
+      fetchDealerUnreadCount(),
+      loadNotifications()
+    ]);
   } catch (err) {
     console.error('Ошибка удаления уведомления:', err);
   }
@@ -116,13 +113,10 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     const fetchUnread = async () => {
       try {
         if (isModerator) {
-          let data = await api.get('/support/support/unread-count');
+          let data = await api.get('/support/unread-count');
           console.log(data);
           setHasUnreadMessages(data.unread_count !== 0);
-        } else {
-          let data = await api.get('/support/unread/replies-count');
-          setHasUnreadMessages(data.unread_replies_count !== 0);
-        }
+        } 
       } catch (err) {
         setError('Ошибка загрузки счетчика непрочитанных сообщений', err);
       }
@@ -258,10 +252,12 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
                         <button
                           onClick={(e) => deleteNotification(notif.id, e)}
                           style={{
-                            position: 'absolute',
+                            display: 'flex',
                             top: '8px',
                             right: '8px',
                             background: 'none',
+                            width:'10%',
+                            height:'10%',
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '14px',
