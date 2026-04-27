@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import './Alert.css';
 
 const Alert = ({ message, type = 'success', duration = 3000, onClose }) => {
