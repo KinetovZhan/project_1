@@ -378,7 +378,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     return (
       <div className="maininfo">
         <h3>Последние версии ПО для {getComponentName()}</h3>
-        <div>Загрузка...</div>
+        <div className='loading'>Загрузка...</div>
       </div>
     );
   }
