@@ -20,6 +20,7 @@
   min-width: 300px;
   max-width: 1000px;
   pointer-events: auto;
+  border: 1px solid #8b8b8b;
 }
 
 /* Анимация появления */
