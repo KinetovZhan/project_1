@@ -30,7 +30,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   // Получение количества непрочитанных уведомлений дилера
   const fetchDealerUnreadCount = async () => {
     try {
-      const data = await api.get('/dealer/notifications/unread-count');
+      const data = await api.get('/notifications/unread-count');
       setDealerUnreadCount(data.unread_count || 0);
     } catch (err) {
       console.error('Ошибка загрузки уведомлений дилера:', err);
@@ -43,7 +43,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     if (!isDealer) return;
     setLoadingNotif(true);
     try {
-      const data = await api.get('/dealer/notifications?limit=10');
+      const data = await api.get('/notifications?limit=10');
       setNotifications(data || []);
     } catch (err) {
       console.error('Ошибка загрузки списка уведомлений:', err);
@@ -55,7 +55,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   // Отметить уведомление как прочитанное
   const markAsRead = async (notificationId) => {
     try {
-      await api.patch(`/dealer/notifications/${notificationId}/read`);
+      await api.patch(`/notifications/${notificationId}/read`);
       // Обновить список: изменить is_read у соответствующего уведомления
       setNotifications(prev =>
         prev.map(n =>
@@ -74,7 +74,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
 const deleteNotification = async (notificationId, event) => {
   event.stopPropagation();
   try {
-    await api.delete(`/dealer/notifications/${notificationId}`);
+    await api.delete(`/notifications/${notificationId}`);
     await Promise.all([
       fetchDealerUnreadCount(),
       loadNotifications()
@@ -165,11 +165,13 @@ const deleteNotification = async (notificationId, event) => {
       </div>
 
       <div className="navigation">
-        <h3 onClick={onKnowledgeBase} style={{ cursor: 'pointer' }}>База знаний</h3>
+        {onLogout?
+        (<h3 onClick={onKnowledgeBase} style={{ cursor: 'pointer' }}>База знаний</h3>) : null
+          }
 
         {/* Уведомления для дилера с выпадающим списком */}
         {isDealer && (
-          <div ref={dropdownRef} style={{ position: 'relative' }}>
+          <div ref={dropdownRef} >
             <h3
               onClick={() => setDropdownOpen(!dropdownOpen)}
               style={{
@@ -182,32 +184,26 @@ const deleteNotification = async (notificationId, event) => {
               Уведомления
               {dealerUnreadCount > 0 && (
                 <span
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    backgroundColor: 'red',
-                    borderRadius: '50%',
-                    display: 'inline-block',
-                  }}
+                className='red-circle'
                 />
               )}
             </h3>
 
             {dropdownOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  width: '320px',
-                  backgroundColor: 'white',
-                  color: '#333',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  zIndex: 1000,
-                  marginTop: '8px',
-                  overflow: 'hidden',
-                }}
+              <div className = 'notification-list'
+                // style={{
+                //   position: 'absolute',
+                //   top: '100%',
+                //   right: 0,
+                //   width: '320px',
+                //   backgroundColor: 'white',
+                //   color: '#333',
+                //   borderRadius: '8px',
+                //   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                //   zIndex: 1000,
+                //   marginTop: '8px',
+                //   overflow: 'hidden',
+                // }}
               >
                 <div style={{ padding: '12px', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
                   Уведомления
@@ -323,8 +319,10 @@ const deleteNotification = async (notificationId, event) => {
             Выйти
           </h3>
         )}
-
-        <h3>Роль:{roleMap()}</h3>
+        {onLogout && (
+           <h3>Роль:{roleMap()}</h3>
+        )}
+        
       </div>
       <div className="icon-ptz">
         <img className="object-pi" src={icon} alt={icon} />

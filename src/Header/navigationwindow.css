@@ -119,3 +119,25 @@
   
 }
 
+.notification-list {
+  /* display:flex; */
+  position: absolute;
+  top: 100%;
+  right: 30vw;
+  width: 15vw;
+  background-Color: white;
+  color: #333;
+  border-Radius: 8px;
+  box-Shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-Index: 1000;
+  margin-Top: 0vh;
+  overflow: hidden;
+}
+
+.red-circle {
+  width: 10px;
+  height: 10px;
+  background-Color: red;
+  border-Radius: 50%;
+  display: inline-block;
+}
