@@ -154,7 +154,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       return JMZImage;
     }
     else {
-      return DefaultImage;
+      return WeiImage;
     }
 
   }
