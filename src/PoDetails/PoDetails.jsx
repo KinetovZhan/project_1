@@ -504,7 +504,7 @@ export function PoDetails({ po, onBack, showAlert }) {
           a.click();
           document.body.removeChild(a);
         }
-        setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
         return;
       }
 
