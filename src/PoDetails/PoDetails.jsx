@@ -503,8 +503,16 @@ export function PoDetails({ po, onBack, showAlert }) {
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          return;
         }
-        setTimeout(() => window.URL.revokeObjectURL(url), 2000);
+        const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
+        try {
+          openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
+        } catch {
+          // no-op: fallback timeout below handles cleanup
+        }
+        setTimeout(cleanupObjectUrl, 600000);
         return;
       }
 
@@ -517,7 +525,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Ошибка открытия инструкции:', error);
-      alert(`Не удалось открыть инструкцию: ${error?.message || 'ошибка сети'}`);
+      alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
       setDownloading(false);
     }
