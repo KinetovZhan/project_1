@@ -480,6 +480,11 @@ export function PoDetails({ po, onBack, showAlert }) {
   const handleOpenInstruction = async () => {
     const fileId = details.id_firmwares;
     if (!fileId) return;
+    const instructionWindow = window.open('', '_blank', 'noopener,noreferrer');
+    if (!instructionWindow) {
+      alert('Не удалось открыть новое окно. Разрешите всплывающие окна для сайта.');
+      return;
+    }
     setDownloading(true);
     try {
       const response = await api.download(`/software/download/${fileId}/instruction`);
@@ -491,42 +496,18 @@ export function PoDetails({ po, onBack, showAlert }) {
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
 
-      const hasExtension = filename.includes('.');
-      const extension = hasExtension ? filename.split('.').pop()?.toLowerCase() : '';
-      const contentType = (response.headers.get('content-type') || blob.type || '').toLowerCase();
-      const isPdf = contentType.includes('application/pdf') || extension === 'pdf';
       const url = window.URL.createObjectURL(blob);
-
-      if (isPdf) {
-        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
-        if (!openedWindow) {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          return;
-        }
-        const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
-        try {
-          openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
-        } catch {
-          // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
-        }
-        setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
-        return;
+      instructionWindow.location.href = url;
+      instructionWindow.document.title = filename;
+      const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
+      try {
+        instructionWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
+      } catch {
+        // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
       }
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
     } catch (error) {
+      instructionWindow.close();
       console.error('Ошибка открытия инструкции:', error);
       alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
