@@ -12,6 +12,8 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
+const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
+
 
 
 export function PoDetails({ po, onBack, showAlert }) {
@@ -489,7 +491,8 @@ export function PoDetails({ po, onBack, showAlert }) {
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
 
-      const extension = filename.split('.').pop()?.toLowerCase();
+      const hasExtension = filename.includes('.');
+      const extension = hasExtension ? filename.split('.').pop()?.toLowerCase() : '';
       const contentType = (response.headers.get('content-type') || blob.type || '').toLowerCase();
       const isPdf = contentType.includes('application/pdf') || extension === 'pdf';
       const url = window.URL.createObjectURL(blob);
@@ -510,9 +513,9 @@ export function PoDetails({ po, onBack, showAlert }) {
         try {
           openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
         } catch {
-          // no-op: fallback timeout below handles cleanup
+          // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
         }
-        setTimeout(cleanupObjectUrl, 600000);
+        setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
         return;
       }
 
