@@ -13,7 +13,7 @@ import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
 // Keep object URL long enough for reading/downloading in the opened tab as needed.
-const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
+const OBJECT_URL_CLEANUP_TIMEOUT_MS = 10 * 60 * 1000;
 
 
 
@@ -483,7 +483,7 @@ export function PoDetails({ po, onBack, showAlert }) {
     if (!fileId) return;
     const instructionWindow = window.open('', '_blank', 'noopener,noreferrer');
     if (!instructionWindow) {
-      alert('Не удалось открыть новое окно. Разрешите всплывающие окна для сайта.');
+      alert('Не удалось открыть новое окно. Разрешите всплывающие окна для сайта и попробуйте снова.');
       return;
     }
     setDownloading(true);
@@ -521,7 +521,11 @@ export function PoDetails({ po, onBack, showAlert }) {
       }
       cleanupTimeoutId = setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
     } catch (error) {
-      instructionWindow.close();
+      try {
+        instructionWindow.document.body.innerHTML = '<p style="font-family: sans-serif; padding: 16px;">Не удалось открыть инструкцию.</p>';
+      } catch {
+        // ignore if writing to window is blocked
+      }
       console.error('Ошибка открытия инструкции:', error);
       alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
