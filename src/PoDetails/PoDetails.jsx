@@ -12,6 +12,7 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
+// Keep object URL long enough for reading/downloading in the opened tab as needed.
 const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
 
 
@@ -498,14 +499,27 @@ export function PoDetails({ po, onBack, showAlert }) {
 
       const url = window.URL.createObjectURL(blob);
       instructionWindow.location.href = url;
-      instructionWindow.document.title = filename;
-      const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
+      try {
+        instructionWindow.document.title = filename;
+      } catch {
+        // Access to document may be blocked by browser/same-origin policy after navigation.
+      }
+      let isCleanedUp = false;
+      let cleanupTimeoutId;
+      const cleanupObjectUrl = () => {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
+        if (cleanupTimeoutId) {
+          clearTimeout(cleanupTimeoutId);
+        }
+        window.URL.revokeObjectURL(url);
+      };
       try {
         instructionWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
       } catch {
         // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
       }
-      setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
+      cleanupTimeoutId = setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
     } catch (error) {
       instructionWindow.close();
       console.error('Ошибка открытия инструкции:', error);
