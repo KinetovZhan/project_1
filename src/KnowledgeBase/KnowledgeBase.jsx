@@ -1,15 +1,47 @@
 // src/Login/KnowledgeBase.jsx
-import React, {useEffect} from 'react';
+import React, {use, useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '../Header/Header.jsx';
 import './KnowledgeBase.css';
-
+import { useAuth } from '../auth/AuthContext';
+import Protocol from './Protocol.jsx';
+import Diagnostic from './Diagnostic.jsx';
+import Exploitation from './Exploitation.jsx';
+import InstructionAboutRework from './InstructionAboutRework.jsx';
+import { api } from '../fetchAPI.js';
 export function KnowledgeBase() {
   const navigate = useNavigate();
-
+  const  [info, setInfo] = useState(false)
+  const { token, user } = useAuth();
+  const userRole = user?.role || 'user';
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [knowledgeBase, setKnowledgeBase] = useState([])
   const handleBack = () => {
     navigate(-1); // Возвращает на предыдущую страницу
   };
+
+
+
+  useEffect(() => {
+    const getData = async () => {
+
+      if(!info){
+        return
+      }
+
+      try {
+        setLoading(true)
+        const response = await api.get(`/knowledge_base?type=${info}`)
+        setKnowledgeBase(response)
+      } catch(error){
+        setError(error.message);
+      }finally {
+        setLoading(false);
+      }
+    };
+    getData();
+  }, [info]);
 
     // Обработчик нажатия клавиш
   useEffect(() => {
@@ -59,23 +91,42 @@ export function KnowledgeBase() {
         </button>
         <div className="knowledge-base-container-base">
           <div className="knowledge-base-container">
-            <div>
-              <h1 className="knowledge-base-title">
-                База знаний
-              </h1>
-            </div>
-            <div className='knowledge-base-maininfo'>
-              <a href="">ссылка 1</a>
-            </div>
-            <div className='knowledge-base-maininfo'>
-              <a href="">ссылка 2</a>
-            </div>
-            <div className='knowledge-base-maininfo'>
-              <a href="">ссылка 3</a>
-            </div>
-            <div className='knowledge-base-maininfo'>
-              <a href="">ссылка 4</a>
-            </div>
+              <div>
+                <h1 className="knowledge-base-title">
+                  База знаний
+                </h1>
+              </div>
+              <div style = {{display: 'flex', flexDirection: 'row', height: '100%'}}>
+                <div className='left-column'>
+                  <div className='knowledge-base-maininfo'>
+                    <a onClick={() => setInfo('diagnostic')}>Диагностическое программное оборудование</a>
+                  </div>
+                  <div className='knowledge-base-maininfo'>
+                    <a onClick={() => setInfo('instruction_about_exploitation')}>Инструкции по эксплуатации</a>
+                  </div>
+                  <div className='knowledge-base-maininfo'>
+                    <a onClick={() => setInfo('instruction_about_rework')}>Инструкция по доработке</a>
+                  </div>
+                  <div className='knowledge-base-maininfo'>
+                    <a onClick={() => setInfo('protocol')}>Протоклолы обмена данными</a>
+                  </div>
+                </div>
+                <div className='right-column'>
+                  {info !== false && 
+                  <div className='info'>
+                    <div className='files'>
+                      {info === 'protocol' && <Protocol data={knowledgeBase} />}
+                      {info === 'diagnostic' && <Diagnostic data={knowledgeBase} />}
+                      {info === 'instruction_about_exploitation' && <Exploitation data={knowledgeBase} />}
+
+                      {info === 'instruction_about_rework' && <InstructionAboutRework data={knowledgeBase} />}
+                    </div>
+                    {userRole === 'moderator' && <input type='file' placeholder='Добавить файл' className='AddFile'/>}
+                  </div>
+                  }
+                </div>
+                
+              </div>
           </div>
         </div>
 
