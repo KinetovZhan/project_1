@@ -505,7 +505,7 @@ export function PoDetails({ po, onBack, showAlert }) {
         // Access to document may be blocked by browser/same-origin policy after navigation.
       }
       let isCleanedUp = false;
-      let cleanupTimeoutId;
+      let cleanupTimeoutId = null;
       const cleanupObjectUrl = () => {
         if (isCleanedUp) return;
         isCleanedUp = true;
@@ -522,7 +522,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       cleanupTimeoutId = setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
     } catch (error) {
       try {
-        instructionWindow.document.body.innerHTML = '<p style="font-family: sans-serif; padding: 16px;">Не удалось открыть инструкцию.</p>';
+        instructionWindow.document.body.textContent = 'Не удалось открыть инструкцию.';
       } catch {
         // ignore if writing to window is blocked
       }
