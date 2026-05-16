@@ -504,7 +504,7 @@ export function PoDetails({ po, onBack, showAlert }) {
           a.click();
           document.body.removeChild(a);
         }
-        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+        setTimeout(() => window.URL.revokeObjectURL(url), 2000);
         return;
       }
 
@@ -517,7 +517,7 @@ export function PoDetails({ po, onBack, showAlert }) {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Ошибка открытия инструкции:', error);
-      alert('Не удалось открыть инструкцию');
+      alert(`Не удалось открыть инструкцию: ${error?.message || 'ошибка сети'}`);
     } finally {
       setDownloading(false);
     }
