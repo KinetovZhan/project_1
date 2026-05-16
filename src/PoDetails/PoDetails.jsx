@@ -12,6 +12,8 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
+const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
+
 
 
 export function PoDetails({ po, onBack, showAlert }) {
@@ -475,7 +477,7 @@ export function PoDetails({ po, onBack, showAlert }) {
     }
   };
 
-  const handleDownloadInstruction = async () => {
+  const handleOpenInstruction = async () => {
     const fileId = details.id_firmwares;
     if (!fileId) return;
     setDownloading(true);
@@ -488,17 +490,45 @@ export function PoDetails({ po, onBack, showAlert }) {
         const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
+
+      const hasExtension = filename.includes('.');
+      const extension = hasExtension ? filename.split('.').pop()?.toLowerCase() : '';
+      const contentType = (response.headers.get('content-type') || blob.type || '').toLowerCase();
+      const isPdf = contentType.includes('application/pdf') || extension === 'pdf';
       const url = window.URL.createObjectURL(blob);
+
+      if (isPdf) {
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!openedWindow) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          return;
+        }
+        const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
+        try {
+          openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
+        } catch {
+          // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
+        }
+        setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
+        return;
+      }
+
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Ошибка скачивания инструкции:', error);
-      alert('Не удалось скачать инструкцию');
+      console.error('Ошибка открытия инструкции:', error);
+      alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
       setDownloading(false);
     }
@@ -718,8 +748,8 @@ export function PoDetails({ po, onBack, showAlert }) {
                   </div>
                 ) : (
                   details.software_path_instruction ? (
-                    <button className="download-button" onClick={handleDownloadInstruction} disabled={downloading}>
-                      {downloading ? 'Скачивание...' : 'Скачать'}
+                    <button className="download-button" onClick={handleOpenInstruction} disabled={downloading}>
+                      {downloading ? 'Открытие...' : 'Открыть'}
                     </button>
                   ) : (
                     <p>—</p>
