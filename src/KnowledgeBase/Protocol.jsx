@@ -31,15 +31,28 @@ const Protocol = ({ data }) => {
                 throw new Error('Download failed');
             }
             
+            // Получаем blob с правильным типом
             const blob = await response.blob();
+            
+            // Создаем URL для blob
             const url = window.URL.createObjectURL(blob);
+            
+            // Создаем временную ссылку
             const link = document.createElement('a');
             link.href = url;
             link.download = fileName;
+            
+            // Важно: добавляем в DOM перед кликом
             document.body.appendChild(link);
+            
+            // Кликаем и удаляем
             link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            
+            // Очищаем
+            setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }, 100);
             
         } catch (error) {
             console.error('Download error:', error);
@@ -51,6 +64,18 @@ const Protocol = ({ data }) => {
 
     const getFileName = (path) => {
         return path.split('/').pop();
+    };
+
+    const truncateFileName = (fileName, maxLength = 40) => {
+        if (fileName.length <= maxLength) {
+            return fileName;
+        }
+        
+        const extension = fileName.split('.').pop();
+        const nameWithoutExt = fileName.slice(0, -(extension.length + 1));
+        const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 3);
+        
+        return `${truncatedName}...${extension}`;
     };
 
     const getFileIcon = (fileName) => {
@@ -125,9 +150,9 @@ const Protocol = ({ data }) => {
                     <div key={file.id} className='protocol-item'>
                         <div className='protocol-info'>
                             <div className='file-icon'>
-                                {getFileIcon(getFileName(file.path))}
+                                {getFileIcon(getFileName(file.path).split('/').pop())}
                             </div>
-                            <span className='protocol-name'>{getFileName(file.path)}</span>
+                            <span className='protocol-name'title={getFileName(file.path)}>{truncateFileName(file.path).split('/').pop()}</span>
                         </div>
                         <div className='protocol-actions'>
                             <button 

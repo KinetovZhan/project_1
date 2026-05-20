@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import './Protocol.css';
-
+import { useAuth } from '../auth/AuthContext';
 const InstructionAboutRework = ({ data }) => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { token } = useAuth();
+    const [downloading, setDownloading] = useState({});
 
     useEffect(() => {
         if (data && data.length > 0) {
@@ -13,13 +15,50 @@ const InstructionAboutRework = ({ data }) => {
         setLoading(false);
     }, [data]);
 
-    const handleDownload = (path) => {
-        const link = document.createElement('a');
-        link.href = path;
-        link.download = path.split('/').pop();
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const handleDownload = async (id, fileName) => {
+        try {
+            setDownloading(prev => ({ ...prev, [id]: true }));
+            
+            const response = await fetch(`http://192.168.3.7:8000/knowledge_base/download/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Download failed');
+            }
+            
+            // Получаем blob с правильным типом
+            const blob = await response.blob();
+            
+            // Создаем URL для blob
+            const url = window.URL.createObjectURL(blob);
+            
+            // Создаем временную ссылку
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            
+            // Важно: добавляем в DOM перед кликом
+            document.body.appendChild(link);
+            
+            // Кликаем и удаляем
+            link.click();
+            
+            // Очищаем
+            setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+            
+        } catch (error) {
+            console.error('Download error:', error);
+            alert('Ошибка при скачивании файла');
+        } finally {
+            setDownloading(prev => ({ ...prev, [id]: false }));
+        }
     };
 
     const getFileName = (path) => {
@@ -85,7 +124,7 @@ const InstructionAboutRework = ({ data }) => {
                         <div className='protocol-actions'>
                             <button 
                                 className='download-btn'
-                                onClick={() => handleDownload(file.path)}
+                                onClick={() => handleDownload(file.id, getFileName(file.path))}  
                             >
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8 1V11M8 11L11 8M8 11L5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
