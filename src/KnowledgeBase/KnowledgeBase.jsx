@@ -72,12 +72,14 @@ const handleFileUpload = async (event) => {
         setUploadSuccess('');
         
         // 1. Загружаем файл через НАТИВНЫЙ FETCH (не api.post)
-        const uploadResponse = await fetch('http://192.168.3.7:8000/knowledge_base/upload', {
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        const uploadResponse = await fetch(`${API_URL}/knowledge_base/upload`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`  // ← токен из контекста
+                'Authorization': `Bearer ${token}`
             },
-            body: formData  // ← FormData, fetch сам добавит boundary
+            body: formData
         });
         
         if (!uploadResponse.ok) {

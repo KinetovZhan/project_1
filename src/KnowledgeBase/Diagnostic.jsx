@@ -19,13 +19,14 @@ const Diagnostic = ({ data }) => {
         try {
             setDownloading(prev => ({ ...prev, [id]: true }));
             
-            const response = await fetch(`http://192.168.3.7:8000/knowledge_base/download/${id}`, {
+                const API_URL = import.meta.env.VITE_API_URL;
+
+                const response = await fetch(`${API_URL}/knowledge_base/download/${id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
             if (!response.ok) {
                 throw new Error('Download failed');
             }
