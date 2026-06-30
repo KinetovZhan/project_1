@@ -1,0 +1,94 @@
+.maininfoProtocol {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+}
+
+.title {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.head {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.protocol-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.protocol-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    transition: all 0.2s;
+    border: 1px solid #eee;
+}
+
+.protocol-item:hover {
+    background: #f0f0f0;
+    border-color: #ddd;
+}
+
+.protocol-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.protocol-name {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.download-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+}
+
+.download-btn:hover {
+    background: #45a049;
+}
+
+.download-btn svg {
+    stroke: white;
+}
+
+.empty-message {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}

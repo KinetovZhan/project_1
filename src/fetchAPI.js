@@ -4,7 +4,7 @@ export const IS_PROD = import.meta.env.PROD;
 export const MODE = import.meta.env.MODE;
 
 // API конфигурация - ИСПРАВЛЕНО: добавлен http://
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://192.168.3.7:8000/';
 console.log('API_BASE_URL =', API_BASE_URL);
 
 // Таймауты и настройки запросов
@@ -133,6 +133,11 @@ class fetchAPI {
      * Обработка ответа от сервера
      */
     async handleResponse(response, endpoint, options, retryCount) {
+
+        if (response.status === 204) {
+        return null;
+    }
+
         // Проверяем Content-Type ответа
         const contentType = response.headers.get('content-type');
         

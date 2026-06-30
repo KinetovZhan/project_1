@@ -80,7 +80,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     model: true,
     assembly_date: true,
     region: true,
-    consumer: true,
+    dealer: true,
     oh_hour: true,
     last_activity: true
   });
@@ -147,7 +147,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     //   getValue: (t) => t.region || '-', 
     //   isBase: true 
     // },
-    consumer: { 
+    dealer: { 
       label: 'Дилер', 
       getValue: (t) => t.dealer || '-', 
       isBase: true 
@@ -245,7 +245,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
   const allNodes = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
   // Порядок столбцов с учётом выбранных узлов и видимости
   const orderedColumns = useMemo(() => {
-    const baseColumns = ['vin', 'model', 'assembly_date', 'consumer', 'oh_hour', 'last_activity'];
+    const baseColumns = ['vin', 'model', 'assembly_date', 'dealer', 'oh_hour', 'last_activity'];
     const selectedNodes = uzelFilter || []; // массив строк, например ['dvs', 'kpp']
     const otherNodes = allNodes.filter(node => !selectedNodes.includes(node));
     // Все возможные столбцы в правильном порядке
@@ -310,7 +310,7 @@ export function TractorTable({ activeFiltersTrac, activeFiltersTrac2, searchQuer
     console.log('Отправляемые данные на бэкенд:', postData);
     console.log('activeMajMinButton:', activeMajMinButton);
     console.log('postData.is_actual:', postData.is_actual);
-    console.log('postData.is_actual:', postData.consumer);
+    console.log('postData.is_actual:', postData.dealer);
 
     return postData;
   };

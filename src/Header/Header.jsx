@@ -30,7 +30,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   // Получение количества непрочитанных уведомлений дилера
   const fetchDealerUnreadCount = async () => {
     try {
-      const data = await api.get('/dealer/notifications/unread-count');
+      const data = await api.get('/notifications/unread-count');
       setDealerUnreadCount(data.unread_count || 0);
     } catch (err) {
       console.error('Ошибка загрузки уведомлений дилера:', err);
@@ -43,7 +43,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     if (!isDealer) return;
     setLoadingNotif(true);
     try {
-      const data = await api.get('/dealer/notifications?limit=10');
+      const data = await api.get('/notifications?limit=10');
       setNotifications(data || []);
     } catch (err) {
       console.error('Ошибка загрузки списка уведомлений:', err);
@@ -55,7 +55,7 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   // Отметить уведомление как прочитанное
   const markAsRead = async (notificationId) => {
     try {
-      await api.patch(`/dealer/notifications/${notificationId}/read`);
+      await api.patch(`/notifications/${notificationId}/read`);
       // Обновить список: изменить is_read у соответствующего уведомления
       setNotifications(prev =>
         prev.map(n =>
@@ -70,18 +70,15 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
   };
 
   // Удаление уведомления
- const deleteNotification = async (notificationId, event) => {
+ // Удаление уведомления
+const deleteNotification = async (notificationId, event) => {
   event.stopPropagation();
   try {
-    await api.delete(`/dealer/notifications/${notificationId}`);
-    // Обновляем счётчик (он обновится фоном)
-    await fetchDealerUnreadCount();
-    // Перезагружаем дропдаун: закрываем и открываем заново
-    setDropdownOpen(false);
-    setTimeout(() => {
-      setDropdownOpen(true);
-      loadNotifications(); // загрузим свежий список после открытия
-    }, 50);
+    await api.delete(`/notifications/${notificationId}`);
+    await Promise.all([
+      fetchDealerUnreadCount(),
+      loadNotifications()
+    ]);
   } catch (err) {
     console.error('Ошибка удаления уведомления:', err);
   }
@@ -116,13 +113,10 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
     const fetchUnread = async () => {
       try {
         if (isModerator) {
-          let data = await api.get('/support/support/unread-count');
+          let data = await api.get('/support/unread-count');
           console.log(data);
           setHasUnreadMessages(data.unread_count !== 0);
-        } else {
-          let data = await api.get('/support/unread/replies-count');
-          setHasUnreadMessages(data.unread_replies_count !== 0);
-        }
+        } 
       } catch (err) {
         setError('Ошибка загрузки счетчика непрочитанных сообщений', err);
       }
@@ -171,11 +165,13 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
       </div>
 
       <div className="navigation">
-        <h3 onClick={onKnowledgeBase} style={{ cursor: 'pointer' }}>База знаний</h3>
+        {onLogout?
+        (<h3 onClick={onKnowledgeBase} style={{ cursor: 'pointer' }}>База знаний</h3>) : null
+          }
 
         {/* Уведомления для дилера с выпадающим списком */}
         {isDealer && (
-          <div ref={dropdownRef} style={{ position: 'relative' }}>
+          <div ref={dropdownRef} >
             <h3
               onClick={() => setDropdownOpen(!dropdownOpen)}
               style={{
@@ -188,32 +184,26 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
               Уведомления
               {dealerUnreadCount > 0 && (
                 <span
-                  style={{
-                    width: '10px',
-                    height: '10px',
-                    backgroundColor: 'red',
-                    borderRadius: '50%',
-                    display: 'inline-block',
-                  }}
+                className='red-circle'
                 />
               )}
             </h3>
 
             {dropdownOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  width: '320px',
-                  backgroundColor: 'white',
-                  color: '#333',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  zIndex: 1000,
-                  marginTop: '8px',
-                  overflow: 'hidden',
-                }}
+              <div className = 'notification-list'
+                // style={{
+                //   position: 'absolute',
+                //   top: '100%',
+                //   right: 0,
+                //   width: '320px',
+                //   backgroundColor: 'white',
+                //   color: '#333',
+                //   borderRadius: '8px',
+                //   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                //   zIndex: 1000,
+                //   marginTop: '8px',
+                //   overflow: 'hidden',
+                // }}
               >
                 <div style={{ padding: '12px', borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
                   Уведомления
@@ -258,10 +248,12 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
                         <button
                           onClick={(e) => deleteNotification(notif.id, e)}
                           style={{
-                            position: 'absolute',
+                            display: 'flex',
                             top: '8px',
                             right: '8px',
                             background: 'none',
+                            width:'10%',
+                            height:'10%',
                             border: 'none',
                             cursor: 'pointer',
                             fontSize: '14px',
@@ -327,8 +319,10 @@ export function Header({ onLogout, onHelp, onKnowledgeBase, isMobileSidebarOpen,
             Выйти
           </h3>
         )}
-
-        <h3>Роль:{roleMap()}</h3>
+        {onLogout && (
+           <h3>Роль:{roleMap()}</h3>
+        )}
+        
       </div>
       <div className="icon-ptz">
         <img className="object-pi" src={icon} alt={icon} />

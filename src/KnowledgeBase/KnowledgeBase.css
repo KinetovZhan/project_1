@@ -8,7 +8,7 @@
   height: 75vh;
   margin-top: 20vh;
   margin-left: 7%;
-  justify-content: flex-start;
+  /* justify-content: center; */
   padding: 2vh;
   border-radius: 20px;
   background: #55565A;
@@ -22,6 +22,7 @@
 
 .knowledge-base-maininfo a{
   color: white;
+  cursor: pointer;
 }
 
 .close-button {
@@ -60,8 +61,84 @@
   margin-top:2vh;
 }
 
+
+.right-column {
+  width: 100%;
+  height: 100%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: #D9D9D9;
+  border-radius: 5%;
+}
+
+.files{
+  height: 90%;
+  width: 100%;
+}
+
+
+.AddFile{
+  color: black;
+}
+
 @media (min-width:1200px) and (max-width:1600px) {
   .knowledge-base-title {
     font-size: 25px;
   }
+}
+
+/* KnowledgeBase.css */
+
+.upload-section {
+    margin-top: 20px;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.upload-label {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.upload-label:hover {
+    background: #0056b3;
+}
+
+.upload-label.uploading {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.AddFile {
+    display: none;
+}
+
+.upload-error {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #fee;
+    color: #c00;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.upload-success {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #efe;
+    color: #0a0;
+    border-radius: 4px;
+    font-size: 14px;
 }

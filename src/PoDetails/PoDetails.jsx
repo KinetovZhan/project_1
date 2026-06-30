@@ -12,6 +12,8 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
+const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
+
 
 
 export function PoDetails({ po, onBack, showAlert }) {
@@ -45,9 +47,6 @@ export function PoDetails({ po, onBack, showAlert }) {
   const [softwareFile, setSoftwareFile] = useState(null);
   const [fileName, setFileName] = useState(null);
   const [uploadingSoftware, setUploadingSoftware] = useState(false);
-  const [instructionViewerOpen, setInstructionViewerOpen] = useState(false);
-  const [instructionViewerUrl, setInstructionViewerUrl] = useState('');
-  const [instructionViewerFilename, setInstructionViewerFilename] = useState('');
   const [previousSWVersion, setPreviousSWVersion] = useState(null);
   const [allTractorModels, setAllTractorModels] = useState([]);
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
@@ -481,15 +480,6 @@ export function PoDetails({ po, onBack, showAlert }) {
     }
   };
 
-  const closeInstructionViewer = () => {
-    if (instructionViewerUrl) {
-      window.URL.revokeObjectURL(instructionViewerUrl);
-    }
-    setInstructionViewerOpen(false);
-    setInstructionViewerUrl('');
-    setInstructionViewerFilename('');
-  };
-
   const handleOpenInstruction = async () => {
     const fileId = details.id_firmwares;
     if (!fileId) return;
@@ -499,50 +489,53 @@ export function PoDetails({ po, onBack, showAlert }) {
       const blob = await response.blob();
       const contentDisposition = response.headers.get('content-disposition');
       let filename = details.software_path_instruction || `instruction_${fileId}.pdf`;
-
       if (contentDisposition) {
         const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i);
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
 
-      const extension = filename.split('.').pop()?.toLowerCase();
-      const isPdf = blob.type === 'application/pdf' || extension === 'pdf';
-      if (!isPdf) {
-        alert('Просмотр доступен только для PDF. Файл будет скачан.');
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(downloadUrl);
-        document.body.removeChild(a);
+      const hasExtension = filename.includes('.');
+      const extension = hasExtension ? filename.split('.').pop()?.toLowerCase() : '';
+      const contentType = (response.headers.get('content-type') || blob.type || '').toLowerCase();
+      const isPdf = contentType.includes('application/pdf') || extension === 'pdf';
+      const url = window.URL.createObjectURL(blob);
+
+      if (isPdf) {
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!openedWindow) {
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          return;
+        }
+        const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
+        try {
+          openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
+        } catch {
+          // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
+        }
+        setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
         return;
       }
 
-      if (instructionViewerUrl) {
-        window.URL.revokeObjectURL(instructionViewerUrl);
-      }
-
-      const blobUrl = window.URL.createObjectURL(blob);
-      setInstructionViewerFilename(filename);
-      setInstructionViewerUrl(blobUrl);
-      setInstructionViewerOpen(true);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Ошибка открытия инструкции:', error);
-      alert('Не удалось открыть инструкцию');
+      alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
       setDownloading(false);
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (instructionViewerUrl) {
-        window.URL.revokeObjectURL(instructionViewerUrl);
-      }
-    };
-  }, [instructionViewerUrl]);
 
   if (loading) {
     return (
@@ -853,30 +846,6 @@ export function PoDetails({ po, onBack, showAlert }) {
           {tooltip.text}
         </div>,
         document.body
-      )}
-      {instructionViewerOpen && (
-        <div className="instruction-modal-overlay" onClick={closeInstructionViewer}>
-          <div className="instruction-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="instruction-modal-header">
-              <h3>Инструкция</h3>
-              <div className="instruction-modal-actions">
-                <a
-                  className="instruction-modal-download"
-                  href={instructionViewerUrl}
-                  download={instructionViewerFilename || 'instruction.pdf'}
-                >
-                  Скачать PDF
-                </a>
-                <button className="instruction-modal-close" onClick={closeInstructionViewer}>Закрыть</button>
-              </div>
-            </div>
-            <iframe
-              className="instruction-modal-frame"
-              src={instructionViewerUrl}
-              title="Инструкция PDF"
-            />
-          </div>
-        </div>
       )}
     </div>
   )

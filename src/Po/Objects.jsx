@@ -154,7 +154,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       return JMZImage;
     }
     else {
-      return DefaultImage;
+      return WeiImage;
     }
 
   }
@@ -378,7 +378,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
     return (
       <div className="maininfo">
         <h3>Последние версии ПО для {getComponentName()}</h3>
-        <div>Загрузка...</div>
+        <div className='loading'>Загрузка...</div>
       </div>
     );
   }
@@ -520,7 +520,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                 .filter((item) => item.id_Firmwares)
                 .map((item) => {
                   // Формируем текст для тултипа
-                  const tooltipText = `${item.type_component || '—'}: ${item.name_component || item.comp_model || '—'}`;
+                  const tooltipText = `${item.description || '—'}`;
                   const tooltipText2 = `${item.download_link} от ${new Date(item.release_date).toLocaleDateString()}`;
                 return (
                   <li key={item.id_Firmwares}>
@@ -553,7 +553,7 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
                             onMouseMove={handleMouseMove}
                             onMouseLeave={() => handleMouseLeave(item.id_Firmwares)}
                           >
-                            Для компонента {typeRus(item.type_component.toUpperCase()) || '—'}: {item.model_component || item.name_component }
+                            {item.description}
                         
                           </h5>
                           </div>
