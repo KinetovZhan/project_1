@@ -29,6 +29,7 @@ export function PoDetails({ po, onBack, showAlert }) {
   const isEngineer = userRole === 'engineer';
 
   // Стейты для редактирования
+  const [softwareName, setSoftwareName] = useState('');
   const [discr, setDiscr] = useState('');
   const [producer, setProducer] = useState('');
   const [isActual, setIsActual] = useState(false);
@@ -98,6 +99,7 @@ export function PoDetails({ po, onBack, showAlert }) {
   // Синхронизация стейтов с текущей версией
   useEffect(() => {
     if (details) {
+      setSoftwareName(details.software_name || '');
       setDiscr(details.software_description || '');
       setStatus(details.software_status || '');
       setIsActual(details.software_is_actual || false);
@@ -212,6 +214,7 @@ export function PoDetails({ po, onBack, showAlert }) {
 
       // 2. Обновление метаданных ПО
       const payload = isModerator ? {
+        name: softwareName,
         description: discr,
         producer: producer,
         status: status,
@@ -222,7 +225,7 @@ export function PoDetails({ po, onBack, showAlert }) {
         is_critical: isCritical,
         end_actuality: endActuality || null,
         previous_sw_version: previousSWVersion,
-        tractor_model: selectedTractorModels.map(item => item.value), 
+        tractor_model: selectedTractorModels.map(item => item.value),
       } : {
         description: discr,
         status: status,
@@ -577,12 +580,22 @@ export function PoDetails({ po, onBack, showAlert }) {
           <div className="left-column">
             <div className="section">
               <h2>
-                <span 
+                <span
                       onMouseEnter={(e) => handleMouseEnter(e, details.software_path || details.software_name || 'Нет данных', details.id_firmwares)}
                       onMouseMove={handleMouseMove}
                       onMouseLeave={() => handleMouseLeave(details.id_firmwares)}
                     >
-                      {details.software_name || 'ПО'} от {formatDate(details.software_release_date)}
+                      {(change && isModerator) ? (
+                        <input
+                          type="text"
+                          value={softwareName}
+                          onChange={(e) => setSoftwareName(e.target.value)}
+                          placeholder="Название ПО"
+                          style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
+                        />
+                      ) : (
+                        `${details.software_name || 'ПО'} от ${formatDate(details.software_release_date)}`
+                      )}
                  </span>
                 <br />
                 {(change&&isModerator) ? 
