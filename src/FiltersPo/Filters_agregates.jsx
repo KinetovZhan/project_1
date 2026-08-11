@@ -28,7 +28,7 @@ export function Filters( {onFilterChange, onFilterChange2, onModelChange, onProd
   const statusOptions = [
     { value: "serial", label: "Серийное" },
     { value: "experienced", label: 'Опытное' },
-    { value: "in_operation", label: 'Для эксплуатации' }
+    { value: "in operation", label: 'Для эксплуатации' }
   ];
 
   const [selectedTractorModels, setSelectedTractorModels] = useState([]);
