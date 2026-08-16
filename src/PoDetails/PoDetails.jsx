@@ -12,7 +12,8 @@ import { api, buildApiUrl } from '../fetchAPI.js';
 import Select from 'react-select';
 import ReactDOM from 'react-dom';
 
-const OBJECT_URL_CLEANUP_TIMEOUT_MS = 600000;
+// Keep object URL long enough for reading/downloading in the opened tab as needed.
+const OBJECT_URL_CLEANUP_TIMEOUT_MS = 10 * 60 * 1000;
 
 
 
@@ -483,6 +484,11 @@ export function PoDetails({ po, onBack, showAlert }) {
   const handleOpenInstruction = async () => {
     const fileId = details.id_firmwares;
     if (!fileId) return;
+    const instructionWindow = window.open('', '_blank', 'noopener,noreferrer');
+    if (!instructionWindow) {
+      alert('Не удалось открыть новое окно. Разрешите всплывающие окна для сайта и попробуйте снова.');
+      return;
+    }
     setDownloading(true);
     try {
       const response = await api.download(`/software/download/${fileId}/instruction`);
@@ -494,42 +500,35 @@ export function PoDetails({ po, onBack, showAlert }) {
         if (match && match[1]) filename = match[1].replace(/['"]/g, '');
       }
 
-      const hasExtension = filename.includes('.');
-      const extension = hasExtension ? filename.split('.').pop()?.toLowerCase() : '';
-      const contentType = (response.headers.get('content-type') || blob.type || '').toLowerCase();
-      const isPdf = contentType.includes('application/pdf') || extension === 'pdf';
       const url = window.URL.createObjectURL(blob);
-
-      if (isPdf) {
-        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
-        if (!openedWindow) {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-          return;
-        }
-        const cleanupObjectUrl = () => window.URL.revokeObjectURL(url);
-        try {
-          openedWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
-        } catch {
-          // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
-        }
-        setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
-        return;
+      instructionWindow.location.href = url;
+      try {
+        instructionWindow.document.title = filename;
+      } catch {
+        // Access to document may be blocked by browser/same-origin policy after navigation.
       }
-
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      let isCleanedUp = false;
+      let cleanupTimeoutId = null;
+      const cleanupObjectUrl = () => {
+        if (isCleanedUp) return;
+        isCleanedUp = true;
+        if (cleanupTimeoutId) {
+          clearTimeout(cleanupTimeoutId);
+        }
+        window.URL.revokeObjectURL(url);
+      };
+      try {
+        instructionWindow.addEventListener('beforeunload', cleanupObjectUrl, { once: true });
+      } catch {
+        // Access may be blocked by browser/same-origin policy; timeout fallback handles cleanup.
+      }
+      cleanupTimeoutId = setTimeout(cleanupObjectUrl, OBJECT_URL_CLEANUP_TIMEOUT_MS);
     } catch (error) {
+      try {
+        instructionWindow.document.body.textContent = 'Не удалось открыть инструкцию.';
+      } catch {
+        // ignore if writing to window is blocked
+      }
       console.error('Ошибка открытия инструкции:', error);
       alert(`Не удалось открыть инструкцию: ${error?.message || 'неизвестная ошибка'}`);
     } finally {
