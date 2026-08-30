@@ -3,20 +3,21 @@
   box-sizing: border-box;
   width: 360px;
   height: 120px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
+  background-color: var(--surface);
+  border-radius: var(--r-lg);
   /* Внутренности */
   display: flex;
   flex-direction: column;
   /* padding: 10px; */
   padding: 10px 0 10px 10px; /* top right bottom left */
   gap: 10px;
-  color: black;
+  color: var(--text);
   /* Полоса прокрутки */
   max-height: 100px;
   overflow-y: auto;
   gap: 10px;
-  border: 1px solid rgba(217, 217, 217, 1);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 
   overflow: hidden;
 
@@ -38,14 +39,14 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
 
   display: flex;
   flex-direction: column;
   gap: 20px;
 
   padding: 3px 10px 0 0;
-  
+
 }
 
 .filters-scroll-bar::-webkit-scrollbar {
@@ -53,13 +54,17 @@
 }
 
 .filters-scroll-bar::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #bebebe;
+  border-radius: var(--r-pill);
+  background-color: var(--gray-400);
+}
+
+.filters-scroll-bar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-red);
 }
 
 .filters-scroll-bar::-webkit-scrollbar-track {
-  background-color: #f0f0f0; /* ← Цвет фона дорожки */
-  border-radius: 10px;
+  background-color: var(--gray-100); /* ← Цвет фона дорожки */
+  border-radius: var(--r-pill);
 }
 
 .filterstrac h3 {
@@ -74,6 +79,7 @@
   position: absolute;
   right: 10px;
   transform: scale(1.5);
+  accent-color: var(--brand-red);
 }
 
 
@@ -83,14 +89,16 @@
   box-sizing: border-box;
   width: 40vh;
   /* min-height: 80px; */
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--r-lg);
   /* Внутренности */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 12px;
   gap: 10px;
-  color: black;
+  color: var(--text);
   /* Положение */
   position: absolute;
   top: 402px;
@@ -99,7 +107,7 @@
 
 .filterstrac2 span {
   margin: 0px;
-  flex-shrink: 0; 
+  flex-shrink: 0;
   font-size: 16px;
   font-family: Arial;
 }
@@ -108,6 +116,7 @@
   position: absolute;
   right: 10px;
   transform: scale(1.5);
+  accent-color: var(--brand-red);
 }
 
 
@@ -115,77 +124,81 @@
   box-sizing: border-box;
   width: 42vh;
   height: 68px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--r-lg);
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
 
   /* Позиция */
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   top: 70vh;
-  
+
 }
 
 .majmin_button {
   border-width: 1px;
-  border: none;
-  border-radius: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
   margin: 4px;
   font-size: 16px;
   font-family: Arial;
-  background-color: rgba(217, 217, 217, 1);
+  font-weight: 600;
+  color: var(--text);
+  background-color: var(--surface);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 
 .majmin_button_active {
   border-width: 1px;
-  border-color: grey;
-  border-radius: 20px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
   margin: 4px;
   font-size: 16px;
   font-family: Arial;
-  color: white;
-  background-color: black;
+  font-weight: 600;
+  color: var(--text-invert);
+  background-color: var(--brand-red);
+  box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
-.majmin_button_active:hover {
-  background: transparent;
-  box-shadow: none;
-  margin: 4px;
-}
-
-.majmin_button:active {
-  background-color: black;
-  color: white;
-  margin: 4px;
-}
-
 
 .majmin_button:hover {
-  background-color: #b6bbc1;
+  background-color: var(--gray-100);
+  color: var(--brand-red);
   margin: 4px;
-  box-shadow: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .majmin_button:active {
-  background-color: #969aa0;
+  background-color: var(--gray-200);
+  color: var(--brand-red);
   box-shadow: none;
   margin: 4px;
 }
 
 
 .majmin_button_active:hover {
-  background-color: black;
-  color: white;
+  background-color: var(--brand-red-hover);
+  color: var(--text-invert);
   margin: 4px;
+  box-shadow: 0 6px 16px rgba(224, 31, 38, 0.45);
 }
 
 
 
 .majmin_button_active:active {
-  background-color: black;
-  color: white;
+  background-color: var(--brand-red-active);
+  color: var(--text-invert);
   margin: 4px;
 }
 @media (max-width:767px) {
@@ -194,21 +207,22 @@
   width: 80%;
   max-width: 300PX;
   height: 65px;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 20px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
   display: flex;
   align-items: center;
 
   /* Позиция */
   position: absolute;
-  left: 13px; 
+  left: 13px;
   top: 600PX;
 }
 
 .majmin_button {
   border-width: 1px;
-  border-color: grey;
-  border-radius: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
   margin: 4px;
   font-size: 14px;
   font-family: Arial;
@@ -225,7 +239,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-  background-color: #f8f9fa;
+  background-color: var(--gray-100);
 }
 
 .nav-button {
@@ -236,11 +250,13 @@
   width: 20px;
   height: 20px;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: var(--r-xs);
 }
 
 .nav-button:hover {
-  background-color: #e9ecef;
+  background-color: var(--gray-200);
+  color: var(--brand-red);
+  box-shadow: none;
 }
 
 .month-year-display {
@@ -257,13 +273,13 @@
 
 .year-select select {
   height: 200px;
-} 
+}
 /* Стили для выпадающих списков в календаре */
 .react-datepicker__year-dropdown,
 .react-datepicker__month-dropdown {
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background-color: var(--surface);
   max-height: 200px;
   overflow-y: auto;
 }
@@ -278,17 +294,17 @@
 
 .react-datepicker__year-option:hover,
 .react-datepicker__month-option:hover {
-  background-color: #f0f0f0;
+  background-color: var(--gray-100);
 }
 
 /* Поиск по дате */
 .release-date {
   display: flex;
   align-items: center;
-  background-color: rgba(217, 217, 217, 1);
+  background-color: var(--surface);
   width: 120%;
   height: 56px;
-  border-radius: 56px;
+  border-radius: var(--r-pill);
   /* position: absolute;
   top: 318px;
   left: 13px; */
@@ -296,11 +312,13 @@
   box-sizing: border-box;
   font-size: 20px;
   font-family: Arial;
+  color: var(--text);
 }
 .release-date ::placeholder {
   font-size: 16px;
   font-family: Arial;
   padding:10px;
+  color: var(--text-muted);
 }
 
 
@@ -310,14 +328,17 @@
   font-family: Arial;
   display: flex;
   align-items: center;
-  background-color: rgba(217, 217, 217, 1);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   width: 90%;
   height: 56px;
-  border-radius: 56px;
+  border-radius: var(--r-lg);
   padding: 0 10px;
   box-sizing: border-box;
   font-size: 20px;
   font-family: Arial;
+  color: var(--text);
 }
 
 
@@ -337,8 +358,8 @@
   font-size: 16px;
   cursor: pointer;
   padding: 0;
-  color: #000000;
-  
+  color: var(--text);
+
   /* Убираем стандартные стили для date input */
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -352,7 +373,7 @@
 }
 
 .choose_date_release::placeholder {
-  color: #000000;
+  color: var(--text-muted);
   opacity: 1;
 }
 
@@ -363,11 +384,12 @@
   justify-content: center;
   cursor: pointer;
   margin-left: 8px;
-  color: #666;
+  color: var(--gray-600);
+  transition: color 0.2s ease;
 }
 
 .calendar-icon:hover {
-  color: #333;
+  color: var(--brand-red);
 }
 
 .calendar-icon svg {
@@ -386,21 +408,22 @@
 
 .react-datepicker {
   font-family: inherit;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
 }
 
 .react-datepicker__header {
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
-  border-radius: 8px 8px 0 0;
+  background-color: var(--gray-100);
+  border-bottom: 1px solid var(--border);
+  border-radius: var(--r-md) var(--r-md) 0 0;
   padding-top: 8px;
 }
 
 .react-datepicker__current-month {
   font-weight: 600;
-  color: #333;
+  color: var(--text);
 }
 
 .react-datepicker__day-names {
@@ -408,46 +431,46 @@
 }
 
 .react-datepicker__day-name {
-  color: #666;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .react-datepicker__day {
   border-radius: 50%;
   margin: 0.2rem;
-  color: #333;
+  color: var(--text);
 }
 
 .react-datepicker__day:hover {
-  background-color: #f0f0f0;
+  background-color: var(--gray-100);
   border-radius: 50%;
 }
 
 .react-datepicker__day--in-range {
-  background-color: #e6f7ff !important;
-  color: #1890ff !important;
+  background-color: var(--brand-red-soft) !important;
+  color: var(--brand-red) !important;
   border-radius: 0 !important;
 }
 
 .react-datepicker__day--in-selecting-range:not(.react-datepicker__day--in-range) {
-  background-color: #f0f8ff !important;
+  background-color: rgba(224, 31, 38, 0.07) !important;
 }
 
 .react-datepicker__day--range-start,
 .react-datepicker__day--range-end {
-  background-color: #1890ff !important;
+  background-color: var(--brand-red) !important;
   color: white !important;
   border-radius: 50% !important;
 }
 
 .react-datepicker__day--selected {
-  background-color: #1890ff !important;
+  background-color: var(--brand-red) !important;
   color: white !important;
   border-radius: 50%;
 }
 
 .react-datepicker__day--keyboard-selected {
-  background-color: #1890ff;
+  background-color: var(--brand-red);
   color: white;
   border-radius: 50%;
 }
@@ -478,7 +501,7 @@
 
 .react-datepicker__close-icon::after {
   background-color: transparent !important;
-  color: #666 !important;
+  color: var(--gray-600) !important;
   border-radius: 50% !important;
   font-size: 22px !important;
   font-weight: 300 !important;
@@ -500,7 +523,7 @@
 .react-datepicker__close-icon:focus::after,
 .react-datepicker__close-icon:active::after {
   background-color: transparent !important;
-  color: #666 !important;
+  color: var(--brand-red) !important;
   transform: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -525,9 +548,9 @@
 .selected-year {
   padding: 4px 8px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--r-xs);
   cursor: pointer;
-  background: #f8f9fa;
+  background: var(--gray-50);
   min-width: 80px;
   text-align: center;
   font-weight: bold;
@@ -541,11 +564,11 @@
   right: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  background: var(--surface);
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .year-option {
@@ -555,11 +578,11 @@
 }
 
 .year-option:hover {
-  background-color: #f0f0f0;
+  background-color: var(--gray-100);
 }
 
 .year-option.selected {
-  background-color: #007bff;
+  background-color: var(--brand-red);
   color: white;
 }
 /* Стили для выпадающего списка месяцев */
@@ -571,9 +594,9 @@
 .selected-month {
   padding: 4px 8px;
   border: none;
-  border-radius: 4px;
+  border-radius: var(--r-xs);
   cursor: pointer;
-  background: #f8f9fa;
+  background: var(--gray-50);
   min-width: 100px;
   text-align: center;
   font-weight: bold;
@@ -592,11 +615,11 @@
   right: 0;
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xs);
+  background: var(--surface);
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-md);
 }
 
 .month-option {
@@ -607,11 +630,11 @@
 }
 
 .month-option:hover {
-  background-color: #f0f0f0;
+  background-color: var(--gray-100);
 }
 
 .month-option.selected {
-  background-color: #007bff;
+  background-color: var(--brand-red);
   color: white;
 }
 
@@ -636,7 +659,7 @@
   margin-right: 5px;
   font-weight: 100;
   font-size: 20px;
-  color: #000000 !important; 
+  color: var(--text) !important;
 }
 /* Поиск диллера */
 
@@ -644,13 +667,16 @@
   animation: slideRightFadeIn 0.5s ease-out forwards;
   display: flex;
   align-items: center;
-  background-color: rgba(217, 217, 217, 1);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   width: 242px;
   height: 56px;
-  border-radius: 56px;
+  border-radius: var(--r-lg);
   padding: 0 20px;
   box-sizing: border-box;
   z-index: -1;
+  color: var(--text);
 }
 
 
@@ -658,27 +684,30 @@
   font-size:16px;
   font-family:Arial;
   padding :0px;
+  color: var(--text-muted);
 }
 
 
 button.search_button {
   width:50px;
-  height: 56px;
+  height: 54px;
   position:absolute;
   border: none;
   right: 0px;
-  background-color: rgba(217, 217, 217, 1);
+  background-color: transparent;
   cursor: pointer;
-  color:  black;
+  color: var(--gray-700);
   padding: 1px;
-  border-radius: 25px;
+  border-radius: var(--r-lg);
   box-shadow: none;
+  transition: color 0.2s ease;
 }
 
 
 .search_button:hover {
   border: none;
-  background-color: rgba(217, 217, 217, 1);
+  background-color: transparent;
+  color: var(--brand-red);
   box-shadow: none;
 }
 
@@ -690,21 +719,24 @@ button.search_button {
   background-color: transparent;
   width: 192px;
   height: 56px;
-  border-radius: 25px;
+  border-radius: var(--r-lg);
   outline: none;
   padding-left: 0px;
   font-size: 16px;
+  color: var(--text);
 }
 
 .searcher_dealer::placeholder {
-  color: #000000;
+  color: var(--text-muted);
   text-align: left;
 }
 
 .tractors-status{
   animation: slideRightFadeIn 0.5s ease-out forwards;
-  background-color: rgba(217, 217, 217, 1);
-  border-radius: 25px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--r-lg);
   display: flex;
   flex-direction: column;
   width: 90%;
@@ -714,7 +746,8 @@ button.search_button {
 }
 
 .tractors-status > span{
-  color: #000000;
+  color: var(--text);
+  font-weight: 600;
 }
 
 .tractors-status > * {
@@ -748,7 +781,7 @@ button.search_button {
     /* left: 50%; */
     transform: translateX(-50%);
   }
-  
+
   .poster {
     max-width: 350px;
   }
@@ -762,7 +795,7 @@ button.search_button {
     font-size: 12px;
     z-index: -1;
   }
- 
+
   .tractors-status{
     position: absolute;
     top: 258%;
@@ -784,18 +817,18 @@ button.search_button {
     width: 42vh;
     height: 8vh;
   }
-  
+
 
   .majmin_button {
     width: 21vh;
     height: 6vh;
-    border-radius: 15px;
+    border-radius: var(--r-sm);
   }
 
   .majmin_button_active {
     width: 21vh;
     height: 6vh;
-    border-radius: 15px;
+    border-radius: var(--r-sm);
   }
 
 }

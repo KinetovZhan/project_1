@@ -4,25 +4,32 @@
   right:10px;
   width: 300px;
   height: 50px;
-  border-radius: 40px;
-  background-color: rgba(85, 86, 90, 1);
-  border-color:transparent;
-  color: black;
+  border-radius: var(--r-sm);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-bar:focus-within {
+  border-color: var(--brand-red);
+  box-shadow: 0 0 0 3px var(--brand-red-soft);
 }
 /* Поле ввода текста */
 .search-bar input {
   border: none;
   background: transparent;
-  color: rgb(245, 243, 243);
+  color: var(--text);
   font-size: 16px;
-  padding: 16px 35px;
+  padding: 16px 35px 16px 18px;
   outline: none;
   width: 220px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .search-bar input::placeholder {
-  color: #fffefe;
+  color: var(--text-muted);
 }
 /* Кнопка поиска с иконкой лупы */
 .search-bar .search-icon-button {
@@ -34,16 +41,16 @@
   transform: translateY(-50%);
   background: transparent;
   cursor: pointer;
-  color: white;
-  cursor: pointer;
+  color: var(--gray-700);
   padding: 1px;
-  border-radius: 10px;
-
+  border-radius: var(--r-xs);
+  transition: color 0.2s ease;
 }
 /* Отключаем эффекты hover для этой кнопки */
 .search-bar .search-icon-button:hover {
   background: transparent;
   box-shadow: none;
+  color: var(--brand-red);
 }
 /* Иконка лупы */
 .search-bar .search-icon-button svg {
@@ -55,12 +62,12 @@
   .search-bar input {
   border: none;
   background: transparent;
-  color: rgb(245, 243, 243);
+  color: var(--text);
   font-size: 14px;
-  padding: 16px 35px;
+  padding: 16px 35px 16px 18px;
   outline: none;
   width: 220px;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 }
 
@@ -69,6 +76,7 @@
     height: 5vh;
     width: 40vh;
     display: flex;
+    align-items: center;
     text-align: center;
     top: 5vh;
   }

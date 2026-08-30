@@ -5,9 +5,11 @@
   box-sizing: border-box;
   width: 110vh;
   height: 70vh;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--r-xl);
+  color: var(--text);
   padding: 0px 70px;
 
 
@@ -41,10 +43,16 @@
   height: 12vh;
   border-style: solid;
   border-width: 1px;
-  border-color: grey;
-  border-radius: 15px;
+  border-color: var(--border);
+  border-radius: var(--r-md);
   display: flex;
   margin-left: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.objectmenu:hover {
+  border-color: var(--brand-red);
+  box-shadow: 0 4px 14px rgba(224, 31, 38, 0.15);
 }
 
 
@@ -61,7 +69,7 @@
 }
 
 .textunder {
-  color: grey;
+  color: var(--text-muted);
   white-space: nowrap;       
   overflow: hidden;          
   text-overflow: ellipsis;   
@@ -84,22 +92,22 @@
 } */
 
 button:hover {
-  background-color: #b6bbc1;
+  background-color: var(--gray-100);
   /* transform: translateY(-2px); */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 button:active {
-  background-color: #707479;
+  background-color: var(--gray-200);
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .back-button {
 
-  background-color: #55565a;
+  background-color: var(--brand-red);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: var(--r-xs);
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
@@ -108,7 +116,9 @@ button:active {
 }
 
 .back-button:hover {
-  background-color: #6b6c70;
+  background-color: var(--brand-red-hover);
+  color: var(--text-invert);
+  box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
 }
 
 .poster {
@@ -152,22 +162,27 @@ button:active {
 }
 
 .list-scroll-bar::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background-color: #bebebe;
+  border-radius: var(--r-pill);
+  background-color: var(--gray-400);
+}
+
+.list-scroll-bar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-red);
 }
 
 .list-scroll-bar::-webkit-scrollbar-track {
-  background-color: #f0f0f0; /* ← Цвет фона дорожки */
-  border-radius: 10px;
+  background-color: var(--gray-100); /* ← Цвет фона дорожки */
+  border-radius: var(--r-pill);
 }
 
 /* ===== КНОПКА ЗАГРУЗКИ ===== */
 .download {
   width: 8vw;
   height: 5vh;
-  border-radius: 20px;
-  background-color: rgba(217, 217, 217, 1);
-  border-color: transparent;
+  border-radius: var(--r-md);
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
   margin: 4px;        /* ИЗМЕНЕНО: auto по бокам для центрирования */
   display: block;          /* Добавлено: для работы margin: auto */
   font-family: Arial;
@@ -178,13 +193,16 @@ button:active {
 }
 
 .download:hover {
-  background-color: #b6bbc1;
+  background-color: var(--brand-red);
+  color: var(--text-invert);
+  border-color: transparent;
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
 }
 
 .download:active {
-  background-color: #707479;
+  background-color: var(--brand-red-active);
+  color: var(--text-invert);
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
@@ -196,9 +214,17 @@ button:active {
   text-align: center;
   justify-content: center;
   width:100px;
-  border: none;
-  background-color:#d7dcf3;
-  border-radius: 20px;
+  border: 1px solid var(--border);
+  background-color: var(--gray-100);
+  color: var(--text);
+  border-radius: var(--r-md);
+}
+
+.archive-button:hover {
+  background-color: var(--brand-red-soft);
+  color: var(--brand-red);
+  border-color: var(--brand-red);
+  box-shadow: none;
 }
 
 @media (max-width:767px) {
@@ -214,14 +240,15 @@ background-color: transparent;
   box-sizing: border-box;
   width: 90%;
   height: 88%;
-  background-color: white;
-  border-radius: 30px;
-  color: black;
+  background-color: var(--surface);
+  border-radius: var(--r-xl);
+  color: var(--text);
   padding: 10px 15px;
   position: absolute;
   left: 5vw;
   top: 70px;
-  border: 1px solid blue;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
 }
 
 .list-container {
@@ -276,8 +303,8 @@ background-color: transparent;
   height: 208px;
   border-style: solid;
   border-width: 1px;
-  border-color: grey;
-  border-radius: 15px;
+  border-color: var(--border);
+  border-radius: var(--r-md);
   display: flex;
   margin-left: 0;
 }
@@ -304,9 +331,11 @@ background-color: transparent;
     box-sizing: border-box;
     width: 80%;
     height: 80%;
-    background-color: white;
-    border-radius: 30px;
-    color: black;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--r-xl);
+    color: var(--text);
     padding: 0px 70px;
 
 
@@ -327,7 +356,7 @@ background-color: transparent;
   .download {
     width: 30vh;
     height: 6vh;
-    border-radius: 15px;
+    border-radius: var(--r-sm);
     font-size: 12px;
   }
 

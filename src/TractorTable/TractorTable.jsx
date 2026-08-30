@@ -575,21 +575,34 @@ const getStatusColorClass = (status) => {
   }
 };
 
+  // Цвета текста версий под статус ячейки (оформление)
+  const statusTextColor = {
+    'cell-critical': '#c2181e',
+    'cell-actual': '#1f7a3d',
+    'cell-oldy': '#a06a00'
+  };
+
   // Функция для определения стиля текста в зависимости от значения поля path
-  const getTextStyle = (tractor, colKey) => {
+  const getTextStyle = (tractor, colKey, statusClassName = '') => {
     const nodeFields = ['dvs', 'kpp', 'rk', 'bk', 'gr', 'autopilot'];
-    
+
     if (nodeFields.includes(colKey)) {
       const pathField = `${colKey}_path`;
       const pathValue = tractor[pathField];
-      
+
+      // Нет файла ПО — серый текст (как и раньше)
+      if (!pathValue || pathValue === '') {
+        return { color: 'gray' };
+      }
+
+      // Есть файл — цвет по статусу подсвеченной ячейки
       return {
-        color: !pathValue || pathValue === '' ? 'gray' : 'black',
+        color: statusTextColor[statusClassName] || 'black',
         // Опционально: можно добавить tooltip с путём
         // title: pathValue || undefined
       };
     }
-    
+
     return {};
   };
 
@@ -779,10 +792,10 @@ const getStatusColorClass = (status) => {
                     const className = shouldHighlight(tractor, colKey) ? getStatusColorClass(status) : '';
                     
                     // Применяем стиль цвета текста в зависимости от значения поля path
-                    const textStyle = getTextStyle(tractor, colKey);
-                    
-                    return <td 
-                      key={colKey} 
+                    const textStyle = getTextStyle(tractor, colKey, className);
+
+                    return <td
+                      key={colKey}
                       className={className} 
                       style={textStyle}
                       onClick={(e) => handleSoftwareClick(e, tractor, colKey)}
