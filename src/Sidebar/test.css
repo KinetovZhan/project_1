@@ -635,7 +635,7 @@
 
   .mobile-sidebar-container .sidebar .modelSelect {
     top: 0px;
-    width: 45vh;
+    width: 45vw;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
