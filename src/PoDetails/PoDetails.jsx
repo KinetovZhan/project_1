@@ -572,6 +572,7 @@ export function PoDetails({ po, onBack, showAlert }) {
         <div className="po-details-content">
           <div className="left-column">
             <div className="section">
+              <label>Наименование</label>
               <h2>
                 <span
                       onMouseEnter={(e) => handleMouseEnter(e, details.software_path || details.software_name || 'Нет данных', details.id_firmwares)}
@@ -587,10 +588,11 @@ export function PoDetails({ po, onBack, showAlert }) {
                           style={{ fontSize: 'inherit', fontWeight: 'inherit' }}
                         />
                       ) : (
-                        `${details.software_name || 'ПО'} от ${formatDate(details.software_release_date)}`
+                        // `${details.software_name || 'ПО'} от ${formatDate(details.software_release_date)}`
+                        `ПО ${details.component_name} ${details.software_tractor_models}`
                       )}
                  </span>
-                <br />
+                {/* <br />
                 {(change&&isModerator) ? 
                  (<select value={type} onChange={(e) => setType(e.target.value)}>
                   <option value="HR">Гидрораспределитель</option>
@@ -666,16 +668,32 @@ export function PoDetails({ po, onBack, showAlert }) {
                   <span>{details.software_tractor_models.join(', ')}</span>
               </span>
           )
-      )}
+      )} */}
               </h2>
-              <img
+              <label>Версия</label>
+              <h2>{details.software_name || 'Неуказана'} <span className='actuallity'>{getStatusActualityText()}</span></h2>
+              <label>Дата релиза</label>
+              <h2 style={{color:'rgb(133, 134, 138)'}}>{formatDate(details.software_release_date)}</h2>
+              <label>Описание</label>
+              {!change ? (
+                <div className="description">{details.software_description || 'Описание отсутствует'}</div>
+              ) : (
+                <textarea
+                  rows="4"
+                  placeholder="Описание"
+                  value={discr}
+                  style={{ width: '300px', maxHeight: '300px', overflowY: 'auto' }}
+                  onChange={(e) => setDiscr(e.target.value)}
+                />
+              )}
+              {/* <img
                 className="object-po"
                 src={ImageToComponent(details.component_type, details.component_name)}
                 alt={details.component_type}
-              />
+              /> */}
             </div>
 
-            <div className="section">
+            {/* <div className="section">
               <h3>Дата выпуска</h3>
               {(change && isModerator) ? (
                 <input
@@ -704,9 +722,9 @@ export function PoDetails({ po, onBack, showAlert }) {
                   <p>{actualityPeriod}</p>
                 </>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <h3>Назначение</h3>
               {!change ? (
                 <p>{getStatusText()}</p>
@@ -730,9 +748,10 @@ export function PoDetails({ po, onBack, showAlert }) {
               ) : (
                 <p>{getStatusActualityText()}</p>
               )}
-            </div>
+            </div> */}
 
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>
+
+            {/* <div style={{ display: 'flex', flexDirection: 'row', gap: '5%' }}>
               <div className="section">
                 <h3>Установщик</h3>
                 {change && isModerator ? (
@@ -769,12 +788,46 @@ export function PoDetails({ po, onBack, showAlert }) {
                   )
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="right-column">
             <div className="section">
-              <h3>Описание</h3>
+              <label>Файлы</label>
+              <div className='btnfrinstl'>
+                {change && isModerator ? (
+                  <div>
+                    <input type="file" onChange={(e) => setSoftwareFile(e.target.files[0])} />
+                    {softwareFile && <p style={{ fontSize: '12px' }}>Выбран: {removeExtension(softwareFile.name)}</p>}
+                    {uploadingSoftware && <p>Загрузка...</p>}
+                  </div>
+                ) : (
+                  details.software_path ? (
+                    <button className="download-button" onClick={handleDownloadSoftware} disabled={downloading}>
+                      {downloading ? 'Скачивание...' : 'Установщик'}
+                    </button>
+                  ) : (
+                    <p>—</p>
+                  )
+                )}
+
+                {change && isModerator ? (
+                  <div>
+                    <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setInstructionFile(e.target.files[0])} />
+                    {instructionFile && <p style={{ fontSize: '12px' }}>Выбран: {removeExtension(instructionFile.name)}</p>}
+                    {uploadingInstruction && <p>Загрузка...</p>}
+                  </div>
+                ) : (
+                  details.software_path_instruction ? (
+                    <button className="download-button" onClick={handleOpenInstruction} disabled={downloading}>
+                      {downloading ? 'Открытие...' : 'Инструкция'}
+                    </button>
+                  ) : (
+                    <p>—</p>
+                  )
+                )}
+              </div>
+              {/* <h3>Описание</h3>
               {!change ? (
                 <div className="description">{details.software_description || 'Описание отсутствует'}</div>
               ) : (
@@ -785,7 +838,7 @@ export function PoDetails({ po, onBack, showAlert }) {
                   style={{ width: '300px', maxHeight: '300px', overflowY: 'auto' }}
                   onChange={(e) => setDiscr(e.target.value)}
                 />
-              )}
+              )} */}
             </div>
 
             <div className="section">
@@ -827,9 +880,20 @@ export function PoDetails({ po, onBack, showAlert }) {
                 )}
               </div>
             </div>
+            <div className='change-buttons-container'>
+              {(isModerator || isEngineer) && (
+                <button onClick={() => setChange(true)} className='change-buttons'>Изменить</button>
+              )}
+              {change && (
+                <>
+                  <button onClick={() => setChange(false)} className='change-buttons'>Отменить</button>
+                  <button onClick={changePoInfo} className='change-buttons'>Принять</button>
+                </>
+              )}
+        </div>
           </div>
         </div>
-        <div className='change-buttons-container'>
+        {/* <div className='change-buttons-container'>
           {(isModerator || isEngineer) && (
             <button onClick={() => setChange(true)} className='change-buttons'>Изменить</button>
           )}
@@ -839,7 +903,7 @@ export function PoDetails({ po, onBack, showAlert }) {
               <button onClick={changePoInfo} className='change-buttons'>Принять</button>
             </>
           )}
-        </div>
+        </div> */}
       </div>
       {tooltip.visible && typeof document !== 'undefined' && document.body && ReactDOM.createPortal(
         <div className="popup-window" style={{ position: 'fixed', left: tooltip.x + 15, top: tooltip.y + 15, pointerEvents: 'none', zIndex: 1000 }}>

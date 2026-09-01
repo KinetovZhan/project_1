@@ -13,7 +13,7 @@ import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
 import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
-
+import { createPortal } from 'react-dom';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo, showAlert}) {
 
@@ -450,31 +450,17 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
       <div className="maininfo">
         <button onClick={onCloseTab} className="go-back" style={{top:'-30px', left:'-40px'}}></button>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', paddingTop:'2vh' }}>
-          <div className='choose' style = {{display:'flex', flexDirection:'column'}}>
+          <div style = {{display:'flex', flexDirection:'column'}}>
             <button 
               onClick={getNewPO} 
-              style={{
-                  padding: '8px 20px',
-                  backgroundColor: choosedObjects === 'active' ? '#e01f26' : '#ffffff',
-                  color: choosedObjects === 'active' ? 'white' : '#1e1e1e',
-                  border: choosedObjects === 'active' ? '1px solid transparent' : '1px solid #e3e5e8',
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
-                }}>
-              <span>Актуальные версии ({softwareItems.length})</span>
+              className={`tab-button ${choosedObjects === 'active' ? 'active' : ''}`}
+            >
+              Актуальные версии ({softwareItems.length})
             </button>
             <button 
               onClick={getArchivePO}
-              style={{
-                padding: '8px 20px',
-                backgroundColor: choosedObjects === 'archive' ? '#e01f26' : '#ffffff',
-                color: choosedObjects === 'archive' ? 'white' : '#1e1e1e',
-                border: choosedObjects === 'archive' ? '1px solid transparent' : '1px solid #e3e5e8',
-                borderRadius: '16px',
-                cursor: 'pointer',
-                fontWeight: choosedObjects === 'archive' ? 'bold' : 'normal'
-              }}>
+              className={`tab-button ${choosedObjects === 'archive' ? 'active' : ''}`}
+            >
               Архивные версии ({archiveItems.length})
             </button>
           </div>
