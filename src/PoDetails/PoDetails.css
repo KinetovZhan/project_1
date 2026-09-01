@@ -71,7 +71,8 @@
 }
 .left-column .section {
   padding:0px;
-  gap:1vh
+  gap:1vh;
+  border: none;
 }
 .right-column {
   display: flex;
@@ -83,7 +84,8 @@
 
 .right-column .section {
   padding:0px;
-  gap:1vh
+  gap:1vh;
+  border: none;
 }
 
 
