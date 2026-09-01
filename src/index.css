@@ -1,87 +1,77 @@
-/* :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ============================================================
+   ДИЗАЙН-ТОКЕНЫ (красно-серая тема)
+   ============================================================ */
+:root {
+  /* Фирменный красный */
+  --brand-red: #e01f26;
+  --brand-red-hover: #c9151c;
+  --brand-red-active: #ac1015;
+  --brand-red-soft: rgba(224, 31, 38, 0.12);
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Серые */
+  --gray-950: #232426;
+  --gray-900: #2c2d30;
+  --gray-800: #3a3b3f;
+  --gray-700: #55565a;
+  --gray-600: #6f7175;
+  --gray-400: #b9bcc1;
+  --gray-200: #e3e5e8;
+  --gray-100: #f1f2f4;
+  --gray-50:  #f8f9fa;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* Поверхности и текст */
+  --surface: #ffffff;
+  --surface-muted: #f4f5f7;
+  --text: #1e1e1e;
+  --text-muted: #6f7175;
+  --text-invert: #ffffff;
+  --border: #e3e5e8;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  /* Статусы */
+  --status-ok-bg: #e6f6ea;
+  --status-ok-fg: #1f7a3d;
+  --status-warn-bg: #fdf3dd;
+  --status-warn-fg: #a06a00;
+  --status-crit-bg: #fde8e9;
+  --status-crit-fg: #c2181e;
+
+  /* Скругления */
+  --r-xs: 8px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* Тени */
+  --shadow-sm: 0 1px 2px rgba(20, 21, 23, 0.08);
+  --shadow-md: 0 6px 18px rgba(20, 21, 23, 0.12);
+  --shadow-lg: 0 18px 45px rgba(20, 21, 23, 0.28);
 }
 
 body {
+  color: var(--text-invert);
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-} */
-
-body {
-  color:rgb(255, 255, 255); 
-  margin: 0; 
   width: 100%;
-  height: 100px;
-  background-image: url(img/backside.jpg);
-  background-size:cover;
+  min-height: 100vh;
+  background-color: var(--gray-900);
+  background-image: linear-gradient(160deg, #3f4044 0%, #2f3033 45%, #262729 100%);
+  background-attachment: fixed;
+  background-size: cover;
 }
 
 #root {
-  font-family:Arial
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
-  font-family:Arial
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Красный акцент у чекбоксов и радио по всему приложению */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--brand-red);
 }
 
 /* тут анимации */
@@ -113,12 +103,20 @@ body {
   height: 24px;
   top: 2px;
   left: 2px;
-  border-radius: 5px !important;
-  background-image: url("data:image/svg+xml,%3Csvg width='28' height='24' viewBox='0 0 28 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 22L2 12L12 2M26 22L16 12L26 2' stroke='%231E1E1E' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  border-radius: var(--r-xs) !important;
+  background-image: url("data:image/svg+xml,%3Csvg width='28' height='24' viewBox='0 0 28 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 22L2 12L12 2M26 22L16 12L26 2' stroke='%23E01F26' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
   border: none;
   background-color: transparent;
   cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.go-back:hover {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  transform: translateX(-3px);
+  opacity: 0.8;
 }

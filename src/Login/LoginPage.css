@@ -13,12 +13,22 @@
 .login-form-container {
   animation: slideUpFadeIn 0.5s ease-out forwards;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 30px;
   width: 40vh;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  /* Текст внутри формы - черный, как в макете */
   color: black;
+  overflow: hidden;
+}
+
+.login-form-container::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #d71920;
 }
 
 .login-form-container h2 {
@@ -38,7 +48,7 @@
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #555;
+  color: #55565a;
 }
 
 .login-form-group input {
@@ -53,11 +63,12 @@
 /* Кнопка "Войти" в стиле вашего проекта */
 .login-button {
   width: 100%;
+  height: 6vh;
   padding: 12px;
   font-size: 18px;
   border: none;
-  border-radius: 20px; /* Как в вашем App.css */
-  background-color: rgb(105, 105, 105); /* Как в вашем App.css */
+  border-radius: 10px; /* Как в вашем App.css */
+  background-color: #d71920; /* Как в вашем App.css */
   cursor: pointer;
   margin-top: 10px;
   color: rgb(255, 255, 255); /* Явно задаем черный цвет текста */

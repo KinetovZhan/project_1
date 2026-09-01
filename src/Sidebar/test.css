@@ -1,3 +1,28 @@
+/* ========== Гамбургер: базовые стили (в т.ч. для экранов < 1200px) ========== */
+.mobile-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  padding: 8px 5px;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  box-shadow: none;
+  color: var(--brand-red);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.mobile-sidebar:hover {
+  background: transparent;
+  color: var(--brand-red-hover);
+}
+
 /* ========== БАЗОВЫЕ СТИЛИ - ДЛЯ ПК И НОУТБУКОВ (от 992px) ========== */
 @media (min-width: 1601px) {
   .sidebar {
@@ -5,8 +30,10 @@
     margin-left: 98px;
     height: 80vh;
     width: 45vh;
-    background-color: rgba(85, 86, 90, 1);
-    border-radius: 30px;
+    background: linear-gradient(180deg, #46474b 0%, #3a3b3f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: var(--shadow-lg);
+    border-radius: var(--r-xl);
     flex-shrink: 1;
     z-index: 2;
     display: flex;
@@ -22,61 +49,92 @@
   .choose {
     display: flex;
     text-align: center;
-    background-color: rgba(217, 217, 217, 1);
-    border-radius: 20px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--r-lg);
     align-items: center;
     flex-direction: column;
+    justify-content: center;
     line-height: 0;
-    width: 30vh;  
-    height: 120px;
+    width: 30vh;
+    height: auto;
+    padding: 8px;
+    box-sizing: border-box;
+    gap: 8px;
   }
-  
+
   .choose button {
     font-family: Arial;
     font-size: 16px;
     font-weight: 600;
-    width: 30vh;
+    width: 100%;
+    box-sizing: border-box;
   }
 
 
   .add-po-container {
-    padding: 0 63px; 
+    padding: 0 63px;
   }
 
   .add-po-container button {
     font-family: Arial;
     font-size:14px;
     font-weight:600;
-  } 
+  }
 
 
   .active{
     font-family: Arial;
     font-size:14px;
     font-weight:600;
-    background-color:rgba(139, 139, 139, 1);
-  } 
+    background-color: var(--brand-red);
+    color: var(--text-invert);
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
+  }
 
 
   .add-po-container2 {
-    padding: 0 63px; 
+    padding: 0 63px;
   }
 
   .add-po-container2 button {
     font-family: Arial;
     font-size:14px;
     font-weight:600;
-  } 
+  }
 
-  
+
   button {
     width: 268px;
     height: 60px;
-    border-radius: 20px;
-    background-color: rgba(217, 217, 217, 1);
-    border-color: transparent;
+    border-radius: var(--r-md);
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
   }
-  
+
+  .sidebar button:hover {
+    background-color: var(--gray-100);
+    color: var(--brand-red);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .sidebar button.active:hover,
+  .sidebar .active:hover {
+    background-color: var(--brand-red-hover);
+    color: var(--text-invert);
+    box-shadow: 0 6px 16px rgba(224, 31, 38, 0.4);
+  }
+
+  .sidebar button:active {
+    transform: translateY(1px);
+  }
+
   .filters {
     animation: slideRightFadeIn 0.5s ease-out forwards;
     display: flex;
@@ -84,19 +142,22 @@
     box-sizing: border-box;
     width: 42vh;
     height: 160px;
-    border-radius: 20px;
-    padding: 12px 10px;
-    gap: 20px;
-    background-color: rgba(217, 217, 217, 1);
-    color: black;
+    border-radius: var(--r-lg);
+    padding: 14px;
+    gap: 18px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
     margin-top: 5%;
   }
-  
+
   .choose button.active {
-    background-color: rgba(139, 139, 139, 1);
-    color: black;
+    background-color: var(--brand-red);
+    color: var(--text-invert);
+    border-color: transparent;
   }
-  
+
   .filter {
     display: flex;
     align-items: center;
@@ -114,35 +175,40 @@
     cursor: pointer;
     gap: 15px;
   }
-  
+
   .filter h3 {
     margin: 0;
     flex-shrink: 0;
+    font-size: 16px;
+    font-weight: 500;
   }
-  
+
   .filter input[type="checkbox"] {
     /* position: absolute; */
     /* right: 0; */
     transform: scale(1.5);
     flex-shrink: 0;
+    accent-color: var(--brand-red);
   }
-  
+
   .filters2 {
     box-sizing: border-box;
     width: 360px;
     height: 120px;
-    background-color: rgba(217, 217, 217, 1);
-    border-radius: 20px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--r-lg);
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 14px;
     gap: 20px;
-    color: black;
+    color: var(--text);
     position: absolute;
     top: 369px;
     left: 13px;
   }
-  
+
   /* Гамбургер - ПО УМОЛЧАНИЮ СКРЫТ (показываем только на мобилках) */
   .mobile-sidebar {
     display: none;
@@ -152,9 +218,9 @@
     height: 40px;
     left: 0px;
     z-index: 1000;
-    background: rgba(85, 86, 90, 1);
+    background: var(--brand-red);
     border: none;
-    border-radius: 0px 0px 10px 0px;
+    border-radius: 0px 0px var(--r-sm) 0px;
     padding: 8px 5px;
     color: white;
     cursor: pointer;
@@ -166,11 +232,11 @@
     transition: all 0.3s ease;
     flex-shrink: 0;
   }
-  
+
   .mobile-sidebar:hover {
-    background: rgba(95, 96, 100, 1);
+    background: var(--brand-red-hover);
   }
-  
+
   .toggle-line {
     display: block;
     width: 25px;
@@ -179,7 +245,7 @@
     transition: 0.3s;
     flex-shrink: 0;
   }
-  
+
   .sidebar-overlay {
     position: fixed;
     top: 0;
@@ -190,7 +256,7 @@
     z-index: 999;
     display: none;
   }
-  
+
   .mobile-sidebar-container {
     display: none;
     position: fixed;
@@ -199,33 +265,33 @@
     width: 85%;
     max-width: 320px;
     height: 100vh;
-    background: rgba(85, 86, 90, 1);
+    background: var(--gray-800);
     z-index: 1000;
     transition: left 0.3s ease;
     overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
   }
-  
+
   .mobile-sidebar-container.open {
     left: 0;
   }
-  
+
   .mobile-sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 3px solid var(--brand-red);
     color: white;
-    background: rgba(75, 76, 80, 1);
+    background: var(--gray-900);
   }
-  
+
   .mobile-sidebar-header h3 {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
   }
-  
+
   .close-sidebar {
     background: none;
     border: none;
@@ -239,11 +305,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, color 0.2s;
   }
-  
+
   .close-sidebar:hover {
     transform: scale(1.1);
+    color: var(--brand-red);
+    background: none;
+    box-shadow: none;
   }
 
   .mobile-sidebar-container {
@@ -275,20 +344,22 @@
     height: 40px;
     left: 5vh;
     z-index: 1000;
-    background: rgba(85, 86, 90, 1);
+    background: transparent;
     border: none;
-    border-radius: 0px 10px 10px 0px;
+    border-radius: var(--r-sm);
     padding: 8px 5px;
-    color: white;
+    color: var(--brand-red);
     cursor: pointer;
     flex-direction: column;
     gap: 4px;
     align-items: center;
-    transition: all 0.3s ease;
+    box-shadow: none;
+    transition: color 0.3s ease;
   }
 
   .mobile-sidebar:hover {
-    background: rgba(85, 86, 90, 1);
+    background: transparent;
+    color: var(--brand-red-hover);
     box-shadow: none;
   }
 
@@ -321,11 +392,12 @@
     left: -100%;
     width: 50vh;
     height: 100vh;
-    background: rgba(85, 86, 90, 1);
+    background: linear-gradient(180deg, #46474b 0%, #3a3b3f 100%);
+    border-right: 3px solid var(--brand-red);
     z-index: 1000;
     transition: left 0.3s ease;
     overflow-y: auto;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 0 18px rgba(0, 0, 0, 0.45);
   }
 
   .mobile-sidebar-container.open {
@@ -338,9 +410,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 3px solid var(--brand-red);
     color: white;
-    background: rgba(75, 76, 80, 1);
+    background: var(--gray-900);
   }
 
   .mobile-sidebar-header h3 {
@@ -360,10 +432,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .close-sidebar:hover {
+    background: none;
+    box-shadow: none;
+    color: var(--brand-red);
+    transform: scale(1.1);
   }
 
   /* ===== ИСПРАВЛЕННЫЕ СТИЛИ ===== */
-  
+
   /* Показываем sidebar ВНУТРИ мобильного контейнера */
   .mobile-sidebar-container .sidebar {
     display: flex;
@@ -374,6 +454,8 @@
     margin: 0;
     padding: 0;
     background: transparent;
+    border: none;
+    box-shadow: none;
     position: relative;
     top: 0;
     left: 0;
@@ -388,33 +470,52 @@
     align-items: center;
     justify-content: center;
     margin: 20px auto;
-    padding: 0px;
+    padding: 6px;
     width: 30vh;
-    background: rgba(217, 217, 217, 1);
-    border-radius: 15px;
-    height: 100px;
-    gap: 0px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--r-lg);
+    height: auto;
+    gap: 6px;
     line-height: 0;
+    box-sizing: border-box;
   }
 
   /* Кнопки внутри choose */
   .mobile-sidebar-container .sidebar .choose button {
-    width: 30vh;
-    height: 50px;
+    width: 100%;
+    box-sizing: border-box;
+    height: 44px;
     margin: 0 auto;
     font-family: Arial;
     font-size: 12px;
     font-weight: 600;
-    border-radius: 15px;
-    background-color: rgba(217, 217, 217, 1);
-    border: none;
+    border-radius: var(--r-sm);
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .mobile-sidebar-container .sidebar .choose button:hover {
+    background-color: var(--gray-100);
+    color: var(--brand-red);
+    box-shadow: var(--shadow-sm);
   }
 
   /* Активное состояние кнопок */
   .mobile-sidebar-container .sidebar .choose button.active {
-    background-color: rgba(139, 139, 139, 1);
+    background-color: var(--brand-red);
+    color: var(--text-invert);
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
+  }
+
+  .mobile-sidebar-container .sidebar .choose button.active:hover {
+    background-color: var(--brand-red-hover);
+    color: var(--text-invert);
   }
 
   /* Контейнеры для добавления */
@@ -442,23 +543,41 @@
   .mobile-sidebar-container .sidebar .add-po-container3 button {
     font-family: Arial;
     font-size: 12px;
-    font-weight: 100;
     width: 100%;
     max-width: 280px;
     height: 50px;
-    border-radius: 15px;
-    background-color: rgba(217, 217, 217, 1);
-    border: none;
+    border-radius: var(--r-sm);
+    background-color: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.2s ease, box-shadow 0.2s ease;
     font-weight: bold;
+  }
+
+  .mobile-sidebar-container .sidebar .add-po-container button:hover,
+  .mobile-sidebar-container .sidebar .add-po-container2 button:hover,
+  .mobile-sidebar-container .sidebar .add-po-container3 button:hover {
+    background-color: var(--gray-100);
+    color: var(--brand-red);
+    box-shadow: var(--shadow-sm);
   }
 
   /* Активное состояние для кнопок добавления */
   .mobile-sidebar-container .sidebar .add-po-container button.active,
   .mobile-sidebar-container .sidebar .add-po-container2 button.active,
   .mobile-sidebar-container .sidebar .add-po-container3 button.active {
-    background-color: rgba(139, 139, 139, 1);
+    background-color: var(--brand-red);
+    color: var(--text-invert);
+    border-color: transparent;
+    box-shadow: 0 6px 16px rgba(224, 31, 38, 0.35);
+  }
+
+  .mobile-sidebar-container .sidebar .add-po-container button.active:hover,
+  .mobile-sidebar-container .sidebar .add-po-container2 button.active:hover,
+  .mobile-sidebar-container .sidebar .add-po-container3 button.active:hover {
+    background-color: var(--brand-red-hover);
+    color: var(--text-invert);
   }
 
   /* Фильтры */
@@ -468,12 +587,14 @@
     width: 40vh;
     height: auto;
     min-height: 150px;
-    border-radius: 20px;
+    border-radius: var(--r-lg);
     padding: 15px;
     gap: 15px;
     margin: 15px auto;
-    background-color: rgba(217, 217, 217, 1);
-    color: black;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
     margin: 0;
   }
 
@@ -483,11 +604,14 @@
     width: 45vh;
     height: auto;
     min-height: 110px;
-    border-radius: 20px;
+    border-radius: var(--r-lg);
     padding: 15px;
     gap: 15px;
     margin: 15px auto;
-    background-color: rgba(217, 217, 217, 1);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    color: var(--text);
     /* top: 50px; */
   }
 
@@ -502,6 +626,7 @@
   .mobile-sidebar-container .sidebar .filter h3 {
     margin: 0;
     font-size: 14px;
+    font-weight: 500;
     flex: 1;
     padding-right: 10px;
   }
@@ -538,12 +663,192 @@
     transform: scale(1.3);
     flex-shrink: 0;
     margin: 0;
-    
+    accent-color: var(--brand-red);
   }
 }
 
+/* ========== Раскладка сайдбара: обычный поток вместо абсолютных top ==========
+   Карточка «типы узлов» (.filters) растёт по содержимому, а выпадающие списки
+   были прибиты к фиксированным top (310/370/430/490/550px и т.п.) — из-за этого
+   список типов наезжал на них. Ставим элементы в поток колонки .sidebar. */
+
+.sidebar .choose br {
+  display: none;
+}
+
+.sidebar .model-tractor,
+.sidebar .model-producer,
+.sidebar .model-uzel,
+.sidebar .model-purpose,
+.sidebar .model-status,
+.sidebar .clear {
+  position: static;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Базовые .clear:hover / :active тянут за собой translateX(-50%) — он больше не нужен */
+.sidebar .clear:hover {
+  transform: translateY(-2px);
+}
+
+.sidebar .clear:active {
+  transform: none;
+}
+
+/* Если содержимого больше, чем высота сайдбара, — скроллим, а не обрезаем */
+.sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 16px;
+  box-sizing: border-box;
+}
 
 
+/* ================================================================
+   МОБИЛЬНЫЙ САЙДБАР: фильтры в обычном потоке
 
+   Раскладка фильтров рассчитана на широкий десктопный сайдбар:
+   почти все блоки — position: absolute с жёстко заданными top
+   (187px, 310px, 70%, 150%, 203%, 258% ...). В узкой выдвижной панели
+   блоки выше, поэтому они наезжали друг на друга (страница ПО),
+   а часть уезжала за край или пряталась под фон панели из-за
+   z-index: -1 (страница тракторов).
 
+   Внутри .mobile-sidebar-container всё переводим в обычный поток:
+   колонка + gap. Селекторы из двух классов перебивают одноклассовые
+   правила в App.css / AggregatesFilters.css / TractorsFilters.css.
+   Десктопная раскладка (>= 1601px) не затрагивается.
+   ================================================================ */
 
+.mobile-sidebar-container .sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 16px 16px 32px;
+  box-sizing: border-box;
+  position: relative;
+  overflow: visible;
+}
+
+/* Снимаем абсолютное позиционирование со всех блоков-фильтров */
+.mobile-sidebar-container .sidebar > *,
+.mobile-sidebar-container .filters,
+.mobile-sidebar-container .filterstrac,
+.mobile-sidebar-container .filterstrac2,
+.mobile-sidebar-container .Majmin,
+.mobile-sidebar-container .model,
+.mobile-sidebar-container .model-tractor,
+.mobile-sidebar-container .model-producer,
+.mobile-sidebar-container .model-uzel,
+.mobile-sidebar-container .model-purpose,
+.mobile-sidebar-container .model-status,
+.mobile-sidebar-container .clear,
+.mobile-sidebar-container .tractorModel,
+.mobile-sidebar-container .release-date-container,
+.mobile-sidebar-container .search_by_dealer,
+.mobile-sidebar-container .tractors-status,
+.mobile-sidebar-container .add-po-container,
+.mobile-sidebar-container .add-po-container2 {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  /* z-index: -1 уводил блоки под фон панели — возвращаем в нормальный слой */
+  z-index: auto;
+  flex-shrink: 0;
+}
+
+/* Высота по содержимому — убирает вложенные полосы прокрутки */
+.mobile-sidebar-container .filters,
+.mobile-sidebar-container .filterstrac,
+.mobile-sidebar-container .filterstrac2,
+.mobile-sidebar-container .tractors-status,
+.mobile-sidebar-container .Majmin {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.mobile-sidebar-container .filters-scroll-bar {
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+/* Карточка выбора «Трактор / ПО» — по ширине остальных блоков */
+.mobile-sidebar-container .sidebar .choose {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Селекты и поля растягиваем на всю ширину панели */
+.mobile-sidebar-container .model select,
+.mobile-sidebar-container .modelSelect,
+.mobile-sidebar-container .modelStatus,
+.mobile-sidebar-container .actuality-filter,
+.mobile-sidebar-container .actuality-select,
+.mobile-sidebar-container .uzel-filter,
+.mobile-sidebar-container .uzel-select,
+.mobile-sidebar-container .searcher_dealer {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Поля дат: убираем отрицательные отступы десктопной раскладки */
+.mobile-sidebar-container .release-date-container {
+  height: auto;
+  padding: 6px 4px;
+}
+
+.mobile-sidebar-container .date-range {
+  width: 100%;
+  margin-left: 0;
+  gap: 0;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+/* Кнопка «Сброс»: была position: absolute + translateX(-50%) */
+.mobile-sidebar-container .clear {
+  height: 52px;
+  margin-top: 4px;
+}
+
+.mobile-sidebar-container .clear:hover {
+  transform: translateY(-2px);
+}
+
+.mobile-sidebar-container .clear:active {
+  transform: translateY(0);
+}
+
+/* Содержимое панели складывается по высоте; полоса прокрутки
+   появляется только если контент реально не помещается */
+.mobile-sidebar-container {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

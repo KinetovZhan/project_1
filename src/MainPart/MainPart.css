@@ -2,10 +2,13 @@
   animation: slideUpFadeIn 0.5s ease-out forwards;
   width:140vh;
   height: 80vh;
-  background-color: rgba(217, 217, 217, 0.7);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(2px);
   flex-shrink: 1; /* Запрещаем уменьшение */
   margin-left:-38px;
-  border-radius: 30px;
+  border-radius: var(--r-xl);
   z-index: 1;
   position: relative;
 }

@@ -455,10 +455,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               onClick={getNewPO} 
               style={{
                   padding: '8px 20px',
-                  backgroundColor: choosedObjects === 'active' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
-                  color: choosedObjects === 'active' ? 'white' : 'black',
-                  border: choosedObjects === 'active' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
-                  borderRadius: '20px',
+                  backgroundColor: choosedObjects === 'active' ? '#e01f26' : '#ffffff',
+                  color: choosedObjects === 'active' ? 'white' : '#1e1e1e',
+                  border: choosedObjects === 'active' ? '1px solid transparent' : '1px solid #e3e5e8',
+                  borderRadius: '16px',
                   cursor: 'pointer',
                   fontWeight: choosedObjects === 'active' ? 'bold' : 'normal'
                 }}>
@@ -468,10 +468,10 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
               onClick={getArchivePO}
               style={{
                 padding: '8px 20px',
-                backgroundColor: choosedObjects === 'archive' ? 'rgb(85, 86, 90)' : 'rgba(217, 217, 217, 1)',
-                color: choosedObjects === 'archive' ? 'white' : 'black',
-                border: choosedObjects === 'archive' ? '2px solid rgb(85, 86, 90)' : '1px solid #ddd',
-                borderRadius: '20px',
+                backgroundColor: choosedObjects === 'archive' ? '#e01f26' : '#ffffff',
+                color: choosedObjects === 'archive' ? 'white' : '#1e1e1e',
+                border: choosedObjects === 'archive' ? '1px solid transparent' : '1px solid #e3e5e8',
+                borderRadius: '16px',
                 cursor: 'pointer',
                 fontWeight: choosedObjects === 'archive' ? 'bold' : 'normal'
               }}>
@@ -482,9 +482,9 @@ export function Objects({ activeFilters, activeFilters2, selectedModel, selected
             onClick={toggleSortOrder}
             style={{
               padding: '8px 15px',
-              backgroundColor: 'rgba(217, 217, 217, 1)',
-              border: '1px solid #ddd',
-              borderRadius: '20px',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e3e5e8',
+              borderRadius: '16px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',

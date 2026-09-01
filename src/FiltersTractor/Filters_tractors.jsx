@@ -434,10 +434,10 @@ const formatActualityOptionLabel = ({ value, label }) => {
               maxHeight: 200, 
               overflowY: 'auto', 
               color: 'black', 
-              backgroundColor:'rgba(217, 217, 217, 1)', 
+              backgroundColor: '#ffffff', borderColor: '#e3e5e8', boxShadow: 'none', 
               // width: isMobile ? '100%':'360px', 
               width: '42vh',
-              borderRadius: '15px', 
+              borderRadius: '16px', 
               height:'53px',
               left: '50%',
               transform: 'Translate(-50%)', 
@@ -453,7 +453,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
               overflowY: 'auto', 
               backgroundColor:'white',
               color:'black', 
-              border: '1px solid rgba(217, 217, 217, 1)',
+              border: '1px solid #e3e5e8',
               scrollbarWidth:'thin',
               fontSize: (isMobile?'12px':'16px')
 
@@ -549,10 +549,10 @@ const formatActualityOptionLabel = ({ value, label }) => {
               control: (base) => ({
                 ...base,
                 width: '100%',
-                borderRadius: '15px',
-                borderColor: 'black',
+                borderRadius: '16px',
+                borderColor: '#e3e5e8',
                 height: '53px',
-                backgroundColor: 'rgba(217, 217, 217, 1)',
+                backgroundColor: '#ffffff', boxShadow: 'none',
                 color: 'black',
                 overflowY: 'auto',
                 overflowX: 'auto',
@@ -568,7 +568,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
                 overflowY: 'auto',
                 backgroundColor: 'white',
                 color: 'black',
-                border: '1px solid rgba(217, 217, 217, 1)',
+                border: '1px solid #e3e5e8',
                 scrollbarWidth: 'thin',
                 fontSize: '16px'
               }),
@@ -596,10 +596,10 @@ const formatActualityOptionLabel = ({ value, label }) => {
               control: (base) => ({
                 ...base,
                 width: '100%',
-                borderRadius: '15px',
+                borderRadius: '16px',
                 height: '53px',
-                borderColor: 'black',
-                backgroundColor: 'rgba(217, 217, 217, 1)',
+                borderColor: '#e3e5e8',
+                backgroundColor: '#ffffff', boxShadow: 'none',
                 color: 'black',
               }),
               menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -609,7 +609,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
                 overflowY: 'auto',
                 backgroundColor: 'white',
                 color: 'black',
-                border: '1px solid rgba(217, 217, 217, 1)',
+                border: '1px solid #e3e5e8',
                 scrollbarWidth: 'thin',
                 fontSize: '16px'
               })

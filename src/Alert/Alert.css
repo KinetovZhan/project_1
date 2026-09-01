@@ -15,7 +15,7 @@
 /* Основной контейнер алерта */
 .alert-container {
   background: white;
-  border-radius: 24px;
+  border-radius: 14px;
   box-shadow: 0 40px 50px -10px rgba(0, 0, 0, 0.15), 0 20px 20px -10px rgba(0, 0, 0, 0.08);
   min-width: 300px;
   max-width: 1000px;
@@ -43,15 +43,16 @@
 
 /* Иконка */
 .alert-icon {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 36px;
   font-weight: bold;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   flex-shrink: 0;
+  
 }
 
 /* Сообщение */
@@ -65,21 +66,21 @@
 
 /* Типы алертов */
 .alert-success {
-  border-left: 8px solid white;
+  border-left: 8px solid #1f7a3d;
 }
 
 .alert-success .alert-icon {
-  color: #10b981;
-  background-color: #ffffff;
+  color: #1f7a3d;
+  background-color: #e6f3ea;
 }
 
 .alert-error {
-  border-left: 8px solid white;
+  border-left: 8px solid #d71920;
 }
 
 .alert-error .alert-icon {
-  color: #ef4444;
-  background-color: #ffffff;
+  color: #d71920;
+  background-color: #fbe3e4;
 }
 
 .alert-warning {

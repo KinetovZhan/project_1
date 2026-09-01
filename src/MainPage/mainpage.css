@@ -16,19 +16,20 @@ main {
 }
 
 .popup-window {
-  background-color: rgb(255, 255, 255);
+  background-color: var(--surface);
   max-width: 200px;
   display: block;
   overflow-wrap: break-word;
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   z-index: 2000;
   position: absolute;
   margin-top: 1px;
   margin-left: 0;
-  border: 1px solid #ddd;
-  border-color: black;
-  padding: 5px;
-  color: grey;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand-red);
+  box-shadow: var(--shadow-md);
+  padding: 8px 10px;
+  color: var(--text-muted);
 }
 
 .infodisc {

@@ -29,8 +29,8 @@ const Alert = ({ message, type = 'success', duration = 3000, onClose }) => {
       <div className={`alert-container alert-${type} ${isClosing ? 'alert-closing' : 'alert-opening'}`}>
         <div className="alert-content">
           <div className="alert-icon">
-            {type === 'success' && '🗹'}
-            {type === 'error' && '⌧'}
+            {type === 'success' && '✓'}
+            {type === 'error' && '!'}
             {type === 'warning' && '⚠'}
             {type === 'info' && 'ℹ'}
           </div>
