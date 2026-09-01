@@ -144,13 +144,13 @@
 } */
 
 button:hover {
-  background-color: var(--gray-100);
+  background-color: var(--brand-red-hover);
   /* transform: translateY(-2px); */
   box-shadow: var(--shadow-sm);
 }
 
 button:active {
-  background-color: var(--gray-200);
+  background-color: var(--brand-red-active);
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
