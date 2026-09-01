@@ -436,7 +436,7 @@ const formatActualityOptionLabel = ({ value, label }) => {
               color: 'black', 
               backgroundColor: '#ffffff', borderColor: '#e3e5e8', boxShadow: 'none', 
               // width: isMobile ? '100%':'360px', 
-              width: '45vw',
+              width: '100%',
               borderRadius: '16px', 
               height:'53px',
               left: '50%',

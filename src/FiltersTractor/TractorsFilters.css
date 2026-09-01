@@ -30,6 +30,7 @@
 .tractorModel {
   animation: slideRightFadeIn 0.5s ease-out forwards;
   display: inline-block;
+  width: 90%;
 }
 
 
@@ -771,6 +772,7 @@ button.search_button {
   .tractorModel {
     position: absolute;
     top: 70%;
+    width: 42vw;
     font-size: 12px;
   }
   .release-date-container {
