@@ -776,7 +776,7 @@ button.search_button {
   .release-date-container {
     position: absolute;
     top: 150%;
-    width: 42vh;
+    width: 42vw;
     font-size: 12px;
     /* left: 50%; */
     transform: translateX(-50%);
