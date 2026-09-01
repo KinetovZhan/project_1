@@ -13,7 +13,7 @@ import { useAuth } from '../auth/AuthContext';
 import { api } from '../fetchAPI.js';
 import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
-
+import { createPortal } from 'react-dom';
 
 export function Objects({ activeFilters, activeFilters2, selectedModel, selectedProducers, searchQuery, selectedStatus, handleAggregateDetails, onCloseTab,actualFilterPo, showAlert}) {
 
