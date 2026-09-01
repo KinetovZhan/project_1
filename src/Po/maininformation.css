@@ -55,6 +55,58 @@
   box-shadow: 0 4px 14px rgba(224, 31, 38, 0.15);
 }
 
+/* Базовый стиль кнопки */
+.tab-button {
+  position: relative;
+  padding: 8px 20px;
+  background-color: #ffffff;
+  color: #1e1e1e;
+  border: 1px solid #e3e5e8;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  
+  /* Используем flexbox для идеального выравнивания текста и флажка */
+  display: inline-flex;
+  align-items: center; 
+  
+  /* Плавный переход при переключении (опционально) */
+  transition: border-color 0.2s ease, font-weight 0.2s ease; 
+  height: 5vh;
+}
+
+/* Стили для активной кнопки */
+.tab-button.active {
+  border-color: #e01f26; /* Можно оставить #e3e5e8, если не хотите менять рамку */
+  font-weight: bold;
+  background-color: #ffffff;
+  color: #1e1e1e;
+  box-shadow: none;
+}
+
+/* Скрытый по умолчанию "флажочек" через псевдоэлемент */
+.tab-button::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: none; /* Скрыт, пока кнопка не активна */
+  width: 5px;
+  height: 1em;
+  margin-right: 10px;
+  flex: 0 0 auto;
+  background: var(--ptz-red, #e01f26); /* Используем вашу переменную с фоллбэком */
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 0 100%);
+  
+  /* vertical-align больше не нужен, так как родитель (кнопка) использует flexbox */
+}
+
+/* Показываем флажочек только для активной кнопки */
+.tab-button.active::before {
+  display: inline-block;
+}
 
 .inform {
   gap: 0px;
